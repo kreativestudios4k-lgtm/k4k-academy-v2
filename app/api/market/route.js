@@ -1,0 +1,1 @@
+export async function GET(request){const country=request.headers.get('x-vercel-ip-country')||'US';const euro=new Set(['AT','BE','HR','CY','EE','FI','FR','DE','GR','IE','IT','LV','LT','LU','MT','NL','PT','SK','SI','ES']);const currency=country==='BR'?'BRL':country==='GB'?'GBP':euro.has(country)?'EUR':'USD';return Response.json({country,currency})}
