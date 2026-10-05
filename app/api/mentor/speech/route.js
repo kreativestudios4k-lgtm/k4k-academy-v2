@@ -11,7 +11,7 @@ export async function POST(request){
   try{
     const body=await request.json();
     const text=String(body?.text||'').trim().slice(0,3500);
-    const profile=voices[body?.voice]?'core':(body?.voice||'core');
+    const profile=voices[body?.voice]?body.voice:'core';
     if(!text)return Response.json({error:'No text'},{status:400});
     const result=await generateSpeech({
       model:gateway.speechModel('google/gemini-3.8-flash-lite-tts'),
