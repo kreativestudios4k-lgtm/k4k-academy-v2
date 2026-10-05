@@ -26,3 +26,12 @@
 .loginLink:hover{border-color:#d6b36a;color:#d6b36a}
 .mobilemenu>a[href="/login"]{display:flex;align-items:center;gap:8px;color:#d6b36a;font-weight:800}
 @media(max-width:800px){nav>.loginLink{margin-left:auto}.navlinks{display:none}}
+
+.googleAuth{background:#fff!important;color:#111!important;border:1px solid #d9d9d9!important;display:flex!important;justify-content:center;align-items:center;gap:10px}
+.googleAuth:hover{background:#f3f3f3!important}.googleAuth svg{width:18px;height:18px}
+.authDivider{display:flex;align-items:center;gap:10px;color:#71808b;font:9px monospace;letter-spacing:1.5px;margin:4px 0}
+.authDivider span{height:1px;background:#ffffff18;flex:1}
+.forgotAuth{background:transparent!important;border:0!important;color:#75dfff!important;padding:5px!important;justify-content:center!important;font-size:11px!important;text-transform:none!important;letter-spacing:.03em!important}
+.forgotAuth:hover{color:#fff!important}.forgotAuth svg{width:14px}
+.authSuccess{padding:14px;border:1px solid #38c98555;background:#38c98512;color:#8cf0b8;display:flex;align-items:center;gap:9px;font-size:12px}
+.authSuccess svg{width:17px}.authEnter{display:flex;justify-content:center;padding:13px;background:#d6b36a;color:#080a0c;font-weight:900;text-transform:uppercase;letter-spacing:.08em}
