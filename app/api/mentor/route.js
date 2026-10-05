@@ -20,7 +20,7 @@ export async function POST(request){
     const studentProgress=(progress||[]).map(p=>`${p.lesson_id}: ${p.completed?'completed':`${p.progress_seconds}s watched`}`).join(', ')||'No lesson progress recorded yet.';
 
     const {text}=await generateText({
-      model:'openai/gpt-5.6-sol',
+      model:'openai/gpt-6-luna',
       system:`You are K4K AI Mentor, the private creator coach inside KreativeStudios4K Academy.
 Teach the K4K method in a practical, confident and encouraging way. You specialize in AI video creation, prompting, character consistency, cinematic direction, short-form retention, branding and monetisation.
 Answer in the same language the student uses. Portuguese must sound natural for Brazil; Spanish should be natural international Spanish.
