@@ -6,7 +6,7 @@ export async function proxy(request){
  let response=NextResponse.next({request:{headers:h}});
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return response;
  const supabase=createServerClient(url,key,{cookies:{getAll(){return request.cookies.getAll()},setAll(cs){cs.forEach(({name,value})=>request.cookies.set(name,value));response=NextResponse.next({request:{headers:h}});cs.forEach(({name,value,options})=>response.cookies.set(name,value,options))}}});
- const{data}=await supabase.auth.getClaims();const user=data?.claims;const protectedPath=request.nextUrl.pathname.startsWith('/academy')||request.nextUrl.pathname.startsWith('/prompts');
+ const{data}=await supabase.auth.getClaims();const user=data?.claims;const protectedPath=request.nextUrl.pathname.startsWith('/academy')||request.nextUrl.pathname.startsWith('/prompts')||request.nextUrl.pathname.startsWith('/mentor');
  if(protectedPath&&!user){const u=request.nextUrl.clone();u.pathname='/login';return NextResponse.redirect(u)}return response
 }
 export const config={matcher:['/((?!_next/static|_next/image|favicon.ico).*)']}
