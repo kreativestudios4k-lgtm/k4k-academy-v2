@@ -21,3 +21,8 @@
 .welcomeVoice small{font:8px monospace;letter-spacing:2px;color:#4fbfe9}
 .welcomeVoice b{font:10px monospace;letter-spacing:1.5px;font-weight:600}
 @keyframes k4kVoicePulse{0%,100%{box-shadow:0 0 0 0 #44d8ff22}50%{box-shadow:0 0 0 8px #44d8ff0b,0 0 18px #44d8ff55}}
+
+.loginLink{display:inline-flex;align-items:center;gap:7px;color:#e9eef2;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:10px 12px;border:1px solid #ffffff24;border-radius:4px;white-space:nowrap}
+.loginLink:hover{border-color:#d6b36a;color:#d6b36a}
+.mobilemenu>a[href="/login"]{display:flex;align-items:center;gap:8px;color:#d6b36a;font-weight:800}
+@media(max-width:800px){nav>.loginLink{margin-left:auto}.navlinks{display:none}}
