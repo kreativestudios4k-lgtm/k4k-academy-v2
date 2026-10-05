@@ -13,7 +13,8 @@
     "react-dom": "19.2.0",
     "lucide-react": "^0.468.0",
     "@supabase/supabase-js": "^2.76.1",
-    "@supabase/ssr": "^0.7.0"
+    "@supabase/ssr": "^0.7.0",
+    "ai": "7.0.123"
   },
   "devDependencies": {}
 }
