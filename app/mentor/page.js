@@ -1,5 +1,7 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
+import {experimental_useRealtime as useRealtime} from '@ai-sdk/react';
+import {gateway} from '@ai-sdk/gateway';
 import Link from 'next/link';
 import {createClient} from '../../lib/supabase/client';
 import {ArrowLeft,ArrowRight,BrainCircuit,Send,Upload,Video,Sparkles,LoaderCircle,CheckCircle2,Mic,MicOff,Globe2,Radio,Play,Pause,Volume2,Languages,TrendingUp,Eye,Clapperboard,BookOpen,Command,ChevronRight} from 'lucide-react';
@@ -26,7 +28,9 @@ export default function Mentor(){
  const [autoVoice,setAutoVoice]=useState(true); const [language,setLanguage]=useState('en-US');
  const [voiceIndex,setVoiceIndex]=useState(0); const [voices,setVoices]=useState([]);
  const [step,setStep]=useState(1); const [uploading,setUploading]=useState(false); const [uploadMsg,setUploadMsg]=useState('');
- const recognition=useRef(null);
+ const recognition=useRef(null); const premiumAudio=useRef(null);
+ const realtimeModel=useMemo(()=>gateway.experimental_realtime('google/gemini-3.8-live'),[]);
+ const realtime=useRealtime({model:realtimeModel,api:{token:'/api/realtime/token'},sessionConfig:{instructions:'You are K4K Core, the interactive voice instructor inside KreativeStudios4K Academy. Teach AI creation step by step. Be concise, practical, multilingual and allow the student to interrupt naturally. Never imitate an existing fictional or real person. If the student changes language, continue naturally in that language.',turnDetection:{type:'server-vad'}},onError:(error)=>console.error('K4K realtime voice',error)});
 
  useEffect(()=>{
    const load=()=>setVoices(window.speechSynthesis?.getVoices?.()||[]);
@@ -38,15 +42,28 @@ export default function Mentor(){
    return()=>window.speechSynthesis?.cancel();
  },[language]);
 
- function speak(text){
-   if(!('speechSynthesis' in window))return;
-   window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
-   u.lang=language; const filtered=voices.filter(v=>v.lang?.toLowerCase().startsWith(language.slice(0,2).toLowerCase()));
-   const v=filtered[voiceIndex%Math.max(filtered.length,1)]||voices[voiceIndex%Math.max(voices.length,1)]; if(v)u.voice=v;
-   u.rate=.96;u.pitch=.88;u.onstart=()=>setSpeaking(true);u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);
-   window.speechSynthesis.speak(u);
+ async function speak(text){
+   stopVoice();setSpeaking(true);
+   const profiles=['core','mentor','warm'];const profile=profiles[voiceIndex%profiles.length];
+   try{
+     const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:profile,language})});
+     if(!res.ok)throw new Error('premium voice unavailable');
+     const blob=await res.blob();const audio=new Audio(URL.createObjectURL(blob));premiumAudio.current=audio;
+     audio.onended=()=>setSpeaking(false);audio.onerror=()=>setSpeaking(false);await audio.play();
+   }catch{
+     if(!('speechSynthesis' in window)){setSpeaking(false);return}
+     const u=new SpeechSynthesisUtterance(text);u.lang=language;
+     const filtered=voices.filter(v=>v.lang?.toLowerCase().startsWith(language.slice(0,2).toLowerCase()));
+     const v=filtered[voiceIndex%Math.max(filtered.length,1)]||voices[voiceIndex%Math.max(voices.length,1)];if(v)u.voice=v;
+     u.rate=.96;u.pitch=.88;u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);window.speechSynthesis.speak(u);
+   }
  }
- function stopVoice(){window.speechSynthesis?.cancel();setSpeaking(false)}
+ function stopVoice(){if(premiumAudio.current){premiumAudio.current.pause();premiumAudio.current=null}window.speechSynthesis?.cancel();setSpeaking(false)}
+ async function toggleRealtime(){
+   try{if(realtime.status==='connected'||realtime.status==='connecting'){await realtime.close();return}
+     stopVoice();await realtime.connect();
+   }catch(error){console.error(error)}
+ }
  function toggleListen(){if(!recognition.current)return; if(listening){recognition.current.stop();setListening(false)}else{recognition.current.lang=language;recognition.current.start();setListening(true)}}
 
  async function ask(text=input){
@@ -93,7 +110,7 @@ export default function Mentor(){
      </aside>
 
      <section className="core">
-       <div className="hudTop"><div><small>ACTIVE INTELLIGENCE</small><h1>K4K <span>CORE</span></h1><p>Your interactive AI creator instructor.</p></div><div className="hudStatus"><span><i/>VOICE READY</span><span><i/>VISION READY</span><span><i/>ACADEMY LINKED</span></div></div>
+       <div className="hudTop"><div><small>ACTIVE INTELLIGENCE</small><h1>K4K <span>CORE</span></h1><p>Your interactive AI creator instructor.</p></div><div className="hudStatus"><span><i/>{realtime.status==='connected'?'LIVE VOICE CONNECTED':'VOICE READY'}</span><span><i/>VISION READY</span><span><i/>ACADEMY LINKED</span></div></div>
 
        <div className="coreVisual">
          <div className="rings r1"/><div className="rings r2"/><div className="rings r3"/>
@@ -103,7 +120,7 @@ export default function Mentor(){
 
        <div className="modeDock">
          <button onClick={()=>ask('Continue my current lesson interactively')}><BookOpen/><span>LEARN</span></button>
-         <button onClick={toggleListen} className={listening?'live':''}>{listening?<MicOff/>:<Mic/>}<span>{listening?'LISTENING':'VOICE'}</span></button>
+         <button onClick={toggleRealtime} className={realtime.status==='connected'?'live':''}>{realtime.status==='connected'?<MicOff/>:<Mic/>}<span>{realtime.status==='connected'?'LIVE':'VOICE'}</span></button>
          <button onClick={()=>ask('Help me create an AI video concept and production prompt')}><Clapperboard/><span>CREATE</span></button>
          <button onClick={()=>ask('Analyse the creative idea I am working on and tell me what to improve')}><Eye/><span>ANALYSE</span></button>
          <button onClick={()=>document.getElementById('radar')?.scrollIntoView({behavior:'smooth'})}><TrendingUp/><span>TRENDS</span></button>
@@ -118,7 +135,7 @@ export default function Mentor(){
        </section>
 
        <section className="conversation">
-         <div className="conversationHead"><div><Radio/> LIVE INSTRUCTOR</div><div className="voiceSettings"><label><input type="checkbox" checked={autoVoice} onChange={e=>setAutoVoice(e.target.checked)}/> Auto voice</label><button onClick={()=>setVoiceIndex(v=>v+1)}><Volume2/> Change voice</button></div></div>
+         <div className="conversationHead"><div><Radio/> LIVE INSTRUCTOR</div><div className="voiceSettings"><label><input type="checkbox" checked={autoVoice} onChange={e=>setAutoVoice(e.target.checked)}/> Auto voice</label><button onClick={()=>setVoiceIndex(v=>(v+1)%3)}><Volume2/> Voice: {['Core','Mentor','Warm'][voiceIndex%3]}</button></div></div>
          <div className="messages">{messages.slice(-5).map((m,i)=><div key={i} className={'bubble '+m.role}>{m.text}</div>)}{loading&&<div className="bubble mentor typing"><LoaderCircle/> K4K Core is thinking…</div>}</div>
          <form onSubmit={e=>{e.preventDefault();ask()}} className="commandInput"><button type="button" onClick={toggleListen} className={listening?'live':''}>{listening?<MicOff/>:<Mic/>}</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder={listening?'Listening…':'Speak or type your command…'}/><button disabled={loading||!input.trim()}><Send/></button></form>
        </section>
