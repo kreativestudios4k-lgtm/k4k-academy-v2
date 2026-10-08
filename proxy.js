@@ -7,6 +7,16 @@ export async function proxy(request){
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return response;
  const supabase=createServerClient(url,key,{cookies:{getAll(){return request.cookies.getAll()},setAll(cs){cs.forEach(({name,value})=>request.cookies.set(name,value));response=NextResponse.next({request:{headers:h}});cs.forEach(({name,value,options})=>response.cookies.set(name,value,options))}}});
  const{data}=await supabase.auth.getClaims();const user=data?.claims;const protectedPath=request.nextUrl.pathname.startsWith('/academy')||request.nextUrl.pathname.startsWith('/prompts')||request.nextUrl.pathname.startsWith('/mentor');
- if(protectedPath&&!user){const u=request.nextUrl.clone();u.pathname='/login';return NextResponse.redirect(u)}return response
+ if(protectedPath&&!user){const u=request.nextUrl.clone();u.pathname='/login';return NextResponse.redirect(u)}
+ if(protectedPath&&user){
+  const uid=user.sub;
+  const [{data:admin},{data:membership}]=await Promise.all([
+   supabase.from('k4k_admins').select('user_id').eq('user_id',uid).maybeSingle(),
+   supabase.from('memberships').select('status,current_period_end').eq('user_id',uid).maybeSingle()
+  ]);
+  const isPaid=membership&&['active','trialing'].includes(membership.status)&&(!membership.current_period_end||new Date(membership.current_period_end).getTime()>Date.now());
+  if(!admin&&!isPaid){const u=request.nextUrl.clone();u.pathname='/membership-required';return NextResponse.redirect(u)}
+ }
+ return response
 }
 export const config={matcher:['/((?!_next/static|_next/image|favicon.ico).*)']}
