@@ -14,6 +14,14 @@ export async function proxy(request){
    supabase.from('k4k_admins').select('user_id').eq('user_id',uid).maybeSingle(),
    supabase.from('memberships').select('status,current_period_end').eq('user_id',uid).maybeSingle()
   ]);
+  // Admins retain their existing operational access. Every other member must
+  // authenticate with a linked Google identity as well as hold a paid membership.
+  const providers=user.app_metadata?.providers??[];
+  const hasGoogle=Array.isArray(providers)?providers.includes('google'):user.app_metadata?.provider==='google';
+  if(!admin&&!hasGoogle){
+   if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Google sign-in required'},{status:403});
+   const u=request.nextUrl.clone();u.pathname='/login';u.searchParams.set('google','required');return NextResponse.redirect(u);
+  }
   const isPaid=membership&&['active','trialing'].includes(membership.status)&&(!membership.current_period_end||new Date(membership.current_period_end).getTime()>Date.now());
   if(!admin&&!isPaid){if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Active membership required'},{status:403});const u=request.nextUrl.clone();u.pathname='/membership-required';return NextResponse.redirect(u)}
  }
