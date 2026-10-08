@@ -1,3 +1,4 @@
+import LogoutButton from '../components/LogoutButton';
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {experimental_useRealtime as useRealtime} from '@ai-sdk/react';
@@ -93,7 +94,7 @@ export default function Mentor(){
    <header className="commandTop">
      <Link href="/academy" className="monoBrand"><span className="mark">K4K</span><b>ACADEMY</b><small>CREATOR INTELLIGENCE</small></Link>
      <div className="system"><i/> K4K CORE ONLINE</div>
-     <div className="topActions"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en-US">EN · English</option><option value="pt-BR">PT · Português</option><option value="es-MX">ES · Español (LatAm)</option></select><Link href="/academy"><ArrowLeft/> Academy</Link></div>
+     <div className="topActions"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en-US">EN · English</option><option value="pt-BR">PT · Português</option><option value="es-MX">ES · Español (LatAm)</option></select><Link href="/academy"><ArrowLeft/> Academy</Link><LogoutButton/></div>
    </header>
 
    <div className="commandShell">
