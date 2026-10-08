@@ -2,7 +2,7 @@ import {experimental_generateSpeech as generateSpeech} from 'ai';
 import {gateway} from '@ai-sdk/gateway';
 import {createClient} from '../../../../lib/supabase/server';
 
-const voices={core:'Orus',mentor:'Sadaltager',warm:'Sulafat'};
+const voices={core:'Sulafat',mentor:'Sulafat',warm:'Sulafat'};
 
 export async function POST(request){
   const supabase=await createClient();
@@ -17,7 +17,7 @@ export async function POST(request){
       model:gateway.speechModel('google/gemini-3.8-flash-lite-tts'),
       text,
       voice:voices[profile]||voices.core,
-      instructions:'Original K4K Core instructor voice. Calm, composed, intelligent and cinematic. Clear teaching cadence, subtle futuristic confidence, never imitate or impersonate any existing fictional or real character.',
+      instructions:'Speak like a friendly, experienced human video-production teacher speaking one-to-one with a student. Natural conversational rhythm, relaxed pace, warm confident tone, subtle emotional expression and genuine enthusiasm. Use short organic pauses at punctuation, vary emphasis naturally, and make the speech sound spontaneous rather than read aloud. Avoid robotic precision, monotone delivery, exaggerated cinematic narration, synthetic-sounding cadence, and overacting. Match the language and regional accent of the provided text. Never imitate a specific real person.',
       outputFormat:'wav'
     });
     return new Response(result.audio.uint8Array,{headers:{'Content-Type':'audio/wav','Cache-Control':'private, max-age=0'}});
