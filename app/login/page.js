@@ -20,6 +20,14 @@ export default function Login(){
    const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:window.location.origin+'/update-password'});
    setLoading(false);setMsg(error?error.message:'Recovery link sent. Check your email inbox and spam folder.');return;
   }
+  if(mode==='signup'){
+   if(password.length<8){setMsg('Use at least 8 characters for your password.');setLoading(false);return}
+   const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin+'/login'}});
+   setLoading(false);
+   if(error){setMsg(error.message);return}
+   if(data?.session){window.location.href='/academy';return}
+   setMsg('Check your email to verify your account, then sign in with the same email you used to pay.');return;
+  }
   const{error}=await supabase.auth.signInWithPassword({email,password});
   if(error){setMsg(error.message);setLoading(false);return}
   window.location.href='/academy';
@@ -31,13 +39,14 @@ export default function Login(){
  }
  return <main className="authpage"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link><form onSubmit={submit}>
   <small>MEMBER ACCESS · K4K CORE</small>
-  <h1>{mode==='recovery'?<>RECOVER<br/><i>ACCESS.</i></>:<>WELCOME<br/><i>BACK.</i></>}</h1>
-  {mode==='login'&&<><button type="button" className="googleAuth" onClick={google} disabled={loading}><GoogleMark/> Continue with Google</button><div className="authDivider"><span/>OR USE EMAIL<span/></div></>}
+  <h1>{mode==='recovery'?<>RECOVER<br/><i>ACCESS.</i></>:mode==='signup'?<>CREATE<br/><i>ACCOUNT.</i></>:<>WELCOME<br/><i>BACK.</i></>}</h1>
+  {mode!=='recovery'&&<><button type="button" className="googleAuth" onClick={google} disabled={loading}><GoogleMark/> Continue with Google</button><div className="authDivider"><span/>OR USE EMAIL<span/></div></>}
   <label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@email.com"/></label>
-  {mode==='login'&&<label>Password<input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/></label>}
+  {mode!=='recovery'&&<label>Password<input type="password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••"/></label>}
   {msg&&<p className="authmsg">{msg}</p>}
-  <button disabled={loading}>{loading?'Please wait…':mode==='recovery'?'Send recovery email':'Enter Academy'} {mode==='recovery'?<Mail/>:<ArrowRight/>}</button>
+  <button disabled={loading}>{loading?'Please wait…':mode==='recovery'?'Send recovery email':mode==='signup'?'Create account':'Enter Academy'} {mode==='recovery'?<Mail/>:<ArrowRight/>}</button>
   {mode==='login'?<button type="button" className="forgotAuth" onClick={()=>{setMode('recovery');setMsg('')}}><KeyRound/> Forgot password?</button>:<button type="button" className="forgotAuth" onClick={()=>{setMode('login');setMsg('')}}>← Back to login</button>}
+  {mode==='login'?<p>Already subscribed? <button type='button' className='forgotAuth' onClick={()=>{setMode('signup');setMsg('')}}>Create your account →</button></p>:mode==='signup'?<p>Already have an account? <button type='button' className='forgotAuth' onClick={()=>{setMode('login');setMsg('')}}>Sign in →</button></p>:null}
   <p>New to K4K? <Link href="/#join">Join the Academy</Link></p>
  </form></main>
 }
