@@ -30,7 +30,7 @@ export default function Mentor(){
  const [step,setStep]=useState(1); const [uploading,setUploading]=useState(false); const [uploadMsg,setUploadMsg]=useState('');
  const recognition=useRef(null); const premiumAudio=useRef(null);
  const realtimeModel=useMemo(()=>gateway.experimental_realtime('google/gemini-3.8-live'),[]);
- const realtime=useRealtime({model:realtimeModel,api:{token:'/api/realtime/token'},sessionConfig:{instructions:'You are K4K Core, the interactive voice instructor inside KreativeStudios4K Academy. Teach AI creation step by step. Be concise, practical, multilingual and allow the student to interrupt naturally. Never imitate an existing fictional or real person. If the student changes language, continue naturally in that language.',turnDetection:{type:'server-vad'}},onError:(error)=>console.error('K4K realtime voice',error)});
+ const realtime=useRealtime({model:realtimeModel,api:{token:'/api/realtime/token'},sessionConfig:{instructions:'You are K4K Core, the interactive voice instructor inside KreativeStudios4K Academy. Teach AI creation step by step. Be concise, practical, multilingual and allow the student to interrupt naturally. Never imitate an existing fictional or real person. Respond in the selected language whenever it is stated by the student. Your vocal persona is a sophisticated male digital assistant: poised, clear, calm and warm, with natural expression; never copy a named actor or fictional character. If the student changes language, continue naturally in that language.',turnDetection:{type:'server-vad'}},onError:(error)=>console.error('K4K realtime voice',error)});
 
  useEffect(()=>{
    const load=()=>setVoices(window.speechSynthesis?.getVoices?.()||[]);
@@ -44,7 +44,7 @@ export default function Mentor(){
 
  async function speak(text){
    stopVoice();setSpeaking(true);
-   const profiles=['core','mentor','warm'];const profile=profiles[voiceIndex%profiles.length];
+   const profile='core';
    try{
      const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:profile,language})});
      if(!res.ok)throw new Error('premium voice unavailable');
@@ -95,7 +95,7 @@ export default function Mentor(){
    <header className="commandTop">
      <Link href="/academy" className="monoBrand"><span className="mark">K4K</span><b>ACADEMY</b><small>CREATOR INTELLIGENCE</small></Link>
      <div className="system"><i/> K4K CORE ONLINE</div>
-     <div className="topActions"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en-US">EN · English</option><option value="pt-BR">PT · Português</option><option value="es-ES">ES · Español</option><option value="fr-FR">FR · Français</option></select><Link href="/academy"><ArrowLeft/> Academy</Link></div>
+     <div className="topActions"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en-US">EN · English</option><option value="pt-BR">PT · Português</option><option value="es-MX">ES · Español (LatAm)</option></select><Link href="/academy"><ArrowLeft/> Academy</Link></div>
    </header>
 
    <div className="commandShell">
@@ -135,7 +135,7 @@ export default function Mentor(){
        </section>
 
        <section className="conversation">
-         <div className="conversationHead"><div><Radio/> LIVE INSTRUCTOR</div><div className="voiceSettings"><label><input type="checkbox" checked={autoVoice} onChange={e=>setAutoVoice(e.target.checked)}/> Auto voice</label><button onClick={()=>setVoiceIndex(v=>(v+1)%3)}><Volume2/> Voice: {['Core','Mentor','Warm'][voiceIndex%3]}</button></div></div>
+         <div className="conversationHead"><div><Radio/> LIVE INSTRUCTOR</div><div className="voiceSettings"><label><input type="checkbox" checked={autoVoice} onChange={e=>setAutoVoice(e.target.checked)}/> Auto voice</label><span><Volume2/> K4K Core · Cinematic voice</span></div></div>
          <div className="messages">{messages.slice(-5).map((m,i)=><div key={i} className={'bubble '+m.role}>{m.text}</div>)}{loading&&<div className="bubble mentor typing"><LoaderCircle/> K4K Core is thinking…</div>}</div>
          <form onSubmit={e=>{e.preventDefault();ask()}} className="commandInput"><button type="button" onClick={toggleListen} className={listening?'live':''}>{listening?<MicOff/>:<Mic/>}</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder={listening?'Listening…':'Speak or type your command…'}/><button disabled={loading||!input.trim()}><Send/></button></form>
        </section>
