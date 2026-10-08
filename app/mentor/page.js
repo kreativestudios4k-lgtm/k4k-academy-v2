@@ -26,7 +26,7 @@ export default function Mentor(){
  const [messages,setMessages]=useState([{role:'mentor',text:'System online. I am your K4K AI instructor. We can learn, create and analyse together. Choose a lesson or ask me anything.'}]);
  const [input,setInput]=useState(''); const [loading,setLoading]=useState(false);
  const [listening,setListening]=useState(false); const [speaking,setSpeaking]=useState(false); const [voiceError,setVoiceError]=useState('');
- const [autoVoice,setAutoVoice]=useState(true); const [language,setLanguage]=useState('en-US');
+ const [autoVoice,setAutoVoice]=useState(false); const [language,setLanguage]=useState('en-US');
  const [voiceIndex,setVoiceIndex]=useState(0); const [voices,setVoices]=useState([]);
  const [step,setStep]=useState(1); const [uploading,setUploading]=useState(false); const [uploadMsg,setUploadMsg]=useState('');
  const recognition=useRef(null); const premiumAudio=useRef(null);
@@ -69,8 +69,8 @@ export default function Mentor(){
    const q=String(text||'').trim();if(!q||loading)return;
    setMessages(m=>[...m,{role:'student',text:q}]);setInput('');setLoading(true);
    try{const res=await fetch('/api/mentor',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q})});
-     const data=await res.json();const answer=data.answer||data.error||'I could not answer that yet.';
-     setMessages(m=>[...m,{role:'mentor',text:answer}]);if(autoVoice)speak(answer);
+     const data=await res.json();if(!res.ok){setVoiceError('AI Mentor is unavailable. The Academy AI service needs its billing configuration enabled.');setMessages(m=>[...m,{role:'mentor',text:'AI Mentor is temporarily offline. Your Academy lessons and saved prompts are still available.'}]);return;}const answer=data.answer||'I could not answer that yet.';
+     setMessages(m=>[...m,{role:'mentor',text:answer}]);if(autoVoice&&res.ok)speak(answer);
    }catch{const t='Connection problem. Please try again.';setMessages(m=>[...m,{role:'mentor',text:t}])}finally{setLoading(false)}
  }
  function teach(n){
