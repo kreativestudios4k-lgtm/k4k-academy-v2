@@ -10,13 +10,14 @@ export default function Login(){
  const [loading,setLoading]=useState(false);
  const [msg,setMsg]=useState('');
  const [checkoutReturn,setCheckoutReturn]=useState(false);
- useEffect(()=>{setCheckoutReturn(new URLSearchParams(window.location.search).get('checkout')==='success')},[]);
+ const [oauthError,setOauthError]=useState(false);
+ useEffect(()=>{const q=new URLSearchParams(window.location.search);setCheckoutReturn(q.get('checkout')==='success');setOauthError(q.has('error'))},[]);
  async function google(){
   setLoading(true);setMsg('');
   const supabase=createClient();
   const {error}=await supabase.auth.signInWithOAuth({
    provider:'google',
-   options:{redirectTo:window.location.origin+'/membership-required',queryParams:{prompt:'select_account'}}
+   options:{redirectTo:window.location.origin+'/auth/callback',queryParams:{prompt:'select_account'}}
   });
   if(error){setMsg(error.message);setLoading(false)}
  }
@@ -26,6 +27,7 @@ export default function Login(){
  <h1 style={{fontSize:'clamp(38px,7vw,58px)',lineHeight:1.05,letterSpacing:'-.05em',margin:'22px 0'}}>YOUR VIDEO.<br/><i>YOUR ACCESS.</i></h1>
  {checkoutReturn?<p role="status" style={{lineHeight:1.7,color:'#e5f6c9',background:'#caff3914',border:'1px solid #caff3955',padding:14,borderRadius:9}}>Thanks for joining! Continue with Google using the <b>same email you used to pay</b>. Your subscription will be checked before access is granted.</p>:<p style={{lineHeight:1.7,color:'#b9c5b3'}}>Already purchased? Continue with Google using the same email address as your Stripe payment to unlock your workflow.</p>}
  <button type="button" className="googleAuth" onClick={google} disabled={loading} style={{width:'100%',margin:'28px 0 12px',display:'flex',justifyContent:'center',alignItems:'center',gap:12}}><GoogleMark/>{loading?'Connecting to Google…':'Continue with Google'}</button>
+ {oauthError&&<p role="alert" style={{color:'#ffb6a6'}}>Google sign-in could not be completed. Please try again.</p>}
  {msg&&<p role="alert" style={{color:'#ffb6a6',lineHeight:1.6}}>{msg}</p>}
  <p style={{display:'flex',alignItems:'center',gap:8,color:'#b9c5b3',fontSize:12,marginTop:16}}><ShieldCheck size={17} color="#caff39"/> Google sign-in does not grant access without an active paid membership.</p>
  <div style={{borderTop:'1px solid #ffffff25',marginTop:28,paddingTop:25}}>
