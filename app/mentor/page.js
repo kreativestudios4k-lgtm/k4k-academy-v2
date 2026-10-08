@@ -1,5 +1,5 @@
-import LogoutButton from '../components/LogoutButton';
 'use client';
+import LogoutButton from '../components/LogoutButton';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {experimental_useRealtime as useRealtime} from '@ai-sdk/react';
 import {gateway} from '@ai-sdk/gateway';
