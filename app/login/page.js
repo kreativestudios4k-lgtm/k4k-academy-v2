@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../lib/supabase/client';
 import {ArrowRight,Mail,KeyRound} from 'lucide-react';
@@ -13,6 +13,8 @@ export default function Login(){
  const[loading,setLoading]=useState(false);
  const[mode,setMode]=useState('login');
  const supabase=createClient();
+ const[checkoutReturn,setCheckoutReturn]=useState(false);
+ useEffect(()=>{if(new URLSearchParams(window.location.search).get('checkout')==='success'){setCheckoutReturn(true);setMode('signup')}},[]);
 
  async function submit(e){
   e.preventDefault();setLoading(true);setMsg('');
@@ -25,7 +27,7 @@ export default function Login(){
    const {data,error}=await supabase.auth.signUp({email,password,options:{emailRedirectTo:window.location.origin+'/login'}});
    setLoading(false);
    if(error){setMsg(error.message);return}
-   if(data?.session){window.location.href='/academy';return}
+   if(data?.session){window.location.href='/membership-required';return}
    setMsg('Check your email to verify your account, then sign in with the same email you used to pay.');return;
   }
   const{error}=await supabase.auth.signInWithPassword({email,password});
@@ -39,6 +41,7 @@ export default function Login(){
  }
  return <main className="authpage"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link><form onSubmit={submit}>
   <small>MEMBER ACCESS · K4K CORE</small>
+  {checkoutReturn&&<div role='status' style={{background:'#caff3914',border:'1px solid #caff3966',borderRadius:10,padding:'14px 16px',margin:'18px 0',color:'#e8f6ce',lineHeight:1.55,fontSize:13}}><b>Thanks for joining K4K Academy.</b> Create your account using the same email you used at Stripe checkout, then verify your email to unlock the Viral Video Workflow. Already have an account? Switch to sign in below.</div>}
   <h1>{mode==='recovery'?<>RECOVER<br/><i>ACCESS.</i></>:mode==='signup'?<>CREATE<br/><i>ACCOUNT.</i></>:<>WELCOME<br/><i>BACK.</i></>}</h1>
   {mode!=='recovery'&&<><button type="button" className="googleAuth" onClick={google} disabled={loading}><GoogleMark/> Continue with Google</button><div className="authDivider"><span/>OR USE EMAIL<span/></div></>}
   <label>Email<input type="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@email.com"/></label>
