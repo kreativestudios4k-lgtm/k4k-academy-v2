@@ -24,7 +24,7 @@ const quick=['Explain this step','Give me an example','Create the prompt','Test 
 export default function Mentor(){
  const [messages,setMessages]=useState([{role:'mentor',text:'System online. I am your K4K AI instructor. We can learn, create and analyse together. Choose a lesson or ask me anything.'}]);
  const [input,setInput]=useState(''); const [loading,setLoading]=useState(false);
- const [listening,setListening]=useState(false); const [speaking,setSpeaking]=useState(false);
+ const [listening,setListening]=useState(false); const [speaking,setSpeaking]=useState(false); const [voiceError,setVoiceError]=useState('');
  const [autoVoice,setAutoVoice]=useState(true); const [language,setLanguage]=useState('en-US');
  const [voiceIndex,setVoiceIndex]=useState(0); const [voices,setVoices]=useState([]);
  const [step,setStep]=useState(1); const [uploading,setUploading]=useState(false); const [uploadMsg,setUploadMsg]=useState('');
@@ -43,19 +43,17 @@ export default function Mentor(){
  },[language]);
 
  async function speak(text){
-   stopVoice();setSpeaking(true);
+   stopVoice();setVoiceError('');setSpeaking(true);
    const profile='core';
    try{
      const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:profile,language})});
      if(!res.ok)throw new Error('premium voice unavailable');
      const blob=await res.blob();const audio=new Audio(URL.createObjectURL(blob));premiumAudio.current=audio;
      audio.onended=()=>setSpeaking(false);audio.onerror=()=>setSpeaking(false);await audio.play();
-   }catch{
-     if(!('speechSynthesis' in window)){setSpeaking(false);return}
-     const u=new SpeechSynthesisUtterance(text);u.lang=language;
-     const filtered=voices.filter(v=>v.lang?.toLowerCase().startsWith(language.slice(0,2).toLowerCase()));
-     const v=filtered[voiceIndex%Math.max(filtered.length,1)]||voices[voiceIndex%Math.max(voices.length,1)];if(v)u.voice=v;
-     u.rate=.96;u.pitch=.88;u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);window.speechSynthesis.speak(u);
+   }catch(error){
+     console.error('K4K premium speech unavailable',error);
+     setSpeaking(false);
+     setVoiceError('K4K Core premium voice is temporarily unavailable. Please retry; device robotic speech is disabled.');
    }
  }
  function stopVoice(){if(premiumAudio.current){premiumAudio.current.pause();premiumAudio.current=null}window.speechSynthesis?.cancel();setSpeaking(false)}
@@ -136,7 +134,7 @@ export default function Mentor(){
 
        <section className="conversation">
          <div className="conversationHead"><div><Radio/> LIVE INSTRUCTOR</div><div className="voiceSettings"><label><input type="checkbox" checked={autoVoice} onChange={e=>setAutoVoice(e.target.checked)}/> Auto voice</label><span><Volume2/> K4K Core · Cinematic voice</span></div></div>
-         <div className="messages">{messages.slice(-5).map((m,i)=><div key={i} className={'bubble '+m.role}>{m.text}</div>)}{loading&&<div className="bubble mentor typing"><LoaderCircle/> K4K Core is thinking…</div>}</div>
+         {voiceError&&<p role="alert" style={{color:'#ffb5a8',fontSize:13,margin:'8px 0'}}>{voiceError}</p>}<div className="messages">{messages.slice(-5).map((m,i)=><div key={i} className={'bubble '+m.role}>{m.text}</div>)}{loading&&<div className="bubble mentor typing"><LoaderCircle/> K4K Core is thinking…</div>}</div>
          <form onSubmit={e=>{e.preventDefault();ask()}} className="commandInput"><button type="button" onClick={toggleListen} className={listening?'live':''}>{listening?<MicOff/>:<Mic/>}</button><input value={input} onChange={e=>setInput(e.target.value)} placeholder={listening?'Listening…':'Speak or type your command…'}/><button disabled={loading||!input.trim()}><Send/></button></form>
        </section>
      </section>
