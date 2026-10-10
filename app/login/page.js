@@ -14,6 +14,9 @@ export default function Login(){
  const [email,setEmail]=useState('');
  const [emailLoading,setEmailLoading]=useState(false);
  const [emailSent,setEmailSent]=useState(false);
+ const [passwordEmail,setPasswordEmail]=useState('');
+ const [password,setPassword]=useState('');
+ const [passwordLoading,setPasswordLoading]=useState(false);
  useEffect(()=>{const q=new URLSearchParams(window.location.search);setCheckoutReturn(q.get('checkout')==='success');setOauthError(q.has('error'))},[]);
  async function google(){
   setLoading(true);setMsg('');
@@ -41,6 +44,23 @@ export default function Login(){
   }catch(err){setMsg(err?.message||'Unable to send sign-in email. Please try again.')}
   finally{setEmailLoading(false)}
  }
+ async function passwordSignIn(event){
+  event.preventDefault();
+  setMsg('');
+  setPasswordLoading(true);
+  try{
+   const supabase=createClient();
+   const {data,error}=await supabase.auth.signInWithPassword({
+    email:passwordEmail.trim().toLowerCase(),
+    password
+   });
+   if(error)throw error;
+   window.location.replace(data?.user?.user_metadata?.k4k_temp_password?'/update-password':'/academy');
+  }catch(err){
+   setMsg(err?.message||'Unable to sign in. Check your email and password.');
+   setPasswordLoading(false);
+  }
+ }
  return <main className="authpage"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link>
  <section style={{maxWidth:440,width:'100%',margin:'auto',padding:'35px 25px',border:'1px solid #ffffff25',borderRadius:18,background:'#111610',color:'#fff'}}>
  <small style={{color:'#caff39',letterSpacing:2,fontWeight:800}}>PRIVATE VIRAL VIDEO WORKFLOW</small>
@@ -51,6 +71,13 @@ export default function Login(){
   <input id="member-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email used when you paid" style={{width:"100%",border:"1px solid #ffffff55",background:"#090e09",color:"#fff",padding:"15px 14px",borderRadius:8,fontSize:15}}/>
   <button type="submit" disabled={emailLoading} style={{width:"100%",background:"#caff39",color:"#0e160c",fontWeight:900,padding:"15px 14px",border:0,borderRadius:8,cursor:"pointer",fontSize:13}}>{emailLoading?'SENDING ACCESS LINK…':'EMAIL ME A SECURE LOGIN LINK →'}</button>
   {emailSent&&<p role="status" style={{lineHeight:1.6,color:"#caff39",border:"1px solid #caff3955",background:"#caff3912",padding:13,borderRadius:8,margin:0}}>Check your inbox (and spam folder) for your secure sign-in email. Open the link on this device to activate your existing paid membership. Do not purchase again.</p>}
+ </form>
+ <form onSubmit={passwordSignIn} style={{margin:"20px 0",display:"grid",gap:11,padding:"18px 0",borderTop:"1px solid #ffffff25"}}>
+  <label htmlFor="password-email" style={{fontSize:13,fontWeight:800,color:"#e7f2dd"}}>SIGN IN WITH PASSWORD</label>
+  <input id="password-email" type="email" autoComplete="username" required value={passwordEmail} onChange={e=>setPasswordEmail(e.target.value)} placeholder="Email used when you paid" style={{width:"100%",border:"1px solid #ffffff55",background:"#090e09",color:"#fff",padding:"15px 14px",borderRadius:8,fontSize:15}}/>
+  <input id="member-password" aria-label="Password" type="password" autoComplete="current-password" required value={password} onChange={e=>setPassword(e.target.value)} placeholder="Your password or temporary password" style={{width:"100%",border:"1px solid #ffffff55",background:"#090e09",color:"#fff",padding:"15px 14px",borderRadius:8,fontSize:15}}/>
+  <button type="submit" disabled={passwordLoading} style={{width:"100%",background:"#caff39",color:"#0e160c",fontWeight:900,padding:"15px 14px",border:0,borderRadius:8,cursor:"pointer",fontSize:13}}>{passwordLoading?'SIGNING IN…':'SIGN IN WITH PASSWORD →'}</button>
+  <p style={{color:"#9da99b",fontSize:12,lineHeight:1.6,margin:0}}>Using a temporary password? You'll be prompted to create your own after signing in.</p>
  </form>
  <div style={{display:"flex",alignItems:"center",gap:12,color:"#a7b2a4",fontSize:12,margin:"16px 0"}}><span style={{flex:1,borderTop:"1px solid #ffffff30"}}/>OR USE GOOGLE<span style={{flex:1,borderTop:"1px solid #ffffff30"}}/></div>
  <button type="button" className="googleAuth" onClick={google} disabled={loading} style={{width:'100%',margin:'28px 0 12px',display:'flex',justifyContent:'center',alignItems:'center',gap:12}}><GoogleMark/>{loading?'Connecting to Google…':'Continue with Google'}</button>
