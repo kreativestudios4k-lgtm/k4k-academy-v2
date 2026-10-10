@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import {CompleteWorkflowButton} from '../../LearningProgress';
 import {useState} from 'react';
 import {ArrowLeft,Check,Copy,Download,Play,Sparkles,Video} from 'lucide-react';
 
@@ -40,4 +41,5 @@ export default function WorkflowOne(){return <main className="workflowPage">
 <section className="workflowBlock featuredStep"><div className="stepNo">03</div><div><small>HIGGSFIELD · GENJUTSU</small><h2>Genjutsu on Higgsfield — Motion Transfer setup</h2><p><b>Genjutsu is a tool inside Higgsfield.</b> Open Higgsfield, select <b>Genjutsu</b>, upload the reference video, add your character sheet, select <b>Motion Transfer</b>, paste the prompt below and generate.</p><div className="miniChecks"><span><Check/> Reference video</span><span><Check/> Character sheet</span><span><Check/> Motion Transfer</span><span><Check/> Prompt</span></div><CopyPrompt title="Genjutsu Character Replacement" text={genjutsuPrompt}/></div></section>
 <section className="workflowBlock"><div className="stepNo">04</div><div><small>RESULT</small><h2>Watch and compare the AI result</h2><p>Check identity, hair, wardrobe, hands, background people, movement and camera behaviour. Regenerate problem areas instead of accepting the first output.</p><p><b>Compare the two videos at the top of this lesson:</b> play the original reference, then play the AI recreation. The AI output is 16 seconds and the full original is 46 seconds. Compare the matching portion, checking the face and outfit in every shot.</p></div></section>
 <section className="workflowBlock"><div className="stepNo">05</div><div><small>EXPORT</small><h2>Finish and publish</h2><p>Trim, add licensed audio, colour-match where needed, apply subtle sharpening and export at 9:16, 1080 × 1920, 30fps for short-form platforms.</p></div></section>
+<CompleteWorkflowButton lessonId="workflow-001"/>
 </main>}
