@@ -28,7 +28,7 @@ export default function Login(){
   event.preventDefault();
   setMsg('');setEmailSent(false);
   const normalized=email.trim().toLowerCase();
-  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalized)){setMsg('Enter a valid email address.');return}
+  if(!normalized.includes('@')||!normalized.split('@')[1]?.includes('.')){setMsg('Enter a valid email address.');return}
   setEmailLoading(true);
   try{
    const supabase=createClient();
