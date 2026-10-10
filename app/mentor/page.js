@@ -8,10 +8,10 @@ import {createClient} from '../../lib/supabase/client';
 import {ArrowLeft,ArrowRight,BrainCircuit,Send,Upload,Video,Sparkles,LoaderCircle,CheckCircle2,Mic,MicOff,Globe2,Radio,Play,Pause,Volume2,Languages,TrendingUp,Eye,Clapperboard,BookOpen,Command,ChevronRight} from 'lucide-react';
 
 const marketRadar=[
- {tag:'VIDEO',title:'Seedance 2.5 Draft Mode',meta:'Faster iteration + enhancement',hot:'+ NEW'},
- {tag:'VOICE',title:'Eleven v4 Turbo',meta:'Expressive realtime · 90+ languages',hot:'~100ms'},
- {tag:'AGENT',title:'Gemini 3.8 Live',meta:'Voice + vision + tool execution',hot:'LIVE'},
- {tag:'WORKFLOW',title:'Multi-model creation',meta:'Kling · Runway · Seedance · audio',hot:'RISING'}
+ {tag:'MOTION',title:'Higgsfield Genjutsu',meta:'Character replacement and motion transfer',hot:'EXPLORE'},
+ {tag:'VIDEO',title:'Kling AI',meta:'AI video generation and creative iteration',hot:'EXPLORE'},
+ {tag:'VIDEO',title:'Runway',meta:'Creative video production and editing',hot:'EXPLORE'},
+ {tag:'VIDEO',title:'Hailuo AI',meta:'Video generation and motion experiments',hot:'EXPLORE'}
 ];
 const lessonSteps=[
  {k:'01',title:'Why identity drifts',body:'Understand why AI changes faces, hair, clothes and proportions between shots.'},
@@ -31,7 +31,7 @@ export default function Mentor(){
  const [step,setStep]=useState(1); const [uploading,setUploading]=useState(false); const [uploadMsg,setUploadMsg]=useState('');
  const recognition=useRef(null); const premiumAudio=useRef(null);
  const realtimeModel=useMemo(()=>gateway.experimental_realtime('google/gemini-3.8-live'),[]);
- const realtime=useRealtime({model:realtimeModel,api:{token:'/api/realtime/token'},sessionConfig:{instructions:'You are K4K Core, the interactive voice instructor inside KreativeStudios4K Academy. Teach AI creation step by step. Be concise, practical, multilingual and allow the student to interrupt naturally. Never imitate an existing fictional or real person. Respond in the selected language whenever it is stated by the student. Your vocal persona is a sophisticated male digital assistant: poised, clear, calm and warm, with natural expression; never copy a named actor or fictional character. If the student changes language, continue naturally in that language.',turnDetection:{type:'server-vad'}},onError:(error)=>console.error('K4K realtime voice',error)});
+ const realtime=useRealtime({model:realtimeModel,api:{token:'/api/realtime/token'},sessionConfig:{instructions:'You are K4K Core, the interactive voice instructor inside KreativeStudios4K Academy. Teach AI creation step by step. Be concise, practical, multilingual and allow the student to interrupt naturally. Never imitate an existing fictional or real person. Respond in the selected language whenever it is stated by the student. Your vocal persona is a sophisticated male digital assistant: poised, clear, calm and warm, with natural expression; never copy a named actor or fictional character. If the student changes language, continue naturally in that language.',turnDetection:{type:'server-vad'}},onError:(error)=>{console.error('K4K realtime voice',error);setVoiceError('Live voice is temporarily unavailable. You can continue with the written lessons.')}});
 
  useEffect(()=>{
    const load=()=>setVoices(window.speechSynthesis?.getVoices?.()||[]);
@@ -93,7 +93,7 @@ export default function Mentor(){
  return <main className="commandPage">
    <header className="commandTop">
      <Link href="/academy" className="monoBrand"><span className="mark">K4K</span><b>ACADEMY</b><small>CREATOR INTELLIGENCE</small></Link>
-     <div className="system"><i/> K4K CORE ONLINE</div>
+     <div className="system"><i/> K4K CORE · LEARNING SPACE</div>
      <div className="topActions"><select value={language} onChange={e=>setLanguage(e.target.value)} aria-label="Language"><option value="en-US">EN · English</option><option value="pt-BR">PT · Português</option><option value="es-MX">ES · Español (LatAm)</option></select><Link href="/academy"><ArrowLeft/> Academy</Link><LogoutButton/></div>
    </header>
 
@@ -102,14 +102,14 @@ export default function Mentor(){
        <div className="railLabel">COMMAND</div>
        <button className="active"><BrainCircuit/> <span>AI Instructor</span></button>
        <button onClick={()=>teach(step)}><BookOpen/><span>My Class</span></button>
-       <button><TrendingUp/><span>Market Radar</span></button>
-       <button><Clapperboard/><span>Create</span></button>
-       <button><Eye/><span>Analyse</span></button>
-       <div className="railFoot"><small>COURSE PROGRESS</small><strong>42%</strong><div><i/></div></div>
+       <button onClick={()=>document.getElementById('radar')?.scrollIntoView({behavior:'smooth'})}><TrendingUp/><span>Tool Watchlist</span></button>
+       <button onClick={()=>ask('Help me plan an AI video with a production-ready prompt')}><Clapperboard/><span>Create</span></button>
+       <button onClick={()=>ask('Teach me how to analyse an original reference video')}><Eye/><span>Analyse</span></button>
+       <div className="railFoot"><small>CURRENT MODULE STEP</small><strong>{step} / {lessonSteps.length}</strong><div><i style={{width:(step/lessonSteps.length*100)+'%'}}/></div></div>
      </aside>
 
      <section className="core">
-       <div className="hudTop"><div><small>ACTIVE INTELLIGENCE</small><h1>K4K <span>CORE</span></h1><p>Your interactive AI creator instructor.</p></div><div className="hudStatus"><span><i/>{realtime.status==='connected'?'LIVE VOICE CONNECTED':'VOICE READY'}</span><span><i/>VISION READY</span><span><i/>ACADEMY LINKED</span></div></div>
+       <div className="hudTop"><div><small>ACTIVE INTELLIGENCE</small><h1>K4K <span>CORE</span></h1><p>Your interactive AI creator instructor.</p></div><div className="hudStatus"><span><i/>{realtime.status==='connected'?'LIVE VOICE CONNECTED':'VOICE OPTIONAL'}</span><span><i/>VIDEO UPLOAD</span><span><i/>ACADEMY LINKED</span></div></div>
 
        <div className="coreVisual">
          <div className="rings r1"/><div className="rings r2"/><div className="rings r3"/>
@@ -141,10 +141,10 @@ export default function Mentor(){
      </section>
 
      <aside className="intel" id="radar">
-       <div className="intelHead"><div><span>LIVE</span><small>AI MARKET RADAR</small></div><Globe2/></div>
-       <p className="intelIntro">Signals shaping AI creation right now.</p>
+       <div className="intelHead"><div><span>GUIDE</span><small>CREATOR TOOL WATCHLIST</small></div><Globe2/></div>
+       <p className="intelIntro">Tools to explore, not a live feed. Check each provider for current models, pricing and availability.</p>
        <div className="radarList">{marketRadar.map((x,i)=><article key={x.title}><span className="rank">0{i+1}</span><div><small>{x.tag}</small><b>{x.title}</b><p>{x.meta}</p></div><em>{x.hot}</em></article>)}</div>
-       <button className="scan" onClick={()=>ask('Based on the latest AI market trends in my Academy radar, what should I learn or create next?')}><Radio/> Ask K4K what matters</button>
+       <button className="scan" onClick={()=>ask('Help me compare these AI creator tools and explain which is most suitable for my project. Verify current features before making time-sensitive claims.')}><Radio/> Ask K4K what matters</button>
 
        <div className="uploadMini"><Upload/><small>VISION LAB</small><h3>Upload your work.</h3><p>Send your video to the private Academy workspace.</p><label>{uploading?'UPLOADING…':'UPLOAD VIDEO'}<input type="file" accept="video/mp4,video/quicktime,video/webm" onChange={uploadVideo} disabled={uploading}/></label>{uploadMsg&&<span>{uploadMsg}</span>}</div>
        <div className="languageCard"><Languages/><div><small>MULTILINGUAL CORE</small><b>Learn in your language.</b><p>English · Português · Español · Français</p></div></div>
