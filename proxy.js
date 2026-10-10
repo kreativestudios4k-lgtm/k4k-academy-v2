@@ -2,6 +2,11 @@ import {createServerClient} from '@supabase/ssr';import {NextResponse} from 'nex
 const euro=new Set(['AT','BE','HR','CY','EE','FI','FR','DE','GR','IE','IT','LV','LT','LU','MT','NL','PT','SK','SI','ES']);
 function market(country){if(country==='BR')return 'BRL';if(country==='GB')return 'GBP';if(euro.has(country))return 'EUR';return 'USD'}
 export async function proxy(request){
+ // The Academy AI Mentor and voice services have been discontinued.
+ // Refuse every legacy API route before authentication or paid gateway calls.
+ const path=request.nextUrl.pathname;
+ if(path==='/mentor'||path.startsWith('/mentor/')){const u=request.nextUrl.clone();u.pathname='/academy';return NextResponse.redirect(u)}
+ if(path==='/api/mentor'||path.startsWith('/api/mentor/')||path==='/api/realtime'||path.startsWith('/api/realtime/'))return NextResponse.json({error:'This Academy feature has been discontinued.'},{status:410});
  const h=new Headers(request.headers);const country=h.get('x-vercel-ip-country')||'US';h.set('x-k4k-country',country);h.set('x-k4k-currency',market(country));
  let response=NextResponse.next({request:{headers:h}});
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return response;
