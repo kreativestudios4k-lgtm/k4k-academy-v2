@@ -17,7 +17,7 @@ const faq=[
  ['Is £7.99 a one-time payment?','No. This is a recurring £7.99 monthly subscription. Stripe shows the billing terms before you confirm payment.'],
  ['How do I access the workflow after paying?','After checkout you will be redirected to create or sign into your K4K Academy account. Use the same email address you used to pay, verify your email if prompted, and your active subscription can be linked to your account.'],
  ['Will I get access to other lessons?','Yes. Active members can access newly released K4K Academy workflows at no additional lesson charge. Workflow 02 is scheduled for Monday 12 October 2026.'],
- ['Can I cancel my subscription?','Yes. Your Stripe receipt contains your purchase details. For billing or cancellation assistance, email hello@kreativestudios4k.com.']
+ ['Can I cancel my subscription?','Yes. Use the secure Stripe customer portal to view invoices, update payment details or cancel future renewals at the end of your billing period. You can also contact Academy support.']
 ];
 export default function Home(){
  const [open,setOpen]=useState(0);
@@ -71,7 +71,7 @@ export default function Home(){
    <section className="faqSection"><div className="sectionKicker">BEFORE YOU JOIN</div><h2>QUESTIONS & <em>ANSWERS.</em></h2><div className="faqList">{faq.map(([q,a],i)=><div className="faqItem" key={q}><button type="button" aria-expanded={open===i} onClick={()=>setOpen(open===i?-1:i)}><span>{q}</span><ChevronDown size={20} className={open===i?'rotated':''}/></button>{open===i&&<p>{a}</p>}</div>)}</div></section>
    <section className="lastCTA"><div className="sectionKicker">K4K ACADEMY</div><h2>READY TO MAKE<br/><em>YOUR VERSION?</em></h2><p>Get Workflow 01 now and future workflow releases while your £7.99/month membership stays active.</p><a href={checkout} className="payButton">UNLOCK FOR £7.99 / MONTH <ArrowRight size={20}/></a><div className="secureRow"><LockKeyhole size={16}/> Secure Stripe checkout · Member access after sign-in</div></section>
   </div>
-  <footer className="k4kFooter"><span className="k4kBrand"><span>K4K</span> ACADEMY</span><span>© 2026 KREATIVE STUDIOS 4K</span><div className="footerLinks"><Link href="/login">Member login</Link><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><a href="mailto:hello@kreativestudios4k.com">Support</a></div></footer>
+  <footer className="k4kFooter"><span className="k4kBrand"><span>K4K</span> ACADEMY</span><span>© 2026 KREATIVE STUDIOS 4K</span><div className="footerLinks"><Link href="/login">Member login</Link><a href="https://billing.stripe.com/p/login/28E7sM93ubxrfkU05WeEo00" target="_blank" rel="noopener noreferrer">Manage billing</a><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><a href="mailto:hello@kreativestudios4k.com">Support</a></div></footer>
   <style>{`
   .k4kCheckout{min-height:100vh;background:#080a08;color:#f7f8f4;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
   .k4kCheckout *{box-sizing:border-box}.k4kCheckout a{text-decoration:none}.k4kCheckout .topline{background:#caff39;color:#12180c;font-size:10px;font-weight:900;letter-spacing:2px;text-align:center;padding:11px 12px}.topline .pulse,.eyebrowTag span,.orderStatus span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#141b0d;margin-right:8px}
