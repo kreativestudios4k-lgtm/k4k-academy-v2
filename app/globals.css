@@ -66,3 +66,13 @@ html{scroll-padding-top:24px}
 @media(max-width:800px){.academyMobileNav{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}.academyMobileNav a{font-size:11px;color:#d8edc7;border:1px solid #caff3955;border-radius:99px;padding:10px 12px;text-decoration:none}.dash aside{flex-wrap:wrap;gap:14px}.dashmain{padding-top:24px}}
 @media(max-width:560px){.learningProgressTop{align-items:flex-start}.learningProgressTop strong{font-size:20px}.workflowCover img{max-height:300px}.continue section{padding:25px!important}.learningProgressItem{padding:12px}.academyHelp{align-items:flex-start}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+.welcomeVoice{flex-direction:column;align-items:stretch}
+.welcomeVoice button:focus-visible{outline:3px solid #caff39;outline-offset:4px}
+.legalPage{min-height:100vh;background:#080d08;color:#edf5e8;padding:clamp(25px,6vw,80px) max(22px,calc((100vw - 850px)/2)) 100px;font-family:Arial,sans-serif}
+.legalPage>a{display:inline-block;color:#caff39;text-decoration:underline;font-weight:800;font-size:13px;margin:10px 0 32px}
+.legalPage>small{display:block;color:#9eb695;font-size:11px;letter-spacing:2px}
+.legalPage h1{font-size:clamp(40px,7vw,75px);line-height:1.05;letter-spacing:-.06em;margin:20px 0 30px}
+.legalPage h2{font-size:clamp(20px,3vw,27px);margin:38px 0 10px;color:#caff39}
+.legalPage p{color:#c2cfc0;line-height:1.9;font-size:15px}
+.legalPage p a{color:#caff39;text-decoration:underline}
