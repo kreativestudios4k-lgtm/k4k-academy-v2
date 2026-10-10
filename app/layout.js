@@ -5,7 +5,6 @@ export const metadata={
  description:'Learn realistic AI character swaps, video recreation and Higgsfield Genjutsu workflows with practical tutorials and copy-ready prompts. K4K Academy membership from £7.99/month.',
  applicationName:'K4K Academy',
  keywords:['K4K Academy','KreativeStudios4K','AI video','character swap','Higgsfield Genjutsu','AI creator tutorials','video motion transfer'],
- alternates:{canonical:'/'},
  openGraph:{type:'website',url:'https://kreativestudios4k.com',siteName:'K4K Academy',title:'K4K Academy | Learn the AI Video Method',description:'Real AI video examples, copy-ready prompts and private step-by-step creator workflows.'},
  twitter:{card:'summary',title:'K4K Academy | AI Creator Workflows',description:'Learn the method behind realistic AI video recreations.'}
 };
