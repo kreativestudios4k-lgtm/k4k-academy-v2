@@ -41,7 +41,7 @@ export default function Login(){
    });
    if(error)throw error;
    setEmailSent(true);
-  }catch(err){setMsg(err?.message||'Unable to send sign-in email. Please try again.')}
+  }catch(err){const message=String(err?.message||'');setMsg(/rate.limit|too many|429/i.test(message)?'Email sign-in is temporarily rate-limited. Please avoid repeated requests. Use Google or your password below, or contact support if you already paid.':message||'Unable to send sign-in email. Please try again.')}
   finally{setEmailLoading(false)}
  }
  async function passwordSignIn(event){
@@ -57,7 +57,7 @@ export default function Login(){
    if(error)throw error;
    window.location.replace(data?.user?.user_metadata?.k4k_temp_password?'/update-password':'/academy');
   }catch(err){
-   setMsg(err?.message||'Unable to sign in. Check your email and password.');
+   setMsg(/invalid login credentials/i.test(String(err?.message||''))?'Email or password not recognised. Try Google or request a secure login link. If you already paid, contact support instead of buying again.':err?.message||'Unable to sign in. Check your email and password.');
    setPasswordLoading(false);
   }
  }
@@ -83,6 +83,7 @@ export default function Login(){
  <button type="button" className="googleAuth" onClick={google} disabled={loading} style={{width:'100%',margin:'28px 0 12px',display:'flex',justifyContent:'center',alignItems:'center',gap:12}}><GoogleMark/>{loading?'Connecting to Google…':'Continue with Google'}</button>
  {oauthError&&<p role="alert" style={{color:'#ffb6a6'}}>Google sign-in could not be completed. Please try again.</p>}
  {msg&&<p role="alert" style={{color:'#ffb6a6',lineHeight:1.6}}>{msg}</p>}
+ <p style={{fontSize:12,color:'#b9c5b3',lineHeight:1.7,marginTop:17}}>Need help with an existing purchase, login or subscription? <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20Academy%20login%20help" style={{color:'#caff39',textDecoration:'underline'}}>Contact Academy support</a>. Please include the email on your payment receipt.</p>
  <p style={{display:'flex',alignItems:'center',gap:8,color:'#b9c5b3',fontSize:12,marginTop:16}}><ShieldCheck size={17} color="#caff39"/> Email or Google sign-in does not grant access without an active paid membership.</p>
  <div style={{borderTop:'1px solid #ffffff25',marginTop:28,paddingTop:25}}>
   <p style={{fontSize:14,color:'#e8eee3',fontWeight:700}}>Not purchased yet?</p>
