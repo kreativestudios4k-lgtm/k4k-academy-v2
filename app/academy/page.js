@@ -10,7 +10,7 @@ export default function Academy(){
   <aside>
    <Link className="brand" href="/"><span>K4K</span> ACADEMY</Link>
    <nav><a className="active" href="/academy">My Workflows</a><a href="/academy/workflows/viral-character-swap">Workflow 01</a><a href="/academy/workflows/puskas-character-swap">Workflow 02 · {workflowTwoAvailable?'Available':'Monday'}</a></nav>
-   <div style={{padding:"12px 0"}}><LogoutButton/></div>
+   <div style={{padding:"12px 0",display:"grid",gap:12}}><Link href="/update-password" style={{color:"#caff39",fontSize:13,fontWeight:800,textDecoration:"underline"}}>Change Password</Link><LogoutButton/></div>
    <div className="member"><small>MEMBERSHIP</small><b>CREATOR MEMBER</b><span>Private workflow library</span></div>
   </aside>
   <section className="dashmain">
