@@ -1,6 +1,7 @@
 import LogoutButton from '../components/LogoutButton';
 import Link from 'next/link';
 import WelcomeVoice from './WelcomeVoice';
+import GooglePasswordReminder from './GooglePasswordReminder';
 import {Play,ArrowRight,LockKeyhole,CalendarDays,CheckCircle2} from 'lucide-react';
 
 export const dynamic='force-dynamic';
@@ -14,6 +15,7 @@ export default function Academy(){
    <div className="member"><small>MEMBERSHIP</small><b>CREATOR MEMBER</b><span>Private workflow library</span></div>
   </aside>
   <section className="dashmain">
+   <GooglePasswordReminder/>
    <WelcomeVoice/>
    <header><div><small>K4K CREATOR SYSTEM · MEMBERS ONLY</small><h1>WELCOME TO<br/><i>THE LAB.</i></h1><p style={{color:"#c1ccbc",maxWidth:620,lineHeight:1.7,marginTop:15}}>Your private K4K Academy learning space. Start with Workflow 01, then come back for a new workflow every week.</p></div><div className="avatar">K4K</div></header>
    <div className="sectiontitle"><div>YOUR WEEKLY WORKFLOWS</div><span>{workflowTwoAvailable?'02 WORKFLOWS AVAILABLE':'01 AVAILABLE · 02 MONDAY 12 OCT'}</span></div>
