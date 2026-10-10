@@ -21,8 +21,8 @@ export default function Academy(){
     <div><span><Play fill="currentColor"/></span></div>
     <section>
      <small><CheckCircle2 size={14} style={{verticalAlign:"middle",marginRight:6}}/> WORKFLOW 001 · AVAILABLE NOW</small>
-     <h2>VIRAL CHARACTER SWAP</h2>
-     <p>Watch the original reference video, create a consistent character sheet, use Higgsfield Genjutsu Motion Transfer, and compare your AI recreation. Includes ready-to-copy prompts and downloadable reference material.</p>
+     <h2>DEMBOW PARTY · CHARACTER SWAP</h2>
+     <p>Watch the 46-second original street-performance video alongside the 16-second AI recreation. Download the exact military-jacket and pink-shorts character sheet, then follow the Higgsfield Genjutsu workflow with ready-to-copy prompts.</p>
      <Link href="/academy/workflows/viral-character-swap">OPEN WORKFLOW 01 <ArrowRight/></Link>
     </section>
    </div>
