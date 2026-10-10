@@ -11,6 +11,9 @@ export default function Login(){
  const [msg,setMsg]=useState('');
  const [checkoutReturn,setCheckoutReturn]=useState(false);
  const [oauthError,setOauthError]=useState(false);
+ const [email,setEmail]=useState('');
+ const [emailLoading,setEmailLoading]=useState(false);
+ const [emailSent,setEmailSent]=useState(false);
  useEffect(()=>{const q=new URLSearchParams(window.location.search);setCheckoutReturn(q.get('checkout')==='success');setOauthError(q.has('error'))},[]);
  async function google(){
   setLoading(true);setMsg('');
@@ -21,19 +24,43 @@ export default function Login(){
   });
   if(error){setMsg(error.message);setLoading(false)}
  }
+ async function emailSignIn(event){
+  event.preventDefault();
+  setMsg('');setEmailSent(false);
+  const normalized=email.trim().toLowerCase();
+  if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(normalized)){setMsg('Enter a valid email address.');return}
+  setEmailLoading(true);
+  try{
+   const supabase=createClient();
+   const {error}=await supabase.auth.signInWithOtp({
+    email:normalized,
+    options:{emailRedirectTo:window.location.origin+'/auth/callback',shouldCreateUser:true}
+   });
+   if(error)throw error;
+   setEmailSent(true);
+  }catch(err){setMsg(err?.message||'Unable to send sign-in email. Please try again.')}
+  finally{setEmailLoading(false)}
+ }
  return <main className="authpage"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link>
  <section style={{maxWidth:440,width:'100%',margin:'auto',padding:'35px 25px',border:'1px solid #ffffff25',borderRadius:18,background:'#111610',color:'#fff'}}>
  <small style={{color:'#caff39',letterSpacing:2,fontWeight:800}}>PRIVATE VIRAL VIDEO WORKFLOW</small>
  <h1 style={{fontSize:'clamp(38px,7vw,58px)',lineHeight:1.05,letterSpacing:'-.05em',margin:'22px 0'}}>YOUR VIDEO.<br/><i>YOUR ACCESS.</i></h1>
- {checkoutReturn?<p role="status" style={{lineHeight:1.7,color:'#e5f6c9',background:'#caff3914',border:'1px solid #caff3955',padding:14,borderRadius:9}}>Thanks for joining! Continue with Google using the <b>same email you used to pay</b>. Your subscription will be checked before access is granted.</p>:<p style={{lineHeight:1.7,color:'#b9c5b3'}}>Already purchased? Continue with Google using the same email address as your Stripe payment to unlock your workflow.</p>}
+ {checkoutReturn?<p role="status" style={{lineHeight:1.7,color:'#e5f6c9',background:'#caff3914',border:'1px solid #caff3955',padding:14,borderRadius:9}}>Thanks for joining! Sign in using the <b>same email you used to pay</b>. Your subscription will be checked before access is granted.</p>:<p style={{lineHeight:1.7,color:'#b9c5b3'}}>Already purchased? Sign in using the same email address as your Stripe payment to unlock your workflow.</p>}
+ <form onSubmit={emailSignIn} style={{margin:"22px 0 18px",display:"grid",gap:11}}>
+  <label htmlFor="member-email" style={{fontSize:13,fontWeight:800,color:"#e7f2dd"}}>MEMBER EMAIL ACCESS</label>
+  <input id="member-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="Email used when you paid" style={{width:"100%",border:"1px solid #ffffff55",background:"#090e09",color:"#fff",padding:"15px 14px",borderRadius:8,fontSize:15}}/>
+  <button type="submit" disabled={emailLoading} style={{width:"100%",background:"#caff39",color:"#0e160c",fontWeight:900,padding:"15px 14px",border:0,borderRadius:8,cursor:"pointer",fontSize:13}}>{emailLoading?'SENDING ACCESS LINK…':'EMAIL ME A SECURE LOGIN LINK →'}</button>
+  {emailSent&&<p role="status" style={{lineHeight:1.6,color:"#caff39",border:"1px solid #caff3955",background:"#caff3912",padding:13,borderRadius:8,margin:0}}>Check your inbox (and spam folder) for your secure sign-in email. Open the link on this device to activate your existing paid membership. Do not purchase again.</p>}
+ </form>
+ <div style={{display:"flex",alignItems:"center",gap:12,color:"#a7b2a4",fontSize:12,margin:"16px 0"}}><span style={{flex:1,borderTop:"1px solid #ffffff30"}}/>OR USE GOOGLE<span style={{flex:1,borderTop:"1px solid #ffffff30"}}/></div>
  <button type="button" className="googleAuth" onClick={google} disabled={loading} style={{width:'100%',margin:'28px 0 12px',display:'flex',justifyContent:'center',alignItems:'center',gap:12}}><GoogleMark/>{loading?'Connecting to Google…':'Continue with Google'}</button>
  {oauthError&&<p role="alert" style={{color:'#ffb6a6'}}>Google sign-in could not be completed. Please try again.</p>}
  {msg&&<p role="alert" style={{color:'#ffb6a6',lineHeight:1.6}}>{msg}</p>}
- <p style={{display:'flex',alignItems:'center',gap:8,color:'#b9c5b3',fontSize:12,marginTop:16}}><ShieldCheck size={17} color="#caff39"/> Google sign-in does not grant access without an active paid membership.</p>
+ <p style={{display:'flex',alignItems:'center',gap:8,color:'#b9c5b3',fontSize:12,marginTop:16}}><ShieldCheck size={17} color="#caff39"/> Email or Google sign-in does not grant access without an active paid membership.</p>
  <div style={{borderTop:'1px solid #ffffff25',marginTop:28,paddingTop:25}}>
   <p style={{fontSize:14,color:'#e8eee3',fontWeight:700}}>Not purchased yet?</p>
   <Link href="/#checkout" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:10,background:'#caff39',color:'#101510',fontWeight:900,padding:'17px 15px',borderRadius:7,textDecoration:'none'}}>GET ACCESS · £7.99 / MONTH <ArrowRight size={17}/></Link>
  </div>
- <p style={{fontSize:12,color:'#98a694',marginTop:23,lineHeight:1.6}}><LockKeyhole size={14} style={{verticalAlign:'middle'}}/> Your workflow is protected. If you paid with a different email, contact Academy support to resolve the mismatch.</p>
+ <p style={{fontSize:12,color:'#98a694',marginTop:23,lineHeight:1.6}}><LockKeyhole size={14} style={{verticalAlign:'middle'}}/> Your workflow is protected. Use the email address on your payment receipt; no second purchase is required.</p>
  </section></main>
 }
