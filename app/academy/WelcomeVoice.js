@@ -32,52 +32,32 @@ function resolveGreeting(locale){
 }
 
 export default function WelcomeVoice(){
- const [locale,setLocale]=useState('en');
- const [label,setLabel]=useState('English');
- const [playing,setPlaying]=useState(false);
- const [ready,setReady]=useState(false);
- const audioRef=useRef(null);
- const spokenRef=useRef(false);
-
- useEffect(()=>{
-   const browserLocale=navigator.languages?.[0]||navigator.language||'en';
-   const [resolved,greeting]=resolveGreeting(browserLocale);
-   setLocale(resolved);setLabel(greeting.name);setReady(true);
-   if(sessionStorage.getItem('k4k-welcome-spoken')==='1')return;
-
-   let disposed=false;
-   const play=async()=>{
-     if(disposed||spokenRef.current)return;
-     spokenRef.current=true;
-     try{
-       const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:greeting.text,voice:'core',language:resolved})});
-       if(!res.ok)throw new Error('voice unavailable');
-       const blob=await res.blob();const audio=new Audio(URL.createObjectURL(blob));audioRef.current=audio;
-       audio.onplay=()=>setPlaying(true);audio.onended=()=>{setPlaying(false);sessionStorage.setItem('k4k-welcome-spoken','1')};
-       audio.onerror=()=>setPlaying(false);await audio.play();
-     }catch{
-       spokenRef.current=false;
-       const unlock=()=>{window.removeEventListener('pointerdown',unlock);window.removeEventListener('keydown',unlock);play()};
-       window.addEventListener('pointerdown',unlock,{once:true});window.addEventListener('keydown',unlock,{once:true});
-     }
-   };
-   const timer=setTimeout(play,500);
-   return()=>{disposed=true;clearTimeout(timer);audioRef.current?.pause()};
- },[]);
-
- async function replay(){
-   const [,greeting]=resolveGreeting(locale);spokenRef.current=false;
-   try{
-     const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:greeting.text,voice:'core',language:locale})});
-     if(!res.ok)throw new Error();
-     const blob=await res.blob();const audio=new Audio(URL.createObjectURL(blob));audioRef.current=audio;
-     audio.onplay=()=>setPlaying(true);audio.onended=()=>setPlaying(false);await audio.play();
-   }catch{setPlaying(false)}
+ const [locale,setLocale]=useState('en');const [label,setLabel]=useState('English');
+ const [playing,setPlaying]=useState(false);const [loading,setLoading]=useState(false);const [unavailable,setUnavailable]=useState(false);
+ const audioRef=useRef(null);const urlRef=useRef(null);
+ useEffect(()=>{const [resolved,greeting]=resolveGreeting(navigator.languages?.[0]||navigator.language||'en');setLocale(resolved);setLabel(greeting.name);return()=>{audioRef.current?.pause();if(urlRef.current)URL.revokeObjectURL(urlRef.current)}},[]);
+ async function play(){
+  if(playing){audioRef.current?.pause();setPlaying(false);return}
+  if(loading||unavailable)return;
+  setLoading(true);
+  try{
+   const [,greeting]=resolveGreeting(locale);
+   const res=await fetch('/api/mentor/speech',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:greeting.text,voice:'core',language:locale})});
+   if(!res.ok)throw Error('Voice currently unavailable');
+   const blob=await res.blob();
+   if(urlRef.current)URL.revokeObjectURL(urlRef.current);
+   urlRef.current=URL.createObjectURL(blob);
+   const audio=new Audio(urlRef.current);audioRef.current=audio;
+   audio.onplay=()=>setPlaying(true);audio.onended=()=>setPlaying(false);audio.onerror=()=>{setPlaying(false);setUnavailable(true)};
+   await audio.play();
+  }catch{setUnavailable(true);setPlaying(false)}
+  finally{setLoading(false)}
  }
-
- if(!ready)return null;
- return <button className={'welcomeVoice '+(playing?'speaking':'')} onClick={playing?()=>{audioRef.current?.pause();setPlaying(false)}:replay} aria-label={playing?'Stop welcome voice':'Replay welcome voice'}>
+ return <div className="welcomeVoice" style={{borderColor:unavailable?'#6c5337':'#174c6b'}}>
+  <button type="button" onClick={play} disabled={loading||unavailable} style={{display:'flex',alignItems:'center',gap:12,width:'100%',background:'transparent',border:0,color:'inherit',cursor:unavailable?'not-allowed':'pointer',textAlign:'left',padding:0}}>
    <span className="voicePulse">{playing?<VolumeX/>:<Volume2/>}</span>
-   <span><small>K4K CORE · {label.toUpperCase()}</small><b>{playing?'WELCOME MESSAGE PLAYING':'VOICE WELCOME READY'}</b></span>
- </button>;
+   <span><small>K4K CORE · {label.toUpperCase()}</small><b>{unavailable?'VOICE TEMPORARILY UNAVAILABLE':loading?'PREPARING WELCOME…':playing?'STOP WELCOME MESSAGE':'PLAY OPTIONAL VOICE WELCOME'}</b></span>
+  </button>
+  {unavailable&&<span style={{display:'block',fontSize:11,color:'#d7bda0',marginTop:9}}>Your lessons are available as normal. Voice playback will return when the service is restored.</span>}
+ </div>;
 }
