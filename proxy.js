@@ -14,7 +14,9 @@ export async function proxy(request){
    supabase.from('k4k_admins').select('user_id').eq('user_id',uid).maybeSingle(),
    supabase.from('memberships').select('status,current_period_end').eq('user_id',uid).maybeSingle()
   ]);
-  // Access is granted only for an authenticated account with an active paid membership.\n  // Email OTP and Google both verify control of the payment email; membership is\n  // linked by the claim-academy-membership function after authentication.\n  const isPaid=membership&&['active','trialing'].includes(membership.status)&&(!membership.current_period_end||new Date(membership.current_period_end).getTime()>Date.now());
+  // Authenticated users must have an active paid membership (or be an admin).
+  // Both email OTP and Google authentication are supported.
+  const isPaid=membership&&['active','trialing'].includes(membership.status)&&(!membership.current_period_end||new Date(membership.current_period_end).getTime()>Date.now());
   if(!admin&&!isPaid){if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Active membership required'},{status:403});const u=request.nextUrl.clone();u.pathname='/membership-required';return NextResponse.redirect(u)}
  }
  return response
