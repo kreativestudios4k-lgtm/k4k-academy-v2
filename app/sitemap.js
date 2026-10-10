@@ -1,0 +1,1 @@
+export default function sitemap(){return ['','/privacy','/terms'].map(path=>({url:'https://kreativestudios4k.com'+path,changeFrequency:path?'yearly':'weekly',priority:path?0.3:1}));}
