@@ -1,1 +1,1 @@
-export default function robots(){return {rules:[{userAgent:'*',allow:['/','/privacy','/terms'],disallow:['/academy/','/admin/','/mentor/','/prompts/','/update-password/','/membership-required/']}],sitemap:'https://kreativestudios4k.com/sitemap.xml'};}
+export default function robots(){return {rules:[{userAgent:'*',allow:['/','/privacy','/terms'],disallow:['/academy','/admin','/mentor','/prompts','/update-password','/membership-required','/auth']}],sitemap:'https://kreativestudios4k.com/sitemap.xml'};}
