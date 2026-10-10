@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import {CompleteWorkflowButton} from '../../LearningProgress';
 import {ArrowLeft,LockKeyhole,CalendarDays,PlayCircle,CheckCircle2,Video,Image as ImageIcon} from 'lucide-react';
 
 export const dynamic='force-dynamic';
@@ -66,6 +67,7 @@ export default function WorkflowTwo(){
     <p style={{lineHeight:1.8,color:'#b9c7b4'}}>Check every cut for facial consistency, natural proportions, accurate foot-to-ball contact, wardrobe stability, preserved camera angles and realistic lighting. Export your final vertical video at 1080 × 1920 if the reference framing supports it.</p>
     <Link href="/academy" className="back">RETURN TO ALL WORKFLOWS →</Link>
    </section>
+  <CompleteWorkflowButton lessonId="workflow-002"/>
   </>}
  </main>;
 }
