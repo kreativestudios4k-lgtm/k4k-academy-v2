@@ -12,7 +12,7 @@ export default function Academy(){
   <aside>
    <Link className="brand" href="/"><span>K4K</span> ACADEMY</Link>
    <nav><Link className="active" href="/academy">My Workflows</Link><Link href="/academy/workflows/viral-character-swap">Workflow 01</Link><Link href="/academy/workflows/puskas-character-swap">Workflow 02 · {workflowTwoAvailable?'Available':'Monday'}</Link><Link href="/prompts">Prompt Vault</Link><Link href="/mentor">AI Instructor</Link></nav>
-   <div style={{padding:"12px 0",display:"grid",gap:12}}><Link href="/update-password" style={{color:"#caff39",fontSize:13,fontWeight:800,textDecoration:"underline"}}>Change Password</Link><LogoutButton/></div>
+   <div style={{padding:"12px 0",display:"grid",gap:12}}><Link href="/update-password" style={{color:"#caff39",fontSize:13,fontWeight:800,textDecoration:"underline"}}>Change Password</Link><a href="https://billing.stripe.com/p/login/28E7sM93ubxrfkU05WeEo00" target="_blank" rel="noopener noreferrer" style={{color:"#d9edcc",fontSize:13,textDecoration:"underline"}}>Manage billing &amp; cancellation ↗</a><LogoutButton/></div>
    <div className="member"><small>MEMBERSHIP</small><b>CREATOR MEMBER</b><span>Private workflow library</span></div>
   </aside>
   <section className="dashmain">
