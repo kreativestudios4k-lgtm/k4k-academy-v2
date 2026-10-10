@@ -29,10 +29,10 @@ export default function MembershipRequired(){
  <p style={{color:'#caff39',fontSize:12,fontWeight:800,letterSpacing:3,marginTop:46}}>PRIVATE CREATOR MEMBERSHIP</p>
  <h1 style={{fontSize:'clamp(38px,7vw,64px)',lineHeight:1.05,letterSpacing:'-.06em',margin:'12px 0 20px'}}>UNLOCK YOUR<br/>VIRAL WORKFLOW.</h1>
  {state==='checking'?<p style={{lineHeight:1.8,color:'#b7c0b1'}} role='status'>Checking your verified subscription and activating member access…</p>:
- <><p style={{lineHeight:1.8,color:'#b7c0b1'}}>{state==='error'?'We could not verify your membership right now. Please try again or contact Academy support.':state==='sign-in'?'Continue with Google using the same email you used at checkout to activate your subscription.':'No active K4K Viral Workflow subscription is linked to this Google email. Purchase access below, or sign in with the Google email used at Stripe checkout. If you paid with another email, contact support.'}</p>
- <Link href='/#checkout' style={{display:'inline-block',marginTop:24,background:'#caff39',color:'#101510',padding:'17px 24px',fontWeight:900,borderRadius:6,textDecoration:'none'}}>PURCHASE ACCESS · £7.99/MONTH →</Link>
- <p style={{color:'#9da99b',fontSize:13,marginTop:28}}>Already paid? Continue with the Google account using your payment email.</p>
- <Link href='/login' style={{color:'#fff',fontSize:13}}>Continue with Google →</Link>
+ <><p style={{lineHeight:1.8,color:'#b7c0b1'}}>{state==='error'?'We could not verify your membership right now. Please try again or contact Academy support.':state==='sign-in'?'Sign in with the email you used at checkout to activate your existing subscription. You can use a secure email link or Google.':'No active subscription is linked to this signed-in email. If you already paid, sign in again using the exact email on your Stripe receipt. Do not pay again. Contact Academy support if the issue continues.'}</p>
+ <Link href='/login' style={{display:'inline-block',marginTop:24,background:'#caff39',color:'#101510',padding:'17px 24px',fontWeight:900,borderRadius:6,textDecoration:'none'}}>SIGN IN WITH YOUR PAYMENT EMAIL →</Link>
+ <p style={{color:'#9da99b',fontSize:13,marginTop:28}}>Already paid? Use the email on your payment receipt. No new purchase is needed.</p>
+ <Link href='/login' style={{color:'#fff',fontSize:13}}>Use secure email login →</Link>
  <button type='button' onClick={()=>window.location.reload()} style={{marginLeft:20,background:'transparent',border:'1px solid #ffffff44',borderRadius:6,color:'#fff',padding:'10px 14px',cursor:'pointer'}}>Retry activation</button>
  </>}
  </section></main>
