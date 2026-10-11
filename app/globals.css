@@ -177,3 +177,87 @@ html{scroll-padding-top:24px}
 @media(max-width:1000px){.academyPublicGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.academyPublicTopics{padding:65px 0}.academyPublicTrend{grid-template-columns:1fr}.academyPublicTrend>img{min-height:205px;max-height:330px}}
 @media(max-width:550px){.academyPublicGrid{grid-template-columns:1fr}.academyPublicCardInfo{padding:18px}.academyPublicHead h2{font-size:38px}}
+
+/* Premium editorial design system, inspired by the studio's selected references.
+   Member journeys and underlying functionality remain unchanged. */
+.dashPremium{background:radial-gradient(ellipse 55% 38% at 78% 8%,#152e547d,transparent 80%),#050609;color:#f3f5fa;font-family:Arial,Helvetica,sans-serif;grid-template-columns:255px minmax(0,1fr)}
+.dashPremium>aside{background:linear-gradient(135deg,#0e121a 0%,#07090e 75%);border-right:1px solid #ffffff20;padding:31px 24px;z-index:2}
+.dashPremium>aside .brand{font-size:22px;font-weight:950;letter-spacing:-.06em;line-height:1.15}
+.dashPremium>aside .brand>span{color:#baff45}
+.dashBrandSub{display:block!important;font-size:8px!important;font-weight:700;letter-spacing:.2em!important;color:#8095af!important;margin-top:10px}
+.dashPremium>aside nav{padding-top:62px;gap:5px}
+.dashPremium>aside nav a{border:1px solid transparent;border-radius:10px;color:#acb7c8;font-size:12px;font-weight:600;letter-spacing:.02em;padding:13px 13px}
+.dashPremium>aside nav a:hover{background:#ffffff0c;color:#fff;border-color:#ffffff25}
+.dashPremium>aside nav a.active{border:1px solid #bcdeff35;border-left:2px solid #baff45;background:linear-gradient(100deg,#1f3c5a78,#0b111a);color:white}
+.dashPremium>aside>.member{margin-top:auto;border:1px solid #ffffff2b;background:linear-gradient(140deg,#101926,#0b1018);border-radius:13px;padding:20px 17px}
+.dashPremium>aside>.member b{color:white}
+.dashPremium>aside>.member span{color:#aeb8c5!important;letter-spacing:0!important}
+.dashPremium .dashmain{width:100%;max-width:1570px;padding:clamp(25px,4vw,65px) clamp(22px,4vw,66px) 120px}
+.dashPremium .dashEditorialHero{position:relative;isolation:isolate;overflow:hidden;border:1px solid #ffffff2b;border-radius:23px;padding:clamp(32px,5vw,67px);min-height:clamp(380px,40vw,560px);background:radial-gradient(ellipse 64% 90% at 90% 45%,#2042769e,transparent 73%),linear-gradient(120deg,#0b0d12,#111929);margin-top:10px;margin-bottom:34px;align-items:center;gap:30px}
+.dashPremium .dashEditorialHero:before{content:"";position:absolute;inset:auto 0 0 auto;height:80%;width:65%;background:radial-gradient(ellipse at 85% 80%,#2c76be32,transparent 70%);pointer-events:none;z-index:-1}
+.dashPremium .dashEditorialHero>div:first-child{z-index:1;flex:1;min-width:0}
+.dashPremium .dashEditorialHero small{display:flex;gap:10px;align-items:center;color:#c1d4e8!important;font-size:10px;letter-spacing:.16em;font-weight:800}
+.dashPremium .dashStatusDot{width:7px;height:7px;border-radius:50%;background:#baff45;box-shadow:0 0 16px #baff457a}
+.dashPremium .dashEditorialHero h1{font-size:clamp(48px,5.4vw,92px);font-weight:900;line-height:.9;letter-spacing:-.09em;color:#fff;margin:32px 0 25px}
+.dashPremium .dashEditorialHero h1 i{font-style:normal;color:transparent;-webkit-text-stroke:1px #f1f5fc}
+.dashPremium .dashEditorialHero p{font-size:15px;color:#bec8d7!important;line-height:1.8;max-width:525px}
+.dashPremium .dashEditorialJump{display:inline-flex;align-items:center;gap:11px;margin-top:15px;color:#baff45;font-size:11px;letter-spacing:.09em;font-weight:900;border-bottom:1px solid #baff4599;padding-bottom:11px}
+.dashPremium .dashEditorialIndex{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;align-self:stretch;flex:0 1 31%;min-width:0}
+.dashPremium .dashEditorialIndex>span{font-size:clamp(70px,12vw,170px);font-weight:900;letter-spacing:-.13em;line-height:1;color:transparent;-webkit-text-stroke:1px #d4e9ff59;transform:rotate(-90deg)}
+.dashPremium .dashEditorialIndex small{white-space:nowrap;color:#a5bdcf!important;font-size:9px}
+.dashPremium .learningProgress{background:linear-gradient(125deg,#141a27bb,#0c111a);border-color:#ffffff31;border-radius:17px}
+.dashPremium .learningProgressTop h2{letter-spacing:-.04em;font-weight:850}
+.dashPremium .learningProgressTrack{background:#e6f3ff22}
+.dashPremium .learningProgressItem{background:#ffffff09;border-color:#ffffff2a}
+.dashPremium .learningProgressItem>span{background:#baff4518}
+.dashPremium .learningProgressItem>span.done{background:#baff45;color:#070b05}
+.dashPremium .learningProgressItem small{color:#afc0d1}
+.dashPremium .academyKicker{letter-spacing:.2em}
+.dashPremium .academyCourseHeading{margin-bottom:36px}
+.dashPremium .academyCourseHeading h2{font-size:clamp(42px,5vw,73px);letter-spacing:-.075em;line-height:.95;font-weight:900}
+.dashPremium .academyCourseHeading h2 em{color:transparent;-webkit-text-stroke:1px #fff}
+.dashPremium .academyCourseHeading p{color:#b6c2d1;line-height:1.8}
+.dashPremium .academyCourseCount{border-color:#b8d3f258;color:#c7d6e8}
+.dashPremium .academyCourseGrid{gap:17px}
+.dashPremium .academyCourseCard{border-color:#ffffff2e;background:linear-gradient(145deg,#171c27,#0b1019);border-radius:17px}
+.dashPremium .academyCourseCard:hover{box-shadow:0 16px 50px #091a32b0;border-color:#a7ceff99}
+.dashPremium .academyCourseImage{background:#101723}
+.dashPremium .academyCourseImage img{filter:saturate(.8)}
+.dashPremium .academyCourseImage:after{background:linear-gradient(0deg,#050b1499,transparent 75%)}
+.dashPremium .academyCourseImage>span{border-color:#ffffff5a;border-radius:99px;background:#101624d9;color:white}
+.dashPremium .academyCourseCardBody{padding:23px;gap:12px}
+.dashPremium .academyCourseCardBody h3{font-size:clamp(21px,2vw,27px);letter-spacing:-.045em}
+.dashPremium .academyCourseCardBody p{color:#b4c0ce}
+.dashPremium .academyCourseLink{color:#baff45}
+.dashPremium .academyTrendFeature{border-color:#ffffff3b;border-radius:18px;background:linear-gradient(135deg,#101a2a,#070e17)}
+.dashPremium .academyTrendFeatureCopy p{color:#b9c6d8}
+.dashPremium .academyTrendSummary{color:#91a7be!important}
+.dashPremium .academyTrendFeatureCopy h2{font-size:clamp(31px,3.5vw,49px);font-weight:900}
+.dashPremium .academyTrendFeatureCopy a{border-radius:99px}
+.dashPremium .sectiontitle{border-top:1px solid #ffffff30;padding-top:18px;color:#a4b6cc}
+.dashPremium .sectiontitle div{color:white}
+.dashPremium .continue{border:1px solid #ffffff2f;border-radius:18px;overflow:hidden;background:#0f1724;grid-template-columns:1fr 1fr}
+.dashPremium .workflowCover{background:#111c2e!important}
+.dashPremium .workflowCover img{max-height:480px;min-height:340px;filter:saturate(.7)}
+.dashPremium .workflowCoverLabel{background:#baff45!important;color:#070909!important}
+.dashPremium .continue section{padding:clamp(24px,4vw,55px)}
+.dashPremium .continue section h2{font-size:clamp(29px,3vw,44px);letter-spacing:-.065em;line-height:1.05}
+.dashPremium .continue section p{color:#bdc9d6;line-height:1.8}
+.dashPremium #coming-next{background:linear-gradient(120deg,#131d2c,#0c121b)!important;border-color:#ffffff2f!important;border-radius:18px!important}
+.dashPremium .academyHelp{background:linear-gradient(120deg,#111b2a,#080d16);border-color:#ffffff30}
+.dashPremium .academyHelp p{color:#b2c1d1}
+.dashPremium .academyMobileNav a{border-color:#ffffff4c;color:#e0e9f4;background:#ffffff0b}
+.dashPremium .academyMobileNav a:hover{border-color:#baff45;color:#baff45}
+@media(max-width:1100px){.dashPremium{grid-template-columns:225px minmax(0,1fr)}.dashPremium>aside{padding:24px 18px}.dashPremium .dashEditorialIndex{flex:0 1 26%}.dashPremium .dashEditorialHero h1{font-size:clamp(46px,5vw,70px)}}
+@media(max-width:800px){.dashPremium{display:block}.dashPremium>aside{position:static;height:auto;display:flex;align-items:center;justify-content:space-between;border-right:0;border-bottom:1px solid #ffffff28;padding:20px 23px;flex-wrap:wrap}.dashPremium>aside nav,.dashPremium>aside>.member{display:none}.dashPremium>aside .dashBrandSub{display:none!important}.dashPremium .dashmain{padding:28px 20px 85px}.dashPremium .dashEditorialHero{margin-top:0;min-height:360px}.dashPremium .academyCourseGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.dashPremium>aside .brand{font-size:19px}.dashPremium .dashEditorialHero{padding:33px 24px;min-height:350px}.dashPremium .dashEditorialHero h1{font-size:clamp(43px,10vw,64px)}.dashPremium .dashEditorialIndex{display:none}.dashPremium .academyCourseGrid{grid-template-columns:1fr}.dashPremium .academyCourseHeading h2{font-size:45px}.dashPremium .continue{grid-template-columns:1fr}.dashPremium .continue section{padding:28px}.dashPremium .workflowCover img{min-height:260px;max-height:300px}.dashPremium .academyTrendFeature{grid-template-columns:1fr}.dashPremium .academyTrendPhoto{min-height:260px}}
+/* Paid learning pages inherit a quieter version of the system */
+.k4kLessonPage{background:radial-gradient(ellipse 45% 20% at 72% 4%,#19365b3d,transparent 92%),#07090e;color:#f1f4f7}
+.k4kLessonHero{background:#111c2a;border-color:#ffffff35}
+.k4kLessonHero:after{background:linear-gradient(90deg,#080c12f5 0%,#0b1521d2 38%,#060a0d5a 100%),linear-gradient(0deg,#091121c8,transparent 75%)}
+.k4kLessonBlock,.k4kLessonAsideCard{background:#121925;border-color:#ffffff2b}
+.k4kLessonNumber{background:#baff4523}
+.k4kLessonPrompt pre{background:#0b111a;border-color:#ffffff34}
+.k4kLessonCheckGrid>div{background:#111a26;border-color:#ffffff25}
+.k4kLessonNavigation a{background:#101725}
+.k4kLessonAssignment{background:#121d2e;border-color:#ffffff36}
