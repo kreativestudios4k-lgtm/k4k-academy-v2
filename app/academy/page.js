@@ -29,6 +29,11 @@ export default function Academy(){
      </Link>)}</div>
      <p className="academyCourseNote">Guided study notes and practice projects. For full filmed examples, continue to the existing weekly Workflows.</p>
    </section>
+
+   <section id="trend-of-the-week" className="academyTrendFeature">
+      <div className="academyTrendPhoto"><img src={weeklyTrend.image} alt={weeklyTrend.imageAlt} width="1920" height="1080" loading="lazy"/></div>
+      <div className="academyTrendFeatureCopy"><span className="academyKicker">TREND OF THE WEEK · {weeklyTrend.week}</span><h2>{weeklyTrend.title}</h2><p>{weeklyTrend.subtitle}</p><p className="academyTrendSummary">Our curated creative challenge: analyse the technique, adapt a ready-to-use prompt and practise with authorised footage.</p><Link href="/academy/trends">OPEN THIS WEEK'S TREND LAB <ArrowRight size={17}/></Link></div>
+   </section>
    <div className="sectiontitle"><div>YOUR WEEKLY WORKFLOWS</div><span>{workflowTwoAvailable?'02 WORKFLOWS AVAILABLE':'01 AVAILABLE · 02 MONDAY 12 OCT'}</span></div>
    <div className="continue">
     <div className="workflowCover"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/06017105-11b5-47e6-aafd-f942478ead64.jpg" alt="Multi-angle character sheet from Dembow Party Workflow 01" loading="lazy"/><span className="workflowCoverLabel">WORKFLOW 001 · REAL EXAMPLE</span></div>
