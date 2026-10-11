@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
+import {courseTopics,weeklyTrend} from '../lib/academy-course';
 import {ArrowRight,Check,ShieldCheck,LockKeyhole,Play,Video,Clapperboard,FileText,ChevronDown,CheckCircle2,MoveUpRight} from 'lucide-react';
 
 const checkout='https://buy.stripe.com/dRmbJ293u6d7egQ8CseEo0n';
@@ -25,7 +26,7 @@ export default function Home(){
   <div className="topline"><span className="pulse"/> K4K ACADEMY · WEEKLY CREATOR WORKFLOWS · PRIVATE MEMBER ACCESS</div>
   <header className="k4kNav">
    <Link href="/" className="k4kBrand"><span>K4K</span> ACADEMY</Link>
-   <div className="navActions"><a href="#included">What you get</a><Link href="/login">Member login <MoveUpRight size={15}/></Link></div>
+   <div className="navActions"><a href="#included">What you get</a><a href="#course-curriculum">Course Topics</a><Link href="/login">Member login <MoveUpRight size={15}/></Link></div>
   </header>
   <div className="k4kContent" id="main-content">
    <section className="k4kHero" id="top">
@@ -58,6 +59,19 @@ export default function Home(){
      <div className="demoMedia"><div className="demoPhone"><video controls playsInline preload="metadata" aria-label="AI character swap recreation preview"><source src={demoVideo} type="video/mp4"/>Your browser does not support this video.</video></div></div>
      <div className="demoCopy"><span className="sectionKicker">WORKFLOW 001 · AVAILABLE NOW</span><h3>FROM REFERENCE<br/>TO RECREATION.</h3><p>Study the original, build your own character sheet, transfer motion in Higgsfield Genjutsu and check the finished video for natural movement and consistent identity.</p><div className="demoPills"><span>Real example</span><span>Copyable prompts</span><span>Guided steps</span></div><a href="#checkout" className="secondaryCTA">LEARN THE METHOD <ArrowRight size={17}/></a><small>Preview clip only. Full lessons require an active membership.</small></div>
     </div>
+   </section>
+
+   <section className="academyPublicTopics" id="course-curriculum">
+      <div className="academyPublicHead"><span className="sectionKicker">YOUR K4K LEARNING ROADMAP</span><h2>LEARN THE PROCESS.<br/><em>MAKE IT YOUR OWN.</em></h2><p>Six illustrated learning topics take you from understanding generative AI to making original videos, mastering reference-based recreations and preparing client-ready projects. Guided notes, prompts and hands-on tasks are available inside the member area.</p></div>
+      <div className="academyPublicGrid">{courseTopics.map(topic=><article className="academyPublicCard" key={topic.slug}>
+         <img src={topic.image} width="1920" height="1080" alt={topic.imageAlt} loading="lazy" decoding="async"/>
+         <div className="academyPublicCardInfo"><small>TOPIC {topic.number} · {topic.eyebrow}</small><h3>{topic.title}</h3><p>{topic.summary}</p></div>
+      </article>)}</div>
+      <div className="academyPublicTrend">
+        <img src={weeklyTrend.image} alt={weeklyTrend.imageAlt} width="1920" height="1080" loading="lazy"/>
+        <div><small>EXTRA: WEEKLY TREND LAB · {weeklyTrend.week}</small><h3>Study the latest featured creator technique.</h3><p>Our first curated focus: {weeklyTrend.title}. Find a practical brief, motion-transfer prompt and creator challenge in your member area.</p><a href="#checkout">UNLOCK THE TREND LAB <ArrowRight size={18}/></a></div>
+      </div>
+      <p className="academyPublicFootnote">These are guided topic lessons and projects. Filmed original-vs-AI demonstrations are provided separately in the available member workflows. Weekly trend features are editorially curated and dated, not a live ranking.</p>
    </section>
    <section className="methodSection">
     <div className="sectionKicker">THE WORKFLOW</div>
