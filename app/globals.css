@@ -152,3 +152,28 @@ html{scroll-padding-top:24px}
 @media(max-width:1140px){.academyCourseGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:800px){.academyCourseHeading{align-items:flex-start;flex-direction:column;gap:13px}.academyTrendFeature{grid-template-columns:1fr}.academyTrendPhoto{min-height:240px}.k4kLessonContents{grid-template-columns:1fr}.k4kLessonAside{position:static;grid-template-columns:1fr 1fr}.k4kLessonRelated{grid-column:1/-1}}
 @media(max-width:560px){.academyCourseGrid{grid-template-columns:1fr}.academyCourseCardBody{padding:19px}.academyTrendPhoto{min-height:200px}.academyTrendFeatureCopy{padding:23px}.k4kLessonPage{padding:20px 16px 65px}.k4kLessonNav a{font-size:11px}.k4kLessonHero{min-height:380px}.k4kLessonHeroCopy{padding:28px 24px}.k4kLessonHeroCopy h1{font-size:38px}.k4kLessonBlock{padding:17px;grid-template-columns:35px minmax(0,1fr);gap:12px}.k4kLessonNumber{width:32px;height:32px}.k4kLessonAside{grid-template-columns:1fr}.k4kLessonNavigation{grid-template-columns:1fr}.k4kLessonCheckGrid{grid-template-columns:1fr}}
+
+
+/* Public K4K Academy curriculum preview */
+.academyPublicTopics{padding:clamp(65px,7vw,105px) 0;max-width:1220px;margin:0 auto}
+.academyPublicHead{margin:0 0 30px}
+.academyPublicHead h2{font-size:clamp(36px,5.6vw,70px);letter-spacing:-.065em;line-height:1.01;margin:16px 0 20px}
+.academyPublicHead h2 em{font-style:normal;color:#caff39}
+.academyPublicHead>p{max-width:750px;color:#bdc9b8;font-size:15px;line-height:1.7}
+.academyPublicGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}
+.academyPublicCard{background:#121a10;border:1px solid #ffffff26;border-radius:18px;overflow:hidden;min-width:0}
+.academyPublicCard>img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;background:#172116}
+.academyPublicCardInfo{padding:21px}
+.academyPublicCardInfo small,.academyPublicTrend small{display:block;color:#caff39;font-size:10px;letter-spacing:.14em;font-weight:900;line-height:1.5}
+.academyPublicCardInfo h3{font-size:clamp(18px,2vw,25px);margin:12px 0 9px;letter-spacing:-.04em;line-height:1.1}
+.academyPublicCardInfo p{font-size:12px;line-height:1.7;color:#b5c4ad}
+.academyPublicTrend{display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden;border:1px solid #caff3959;border-radius:20px;margin-top:24px;background:#132012}
+.academyPublicTrend>img{display:block;width:100%;height:100%;min-height:260px;object-fit:cover}
+.academyPublicTrend>div{padding:clamp(23px,4vw,48px);display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.academyPublicTrend h3{font-size:clamp(24px,2.8vw,38px);line-height:1.05;letter-spacing:-.045em;margin:15px 0}
+.academyPublicTrend p{font-size:13px;line-height:1.7;color:#c6d8bd}
+.academyPublicTrend a{display:inline-flex;align-items:center;gap:10px;border-radius:8px;padding:13px 18px;background:#caff39;color:#0d160b;font-size:11px;font-weight:900;margin-top:12px}
+.academyPublicFootnote{font-size:12px;line-height:1.7;color:#a5b29f;margin:20px 0 0}
+@media(max-width:1000px){.academyPublicGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.academyPublicTopics{padding:65px 0}.academyPublicTrend{grid-template-columns:1fr}.academyPublicTrend>img{min-height:205px;max-height:330px}}
+@media(max-width:550px){.academyPublicGrid{grid-template-columns:1fr}.academyPublicCardInfo{padding:18px}.academyPublicHead h2{font-size:38px}}
