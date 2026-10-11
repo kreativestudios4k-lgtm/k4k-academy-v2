@@ -8,9 +8,9 @@ import {ArrowRight,LockKeyhole,CalendarDays,CheckCircle2,LifeBuoy,BookOpen} from
 export const dynamic='force-dynamic';
 export default function Academy(){
  const workflowTwoAvailable=Date.now()>=new Date('2026-10-11T23:00:00.000Z').getTime();
- return <main className="dash">
+ return <main className="dash dashPremium">
   <aside>
-   <Link className="brand" href="/"><span>K4K</span> ACADEMY</Link>
+   <Link className="brand" href="/"><span>K4K</span> ACADEMY <small className="dashBrandSub">CREATOR STUDIO / MEMBERS</small></Link>
    <nav><Link className="active" href="/academy">My Workflows</Link><Link href="/academy#course-topics">Course Topics</Link><Link href="/academy/trends">Trend of the Week</Link><Link href="/academy/workflows/viral-character-swap">Workflow 01</Link><Link href="/academy/workflows/puskas-character-swap">Workflow 02 · {workflowTwoAvailable?'Available':'Monday'}</Link><Link href="/prompts">Prompt Vault</Link></nav>
    <div style={{padding:"12px 0",display:"grid",gap:12}}><Link href="/update-password" style={{color:"#caff39",fontSize:13,fontWeight:800,textDecoration:"underline"}}>Change Password</Link><a href="https://billing.stripe.com/p/login/28E7sM93ubxrfkU05WeEo00" target="_blank" rel="noopener noreferrer" style={{color:"#d9edcc",fontSize:13,textDecoration:"underline"}}>Manage billing &amp; cancellation ↗</a><LogoutButton/></div>
    <div className="member"><small>MEMBERSHIP</small><b>CREATOR MEMBER</b><span>Private workflow library</span></div>
@@ -18,7 +18,7 @@ export default function Academy(){
   <section className="dashmain">
    <div className="academyMobileNav"><Link href="/academy#course-topics">Course Topics</Link><Link href="/academy/trends">Weekly Trend</Link><Link href="/academy/workflows/viral-character-swap">Workflow 01</Link><Link href="/academy/workflows/puskas-character-swap">Workflow 02</Link><Link href="/prompts">Prompts</Link><Link href="/update-password">Password</Link></div>
    <GooglePasswordReminder/>
-   <header><div><small>K4K CREATOR SYSTEM · MEMBERS ONLY</small><h1>WELCOME TO<br/><i>THE LAB.</i></h1><p style={{color:"#c1ccbc",maxWidth:620,lineHeight:1.7,marginTop:15}}>Your private K4K Academy learning space. Start with Workflow 01, then come back for a new workflow every week.</p></div><div className="avatar">K4K</div></header>
+   <header className="dashEditorialHero"><div><small><span className="dashStatusDot"/> K4K ACADEMY / THE MEMBER SPACE</small><h1>YOUR<br/>CREATIVE<br/><i>CONTROL ROOM.</i></h1><p>Everything behind the finished frame. Your workflow library, creator lessons, useful prompts and real progress—all in one private studio.</p><a href="#course-topics" className="dashEditorialJump">EXPLORE THE CURRICULUM <ArrowRight size={17}/></a></div><div className="dashEditorialIndex" aria-hidden="true"><span>K4K</span><small>CREATE / LEARN / REFINE</small></div></header>
    <LearningProgress workflowTwoAvailable={workflowTwoAvailable}/>
 
    <section id="course-topics" className="academyCourseSection">
