@@ -76,3 +76,79 @@ html{scroll-padding-top:24px}
 .legalPage h2{font-size:clamp(20px,3vw,27px);margin:38px 0 10px;color:#caff39}
 .legalPage p{color:#c2cfc0;line-height:1.9;font-size:15px}
 .legalPage p a{color:#caff39;text-decoration:underline}
+
+
+/* K4K Academy 2026 learning path and editorial weekly trend */
+.academyKicker{display:inline-flex;align-items:center;gap:8px;color:#caff39;font-weight:900;font-size:10px;letter-spacing:.17em;text-transform:uppercase;line-height:1.6}
+.academyCourseSection{margin:42px 0 0;scroll-margin-top:20px}
+.academyCourseHeading{display:flex;align-items:flex-end;justify-content:space-between;gap:28px;margin-bottom:25px}
+.academyCourseHeading h2{font-size:clamp(29px,4vw,50px);line-height:1.03;letter-spacing:-.055em;margin:12px 0}
+.academyCourseHeading h2 em{color:#caff39;font-style:normal}
+.academyCourseHeading p{font-size:14px;line-height:1.75;color:#b7c7ae;max-width:690px;margin:0}
+.academyCourseCount{color:#d9e6d1;border:1px solid #566847;border-radius:99px;padding:10px 15px;letter-spacing:.13em;font-size:10px;white-space:nowrap}
+.academyCourseGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.academyCourseCard{display:flex;flex-direction:column;overflow:hidden;min-width:0;border:1px solid #ffffff22;border-radius:18px;background:#111710;color:#f3f8ef;transition:transform .2s,border-color .2s,box-shadow .2s}
+.academyCourseCard:hover,.academyCourseCard:focus-visible{transform:translateY(-3px);border-color:#caff3999;box-shadow:0 12px 36px #0005;outline-offset:4px}
+.academyCourseImage{aspect-ratio:16/9;position:relative;overflow:hidden;background:#1c281a}
+.academyCourseImage img{width:100%;height:100%;display:block;object-fit:cover;object-position:center}
+.academyCourseImage::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#07100770,transparent 55%);pointer-events:none}
+.academyCourseImage>span{position:absolute;z-index:1;bottom:12px;left:14px;padding:6px 10px;border:1px solid #d8ff7080;border-radius:30px;background:#071108cc;color:#d6ff83;letter-spacing:.13em;font-size:10px;font-weight:900}
+.academyCourseCardBody{display:flex;flex-direction:column;flex:1;padding:22px;gap:10px}
+.academyCourseCardBody>small{color:#caff39;letter-spacing:.13em;font-weight:900;font-size:9px;line-height:1.6}
+.academyCourseCardBody h3{font-size:clamp(19px,2vw,25px);line-height:1.1;letter-spacing:-.03em;margin:0}
+.academyCourseCardBody p{color:#b8c3b4;font-size:12px;line-height:1.7;margin:0;flex:1}
+.academyCourseLink{display:inline-flex;gap:9px;align-items:center;color:#caff39;font-size:10px;letter-spacing:.12em;font-weight:900;margin-top:7px}
+.academyCourseNote{font-size:12px;line-height:1.6;color:#98a68f;margin:15px 0 0}
+.academyTrendFeature{display:grid;grid-template-columns:1.05fr .95fr;gap:0;margin:40px 0 22px;border-radius:20px;overflow:hidden;border:1px solid #caff3955;background:linear-gradient(135deg,#172717,#0c120e);scroll-margin-top:28px}
+.academyTrendPhoto{min-height:300px;position:relative}
+.academyTrendPhoto img{display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.academyTrendFeatureCopy{padding:clamp(25px,4vw,48px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.academyTrendFeatureCopy h2{font-size:clamp(26px,3vw,42px);line-height:1.05;letter-spacing:-.05em;margin:15px 0}
+.academyTrendFeatureCopy p{color:#d7e1d1;font-size:14px;line-height:1.65;margin:0 0 10px}
+.academyTrendSummary{font-size:12px!important;color:#a8bda0!important}
+.academyTrendFeatureCopy a{display:inline-flex;align-items:center;gap:9px;border-radius:9px;background:#caff39;color:#09100a;font-size:11px;font-weight:900;letter-spacing:.04em;margin-top:15px;padding:14px 19px;line-height:1.5}
+.k4kLessonPage{background:#080b08;color:#f4f8ef;min-height:100vh;max-width:1540px;margin:0 auto;padding:clamp(18px,4vw,60px) clamp(18px,5vw,78px) 110px}
+.k4kLessonNav{display:flex;justify-content:space-between;align-items:center;gap:20px;margin:0 0 25px}
+.k4kLessonNav a{display:inline-flex;align-items:center;gap:8px;color:#caff39;font-size:12px;font-weight:800;padding:6px 0}
+.k4kLessonHero{position:relative;isolation:isolate;display:flex;align-items:flex-end;min-height:clamp(360px,39vw,530px);overflow:hidden;border:1px solid #ffffff29;border-radius:24px;background:#111a11}
+.k4kLessonHero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.k4kLessonHero:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#060a07ed 0%,#070e08ce 35%,#060a0770 75%,#070d073f 100%),linear-gradient(0deg,#080d08ce,transparent 65%);z-index:-1}
+.k4kLessonHeroCopy{padding:clamp(28px,5vw,76px);max-width:950px}
+.k4kLessonHeroCopy h1{font-size:clamp(36px,5.8vw,78px);line-height:.98;letter-spacing:-.065em;max-width:880px;margin:17px 0}
+.k4kLessonHeroCopy>p{font-size:clamp(14px,1.55vw,18px);line-height:1.65;color:#d7e4d1;max-width:620px}
+.k4kLessonMeta{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.k4kLessonMeta span{display:inline-flex;align-items:center;gap:7px;font-size:12px;border:1px solid #ffffff54;border-radius:99px;padding:9px 13px;background:#02070266}
+.k4kLessonContents{display:grid;grid-template-columns:minmax(0,1fr) minmax(215px,290px);gap:clamp(25px,4vw,55px);margin-top:40px;align-items:start}
+.k4kLessonSection{border-bottom:1px solid #ffffff24;padding:14px 0 40px;margin-bottom:28px}
+.k4kLessonSection h2{font-size:clamp(25px,3.2vw,37px);letter-spacing:-.04em;line-height:1.12;margin:12px 0 18px}
+.k4kLessonSection p,.k4kLessonSection li{color:#c1cebc;line-height:1.85;font-size:14px}
+.k4kLessonSection p{max-width:800px}
+.k4kLessonBlocks{display:grid;gap:16px}
+.k4kLessonBlock{display:grid;grid-template-columns:48px minmax(0,1fr);gap:22px;padding:27px 25px;border-radius:15px;background:#121a11;border:1px solid #ffffff1d}
+.k4kLessonNumber{width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:14px;font-weight:900;background:#caff391c;color:#caff39}
+.k4kLessonBlock h3{font-size:20px;margin:2px 0 10px}
+.k4kLessonBlock p{margin:0 0 9px}
+.k4kLessonSection ul{padding-left:22px;margin:10px 0}
+.k4kLessonPrompt pre{padding:23px;white-space:pre-wrap;overflow-wrap:anywhere;border-radius:14px;border:1px solid #caff3940;background:#0f190f;color:#eff8e9;line-height:1.8;font-size:13px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.k4kLessonPrompt>a{display:inline-flex;gap:9px;align-items:center;font-weight:900;font-size:12px;color:#caff39}
+.k4kLessonAssignment{background:#172417;padding:30px;border:1px solid #caff3950;border-radius:18px}
+.k4kLessonAssignment h3{color:#f4fbec;font-size:17px;margin:20px 0 8px}
+.k4kLessonAside{position:sticky;top:25px;display:grid;gap:18px}
+.k4kLessonAsideCard{padding:23px;background:#111a10;border:1px solid #ffffff2b;border-radius:15px}
+.k4kLessonAsideCard h3{font-size:19px;letter-spacing:-.02em;margin:13px 0}
+.k4kLessonAsideCard p{color:#bacab3;font-size:13px;line-height:1.75}
+.k4kLessonAsideCard>div{display:flex;align-items:flex-start;gap:9px;color:#d4e3cb;font-size:12px;line-height:1.6;margin:12px 0}
+.k4kLessonAsideCard>div svg,.k4kLessonAsideCard>svg{flex-shrink:0;color:#caff39}
+.k4kLessonRelated{display:inline-flex;align-items:center;gap:10px;border-radius:12px;padding:16px 17px;background:#caff39;color:#0a1408;font-size:12px;font-weight:900}
+.k4kLessonRelated svg:last-child{margin-left:auto;flex-shrink:0}
+.k4kLessonNavigation{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.k4kLessonNavigation a{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#10180e;padding:18px;border:1px solid #ffffff2b;border-radius:12px;font-size:12px}
+.k4kLessonNavigation small{display:block;color:#caff39;font-size:9px;letter-spacing:.1em;margin-bottom:6px}
+.k4kLessonNavigation strong{font-size:13px}
+.k4kLessonCheckGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.k4kLessonCheckGrid>div{display:flex;gap:11px;align-items:flex-start;background:#121b10;padding:16px;border:1px solid #ffffff23;border-radius:12px;font-size:13px;line-height:1.6}
+.k4kLessonCheckGrid svg{color:#caff39;flex-shrink:0}
+.k4kTrendDisclaimer{color:#a6b49d!important;font-size:12px!important;border-left:2px solid #caff39;padding-left:15px}
+@media(max-width:1140px){.academyCourseGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.academyCourseHeading{align-items:flex-start;flex-direction:column;gap:13px}.academyTrendFeature{grid-template-columns:1fr}.academyTrendPhoto{min-height:240px}.k4kLessonContents{grid-template-columns:1fr}.k4kLessonAside{position:static;grid-template-columns:1fr 1fr}.k4kLessonRelated{grid-column:1/-1}}
+@media(max-width:560px){.academyCourseGrid{grid-template-columns:1fr}.academyCourseCardBody{padding:19px}.academyTrendPhoto{min-height:200px}.academyTrendFeatureCopy{padding:23px}.k4kLessonPage{padding:20px 16px 65px}.k4kLessonNav a{font-size:11px}.k4kLessonHero{min-height:380px}.k4kLessonHeroCopy{padding:28px 24px}.k4kLessonHeroCopy h1{font-size:38px}.k4kLessonBlock{padding:17px;grid-template-columns:35px minmax(0,1fr);gap:12px}.k4kLessonNumber{width:32px;height:32px}.k4kLessonAside{grid-template-columns:1fr}.k4kLessonNavigation{grid-template-columns:1fr}.k4kLessonCheckGrid{grid-template-columns:1fr}}
