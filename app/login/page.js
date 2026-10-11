@@ -61,8 +61,9 @@ export default function Login(){
    setPasswordLoading(false);
   }
  }
- return <main className="authpage"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link>
- <section style={{maxWidth:440,width:'100%',margin:'auto',padding:'35px 25px',border:'1px solid #ffffff25',borderRadius:18,background:'#111610',color:'#fff'}}>
+ return <main className="authpage authPremium"><Link href="/" className="brand"><span>K4K</span> ACADEMY</Link>
+ <div className="authPremiumLayout"><div className="authPremiumPitch"><span>THE K4K CREATOR ACADEMY / MEMBERS</span><h2>WELCOME<br/>TO YOUR<br/><em>CREATIVE SPACE.</em></h2><p>Everything behind the finished frame. Your workflow library, prompts and learning progress—ready when you are.</p><div><span className="authPremiumDot"/> MEMBERS ONLY · SECURE SIGN IN</div></div>
+ <section className="authPremiumCard">
  <small style={{color:'#caff39',letterSpacing:2,fontWeight:800}}>PRIVATE VIRAL VIDEO WORKFLOW</small>
  <h1 style={{fontSize:'clamp(38px,7vw,58px)',lineHeight:1.05,letterSpacing:'-.05em',margin:'22px 0'}}>YOUR VIDEO.<br/><i>YOUR ACCESS.</i></h1>
  {checkoutReturn?<p role="status" style={{lineHeight:1.7,color:'#e5f6c9',background:'#caff3914',border:'1px solid #caff3955',padding:14,borderRadius:9}}>Thanks for joining! Sign in using the <b>same email you used to pay</b>. Your subscription will be checked before access is granted.</p>:<p style={{lineHeight:1.7,color:'#b9c5b3'}}>Already purchased? Sign in using the same email address as your Stripe payment to unlock your workflow.</p>}
@@ -90,5 +91,5 @@ export default function Login(){
   <Link href="/#checkout" style={{display:'flex',justifyContent:'center',alignItems:'center',gap:10,background:'#caff39',color:'#101510',fontWeight:900,padding:'17px 15px',borderRadius:7,textDecoration:'none'}}>GET ACCESS · £7.99 / MONTH <ArrowRight size={17}/></Link>
  </div>
  <p style={{fontSize:12,color:'#98a694',marginTop:23,lineHeight:1.6}}><LockKeyhole size={14} style={{verticalAlign:'middle'}}/> Your workflow is protected. Use the email address on your payment receipt; no second purchase is required.</p>
- </section></main>
+ </section></div></main>
 }
