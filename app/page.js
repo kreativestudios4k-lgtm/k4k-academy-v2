@@ -1,121 +1,166 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
+import {ArrowUpRight,ArrowRight,ArrowDown,Check,ChevronDown,Play,ShieldCheck,MoveUpRight,LockKeyhole} from 'lucide-react';
 import {courseTopics,weeklyTrend} from '../lib/academy-course';
-import {ArrowRight,Check,ShieldCheck,LockKeyhole,Play,Video,Clapperboard,FileText,ChevronDown,CheckCircle2,MoveUpRight} from 'lucide-react';
 
 const checkout='https://buy.stripe.com/dRmbJ293u6d7egQ8CseEo0n';
+const billingPortal='https://billing.stripe.com/p/login/28E7sM93ubxrfkU05WeEo00';
 const demoVideo='https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/94c04cc0-e9f1-48cf-a4fd-a8c271ba069d.mp4';
-const steps=[
- {number:'01',title:'Study the viral reference',description:'Break down the original movement, timing, camera angles and performance before you start.'},
- {number:'02',title:'Create your character sheet',description:'Use the included prompt to create consistent reference views of your own character.'},
- {number:'03',title:'Recreate it in Genjutsu',description:'Follow the Higgsfield Motion Transfer setup and use the ready-to-copy replacement prompt.'},
- {number:'04',title:'Compare and export',description:'Compare the AI result, correct identity drift and prepare your final vertical video.'}
+const method=[
+ {number:'01',title:'OBSERVE.',sub:'Read the frame.',body:'Study your original reference: movement, camera, timing and the small details that make it convincing.'},
+ {number:'02',title:'DESIGN.',sub:'Lock your character.',body:'Create a consistent character sheet with the right face, outfit, angles and body proportions.'},
+ {number:'03',title:'CREATE.',sub:'Transfer the motion.',body:'Bring your references into the AI workflow. Use a structured prompt, test, and refine.'},
+ {number:'04',title:'REFINE.',sub:'Make every frame count.',body:'Compare the output, correct identity drift, and export a polished vertical video.'}
 ];
-const included=['Workflow 01: original video, AI result and full tutorial','New workflow releases in the member library','Character sheet and copy-ready AI prompts','Higgsfield Genjutsu motion-transfer lessons','Quality checks, export tips and practice assets','Private access while your subscription is active'];
-const faq=[
- ['What am I buying?','An active K4K Academy membership. Workflow 01 is ready now; new workflows are released to the private library as they become available.'],
- ['Is £7.99 a one-time payment?','No. This is a recurring £7.99 monthly subscription. Stripe shows the billing terms before you confirm payment.'],
- ['How do I access the workflow after paying?','After checkout you will be redirected to create or sign into your K4K Academy account. Use the same email address you used to pay, verify your email if prompted, and your active subscription can be linked to your account.'],
- ['Will I get access to other lessons?','Yes. Active members can access newly released K4K Academy workflows at no additional lesson charge. Workflow 02 is scheduled for Monday 12 October 2026.'],
- ['Can I cancel my subscription?','Yes. Use the secure Stripe customer portal to view invoices, update payment details or cancel future renewals at the end of your billing period. You can also contact Academy support.']
+const benefits=[
+ 'Real AI recreation examples and reference videos',
+ 'Six guided learning topics with practical assignments',
+ 'Character sheets and copy-ready production prompts',
+ 'Weekly workflow releases for active members',
+ 'Higgsfield Genjutsu motion-transfer tutorials',
+ 'Private member dashboard and learning progress'
+];
+const faqs=[
+ ['What exactly is K4K Academy?','A private AI video creation learning membership. You get practical lessons, original/reference video breakdowns, character-sheet guidance, copy-ready prompts and access to new workflows as they are released.'],
+ ['Is £7.99 a one-time payment?','No. The listed UK membership costs £7.99 each month. Stripe confirms your final price, currency and subscription terms before you pay.'],
+ ['How do I get access after payment?','After checkout, sign in using the same email address shown on your Stripe payment receipt. You can use Google or a secure email link, then set a password from your member area.'],
+ ['Are new lessons included?','Yes. Active members receive access to new Academy workflow releases without an extra lesson charge. Release dates and content availability are shown in the private library.'],
+ ['Can I cancel?','Yes. You can manage your subscription, payment methods and invoices in the secure Stripe billing portal and cancel future renewals at the end of your billing period.']
 ];
 export default function Home(){
- const [open,setOpen]=useState(0);
- return <main className="k4kCheckout"><a className="skipLink" href="#main-content">Skip to content</a>
-  <div className="topline"><span className="pulse"/> K4K ACADEMY · WEEKLY CREATOR WORKFLOWS · PRIVATE MEMBER ACCESS</div>
-  <header className="k4kNav">
-   <Link href="/" className="k4kBrand"><span>K4K</span> ACADEMY</Link>
-   <div className="navActions"><a href="#included">What you get</a><a href="#course-curriculum">Course Topics</a><Link href="/login">Member login <MoveUpRight size={15}/></Link></div>
+ const [open,setOpen]=useState(-1);
+ return <main className="studioSite" id="top">
+  <a className="studioSkip" href="#main">Skip to content</a>
+  <div className="studioBackdrop" aria-hidden="true"/>
+  <header className="studioHeader">
+   <Link className="studioWordmark" href="/" aria-label="K4K Academy homepage"><span className="logoMark">K<span>4</span>K</span><span className="logoDivider"/><span className="logoCaption">ACADEMY<br/><small>CREATOR EDUCATION</small></span></Link>
+   <nav className="studioNav" aria-label="Primary navigation"><a href="#method">Method</a><a href="#curriculum">Explore</a><a href="#pricing">Membership</a><a href="#faq">FAQ</a></nav>
+   <Link className="studioHeaderLink" href="/login">MEMBER LOGIN <ArrowUpRight size={15}/></Link>
   </header>
-  <div className="k4kContent" id="main-content">
-   <section className="k4kHero" id="top">
-    <div className="k4kHeroText">
-     <div className="eyebrowTag"><span/> THE K4K AI CREATOR MEMBERSHIP</div>
-     <h1>RECREATE THE<br/><em>VIRAL VIDEO.</em><br/>STEP BY STEP.</h1>
-     <p className="heroLead">Go from a real reference clip to your own AI character swap. Get guided video breakdowns, copy-ready prompts and new creative workflows in your private member library.</p>
-     <div className="heroChecks"><span><CheckCircle2/> Real video breakdown</span><span><CheckCircle2/> Copy-ready prompts</span><span><CheckCircle2/> Private workflow access</span></div>
-     <a href="#checkout" className="primaryCTA mobileCTA">GET THE WORKFLOW <ArrowRight size={19}/></a>
-    </div>
-    <aside className="orderCard" id="checkout">
-     <div className="orderTop"><span className="orderEyebrow">YOUR ACCESS</span><span className="orderStatus"><span/> AVAILABLE NOW</span></div>
-     <div className="orderIcon"><Clapperboard size={27}/></div>
-     <h2>K4K ACADEMY<br/>MEMBERSHIP</h2>
-     <p className="orderSubtitle">Character Swap · Higgsfield Genjutsu</p>
-     <div className="orderDivider"/>
-     <div className="orderPrice"><strong>£7.99</strong><span>/ month</span></div>
-     <p className="priceNote">Recurring monthly membership · cancel any time with billing support</p>
-     <div className="orderDivider"/>
-     <div className="orderList">{included.slice(0,5).map(x=><div key={x}><Check size={17}/><span>{x}</span></div>)}</div>
-     <a href={checkout} className="payButton">JOIN K4K ACADEMY <ArrowRight size={20}/></a>
-     <div className="secureRow"><ShieldCheck size={17}/> Secure payment powered by Stripe</div>
-     <p className="orderFootnote">After payment: sign in using the <b>same email</b> as your Stripe receipt. Already paid? <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20Academy%20access%20help" style={{color:'#caff39',textDecoration:'underline'}}>Get access help</a> instead of purchasing again.</p>
-    </aside>
-   </section>
-   <section className="previewSection" id="included">
-    <div className="sectionKicker">REAL AI RESULTS · FULL METHOD FOR MEMBERS</div>
-    <div className="sectionHeading"><h2>SEE WHAT YOU CAN<br/><em>LEARN TO CREATE.</em></h2><p>Watch a short AI recreation from Workflow 01. The original reference, downloadable assets, full lesson and prompts stay inside your private Academy.</p></div>
-    <div className="comparisonFrame realPreview">
-     <div className="demoMedia"><div className="demoPhone"><video controls playsInline preload="metadata" aria-label="AI character swap recreation preview"><source src={demoVideo} type="video/mp4"/>Your browser does not support this video.</video></div></div>
-     <div className="demoCopy"><span className="sectionKicker">WORKFLOW 001 · AVAILABLE NOW</span><h3>FROM REFERENCE<br/>TO RECREATION.</h3><p>Study the original, build your own character sheet, transfer motion in Higgsfield Genjutsu and check the finished video for natural movement and consistent identity.</p><div className="demoPills"><span>Real example</span><span>Copyable prompts</span><span>Guided steps</span></div><a href="#checkout" className="secondaryCTA">LEARN THE METHOD <ArrowRight size={17}/></a><small>Preview clip only. Full lessons require an active membership.</small></div>
-    </div>
-   </section>
 
-   <section className="academyPublicTopics" id="course-curriculum">
-      <div className="academyPublicHead"><span className="sectionKicker">YOUR K4K LEARNING ROADMAP</span><h2>LEARN THE PROCESS.<br/><em>MAKE IT YOUR OWN.</em></h2><p>Six illustrated learning topics take you from understanding generative AI to making original videos, mastering reference-based recreations and preparing client-ready projects. Guided notes, prompts and hands-on tasks are available inside the member area.</p></div>
-      <div className="academyPublicGrid">{courseTopics.map(topic=><article className="academyPublicCard" key={topic.slug}>
-         <img src={topic.image} width="1920" height="1080" alt={topic.imageAlt} loading="lazy" decoding="async"/>
-         <div className="academyPublicCardInfo"><small>TOPIC {topic.number} · {topic.eyebrow}</small><h3>{topic.title}</h3><p>{topic.summary}</p></div>
-      </article>)}</div>
-      <div className="academyPublicTrend">
-        <img src={weeklyTrend.image} alt={weeklyTrend.imageAlt} width="1920" height="1080" loading="lazy"/>
-        <div><small>EXTRA: WEEKLY TREND LAB · {weeklyTrend.week}</small><h3>Study the latest featured creator technique.</h3><p>Our first curated focus: {weeklyTrend.title}. Find a practical brief, motion-transfer prompt and creator challenge in your member area.</p><a href="#checkout">UNLOCK THE TREND LAB <ArrowRight size={18}/></a></div>
+  <div id="main">
+   <section className="studioHero">
+    <div className="studioHeroEyebrow"><span className="statusDot"/> KREATIVE STUDIOS 4K <span className="eyebrowDivider">/</span> THE CREATOR ACADEMY</div>
+    <div className="studioHeroGrid">
+     <div className="studioHeroContent">
+      <h1>THE ART<br/>OF <span className="studioHeroGlow">MAKING</span><br/><span className="studioOutline">REAL.</span></h1>
+      <div className="studioHeroBottom">
+       <p>Learn to transform creative ideas and video references into striking AI productions. Your vision. Your characters. A method you can actually follow.</p>
+       <div className="studioHeroButtons"><a className="studioPrimary" href="#pricing">EXPLORE MEMBERSHIP <ArrowUpRight size={19}/></a><a className="studioTextLink" href="#showcase">SEE THE WORK <ArrowDown size={17}/></a></div>
       </div>
-      <p className="academyPublicFootnote">These are guided topic lessons and projects. Filmed original-vs-AI demonstrations are provided separately in the available member workflows. Weekly trend features are editorially curated and dated, not a live ranking.</p>
+     </div>
+     <div className="studioHeroVisual">
+      <div className="studioVisualCaption"><span>FIG. 01</span><span>REFERENCE → RECREATION</span></div>
+      <div className="studioVisualFrame"><div className="studioVisualHighlight"/><video controls playsInline preload="metadata" aria-label="K4K Academy AI video recreation demonstration"><source src={demoVideo} type="video/mp4"/>Your browser does not support video playback.</video></div>
+      <div className="studioVisualFoot"><span><span className="littleCircle"/> AI MOTION WORKFLOW</span><span>VIDEO STUDY / 001</span></div>
+      <span className="studioFloatingStamp" aria-hidden="true">K4K<br/>/ 26</span>
+     </div>
+    </div>
+    <div className="studioHeroBaseline"><span>LEARN THE METHOD. CREATE YOUR VERSION.</span><a href="#showcase">SCROLL TO EXPLORE <ArrowDown size={16}/></a><span>© K4K CREATIVE SYSTEM</span></div>
    </section>
-   <section className="methodSection">
-    <div className="sectionKicker">THE WORKFLOW</div>
-    <h2>FOUR STEPS.<br/><em>ONE COMPLETE PROCESS.</em></h2>
-    <div className="stepsGrid">{steps.map(s=><article key={s.number}><span className="stepNumber">{s.number}</span><h3>{s.title}</h3><p>{s.description}</p></article>)}</div>
-   </section>
-   <section className="includedSection">
-    <div><div className="sectionKicker">INSIDE YOUR MEMBERSHIP</div><h2>EVERYTHING YOU NEED<br/><em>FOR THIS VIDEO.</em></h2><p>Start with the character swap method, then explore new step-by-step video workflows as they are released to your private member library.</p><a href={checkout} className="secondaryCTA">JOIN THE ACADEMY <ArrowRight size={19}/></a></div>
-    <div className="includedPanel">{included.map((x,i)=><div key={x}><span className="includeIcon">{i===0?<Play size={16}/>:i===1?<Clapperboard size={16}/>:i===2||i===3?<FileText size={16}/>:<Check size={16}/>}</span><span>{x}</span><Check size={16} className="includeTick"/></div>)}</div>
-   </section>
-   <section className="faqSection"><div className="sectionKicker">BEFORE YOU JOIN</div><h2>QUESTIONS & <em>ANSWERS.</em></h2><div className="faqList">{faq.map(([q,a],i)=><div className="faqItem" key={q}><button type="button" aria-expanded={open===i} onClick={()=>setOpen(open===i?-1:i)}><span>{q}</span><ChevronDown size={20} className={open===i?'rotated':''}/></button>{open===i&&<p>{a}</p>}</div>)}</div></section>
-   <section className="lastCTA"><div className="sectionKicker">K4K ACADEMY</div><h2>READY TO MAKE<br/><em>YOUR VERSION?</em></h2><p>Get Workflow 01 now and future workflow releases while your £7.99/month membership stays active.</p><a href={checkout} className="payButton">UNLOCK FOR £7.99 / MONTH <ArrowRight size={20}/></a><div className="secureRow"><LockKeyhole size={16}/> Secure Stripe checkout · Member access after sign-in</div></section>
-  </div>
-  <footer className="k4kFooter"><span className="k4kBrand"><span>K4K</span> ACADEMY</span><span>© 2026 KREATIVE STUDIOS 4K</span><div className="footerLinks"><Link href="/login">Member login</Link><a href="https://billing.stripe.com/p/login/28E7sM93ubxrfkU05WeEo00" target="_blank" rel="noopener noreferrer">Manage billing</a><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><a href="mailto:hello@kreativestudios4k.com">Support</a></div></footer>
-  <style>{`
-  .k4kCheckout{min-height:100vh;background:#080a08;color:#f7f8f4;font-family:Arial,Helvetica,sans-serif;overflow:hidden}
-  .k4kCheckout *{box-sizing:border-box}.k4kCheckout a{text-decoration:none}.k4kCheckout .topline{background:#caff39;color:#12180c;font-size:10px;font-weight:900;letter-spacing:2px;text-align:center;padding:11px 12px}.topline .pulse,.eyebrowTag span,.orderStatus span{display:inline-block;width:7px;height:7px;border-radius:50%;background:#141b0d;margin-right:8px}
-  .k4kNav{height:80px;max-width:1240px;margin:auto;padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #ffffff18}
-  .k4kBrand{color:white;font-size:22px;font-weight:900;letter-spacing:-1px}.k4kBrand span{color:#caff39}
-  .navActions{display:flex;gap:28px;align-items:center}.navActions a{font-size:13px;font-weight:700;color:#c6cfc1}.navActions a:last-child{display:flex;align-items:center;gap:6px;color:white}
-  .k4kContent{max-width:1240px;margin:0 auto;padding:0 28px}.k4kHero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(345px,.78fr);gap:66px;align-items:center;padding:85px 0 110px}
-  .eyebrowTag,.sectionKicker{font-size:11px;letter-spacing:2.5px;font-weight:900;color:#caff39}.eyebrowTag{display:inline-flex;align-items:center;border:1px solid #caff3944;border-radius:99px;padding:12px 16px;background:#caff390d}.eyebrowTag span{background:#caff39}
-  .k4kHero h1{font-size:clamp(46px,5.5vw,78px);letter-spacing:-.075em;line-height:1.03;margin:28px 0 25px;font-weight:950}.k4kCheckout h1 em,.k4kCheckout h2 em{color:#caff39;font-style:normal}
-  .heroLead{color:#c1c7bd;font-size:17px;line-height:1.85;max-width:570px}.heroChecks{display:flex;flex-direction:column;gap:14px;margin-top:35px}.heroChecks span{display:flex;align-items:center;gap:12px;color:#e3e9dd;font-size:14px;font-weight:700}.heroChecks svg{color:#caff39;width:19px}
-  .orderCard{background:#151a14;border:1px solid #414d32;border-radius:22px;padding:32px;box-shadow:0 30px 100px #0009;position:relative}.orderTop{display:flex;justify-content:space-between;align-items:center;gap:8px}.orderEyebrow{color:#aab8a0;letter-spacing:2px;font-size:10px;font-weight:900}.orderStatus{color:#caff39;font-size:10px;font-weight:900;white-space:nowrap}.orderStatus span{background:#caff39}
-  .orderIcon{width:55px;height:55px;background:#caff39;color:#10160d;display:grid;place-items:center;border-radius:13px;margin-top:28px}.orderCard h2{font-size:29px;line-height:1.08;letter-spacing:-1px;margin:20px 0 9px}.orderSubtitle{color:#aeb9a6;font-size:13px}.orderDivider{height:1px;background:#ffffff1b;margin:23px 0}.orderPrice strong{font-size:56px;letter-spacing:-3px}.orderPrice span{font-size:15px;color:#b5c1ad;margin-left:10px}.priceNote{font-size:11px;color:#aeb9a6;line-height:1.6}.orderList{display:grid;gap:13px;margin-bottom:26px}.orderList>div{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:#e2e9db;line-height:1.45}.orderList svg{flex-shrink:0;color:#caff39}
-  .payButton,.primaryCTA,.secondaryCTA{display:flex;justify-content:center;align-items:center;gap:12px;padding:19px 18px;border-radius:9px;background:#caff39;color:#0b1008;font-weight:950;font-size:14px;letter-spacing:.25px;box-shadow:0 8px 30px #caff3922;transition:transform .2s,background .2s}.payButton:hover,.primaryCTA:hover,.secondaryCTA:hover{transform:translateY(-2px);background:#dbff6a}
-  .secureRow{display:flex;justify-content:center;align-items:center;gap:8px;color:#b9c6b0;font-size:11px;margin-top:17px}.orderFootnote{font-size:11px;line-height:1.65;color:#a9b6a3;text-align:center;margin:17px 0 0}.orderFootnote b{color:#e8f1de}.mobileCTA{display:none}
-  .previewSection,.methodSection,.includedSection,.faqSection{padding:95px 0;border-top:1px solid #ffffff1a}.k4kCheckout h2{font-size:clamp(32px,4.3vw,55px);letter-spacing:-.055em;line-height:1.1}.sectionHeading{display:flex;justify-content:space-between;align-items:end;gap:40px}.sectionHeading h2{margin:18px 0 30px}.sectionHeading p{max-width:350px;color:#b9c5b1;line-height:1.7;font-size:14px;margin-bottom:34px}.comparisonFrame{background:#111810;border:1px solid #ffffff24;border-radius:18px;overflow:hidden}.comparisonFrame img{display:block;width:100%;height:auto;min-height:220px;object-fit:cover}.comparisonCaption{padding:20px 24px;display:flex;justify-content:space-between;gap:20px;color:#caff39;font-size:11px;font-weight:900;letter-spacing:1.4px}.comparisonCaption span:first-child{display:flex;align-items:center;gap:10px}.comparisonCaption span:last-child{color:#b7c2b0}
-  .methodSection h2,.includedSection h2,.faqSection h2{margin:18px 0 35px}.stepsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px}.stepsGrid article{padding:26px 22px;background:#141a12;border:1px solid #ffffff1b;border-radius:14px}.stepNumber{color:#caff39;font-size:13px;font-weight:900;letter-spacing:2px}.stepsGrid h3{font-size:20px;line-height:1.2;letter-spacing:-.6px;margin:27px 0 13px}.stepsGrid p{color:#acb9a7;line-height:1.7;font-size:13px}
-  .includedSection{display:grid;grid-template-columns:1fr 1fr;gap:70px;align-items:center}.includedSection>div>p{color:#b8c3b2;line-height:1.75;font-size:15px;max-width:460px}.secondaryCTA{display:inline-flex;margin-top:25px}.includedPanel{background:#151a14;border:1px solid #ffffff26;border-radius:17px;padding:20px 27px}.includedPanel>div{display:flex;align-items:center;gap:15px;padding:17px 0;border-bottom:1px solid #ffffff18;font-size:14px;color:#e6ede2}.includedPanel>div:last-child{border:0}.includeIcon{width:34px;height:34px;border-radius:8px;background:#caff3917;color:#caff39;display:grid;place-items:center;flex-shrink:0}.includeTick{margin-left:auto;color:#caff39;flex-shrink:0}
-  .faqSection{max-width:850px;margin:auto}.faqList{border-top:1px solid #ffffff24}.faqItem{border-bottom:1px solid #ffffff24}.faqItem button{width:100%;padding:25px 0;display:flex;justify-content:space-between;gap:20px;align-items:center;background:none;border:0;color:#f7f8f4;text-align:left;font-size:17px;font-weight:800;cursor:pointer}.faqItem button svg{color:#caff39;transition:transform .2s;flex-shrink:0}.faqItem button svg.rotated{transform:rotate(180deg)}.faqItem p{margin:0 0 24px;color:#b6c2af;line-height:1.8;font-size:14px;max-width:740px}
-  .lastCTA{text-align:center;border:1px solid #caff3933;border-radius:22px;background:radial-gradient(circle at 50% 0,#2c3a1c,#111710 65%);padding:75px 30px;margin:15px 0 95px}.lastCTA h2{font-size:clamp(42px,5.4vw,69px);margin:19px 0}.lastCTA p{color:#c5cfc0;font-size:16px}.lastCTA .payButton{max-width:350px;margin:30px auto 0}
-  .k4kFooter{max-width:1240px;margin:auto;padding:35px 28px 45px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-top:1px solid #ffffff18}.k4kFooter>span:nth-child(2),.k4kFooter>a{font-size:11px;color:#aab6a3}.k4kFooter>a{text-decoration:underline}
 
-  .skipLink{position:absolute;top:-100px;left:12px;z-index:100;background:#caff39;color:#101510;padding:12px 18px;border-radius:8px}.skipLink:focus{top:12px}
-  .k4kCheckout :is(a,button,video):focus-visible{outline:3px solid #e8ff9b;outline-offset:4px}
-  .realPreview{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1fr);align-items:center;gap:clamp(25px,5vw,70px);padding:clamp(22px,5vw,56px);background:radial-gradient(circle at 15% 35%,#2b3b20,#101710 55%)}
-  .demoMedia{display:grid;place-items:center}.demoPhone{width:min(100%,290px);aspect-ratio:9/16;background:#050605;border:7px solid #273622;border-radius:25px;overflow:hidden;box-shadow:0 25px 60px #0009}.demoPhone video{width:100%;height:100%;object-fit:contain;background:#000;display:block}
-  .demoCopy h3{font-size:clamp(30px,4vw,50px);line-height:1.05;letter-spacing:-.055em;margin:22px 0}.demoCopy p{font-size:15px;line-height:1.8;color:#c1cdbb;max-width:470px}.demoPills{display:flex;gap:9px;flex-wrap:wrap;margin:23px 0}.demoPills span{border:1px solid #caff3945;background:#caff390b;color:#dff5ca;padding:8px 11px;border-radius:30px;font-size:11px;font-weight:800}.demoCopy .secondaryCTA{margin:15px 0;max-width:260px}.demoCopy>small{display:block;color:#9fac99;font-size:11px;line-height:1.6}.footerLinks{display:flex;gap:17px;flex-wrap:wrap}.footerLinks a{font-size:12px;color:#c7d2bf;text-decoration:underline}
-  @media(max-width:760px){.realPreview{grid-template-columns:1fr}.demoPhone{width:min(100%,265px)}.demoCopy{text-align:left}}
-  @media(prefers-reduced-motion:reduce){.k4kCheckout *{scroll-behavior:auto!important;transition:none!important}}
-  @media(max-width:900px){.k4kHero{grid-template-columns:1fr;gap:40px;padding:65px 0 80px}.orderCard{max-width:620px;width:100%;margin:auto}.stepsGrid{grid-template-columns:repeat(2,1fr)}.includedSection{grid-template-columns:1fr;gap:35px}.sectionHeading{display:block}.sectionHeading p{max-width:650px}.mobileCTA{display:inline-flex;margin-top:30px}.k4kHero h1{font-size:clamp(45px,8vw,72px)}}
-  @media(max-width:560px){.k4kNav{height:65px;padding:0 18px}.k4kBrand{font-size:18px}.navActions{gap:0}.navActions>a:first-child{display:none}.navActions a{font-size:12px}.k4kContent{padding:0 17px}.k4kHero{padding:48px 0 60px}.k4kHero h1{font-size:clamp(40px,10.5vw,57px);letter-spacing:-.065em}.heroLead{font-size:15px;line-height:1.75}.orderCard{padding:25px 21px}.orderCard h2{font-size:27px}.orderPrice strong{font-size:49px}.previewSection,.methodSection,.includedSection,.faqSection{padding:65px 0}.stepsGrid{grid-template-columns:1fr}.stepsGrid article{padding:22px}.comparisonCaption{flex-direction:column;font-size:10px}.lastCTA{padding:55px 20px;margin-bottom:60px}.k4kFooter{flex-direction:column;align-items:flex-start;padding:30px 18px}.k4kCheckout h2{font-size:clamp(31px,8.5vw,45px)}}
+   <section className="studioShowcase" id="showcase">
+    <div className="studioSectionTop"><span>01 / THE POSSIBILITY</span><span>DESIGNED TO MAKE YOU CREATE</span></div>
+    <div className="studioShowcaseHeading"><h2>DON'T JUST<br/>WATCH THE <span>FUTURE.</span></h2><p>Behind every striking AI video is a series of decisions. Learn those decisions—not just the final prompt.</p></div>
+    <div className="studioShowcaseVisual">
+     <div className="studioCaseLabel"><span className="littleCircle"/> CASE STUDY / CHARACTER SWAP</div>
+     <div className="studioCaseImage"><img src={courseTopics[4].image} alt={courseTopics[4].imageAlt} loading="lazy"/></div>
+     <div className="studioCaseOverlay"><span>FROM AN ORIGINAL REFERENCE</span><strong>TO YOUR<br/>OWN WORLD.</strong><a href="#method">DISCOVER THE PROCESS <ArrowUpRight size={16}/></a></div>
+     <div className="studioCaseIndex">K4K — 001</div>
+    </div>
+   </section>
+
+   <section className="studioMethod" id="method">
+    <div className="studioSectionTop"><span>02 / THE METHODOLOGY</span><span>THE PROCESS BEHIND THE RESULT</span></div>
+    <div className="studioSplitIntro"><h2>FOUR<br/>MOVES.<br/><em>ONE VISION.</em></h2><div><span className="studioOverline">A CREATIVE SYSTEM</span><p>Less guesswork. More direction. Follow a repeatable process to turn reference footage and original concepts into stronger AI videos.</p><a href="#pricing" className="studioTinyLink">LEARN WITH K4K <ArrowUpRight size={17}/></a></div></div>
+    <div className="studioMethodList">{method.map(item=><article key={item.number} className="studioMethodItem"><span className="studioMethodNumber">{item.number} / 04</span><div><h3>{item.title}</h3><span>{item.sub}</span></div><p>{item.body}</p><ArrowUpRight className="studioMethodArrow" size={22}/></article>)}</div>
+   </section>
+
+   <section className="studioCurriculum" id="curriculum">
+    <div className="studioSectionTop"><span>03 / THE CURRICULUM</span><span>LEARNING, NOT JUST WATCHING</span></div>
+    <div className="studioCurriculumHead"><div><span className="studioOverline">YOUR NEXT CREATIVE CHAPTER</span><h2>KNOWLEDGE<br/>IN <em>MOTION.</em></h2></div><p>Six guided topics. Realistic examples, prompts and exercises that move from first principles to finished creative projects.</p></div>
+    <div className="studioCourseGrid">{courseTopics.map((topic,i)=><article key={topic.slug} className={'studioCourseCard '+(i===0||i===3?'studioCourseLarge':'')}>
+      <div className="studioCourseArt"><img src={topic.image} alt={topic.imageAlt} loading="lazy"/><span className="studioCourseNumber">{topic.number} / 06</span></div>
+      <div className="studioCourseText"><div><small>{topic.eyebrow} <span>·</span> {topic.level}</small><h3>{topic.title}</h3><p>{topic.summary}</p></div><span className="studioCourseArrow"><ArrowUpRight size={19}/></span></div>
+     </article>)}</div>
+    <p className="studioUnderGrid">TOPICS INCLUDE GUIDED NOTES, PRACTICAL TASKS AND COPYABLE PROMPTS. FULL VIDEO WORKFLOWS ARE INSIDE THE MEMBER LIBRARY.</p>
+   </section>
+
+   <section className="studioWeekly" id="weekly">
+     <div className="studioWeeklyImage"><img src={weeklyTrend.image} alt={weeklyTrend.imageAlt} loading="lazy"/></div>
+     <div className="studioWeeklyContent"><div className="studioWeeklyTop"><span className="statusDot"/> THE WEEKLY CREATIVE BRIEF <span>{weeklyTrend.week}</span></div><h2>STAY<br/>CURIOUS.</h2><div><h3>{weeklyTrend.title}</h3><p>{weeklyTrend.subtitle}</p><span>Explore a new creative technique with a guided challenge inside the Academy. Editorially curated, not an automated live ranking.</span><a href="#pricing">GET MEMBER ACCESS <ArrowUpRight size={17}/></a></div></div>
+   </section>
+
+   <section className="studioPricing" id="pricing">
+    <div className="studioSectionTop"><span>04 / MEMBERSHIP</span><span>START CREATING TODAY</span></div>
+    <div className="studioPricingAmbient" aria-hidden="true"/>
+    <div className="studioPricingHead"><span className="studioOverline">A CREATIVE ADVANTAGE</span><h2>YOUR NEXT<br/><em>MOVE.</em></h2><p>One membership. The essential methods, reference studies and creative systems behind better AI video production.</p></div>
+    <div className="studioPriceCard">
+     <div className="studioPriceCardTop"><div><span>MEMBERSHIP / 01</span><h3>K4K ACADEMY</h3><p>Private AI creator education</p></div><span className="studioPriceTag"><span className="statusDot"/> OPEN FOR MEMBERS</span></div>
+     <div className="studioPriceBody"><div className="studioPriceFigure"><strong>£7.99</strong><span>/ MONTH<br/>RECURRING</span><p>Final checkout price and terms shown by Stripe.</p></div><div className="studioBenefits"><span className="studioOverline">YOUR MEMBERSHIP INCLUDES</span>{benefits.map(item=><div key={item}><Check size={17}/><span>{item}</span></div>)}</div></div>
+     <div className="studioPriceBottom"><div><a href={checkout} className="studioPriceCTA">JOIN K4K ACADEMY <ArrowUpRight size={20}/></a><p><ShieldCheck size={15}/> Secure Stripe checkout · Cancel future renewals</p></div><p>Already subscribed? <Link href="/login">Sign in to your member area</Link>. Always use the same email address as your payment receipt.</p></div>
+    </div>
+   </section>
+
+   <section className="studioFAQ" id="faq">
+    <div className="studioSectionTop"><span>05 / QUESTIONS</span><span>EVERYTHING YOU NEED TO KNOW</span></div>
+    <div className="studioFAQLayout"><div><span className="studioOverline">CLEAR ANSWERS</span><h2>GOOD<br/>QUESTIONS.</h2><p>Want to ask us something directly? <a href="mailto:hello@kreativestudios4k.com">Talk to K4K support <ArrowUpRight size={16}/></a></p></div>
+     <div className="studioFAQItems">{faqs.map(([q,a],i)=><div className="studioFAQItem" key={q}><button type="button" aria-expanded={open===i} onClick={()=>setOpen(open===i?-1:i)}><span>{String(i+1).padStart(2,'0')}</span><strong>{q}</strong><ChevronDown size={21} className={open===i?'open':''}/></button>{open===i&&<p>{a}</p>}</div>)}</div>
+    </div>
+   </section>
+
+   <section className="studioClosing"><span>THE NEXT FRAME IS YOURS.</span><h2>CREATE<br/><em>SOMETHING</em><br/>REAL.</h2><div><p>Learn the process. Find your style. Make the next idea happen.</p><a href={checkout}>BEGIN YOUR CREATOR JOURNEY <ArrowUpRight size={20}/></a></div></section>
+  </div>
+
+  <footer className="studioFooter"><div><Link href="/" className="studioFooterBrand">K<span>4</span>K<span className="studioFooterAcademy"> ACADEMY</span></Link><p>Kreative Studios 4K · Creator education</p></div><div className="studioFooterLinks"><Link href="/login">Member login</Link><a href={billingPortal} target="_blank" rel="noopener noreferrer">Manage billing</a><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><a href="mailto:hello@kreativestudios4k.com">Support</a></div><div className="studioFooterCopyright">© 2026 KREATIVE STUDIOS 4K <a href="#top">BACK TO TOP ↑</a></div></footer>
+
+  <style>{`
+  .studioSite{--lime:#baff45;--fg:#f3f4f3;--muted:#a2a7b0;--rule:rgba(255,255,255,.17);background:#050506;color:var(--fg);font-family:Arial,Helvetica,sans-serif;min-height:100vh;overflow:hidden;position:relative;isolation:isolate}
+  .studioSite *{box-sizing:border-box}.studioSite a{text-decoration:none}.studioSite :is(a,button,video):focus-visible{outline:2px solid var(--lime);outline-offset:5px}
+  .studioBackdrop{position:absolute;top:0;left:0;right:0;height:1000px;pointer-events:none;z-index:-1;background:radial-gradient(ellipse 40% 34% at 75% 27%,rgba(21,92,206,.29),transparent 82%),radial-gradient(ellipse 25% 30% at 51% 7%,rgba(8,36,79,.17),transparent 90%)}
+  .studioSkip{position:absolute;top:-120px;left:20px;padding:13px 20px;background:var(--lime);color:#000;z-index:50}.studioSkip:focus{top:20px}
+  .studioHeader{max-width:1540px;padding:26px clamp(22px,4vw,66px);margin:auto;display:flex;align-items:center;justify-content:space-between;gap:25px;min-height:110px;border-bottom:1px solid var(--rule)}
+  .studioWordmark{display:flex;align-items:center;gap:14px;white-space:nowrap}.logoMark{font-size:31px;font-weight:950;letter-spacing:-.09em}.logoMark span,.studioFooterBrand>span{color:var(--lime)}.logoDivider{width:1px;height:33px;background:#ffffff46}.logoCaption{font-size:12px;font-weight:800;letter-spacing:.28em;line-height:1.5}.logoCaption small{font-size:8px;font-weight:500;letter-spacing:.19em;color:#a2a6ae}
+  .studioNav{display:flex;gap:32px;border:1px solid #ffffff2e;border-radius:99px;background:#ffffff08;padding:14px 26px;backdrop-filter:blur(20px)}.studioNav a{font-size:12px;color:#b9bec8}.studioNav a:hover{color:white}
+  .studioHeaderLink{display:flex;align-items:center;gap:12px;font-size:11px;letter-spacing:.07em;font-weight:800;border:1px solid #ffffff35;border-radius:99px;padding:15px 20px;white-space:nowrap}.studioHeaderLink:hover{border-color:var(--lime);color:var(--lime)}
+  .studioHero,.studioShowcase,.studioMethod,.studioCurriculum,.studioPricing,.studioFAQ{max-width:1540px;margin:0 auto;padding-left:clamp(22px,4vw,66px);padding-right:clamp(22px,4vw,66px)}
+  .studioHero{padding-top:clamp(50px,7vw,113px);padding-bottom:70px}.studioHeroEyebrow,.studioOverline,.studioSectionTop,.studioHeroBaseline,.studioVisualCaption,.studioVisualFoot,.studioCourseNumber{font-size:10px;letter-spacing:.19em;font-weight:700}.studioHeroEyebrow{color:#d4d9e1;display:flex;align-items:center;gap:12px}.eyebrowDivider{color:#707782}.statusDot,.littleCircle{width:7px;height:7px;display:inline-block;flex-shrink:0;background:var(--lime);border-radius:50%;box-shadow:0 0 14px #aaff4f55}
+  .studioHeroGrid{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(260px,.72fr);gap:clamp(25px,3.4vw,60px);align-items:end;margin-top:35px}.studioHeroContent{min-width:0;position:relative;z-index:1}
+  .studioHero h1{font-size:clamp(68px,9.2vw,154px);line-height:.85;letter-spacing:-.092em;font-weight:900;margin:0 0 46px;white-space:nowrap}.studioHeroGlow{color:#e9f1ff;text-shadow:0 0 70px #3a6ebc55}.studioOutline{color:transparent;-webkit-text-stroke:1.5px #f6f7f7;text-shadow:none}
+  .studioHeroBottom{max-width:600px}.studioHeroBottom>p{color:#b2b7c2;font-size:clamp(15px,1.4vw,18px);line-height:1.7;max-width:545px;margin:0 0 28px}.studioHeroButtons{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+  .studioPrimary{background:var(--lime);color:#080907;display:inline-flex;align-items:center;justify-content:space-between;gap:35px;border-radius:99px;padding:19px 23px;font-size:12px;font-weight:900;letter-spacing:.045em;min-width:260px;transition:background .2s,transform .2s}.studioPrimary:hover{background:#d8ff97;transform:translateY(-2px)}
+  .studioTextLink{font-size:11px;letter-spacing:.075em;font-weight:800;color:#e6e7eb;display:inline-flex;align-items:center;gap:12px}.studioTextLink:hover{color:var(--lime)}
+  .studioHeroVisual{position:relative;max-width:450px;margin-left:auto;width:100%;align-self:stretch;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:8px}
+  .studioVisualCaption{display:flex;justify-content:space-between;gap:12px;color:#b3c6e1;margin-bottom:14px}.studioVisualFrame{height:clamp(390px,42vw,565px);width:100%;position:relative;border:1px solid #b6caff55;border-radius:170px 170px 15px 15px;overflow:hidden;background:linear-gradient(130deg,#0a0b0f,#16355d 60%,#070707);box-shadow:0 0 110px rgba(46,101,199,.18),inset 0 1px 0 #ffffff55}
+  .studioVisualFrame video{width:100%;height:100%;object-fit:contain;display:block;position:relative;z-index:1;background:#010306}.studioVisualHighlight{position:absolute;inset:0;pointer-events:none;background:linear-gradient(120deg,transparent,#afc9ff25,transparent);z-index:2}.studioVisualFoot{display:flex;justify-content:space-between;align-items:center;gap:10px;color:#91a0bb;margin-top:15px;font-size:9px}.studioVisualFoot>span:first-child{display:inline-flex;align-items:center;gap:8px}
+  .studioFloatingStamp{position:absolute;right:-18px;top:25%;border:1px solid #ffffff85;border-radius:50%;width:75px;height:75px;display:grid;place-items:center;background:#151923eb;text-align:center;font-size:16px;font-weight:900;line-height:1;transform:rotate(16deg);z-index:5;color:var(--lime)}
+  .studioHeroBaseline{border-top:1px solid var(--rule);margin-top:82px;padding-top:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;color:#797e8a;font-size:9px}.studioHeroBaseline a{display:inline-flex;align-items:center;gap:11px;color:#f5f5f5}
+  .studioSectionTop{display:flex;justify-content:space-between;align-items:center;gap:20px;color:#a6abb4;border-top:1px solid var(--rule);padding-top:19px;margin-bottom:55px;font-size:10px}
+  .studioShowcase{padding-top:65px;padding-bottom:115px}.studioShowcaseHeading{display:flex;align-items:end;justify-content:space-between;gap:35px;margin-bottom:38px}.studioShowcase h2,.studioSplitIntro h2,.studioCurriculum h2,.studioPricingHead h2,.studioFAQ h2,.studioClosing h2{font-weight:900;letter-spacing:-.08em;line-height:.91}
+  .studioShowcase h2{font-size:clamp(44px,6.1vw,96px);margin:0}.studioShowcase h2 span{color:#879fbd}.studioShowcaseHeading p{max-width:305px;line-height:1.7;color:#abb3be;font-size:15px;margin-bottom:4px}
+  .studioShowcaseVisual{min-height:clamp(400px,48vw,610px);background:#0e141d;border:1px solid #ffffff31;position:relative;overflow:hidden}.studioCaseImage{position:absolute;inset:0}.studioCaseImage img{height:100%;width:100%;object-fit:cover;filter:brightness(.62) saturate(.78)}.studioCaseImage:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#06070ade 0%,#080a0cb2 32%,transparent 78%),linear-gradient(0deg,#0306099e,transparent 53%)}.studioCaseLabel{position:absolute;z-index:2;left:32px;top:27px;display:flex;align-items:center;gap:9px;letter-spacing:.18em;font-size:10px}
+  .studioCaseOverlay{position:absolute;z-index:2;left:clamp(30px,6vw,85px);bottom:clamp(45px,6vw,85px)}.studioCaseOverlay>span{font-size:10px;letter-spacing:.2em;color:#c9d2dd}.studioCaseOverlay strong{display:block;font-size:clamp(45px,6.2vw,95px);line-height:.94;letter-spacing:-.075em;margin:18px 0 30px}.studioCaseOverlay>a{display:inline-flex;align-items:center;gap:12px;font-size:11px;font-weight:800;letter-spacing:.065em;border-bottom:1px solid #ffffffaa;padding-bottom:8px}.studioCaseIndex{position:absolute;bottom:26px;right:31px;z-index:2;font-size:10px;letter-spacing:.18em;color:#d1d7e5}
+  .studioMethod{padding-top:0;padding-bottom:145px}.studioSplitIntro{display:grid;grid-template-columns:1.12fr .7fr;gap:15%;align-items:end;margin:50px 0 75px}.studioSplitIntro h2{font-size:clamp(60px,8vw,126px);margin:0}.studioSplitIntro h2 em,.studioCurriculum h2 em,.studioPricingHead h2 em,.studioClosing h2 em{font-style:normal;color:#aebdcc}.studioSplitIntro>div{padding-bottom:8px}.studioOverline{color:var(--lime);display:block;line-height:1.65}.studioSplitIntro>div>p{line-height:1.85;font-size:16px;color:#aeb6c0;max-width:400px}.studioTinyLink{display:inline-flex;align-items:center;gap:16px;font-size:11px;font-weight:800;letter-spacing:.07em;border-bottom:1px solid #ffffff55;padding:9px 0;margin-top:10px}
+  .studioMethodList{border-top:1px solid var(--rule)}.studioMethodItem{display:grid;grid-template-columns:.19fr .58fr .43fr 25px;gap:28px;align-items:center;min-height:142px;border-bottom:1px solid var(--rule);padding:23px 7px}.studioMethodNumber{font-size:10px;color:#a7b4c9;letter-spacing:.12em}.studioMethodItem h3{font-size:clamp(32px,4vw,60px);line-height:1;letter-spacing:-.065em;margin:0 0 8px}.studioMethodItem>div>span{font-size:12px;color:#aeb5c0}.studioMethodItem>p{color:#a1a9b6;font-size:13px;line-height:1.7;max-width:330px}.studioMethodArrow{color:#a1adc1}
+  .studioCurriculum{padding-top:0;padding-bottom:140px}.studioCurriculumHead{display:flex;justify-content:space-between;align-items:end;gap:50px;margin-bottom:52px}.studioCurriculum h2{font-size:clamp(58px,7.5vw,112px);margin:16px 0 0}.studioCurriculumHead>p{font-size:15px;line-height:1.85;color:#aab3c1;max-width:330px}
+  .studioCourseGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.studioCourseCard{overflow:hidden;background:linear-gradient(160deg,#161a22d9,#090c12ee);border:1px solid #ffffff29;border-radius:19px;min-width:0;transition:border-color .2s,transform .2s}.studioCourseCard:hover{transform:translateY(-3px);border-color:#85baff99}
+  .studioCourseArt{position:relative;aspect-ratio:1.55;overflow:hidden;background:#111822}.studioCourseArt img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s;filter:saturate(.75)}.studioCourseCard:hover img{transform:scale(1.03)}.studioCourseArt:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#070c13c9,transparent 44%)}.studioCourseNumber{position:absolute;bottom:17px;left:19px;color:white;z-index:1}
+  .studioCourseText{padding:24px 25px 27px;display:flex;align-items:flex-end;justify-content:space-between;gap:10px}.studioCourseText>div{flex:1}.studioCourseText small{font-size:9px;font-weight:800;letter-spacing:.12em;color:#a4b6ce}.studioCourseText small span{color:var(--lime)}.studioCourseText h3{font-size:clamp(19px,2vw,29px);letter-spacing:-.05em;line-height:1.1;margin:13px 0 11px}.studioCourseText p{font-size:12px;color:#adb5c2;line-height:1.65;margin:0}.studioCourseArrow{flex-shrink:0;width:34px;height:34px;display:grid;place-items:center;border:1px solid #ffffff58;border-radius:50%;color:var(--lime)}.studioUnderGrid{font-size:10px;letter-spacing:.11em;color:#858e9c;line-height:1.7;margin-top:26px}
+  .studioWeekly{display:grid;grid-template-columns:1fr 1fr;max-width:1410px;margin:0 auto 130px;min-height:510px;border:1px solid #ffffff30;background:#0c1017}.studioWeeklyImage{position:relative;min-height:350px;overflow:hidden}.studioWeeklyImage img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.75) saturate(.82)}
+  .studioWeeklyContent{padding:clamp(27px,4vw,55px);display:flex;flex-direction:column;justify-content:space-between;min-width:0;background:radial-gradient(ellipse at 90% 85%,#1837668a,transparent 70%),#0a101a}.studioWeeklyTop{display:flex;align-items:center;gap:10px;font-size:9px;letter-spacing:.14em;color:#d7e0ec}.studioWeeklyTop>span:last-child{margin-left:auto;color:#8ea2c1}.studioWeekly h2{font-size:clamp(59px,7vw,110px);line-height:.9;letter-spacing:-.08em;margin:40px 0}.studioWeekly h3{font-size:23px;letter-spacing:-.04em;margin:0 0 9px}.studioWeekly p{color:#d0d8e5;line-height:1.5;font-size:14px}.studioWeeklyContent>div:last-child>span{color:#8295b0;line-height:1.7;display:block;font-size:12px}.studioWeekly a{margin-top:20px;display:inline-flex;gap:12px;align-items:center;border-bottom:1px solid #ffffff91;padding-bottom:9px;font-size:10px;letter-spacing:.12em;font-weight:800}
+  .studioPricing{position:relative;padding-top:0;padding-bottom:155px;isolation:isolate}.studioPricingAmbient{position:absolute;z-index:-1;inset:70px -15% -20px;pointer-events:none;background:radial-gradient(ellipse 36% 38% at 52% 67%,rgba(30,107,214,.32),transparent 90%),radial-gradient(ellipse 29% 19% at 70% 44%,rgba(33,107,201,.19),transparent 90%)}.studioPricingHead{text-align:center;max-width:900px;margin:75px auto 60px}.studioPricingHead h2{font-size:clamp(74px,10vw,145px);margin:18px 0}.studioPricingHead p{color:#aab6c4;font-size:15px;line-height:1.75;max-width:560px;margin:0 auto}
+  .studioPriceCard{max-width:1050px;margin:auto;padding:0;border:1px solid #ffffff66;border-radius:32px;background:linear-gradient(137deg,#ffffff1c,#ffffff06 45%,#193b6137 85%,#ffffff06);box-shadow:0 30px 100px #0008,0 0 85px #406cac25;backdrop-filter:blur(24px);overflow:hidden}.studioPriceCardTop{display:flex;justify-content:space-between;align-items:flex-start;padding:36px 45px 27px;gap:25px;border-bottom:1px solid #ffffff30}.studioPriceCardTop>div>span{color:#b5c2d5;font-size:10px;letter-spacing:.15em}.studioPriceCard h3{font-size:35px;letter-spacing:-.065em;margin:12px 0 4px}.studioPriceCardTop p{font-size:13px;color:#bac4d0;margin:5px 0}.studioPriceTag{border-radius:99px;padding:9px 13px;background:#ffffff14;border:1px solid #ffffff46;white-space:nowrap;font-size:9px;letter-spacing:.08em;display:inline-flex;gap:10px;align-items:center}
+  .studioPriceBody{display:grid;grid-template-columns:.85fr 1.15fr;gap:46px;padding:38px 45px}.studioPriceFigure{border-right:1px solid #ffffff2f;display:flex;flex-direction:column;justify-content:center}.studioPriceFigure strong{font-size:clamp(66px,7vw,100px);line-height:1;letter-spacing:-.095em}.studioPriceFigure>span{font-size:11px;letter-spacing:.15em;color:#bcc8d8;line-height:1.65;margin-top:12px}.studioPriceFigure p{color:#9aa7bb;font-size:11px;line-height:1.5;margin-top:30px;max-width:220px}.studioBenefits>.studioOverline{margin-bottom:20px}.studioBenefits>div{display:flex;align-items:flex-start;gap:12px;font-size:13px;color:#ecf0f6;line-height:1.5;margin:13px 0}.studioBenefits svg{color:var(--lime);flex-shrink:0}
+  .studioPriceBottom{border-top:1px solid #ffffff30;padding:27px 45px 38px;display:grid;grid-template-columns:1fr 1fr;gap:38px;align-items:center}.studioPriceCTA{display:flex;align-items:center;justify-content:space-between;gap:20px;border-radius:99px;background:var(--lime);color:#090b08;font-size:12px;font-weight:900;letter-spacing:.04em;padding:19px 23px;max-width:370px}.studioPriceCTA:hover{background:#dbff95}.studioPriceBottom>div>p{color:#a8b5c7;display:flex;align-items:center;gap:8px;font-size:11px;margin:14px 0 0}.studioPriceBottom>p{color:#acbbcf;font-size:13px;line-height:1.8;max-width:330px}.studioPriceBottom>p a{color:#f4f5f6;text-decoration:underline}
+  .studioFAQ{padding-bottom:140px}.studioFAQLayout{display:grid;grid-template-columns:.8fr 1.2fr;gap:12%}.studioFAQ h2{font-size:clamp(53px,6.5vw,103px);margin:24px 0}.studioFAQLayout>div:first-child>p{color:#aeb6c3;font-size:14px;line-height:1.8}.studioFAQLayout>div:first-child>p>a{color:white;display:inline-flex;align-items:center;gap:8px;border-bottom:1px solid #ffffff70}.studioFAQItems{border-top:1px solid var(--rule)}.studioFAQItem{border-bottom:1px solid var(--rule)}.studioFAQItem button{width:100%;display:flex;align-items:center;gap:20px;border:0;background:transparent;color:white;text-align:left;padding:27px 0;cursor:pointer}.studioFAQItem button>span{color:#7487a3;font-size:11px}.studioFAQItem button strong{font-size:clamp(15px,1.4vw,19px);font-weight:600;flex:1;letter-spacing:-.025em}.studioFAQItem button svg{transition:transform .2s;color:#a5b7d0}.studioFAQItem button svg.open{transform:rotate(180deg)}.studioFAQItem p{color:#aeb9c9;font-size:14px;line-height:1.8;padding:0 28px 25px;margin:0}
+  .studioClosing{padding:100px clamp(22px,7vw,120px) 110px;background:radial-gradient(ellipse at 56% 100%,#12315b9f,transparent 66%),#080b11;border-top:1px solid #ffffff20}.studioClosing>span{font-size:10px;letter-spacing:.24em;color:var(--lime)}.studioClosing h2{font-size:clamp(73px,13vw,192px);line-height:.8;margin:55px 0 30px}.studioClosing>div{display:flex;justify-content:space-between;align-items:center;gap:30px}.studioClosing>div p{color:#b9c2d0;max-width:300px;line-height:1.7}.studioClosing>div a{background:#f5f5f5;color:#0c0e14;border-radius:99px;padding:21px 26px;font-size:12px;font-weight:900;display:inline-flex;gap:25px;align-items:center}
+  .studioFooter{border-top:1px solid #ffffff24;max-width:1540px;margin:auto;padding:48px clamp(22px,4vw,66px) 35px;display:grid;grid-template-columns:1fr 1.5fr;gap:36px}.studioFooterBrand{font-weight:950;font-size:31px;letter-spacing:-.08em}.studioFooterAcademy{font-size:17px;font-weight:600;letter-spacing:.2em;color:white!important}.studioFooter>div:first-child>p{font-size:12px;color:#8d9aac}.studioFooterLinks{display:flex;justify-content:flex-end;align-items:flex-start;gap:20px;flex-wrap:wrap}.studioFooterLinks a{color:#c2c9d4;font-size:12px}.studioFooterLinks a:hover{color:var(--lime)}.studioFooterCopyright{grid-column:1/-1;border-top:1px solid #ffffff23;padding-top:25px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.13em;color:#7b8493}.studioFooterCopyright a{color:#aebaca}
+  @media(max-width:1200px){.studioHero h1{font-size:clamp(64px,9vw,120px)}.studioHeroGrid{grid-template-columns:minmax(0,1.15fr) minmax(250px,.85fr)}.studioShowcase h2{font-size:clamp(48px,6vw,80px)}.studioCourseGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.studioWeekly{margin-left:30px;margin-right:30px}}
+  @media(max-width:900px){.studioNav{gap:16px;padding:12px 18px}.studioNav a{font-size:11px}.studioHeroGrid{grid-template-columns:1fr .78fr}.studioHero h1{font-size:clamp(53px,8vw,75px)}.studioVisualFrame{height:420px}.studioHeroButtons{gap:15px}.studioHeroBaseline{margin-top:55px}.studioMethodItem{grid-template-columns:.18fr 1fr 1fr 20px}.studioPriceBody{gap:25px}}
+  @media(max-width:700px){.studioHeader{min-height:83px}.studioNav{display:none}.studioHeaderLink{padding:12px 13px;font-size:10px}.logoMark{font-size:27px}.logoCaption{font-size:11px}.studioHero{padding-top:66px}.studioHeroGrid{display:flex;flex-direction:column;align-items:stretch;gap:47px}.studioHero h1{font-size:clamp(62px,12.5vw,102px);white-space:normal}.studioHeroBottom{max-width:580px}.studioHeroVisual{margin:auto;max-width:440px}.studioVisualFrame{height:550px}.studioHeroBaseline>span:last-child{display:none}.studioShowcaseHeading,.studioCurriculumHead{display:block}.studioShowcaseHeading>p,.studioCurriculumHead>p{max-width:450px;margin-top:24px}.studioSplitIntro{grid-template-columns:1fr;gap:26px}.studioSplitIntro>div>p{max-width:500px}.studioMethodItem{grid-template-columns:70px 1fr 20px;gap:14px;padding:28px 0}.studioMethodItem>p{grid-column:2;grid-row:2;margin:0}.studioMethodArrow{grid-column:3;grid-row:1}.studioWeekly{grid-template-columns:1fr;margin:0 22px 90px}.studioWeeklyImage{min-height:300px}.studioPriceBody{grid-template-columns:1fr}.studioPriceFigure{border-right:0;border-bottom:1px solid #ffffff31;padding-bottom:25px}.studioPriceBottom{grid-template-columns:1fr}.studioFAQLayout{grid-template-columns:1fr;gap:40px}.studioClosing>div{flex-direction:column;align-items:flex-start}.studioFooter{grid-template-columns:1fr}.studioFooterLinks{justify-content:flex-start}}
+  @media(max-width:500px){.studioHeader{padding:18px 20px;gap:8px}.logoMark{font-size:26px}.logoDivider{height:30px}.logoCaption{font-size:9px}.logoCaption small{font-size:7px}.studioHeaderLink{font-size:9px;gap:5px;padding:11px}.studioHeroEyebrow{font-size:8px;letter-spacing:.12em;gap:8px}.studioHero h1{font-size:clamp(56px,14vw,74px);margin-bottom:34px}.studioHeroBottom>p{font-size:15px}.studioPrimary{width:100%;min-width:0}.studioHeroButtons{align-items:stretch}.studioVisualFrame{height:490px}.studioFloatingStamp{right:-9px;top:23%}.studioHeroBaseline{font-size:8px}.studioSectionTop{font-size:8px;letter-spacing:.12em;margin-bottom:37px}.studioShowcase{padding-bottom:90px}.studioShowcase h2{font-size:clamp(44px,11vw,59px)}.studioShowcaseVisual{min-height:430px}.studioCaseOverlay{left:25px;bottom:54px}.studioCaseOverlay strong{font-size:50px}.studioMethod{padding-bottom:100px}.studioSplitIntro h2{font-size:clamp(62px,14vw,84px)}.studioMethodItem h3{font-size:39px}.studioCurriculum{padding-bottom:90px}.studioCurriculum h2{font-size:clamp(56px,13vw,75px)}.studioCourseGrid{grid-template-columns:1fr}.studioWeeklyContent{padding:27px}.studioWeekly h2{font-size:69px}.studioPricing{padding-bottom:95px}.studioPricingHead h2{font-size:clamp(69px,17vw,90px)}.studioPriceCard{border-radius:23px}.studioPriceCardTop{padding:25px 23px;flex-wrap:wrap}.studioPriceCard h3{font-size:30px}.studioPriceBody{padding:26px 23px}.studioPriceBottom{padding:26px 23px}.studioPriceCTA{justify-content:center;gap:12px}.studioFAQ{padding-bottom:95px}.studioFAQ h2{font-size:67px}.studioClosing{padding:85px 22px}.studioClosing h2{font-size:clamp(70px,17vw,115px);margin:35px 0}.studioClosing>div a{font-size:10px;width:100%;justify-content:space-between}.studioFooter{padding-bottom:32px}}
+  @media(prefers-reduced-motion:reduce){.studioSite *, .studioSite *:before, .studioSite *:after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
   `}</style>
- </main>
+ </main>;
 }
