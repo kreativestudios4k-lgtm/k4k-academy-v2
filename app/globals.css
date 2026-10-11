@@ -261,3 +261,26 @@ html{scroll-padding-top:24px}
 .k4kLessonCheckGrid>div{background:#111a26;border-color:#ffffff25}
 .k4kLessonNavigation a{background:#101725}
 .k4kLessonAssignment{background:#121d2e;border-color:#ffffff36}
+
+/* Editorial login, same Supabase authentication logic */
+.authPremium{padding:31px clamp(20px,4vw,64px) 80px;background:radial-gradient(ellipse 40% 50% at 24% 44%,#142e5487,transparent 87%),#050609;min-height:100vh;color:#fff}
+.authPremium>.brand{display:inline-flex;align-items:center;margin:0 auto 16px;font-size:22px;letter-spacing:-.065em}
+.authPremium>.brand span{color:#baff45}
+.authPremiumLayout{max-width:1250px;margin:0 auto;display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(26px,6vw,92px);align-items:center;min-height:calc(100vh - 110px)}
+.authPremiumPitch{padding:35px 0}
+.authPremiumPitch>span{font-size:10px;letter-spacing:.2em;color:#adbad0;font-weight:800}
+.authPremiumPitch h2{font-size:clamp(55px,7.1vw,110px);letter-spacing:-.09em;line-height:.93;margin:30px 0;font-weight:900}
+.authPremiumPitch h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #e9f3ff}
+.authPremiumPitch>p{color:#b4c2d3;font-size:16px;line-height:1.8;max-width:465px}
+.authPremiumPitch>div{font-size:10px;letter-spacing:.16em;color:#9eb2cb;display:flex;gap:12px;align-items:center;margin-top:50px}
+.authPremiumDot{height:7px;width:7px;border-radius:50%;background:#baff45;box-shadow:0 0 18px #baff4580}
+.authPremiumCard{width:100%;max-width:490px;margin:30px auto;border:1px solid #ffffff54;border-radius:24px;padding:clamp(22px,3vw,40px);background:linear-gradient(130deg,#ffffff13,#0c1521c9 67%,#10233e8a);box-shadow:0 35px 100px #0008;backdrop-filter:blur(20px);color:#fff}
+.authPremiumCard h1{font-weight:900}
+.authPremiumCard h1 i{color:#baff45;font-style:normal}
+.authPremiumCard input{border-radius:9px!important;border:1px solid #ffffff66!important;background:#080e18!important;color:white!important}
+.authPremiumCard input:focus-visible{outline:2px solid #baff45;outline-offset:2px}
+.authPremiumCard button[type=submit],.authPremiumCard a[href="/#checkout"]{border-radius:99px!important}
+.authPremiumCard .googleAuth{border-radius:99px!important;min-height:46px}
+.authPremiumCard a:not(.googleAuth){text-underline-offset:3px}
+@media(max-width:850px){.authPremiumLayout{grid-template-columns:1fr;gap:5px;min-height:auto}.authPremiumPitch{padding:48px 0 12px}.authPremiumPitch h2{font-size:clamp(46px,9vw,74px)}.authPremiumPitch>div{margin-top:28px}.authPremiumCard{max-width:680px}}
+@media(max-width:550px){.authPremium{padding:23px 17px 60px}.authPremiumPitch{padding:34px 0 5px}.authPremiumPitch h2{font-size:clamp(44px,12vw,64px)}.authPremiumCard{padding:22px 19px;margin:18px 0}.authPremiumCard h1{font-size:clamp(36px,9vw,46px)!important}}
