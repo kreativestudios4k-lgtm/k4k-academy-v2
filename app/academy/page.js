@@ -20,6 +20,15 @@ export default function Academy(){
    <GooglePasswordReminder/>
    <header><div><small>K4K CREATOR SYSTEM · MEMBERS ONLY</small><h1>WELCOME TO<br/><i>THE LAB.</i></h1><p style={{color:"#c1ccbc",maxWidth:620,lineHeight:1.7,marginTop:15}}>Your private K4K Academy learning space. Start with Workflow 01, then come back for a new workflow every week.</p></div><div className="avatar">K4K</div></header>
    <LearningProgress workflowTwoAvailable={workflowTwoAvailable}/>
+
+   <section id="course-topics" className="academyCourseSection">
+     <div className="academyCourseHeading"><div><span className="academyKicker">K4K ACADEMY · YOUR LEARNING PATH</span><h2>FROM ZERO TO <em>AI CREATOR.</em></h2><p>Six guided topics featuring practical lessons, copyable prompts, quality checks and student challenges.</p></div><span className="academyCourseCount">06 TOPICS</span></div>
+     <div className="academyCourseGrid">{courseTopics.map(topic=><Link className="academyCourseCard" href={`/academy/topics/${topic.slug}`} key={topic.slug}>
+       <div className="academyCourseImage"><img src={topic.image} alt={topic.imageAlt} width="1920" height="1080" loading="lazy"/><span>TOPIC {topic.number}</span></div>
+       <div className="academyCourseCardBody"><small>{topic.eyebrow} · {topic.level}</small><h3>{topic.title}</h3><p>{topic.summary}</p><span className="academyCourseLink">OPEN TOPIC <ArrowRight size={16}/></span></div>
+     </Link>)}</div>
+     <p className="academyCourseNote">Guided study notes and practice projects. For full filmed examples, continue to the existing weekly Workflows.</p>
+   </section>
    <div className="sectiontitle"><div>YOUR WEEKLY WORKFLOWS</div><span>{workflowTwoAvailable?'02 WORKFLOWS AVAILABLE':'01 AVAILABLE · 02 MONDAY 12 OCT'}</span></div>
    <div className="continue">
     <div className="workflowCover"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/06017105-11b5-47e6-aafd-f942478ead64.jpg" alt="Multi-angle character sheet from Dembow Party Workflow 01" loading="lazy"/><span className="workflowCoverLabel">WORKFLOW 001 · REAL EXAMPLE</span></div>
