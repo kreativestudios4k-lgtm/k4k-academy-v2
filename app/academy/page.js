@@ -78,6 +78,5 @@ export default function Academy(){
    @media(max-width:850px){.k4kStartIntro{display:block}.k4kStartIntro>a{margin-top:24px;max-width:none}.k4kStartActions{grid-template-columns:1fr}.k4kStartActions>a{border-right:0;border-bottom:1px solid #ffffff30}.k4kDashboardGalleryGrid{grid-template-columns:1fr 1fr}}
    @media(max-width:520px){.k4kStartStages>span{font-size:8px;gap:4px;flex-direction:column}.k4kStartStages b{font-size:21px}.k4kDashboardGalleryGrid{grid-template-columns:1fr}.k4kDashboardGalleryGrid img{height:210px}}
   `}</style>
- </section>
  </main>
 }
