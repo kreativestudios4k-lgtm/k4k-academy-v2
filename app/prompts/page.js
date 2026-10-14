@@ -40,6 +40,32 @@ FINAL 3s: End on a memorable visual or question that invites genuine comments.
 CAMERA: Specify framing, movement and cut timing for every beat.
 ON-SCREEN TEXT: Keep short, legible and inside platform-safe margins.
 QUALITY CHECK: Clear opening, consistent character identity, natural pacing, licensed audio and mobile-first composition.`}
+,
+ {title:'Portrait Texture · No Beauty Filter',category:'PHOTOREALISM',body:`Use the uploaded adult portrait as the only identity reference. Preserve their actual face, hairstyle, glasses, age appearance, facial hair, proportions and natural skin tone.
+
+GOAL: Improve authentic photographic texture without changing identity.
+SKIN: Irregular naturally distributed pores, fine facial hair, realistic beard stubble, subtle pigmentation variation, fine creases and realistic lip texture. Correct eyelids, catchlights and surface reflections.
+LIGHTING: Soft directional natural light, accurate shadow falloff, restrained specular highlights, physically plausible skin translucency and subtle film grain.
+KEEP: Same camera angle, clothing, expression, environment and framing.
+REVIEW: Compare the new image with the original around eyebrows, nose, lips, spectacles and hairline.
+AVOID: Waxy CGI, excessive sharpening, artificial uniform pores, beauty smoothing or face reshaping.
+
+Photorealism must not be misrepresented as an untouched documentary photograph.`},
+ {title:'QA Review · Fix the Weak Frame',category:'ITERATION & QC',body:`Act as a production quality-control reviewer for an AI-generated image or video and its authorised reference.
+
+INPUTS: [SOURCE IMAGE/VIDEO], [AI RESULT], [THE PROMPT AND SETTINGS USED].
+TASK: Compare the same moments or angles. Do NOT assume the generation succeeded.
+
+CHECK THESE:
+1. Face and identity drift, eyewear, hairstyle, outfit and body scale.
+2. Hands, feet, ball or object contact, limb anatomy and background interactions.
+3. Camera position, lens perspective, lighting direction and motion timing.
+4. Unwanted cuts, missing speech, inaccurate lip sync or sound glitches.
+5. Source and music usage permissions, export format and disclosure.
+
+RETURN: A short table with (timestamp or region), what is wrong, severity, which input is relevant, one precise correction, and how to verify it. Recommend changing one variable at a time. If the model cannot guarantee a fix, say so.
+
+Never invent quality scores or claim to see frames you were not given.`}
 ];
 
 const visualPrompts=[
@@ -153,12 +179,19 @@ export default function Prompts(){
   <section className="promptEditorialHero" id="prompt-content">
    <div className="promptEditorialKicker"><span/> K4K STUDIO EDITIONS · VISUAL CREATION LAB</div>
    <h1>THE ART<br/>OF THE <em>PROMPT.</em></h1>
-   <div className="promptEditorialLead"><p>A collection of visual studies built around the K4K masked creator. Discover the exact creative direction behind each style, then use the prompt as the starting point for your own production.</p><div><span>09 EDITORIAL STUDIES</span><span>04 CORE WORKFLOW PROMPTS</span></div></div>
+   <div className="promptEditorialLead"><p>A collection of visual studies built around the K4K masked creator. Study the image, then study the decisions: identity, composition, camera and lighting. The prompt starts the experiment, but your judgement finishes it.</p><div><span>09 EDITORIAL STUDIES</span><span>06 PRACTICAL PROMPT TEMPLATES</span></div></div>
+  </section>
+  <section className="promptProofBridge" aria-label="How real character references improve production">
+   <div className="promptProofImage"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/32d483de-7d94-4b63-89c2-454821b2c4d9.png" alt="A K4K four-panel full-body and close-up character reference used in an actual production" loading="lazy"/></div>
+   <div><small>REAL CREATOR ASSET / THE FOUR-VIEW REFERENCE</small><h2>ONE FACE.<br/><em>FOUR CHECKS.</em></h2><p>This actual creator reference uses full-body front, full-body profile and two close-up angles. The image is an input: it helps the model, but does not guarantee consistency by itself.</p>
+    <ol><li>Choose a face with permission or use your own.</li><li>Check the same glasses, haircut and body scale across panels.</li><li>Save the character sheet alongside the exact video prompt.</li><li>Inspect the output whenever the camera changes angle.</li></ol>
+    <Link href="/academy/method">LEARN THE FRAME METHOD <ArrowUpRight size={18}/></Link>
+   </div>
   </section>
   <section className="promptEditorialLibrary">
    <div className="promptEditorialTabs" role="group" aria-label="Choose prompt collection">
     <button type="button" className={section==='gallery'?'selected':''} aria-pressed={section==='gallery'} onClick={()=>setSection('gallery')}><ImageIcon size={16}/> VISUAL PROMPT COLLECTION <span>09</span></button>
-    <button type="button" className={section==='workflows'?'selected':''} aria-pressed={section==='workflows'} onClick={()=>setSection('workflows')}><BookOpen size={16}/> CORE WORKFLOW PROMPTS <span>04</span></button>
+    <button type="button" className={section==='workflows'?'selected':''} aria-pressed={section==='workflows'} onClick={()=>setSection('workflows')}><BookOpen size={16}/> PRODUCTION PROMPTS <span>06</span></button>
    </div>
    {section==='gallery'?<>
     <div className="promptEditorialSectionInfo"><div><small>STUDIO COLLECTION / 2026</small><h2>NINE STUDIES.<br/>ONE CREATIVE IDENTITY.</h2></div><p>The same signature masked creator, reimagined through lighting, composition, motion and art direction. Each image opens a fully copyable production brief.</p></div>
@@ -171,7 +204,7 @@ export default function Prompts(){
     </article>)}</div>
     <p className="promptGalleryDisclaimer">IMAGE STUDIES ARE VISUAL EXAMPLES, NOT GUARANTEED GENERATION OUTPUTS. UPLOAD AN AUTHORISED CHARACTER REFERENCE AND ADAPT THE PROMPT TO YOUR OWN IDEA. THIRD-PARTY TOOL COSTS MAY APPLY.</p>
    </>:<>
-    <div className="promptEditorialSectionInfo"><div><small>YOUR PRODUCTION FOUNDATION</small><h2>BUILT FOR<br/>REAL WORKFLOWS.</h2></div><p>Four practical prompts for character sheets, motion transfer, cinematic scene direction and short-form storytelling. Replace the bracketed details before generating.</p></div>
+    <div className="promptEditorialSectionInfo"><div><small>YOUR PRODUCTION FOUNDATION</small><h2>BUILT FOR<br/>REAL WORKFLOWS.</h2></div><p>Six practical templates covering character references, motion transfer, cinematic scenes, short-form structure, realistic skin and frame-by-frame quality review. Adapt the inputs, then check the result.</p></div>
     <div className="promptCoreGrid">{corePrompts.map((item,index)=><article key={item.title} className="promptCoreCard"><small>CORE / {String(index+1).padStart(2,'0')} · {item.category}</small><h3>{item.title}</h3><pre>{item.body}</pre><button type="button" onClick={()=>copy(item.body,'core-'+index)}>{copied==='core-'+index?<Check size={17}/>:<Copy size={17}/>} {copied==='core-'+index?'COPIED':'COPY PROMPT'}</button></article>)}</div>
    </>}
    {error&&<p role="alert" className="promptCopyError">{error}</p>}
@@ -179,6 +212,8 @@ export default function Prompts(){
   <section className="promptEditorialClosing"><span>K4K ACADEMY / THE CREATOR METHOD</span><h2>FROM PROMPT<br/>TO <em>PRODUCTION.</em></h2><div><p>Want the full video breakdown, references and step-by-step workflow?</p><Link href="/academy/workflows/viral-character-swap">EXPLORE WORKFLOW 01 <ArrowUpRight size={18}/></Link></div></section>
   <footer className="promptEditorialFooter"><Link href="/academy">← PRIVATE ACADEMY</Link><span>© 2026 KREATIVE STUDIOS 4K</span><Link href="/">KREATIVESTUDIOS4K.COM</Link></footer>
   <style>{`
+    .promptProofBridge{max-width:1600px;margin:0 auto;padding:70px clamp(20px,5vw,74px);display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(25px,5vw,85px);align-items:center;border-top:1px solid #ffffff29;border-bottom:1px solid #ffffff29;background:radial-gradient(ellipse at 18% 65%,#1838675d,transparent 70%)}.promptProofImage{border:1px solid #ffffff3e;border-radius:20px;background:#0b101a;overflow:hidden}.promptProofImage img{width:100%;display:block;max-height:500px;object-fit:contain}.promptProofBridge small{font-size:10px;color:#baff45;letter-spacing:.18em;font-weight:900}.promptProofBridge h2{font-size:clamp(43px,6vw,88px);letter-spacing:-.08em;line-height:.92;margin:25px 0}.promptProofBridge h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #fff}.promptProofBridge p{font-size:15px;line-height:1.8;color:#bbc9d8}.promptProofBridge ol{padding-left:21px;color:#d6e2f2;line-height:1.8;font-size:13px}.promptProofBridge li{margin-bottom:7px}.promptProofBridge a{display:inline-flex;align-items:center;gap:12px;border:1px solid #ffffff5e;border-radius:99px;padding:17px 20px;font-size:11px;font-weight:900;margin-top:18px}
+    @media(max-width:780px){.promptProofBridge{grid-template-columns:1fr}.promptProofImage img{max-height:420px}}
     .promptEditorialPage{color:#f3f5f7;background:#06080c;min-height:100vh;font-family:Arial,Helvetica,sans-serif;overflow:hidden}.promptEditorialPage *{box-sizing:border-box}.promptEditorialPage a{text-decoration:none}.promptEditorialPage :is(button,a,summary):focus-visible{outline:2px solid #caff39;outline-offset:4px}
     .vaultSkip{position:absolute;left:16px;top:-200px;background:#caff39;color:#070907;padding:12px 18px;z-index:100}.vaultSkip:focus{top:16px}
     .promptEditorialNav{padding:25px clamp(20px,5vw,74px);display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff30;max-width:1600px;margin:auto}.promptEditorialNav>a:first-child{display:flex;align-items:center;gap:9px;color:#e3eaf4;font-size:10px;font-weight:800;letter-spacing:.12em}.promptEditorialNav>span{color:#8797a9;font-size:9px;letter-spacing:.17em}.promptEditorialLogo{font-size:24px;color:#fff;font-weight:900;letter-spacing:-.08em;white-space:nowrap}.promptEditorialLogo span{color:#caff39}.promptEditorialLogo small{font-size:12px;letter-spacing:.2em;font-weight:700;margin-left:6px}
