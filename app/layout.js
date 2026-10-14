@@ -1,4 +1,5 @@
 import './globals.css';
+import './idea-studio.css';
 export const metadata={
  metadataBase:new URL('https://kreativestudios4k.com'),
  title:{default:'K4K Academy | AI Video Creation Workflows',template:'%s | K4K Academy'},
