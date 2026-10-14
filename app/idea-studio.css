@@ -275,3 +275,19 @@
 .k4kAccountBottom span:last-child{display:flex;align-items:center;gap:8px}
 @media(max-width:1000px){.k4kAccountLayout{grid-template-columns:1fr;gap:35px;padding:48px 0 70px}.k4kAccountIntro h1{font-size:clamp(58px,9vw,100px)}.k4kAccountIntro>p{max-width:650px}.k4kAccountFeatures{display:none}.k4kAccountPanel{max-width:700px}.k4kAccountSafe{margin-top:20px}}
 @media(max-width:650px){.k4kAccountHeader,.k4kAccountLayout,.k4kAccountBottom{width:calc(100% - 32px)}.k4kAccountHeader{min-height:75px}.k4kAccountBrand{font-size:26px}.k4kAccountBrand small{font-size:9px}.k4kAccountHome{font-size:9px}.k4kAccountLayout{padding:37px 0 65px}.k4kAccountIntro h1{font-size:clamp(49px,10.5vw,73px);margin:24px 0}.k4kAccountIntro>p{font-size:15px}.k4kAccountPanel{padding:20px 17px;border-radius:13px}.k4kAccountPanelHead{padding:27px 0 17px}.k4kAccountSubmit{width:100%}}
+
+/* Always-available website Home and session-aware Log out navigation. */
+.idea-header-actions{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.idea-home-button,.idea-logout-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 15px;border:1px solid #ffffff65;border-radius:99px;background:transparent;color:#f1f1eb;font-size:10px;letter-spacing:.08em;font-weight:900;cursor:pointer;font-family:inherit;white-space:nowrap}
+.idea-home-button:hover,.idea-logout-button:hover:not(:disabled){background:#d0ff6b;border-color:#d0ff6b;color:#10110a}
+.idea-home-button svg,.idea-logout-button svg{flex-shrink:0}
+.idea-logout-button:disabled{opacity:.65;cursor:wait}
+.idea-logout-wrap{display:inline-flex;flex-direction:column;gap:4px}
+.idea-logout-error{display:block;max-width:140px;line-height:1.4;font-size:11px;color:#ffb5ad}
+.idea-mobile-menu .idea-logout-mobile{display:block;padding:8px}
+.idea-mobile-menu .idea-logout-mobile .idea-logout-button{border-radius:8px;width:100%;justify-content:flex-start;min-height:42px;color:#d0ff6b}
+.idea-mobile-menu .idea-logout-mobile .idea-logout-error{max-width:none}
+.idea-mobile-menu nav .idea-mobile-home{display:flex;align-items:center;gap:8px;color:#d0ff6b}
+@media(max-width:1200px){.idea-header-actions{gap:7px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{padding-inline:11px}}
+@media(max-width:760px){.idea-nav-row{gap:8px}.idea-header-actions{margin-left:auto;gap:5px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{width:39px;min-height:39px;padding:0;border-radius:50%;font-size:0;gap:0}.idea-header-actions .idea-home-button svg,.idea-header-actions .idea-logout-button svg{width:17px;height:17px}.idea-mobile-menu summary{padding:10px 11px}.idea-mobile-menu nav{z-index:90}}
+@media(max-width:390px){.idea-logo-line small{display:none}.idea-logo-line{letter-spacing:.14em;font-size:10px}.idea-logo-icon{font-size:24px}.idea-logo{gap:5px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{width:35px;min-height:35px}}
