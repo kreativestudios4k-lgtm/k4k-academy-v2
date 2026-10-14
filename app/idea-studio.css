@@ -291,3 +291,84 @@
 @media(max-width:1200px){.idea-header-actions{gap:7px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{padding-inline:11px}}
 @media(max-width:760px){.idea-nav-row{gap:8px}.idea-header-actions{margin-left:auto;gap:5px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{width:39px;min-height:39px;padding:0;border-radius:50%;font-size:0;gap:0}.idea-header-actions .idea-home-button svg,.idea-header-actions .idea-logout-button svg{width:17px;height:17px}.idea-mobile-menu summary{padding:10px 11px}.idea-mobile-menu nav{z-index:90}}
 @media(max-width:390px){.idea-logo-line small{display:none}.idea-logo-line{letter-spacing:.14em;font-size:10px}.idea-logo-icon{font-size:24px}.idea-logo{gap:5px}.idea-header-actions .idea-home-button,.idea-header-actions .idea-logout-button{width:35px;min-height:35px}}
+
+/* Public landing page spacing revision — 14 Oct 2026.
+   Eliminate the empty right side and full-height hero seen on laptop screens.
+   Scope all refinements to .ideaSite so the member lessons keep their layout. */
+@media (min-width: 1001px) {
+  .ideaSite .idea-hero {
+    min-height:0;
+    padding:clamp(56px,5.5vw,94px) 0 42px;
+    display:block;
+  }
+  .ideaSite .idea-hero-main {
+    display:grid;
+    grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);
+    column-gap:clamp(34px,5.3vw,94px);
+    align-items:center;
+  }
+  .ideaSite .idea-hero-main>.idea-kicker{grid-column:1/-1;grid-row:1}
+  .ideaSite .idea-hero h1{
+    grid-column:1;
+    grid-row:2;
+    font-size:clamp(61px,6.1vw,110px);
+    line-height:.88;
+    margin:40px 0 28px;
+    max-width:100%;
+    overflow-wrap:normal;
+  }
+  .ideaSite .idea-hero-bottom{
+    grid-column:2;
+    grid-row:2;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:stretch;
+    gap:28px;
+    padding:20px 0 0;
+    max-width:430px;
+  }
+  .ideaSite .idea-hero-side{
+    order:-1;
+    border-left:2px solid #d0ff6b;
+    padding:5px 0 5px 23px;
+    max-width:410px;
+  }
+  .ideaSite .idea-hero-side p{margin:14px 0 0;font-size:clamp(15px,1.25vw,18px);line-height:1.65}
+  .ideaSite .idea-hero-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start}
+  .ideaSite .idea-hero-actions .idea-button{min-height:48px;padding:13px 19px;font-size:10px;gap:13px}
+  .ideaSite .idea-hero-meta{
+    grid-column:1/-1;
+    grid-row:3;
+    margin-top:47px;
+    padding-top:18px;
+  }
+}
+@media (min-width: 761px) and (max-width: 1000px) {
+  .ideaSite .idea-hero{min-height:0;padding:62px 0 30px}
+  .ideaSite .idea-hero h1{font-size:clamp(66px,9vw,90px);line-height:.86;margin:30px 0 18px}
+  .ideaSite .idea-hero-bottom{padding-top:30px;align-items:start;gap:30px}
+  .ideaSite .idea-hero-meta{margin-top:38px}
+}
+@media (max-width: 760px) {
+  .ideaSite .idea-hero{min-height:0;padding:44px 0 22px}
+  .ideaSite .idea-hero h1{font-size:clamp(47px,10.9vw,80px);margin:24px 0 18px;line-height:.9}
+  .ideaSite .idea-hero-bottom{padding-top:8px}
+  .ideaSite .idea-hero-side{margin-top:23px;padding-top:15px}
+  .ideaSite .idea-hero-actions{gap:10px}
+  .ideaSite .idea-hero-actions .idea-button{min-height:47px;padding:12px 16px;font-size:10px;gap:12px}
+  .ideaSite .idea-hero-meta{margin-top:31px;gap:10px;flex-wrap:wrap;font-size:8px;line-height:1.6}
+}
+.ideaSite .idea-section{padding-top:clamp(55px,6.1vw,86px);padding-bottom:clamp(55px,6.1vw,86px)}
+.ideaSite .idea-section-header{margin-top:24px;margin-bottom:35px;gap:5%}
+.ideaSite .idea-method-card{min-height:370px;padding-block:27px}
+.ideaSite .idea-price-grid{padding-top:35px}
+.ideaSite .idea-pricing{padding-top:clamp(60px,6vw,90px);padding-bottom:clamp(60px,6vw,90px)}
+.ideaSite .idea-case-row{padding-block:26px}
+.ideaSite .idea-hero::after{right:-6%;bottom:14%;width:32%;opacity:.65}
+@media (max-width:760px) {
+  .ideaSite .idea-section{padding-top:52px;padding-bottom:52px}
+  .ideaSite .idea-section-header{margin-top:22px;margin-bottom:26px}
+  .ideaSite .idea-method-card{min-height:230px}
+  .ideaSite .idea-hero::after{width:62%;right:-32%;bottom:24%;opacity:.35}
+}
