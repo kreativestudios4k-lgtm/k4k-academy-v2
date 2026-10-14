@@ -183,3 +183,27 @@
 @media(max-width:760px){.idea-wrap{width:min(100% - 36px,1600px)}.idea-nav-row{min-height:72px;gap:8px}.idea-logo-icon{font-size:26px}.idea-logo-line{font-size:11px;padding-left:10px}.idea-logo-line small{font-size:6px}.idea-nav-cta{display:none}.idea-hero{min-height:calc(90svh - 72px);padding:65px 0 22px}.idea-hero h1{margin:35px 0 24px}.idea-hero-bottom{display:block;padding-top:30px}.idea-hero-side{border-left:0;border-top:1px solid #ffffff53;padding:20px 0 0;margin-top:40px}.idea-hero-meta{font-size:8px}.idea-section-header{grid-template-columns:1fr;gap:20px;margin-bottom:35px}.idea-section{padding:70px 0}.idea-method-grid{grid-template-columns:1fr 1fr}.idea-method-card{min-height:310px;border-bottom:1px solid #18181842}.idea-method-card:nth-child(2){border-right:0}.idea-method-card .letter{font-size:105px}.idea-method-card h3{font-size:23px}.idea-method-card p{font-size:13px}.idea-metric-strip{grid-template-columns:1fr}.idea-metric-strip>div{border-right:0;border-bottom:1px solid #ffffff32}.idea-metric-strip>div:last-child{border:0}.idea-case-row{grid-template-columns:1fr 25px;gap:12px}.idea-case-row>p,.idea-case-row>div:nth-child(2){grid-column:1/-1}.idea-syllabus-row{grid-template-columns:38px 1fr 25px}.idea-syllabus-row>small{grid-column:2/-1}.idea-price-grid{grid-template-columns:1fr}.idea-price-card{max-width:490px}.idea-footer-top{grid-template-columns:1fr 1fr;gap:40px}.idea-footer-top>div:first-child{grid-column:1/-1}.idea-footer-top strong{font-size:100px}.idea-subhero{padding:75px 0 65px;min-height:0}.idea-step-article{grid-template-columns:54px 1fr;gap:15px}.idea-step-article>div:last-child{grid-column:1/-1}.idea-step-artifact,.ideaModuleColumns,.idea-member-grid,.idea-casebook-grid,.idea-prompt-grid{grid-template-columns:1fr}.idea-ethics{grid-template-columns:1fr}.ideaModuleList article{grid-template-columns:33px 1fr;gap:15px}}
 @media(max-width:450px){.idea-xl{font-size:clamp(49px,12.6vw,62px)}.idea-display{font-size:clamp(46px,12.2vw,62px)}.idea-logo-line small{display:none}.idea-logo{gap:8px}.idea-method-grid{grid-template-columns:1fr}.idea-method-card{min-height:220px;gap:14px;border-right:0}.idea-method-card .letter{font-size:100px}.idea-footer-top{grid-template-columns:1fr}.idea-footer-top>div:first-child{grid-column:auto}.idea-case-card{min-height:320px}.idea-step-artifact{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){.ideaSite *,.ideaPage *,.ideaMember *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+/* Identity bridge for existing authentication screens; changes presentation, never auth logic. */
+.authpage.authPremium{background:#0b0b0b;color:#f2f2e9;font-family:Arial,Helvetica,sans-serif}
+.authPremium>.brand{font-weight:950;letter-spacing:-.065em}
+.authPremium>.brand span{color:#d0ff6b}
+.authPremiumLayout{max-width:1600px;grid-template-columns:minmax(0,1.1fr) minmax(360px,.9fr)}
+.authPremiumPitch>span{color:#d0ff6b}
+.authPremiumPitch h2{font-size:clamp(54px,7.2vw,110px);line-height:.87}
+.authPremiumPitch h2 em{font-family:Georgia,serif;font-weight:400;font-style:italic;-webkit-text-stroke:0;color:#d0ff6b}
+.authPremiumPitch>p{color:#b9b9b1}
+.authPremiumPitch>div{color:#aaa9a2}
+.authPremiumDot{background:#d0ff6b;box-shadow:0 0 18px #d0ff6b66}
+.authPremiumCard{background:#171714;border:1px solid #ffffff51;border-radius:4px;box-shadow:none;max-width:540px}
+.authPremiumCard h1 i{color:#d0ff6b;font-family:Georgia,serif;font-style:italic;font-weight:400}
+.authPremiumCard input{border-radius:4px!important;background:#0c0d0a!important}
+.authPremiumCard input:focus-visible{outline-color:#d0ff6b}
+.authPremiumCard button[type=submit]{background:#d0ff6b!important;color:#0a0a09!important;border-radius:99px}
+.authPremiumCard a[href="/#membership"]{border-radius:99px!important}
+.authPremiumCard .googleAuth{border-radius:99px!important}
+.authPremiumCard input,.authPremiumCard button{font-family:Arial,Helvetica,sans-serif}
+.authpage:not(.authPremium){background:#0b0b0b;color:#f5f4e9}
+.authpage:not(.authPremium)>form{background:#171714;border:1px solid #ffffff51}
+.authpage:not(.authPremium) :is(button,.brand span){color:#111}
+@media(max-width:850px){.authPremiumLayout{grid-template-columns:1fr}}
