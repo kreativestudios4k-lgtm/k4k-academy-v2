@@ -1,6 +1,8 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
+import {IdeaHeader,IdeaFooter,IdeaKicker,IdeaLink} from '../components/IdeaUI';
+
 import {ArrowLeft,ArrowUpRight,Copy,Check,BookOpen,ChevronDown,Image as ImageIcon} from 'lucide-react';
 
 const corePrompts=[
@@ -163,79 +165,29 @@ const visualPrompts=[
 const filters=['All','Portrait','Creative','Motion','Football'];
 
 export default function Prompts(){
- const [section,setSection]=useState('gallery');
- const [filter,setFilter]=useState('All');
- const [copied,setCopied]=useState('');
- const [error,setError]=useState('');
- const visible=filter==='All'?visualPrompts:visualPrompts.filter(item=>item.category===filter);
- async function copy(body,id){
-  setError('');
-  try{await navigator.clipboard.writeText(body);setCopied(id)}
-  catch{setCopied('');setError('Clipboard unavailable. Select and copy the text manually.')}
- }
- return <main className="promptEditorialPage">
-  <a className="vaultSkip" href="#prompt-content">Skip to prompt content</a>
-  <nav className="promptEditorialNav"><Link href="/academy"><ArrowLeft size={17}/> BACK TO ACADEMY</Link><Link href="/" className="promptEditorialLogo">K<span>4</span>K <small>ACADEMY</small></Link><span>CREATOR TOOLS / 001</span></nav>
-  <section className="promptEditorialHero" id="prompt-content">
-   <div className="promptEditorialKicker"><span/> K4K STUDIO EDITIONS · VISUAL CREATION LAB</div>
-   <h1>THE ART<br/>OF THE <em>PROMPT.</em></h1>
-   <div className="promptEditorialLead"><p>A collection of visual studies built around the K4K masked creator. Study the image, then study the decisions: identity, composition, camera and lighting. The prompt starts the experiment, but your judgement finishes it.</p><div><span>09 EDITORIAL STUDIES</span><span>06 PRACTICAL PROMPT TEMPLATES</span></div></div>
-  </section>
-  <section className="promptProofBridge" aria-label="How real character references improve production">
-   <div className="promptProofImage"><img src="https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/32d483de-7d94-4b63-89c2-454821b2c4d9.png" alt="A K4K four-panel full-body and close-up character reference used in an actual production" loading="lazy"/></div>
-   <div><small>REAL CREATOR ASSET / THE FOUR-VIEW REFERENCE</small><h2>ONE FACE.<br/><em>FOUR CHECKS.</em></h2><p>This actual creator reference uses full-body front, full-body profile and two close-up angles. The image is an input: it helps the model, but does not guarantee consistency by itself.</p>
-    <ol><li>Choose a face with permission or use your own.</li><li>Check the same glasses, haircut and body scale across panels.</li><li>Save the character sheet alongside the exact video prompt.</li><li>Inspect the output whenever the camera changes angle.</li></ol>
-    <Link href="/academy/method">LEARN THE FRAME METHOD <ArrowUpRight size={18}/></Link>
-   </div>
-  </section>
-  <section className="promptEditorialLibrary">
-   <div className="promptEditorialTabs" role="group" aria-label="Choose prompt collection">
-    <button type="button" className={section==='gallery'?'selected':''} aria-pressed={section==='gallery'} onClick={()=>setSection('gallery')}><ImageIcon size={16}/> VISUAL PROMPT COLLECTION <span>09</span></button>
-    <button type="button" className={section==='workflows'?'selected':''} aria-pressed={section==='workflows'} onClick={()=>setSection('workflows')}><BookOpen size={16}/> PRODUCTION PROMPTS <span>06</span></button>
-   </div>
-   {section==='gallery'?<>
-    <div className="promptEditorialSectionInfo"><div><small>STUDIO COLLECTION / 2026</small><h2>NINE STUDIES.<br/>ONE CREATIVE IDENTITY.</h2></div><p>The same signature masked creator, reimagined through lighting, composition, motion and art direction. Each image opens a fully copyable production brief.</p></div>
-    <div className="promptFilterBar" aria-label="Filter gallery by style">{filters.map(value=><button type="button" key={value} className={filter===value?'selected':''} aria-pressed={filter===value} onClick={()=>setFilter(value)}>{value.toUpperCase()}</button>)}</div>
-    <div className="promptEditorialGrid">{visible.map((item)=><article className="promptEditorialCard" key={item.id}>
-     <div className="promptEditorialArt"><img src={item.src} width="660" height="825" loading="lazy" alt={item.alt}/><span className="promptArtCounter">K4K / {item.id}</span></div>
-     <div className="promptEditorialCardContent"><small>{item.category.toUpperCase()} · EDITORIAL STUDY {item.id}</small><div className="promptEditorialTitleLine"><h3>{item.title}</h3><ArrowUpRight size={19}/></div><p>{item.caption}</p>
-      <details className="promptEditorialDetails"><summary>REVEAL THE PROMPT <ChevronDown size={17}/></summary><div className="promptEditorialPrompt"><p>{item.body}</p><button type="button" onClick={()=>copy(item.body,'gallery-'+item.id)}>{copied==='gallery-'+item.id?<Check size={17}/>:<Copy size={17}/>} {copied==='gallery-'+item.id?'COPIED TO CLIPBOARD':'COPY THIS PROMPT'}</button></div></details>
-     </div>
-    </article>)}</div>
-    <p className="promptGalleryDisclaimer">IMAGE STUDIES ARE VISUAL EXAMPLES, NOT GUARANTEED GENERATION OUTPUTS. UPLOAD AN AUTHORISED CHARACTER REFERENCE AND ADAPT THE PROMPT TO YOUR OWN IDEA. THIRD-PARTY TOOL COSTS MAY APPLY.</p>
-   </>:<>
-    <div className="promptEditorialSectionInfo"><div><small>YOUR PRODUCTION FOUNDATION</small><h2>BUILT FOR<br/>REAL WORKFLOWS.</h2></div><p>Six practical templates covering character references, motion transfer, cinematic scenes, short-form structure, realistic skin and frame-by-frame quality review. Adapt the inputs, then check the result.</p></div>
-    <div className="promptCoreGrid">{corePrompts.map((item,index)=><article key={item.title} className="promptCoreCard"><small>CORE / {String(index+1).padStart(2,'0')} · {item.category}</small><h3>{item.title}</h3><pre>{item.body}</pre><button type="button" onClick={()=>copy(item.body,'core-'+index)}>{copied==='core-'+index?<Check size={17}/>:<Copy size={17}/>} {copied==='core-'+index?'COPIED':'COPY PROMPT'}</button></article>)}</div>
-   </>}
-   {error&&<p role="alert" className="promptCopyError">{error}</p>}
-  </section>
-  <section className="promptEditorialClosing"><span>K4K ACADEMY / THE CREATOR METHOD</span><h2>FROM PROMPT<br/>TO <em>PRODUCTION.</em></h2><div><p>Want the full video breakdown, references and step-by-step workflow?</p><Link href="/academy/workflows/viral-character-swap">EXPLORE WORKFLOW 01 <ArrowUpRight size={18}/></Link></div></section>
-  <footer className="promptEditorialFooter"><Link href="/academy">← PRIVATE ACADEMY</Link><span>© 2026 KREATIVE STUDIOS 4K</span><Link href="/">KREATIVESTUDIOS4K.COM</Link></footer>
-  <style>{`
-    .promptProofBridge{max-width:1600px;margin:0 auto;padding:70px clamp(20px,5vw,74px);display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(25px,5vw,85px);align-items:center;border-top:1px solid #ffffff29;border-bottom:1px solid #ffffff29;background:radial-gradient(ellipse at 18% 65%,#1838675d,transparent 70%)}.promptProofImage{border:1px solid #ffffff3e;border-radius:20px;background:#0b101a;overflow:hidden}.promptProofImage img{width:100%;display:block;max-height:500px;object-fit:contain}.promptProofBridge small{font-size:10px;color:#baff45;letter-spacing:.18em;font-weight:900}.promptProofBridge h2{font-size:clamp(43px,6vw,88px);letter-spacing:-.08em;line-height:.92;margin:25px 0}.promptProofBridge h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #fff}.promptProofBridge p{font-size:15px;line-height:1.8;color:#bbc9d8}.promptProofBridge ol{padding-left:21px;color:#d6e2f2;line-height:1.8;font-size:13px}.promptProofBridge li{margin-bottom:7px}.promptProofBridge a{display:inline-flex;align-items:center;gap:12px;border:1px solid #ffffff5e;border-radius:99px;padding:17px 20px;font-size:11px;font-weight:900;margin-top:18px}
-    @media(max-width:780px){.promptProofBridge{grid-template-columns:1fr}.promptProofImage img{max-height:420px}}
-    .promptEditorialPage{color:#f3f5f7;background:#06080c;min-height:100vh;font-family:Arial,Helvetica,sans-serif;overflow:hidden}.promptEditorialPage *{box-sizing:border-box}.promptEditorialPage a{text-decoration:none}.promptEditorialPage :is(button,a,summary):focus-visible{outline:2px solid #caff39;outline-offset:4px}
-    .vaultSkip{position:absolute;left:16px;top:-200px;background:#caff39;color:#070907;padding:12px 18px;z-index:100}.vaultSkip:focus{top:16px}
-    .promptEditorialNav{padding:25px clamp(20px,5vw,74px);display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #ffffff30;max-width:1600px;margin:auto}.promptEditorialNav>a:first-child{display:flex;align-items:center;gap:9px;color:#e3eaf4;font-size:10px;font-weight:800;letter-spacing:.12em}.promptEditorialNav>span{color:#8797a9;font-size:9px;letter-spacing:.17em}.promptEditorialLogo{font-size:24px;color:#fff;font-weight:900;letter-spacing:-.08em;white-space:nowrap}.promptEditorialLogo span{color:#caff39}.promptEditorialLogo small{font-size:12px;letter-spacing:.2em;font-weight:700;margin-left:6px}
-    .promptEditorialHero{max-width:1600px;margin:auto;padding:clamp(70px,9vw,135px) clamp(20px,5vw,74px) 80px;background:radial-gradient(ellipse 45% 55% at 80% 47%,#13396788,transparent 84%)}.promptEditorialKicker{font-size:10px;font-weight:900;letter-spacing:.2em;color:#b9c9dc;display:flex;align-items:center;gap:12px}.promptEditorialKicker>span{display:block;width:7px;height:7px;border-radius:50%;background:#caff39;box-shadow:0 0 15px #caff3955}
-    .promptEditorialHero h1{font-size:clamp(64px,10vw,165px);font-weight:900;line-height:.82;letter-spacing:-.095em;margin:42px 0}.promptEditorialHero h1 em{color:transparent;-webkit-text-stroke:1.5px #f0f7fe;font-style:normal}
-    .promptEditorialLead{display:flex;justify-content:space-between;align-items:flex-end;gap:40px;border-top:1px solid #ffffff35;padding-top:25px}.promptEditorialLead>p{max-width:570px;color:#adbed1;font-size:clamp(14px,1.4vw,18px);line-height:1.85;margin:0}.promptEditorialLead>div{display:flex;gap:25px;flex-wrap:wrap;justify-content:flex-end}.promptEditorialLead>div span{font-size:10px;font-weight:800;letter-spacing:.09em;color:#c7d4e4}
-    .promptEditorialLibrary{max-width:1600px;margin:auto;padding:20px clamp(20px,5vw,74px) 130px}
-    .promptEditorialTabs{border-bottom:1px solid #ffffff3b;display:flex;gap:35px;flex-wrap:wrap}.promptEditorialTabs button{display:inline-flex;align-items:center;gap:12px;border:0;border-bottom:2px solid transparent;color:#9aa7b8;background:transparent;padding:22px 3px;cursor:pointer;font-size:11px;font-weight:900;letter-spacing:.07em}.promptEditorialTabs button.selected{color:white;border-bottom-color:#caff39}.promptEditorialTabs button span{border:1px solid #ffffff3c;border-radius:99px;padding:4px 8px;color:#caff39;font-size:9px}
-    .promptEditorialSectionInfo{display:flex;align-items:end;justify-content:space-between;gap:36px;padding:68px 0 36px}.promptEditorialSectionInfo small{font-size:9px;color:#caff39;letter-spacing:.18em;font-weight:900}.promptEditorialSectionInfo h2{font-size:clamp(38px,5vw,76px);font-weight:900;letter-spacing:-.07em;line-height:.94;margin:20px 0 0}.promptEditorialSectionInfo>p{font-size:14px;line-height:1.8;color:#afbed0;max-width:360px;margin:0}
-    .promptFilterBar{display:flex;flex-wrap:wrap;gap:9px;margin:10px 0 26px}.promptFilterBar button{border:1px solid #ffffff3b;border-radius:99px;padding:11px 17px;font-size:10px;letter-spacing:.08em;font-weight:800;color:#bacbde;background:#ffffff09;cursor:pointer}.promptFilterBar button.selected{color:#060806;background:#caff39;border-color:#caff39}
-    .promptEditorialGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}.promptEditorialCard{min-width:0;background:linear-gradient(140deg,#161d29,#0d111a);border:1px solid #ffffff31;border-radius:16px;overflow:hidden;transition:border-color .2s,transform .2s}.promptEditorialCard:hover{border-color:#a8caff9d;transform:translateY(-2px)}
-    .promptEditorialArt{position:relative;overflow:hidden;background:#172232}.promptEditorialArt img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover;filter:saturate(.93)}.promptArtCounter{position:absolute;top:16px;left:16px;background:#0b1018cd;border:1px solid #ffffff6b;padding:8px 10px;border-radius:99px;font-size:9px;font-weight:800;letter-spacing:.13em}
-    .promptEditorialCardContent{padding:24px}.promptEditorialCardContent>small{color:#9eb6d0;font-weight:900;font-size:9px;letter-spacing:.18em}.promptEditorialTitleLine{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 8px}.promptEditorialTitleLine h3{font-size:clamp(24px,2.5vw,38px);line-height:1;letter-spacing:-.06em;margin:0}.promptEditorialTitleLine svg{color:#caff39}.promptEditorialCardContent>p{font-size:12px;color:#b6c4d3;line-height:1.6}
-    .promptEditorialDetails{margin-top:26px;border-top:1px solid #ffffff33}.promptEditorialDetails summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:9px;cursor:pointer;color:#caff39;font-size:11px;font-weight:900;letter-spacing:.07em;padding:19px 0 0}.promptEditorialDetails summary::-webkit-details-marker{display:none}.promptEditorialDetails[open] summary svg{transform:rotate(180deg)}.promptEditorialPrompt{padding-top:17px}.promptEditorialPrompt>p{font-size:12px;line-height:1.9;color:#d0dae7;white-space:pre-wrap;margin:0 0 18px}.promptEditorialPrompt button,.promptCoreCard button{display:inline-flex;align-items:center;gap:9px;border:0;background:#caff39;color:#081009;border-radius:99px;padding:13px 17px;font-size:11px;font-weight:900;cursor:pointer}
-    .promptGalleryDisclaimer{color:#8594a7;font-size:9px;letter-spacing:.1em;line-height:1.9;max-width:950px;margin:34px 0}
-    .promptCoreGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.promptCoreCard{min-width:0;border:1px solid #ffffff35;border-radius:19px;background:#131924;padding:clamp(21px,3vw,33px)}.promptCoreCard>small{font-size:10px;color:#caff39;letter-spacing:.12em;font-weight:900}.promptCoreCard h3{font-size:clamp(24px,3vw,37px);letter-spacing:-.055em;line-height:1.05;margin:17px 0}.promptCoreCard pre{font-family:inherit;white-space:pre-wrap;overflow-wrap:anywhere;color:#bdcbdc;background:#0a0e16;border:1px solid #ffffff27;padding:20px;border-radius:11px;font-size:13px;line-height:1.85;max-height:390px;overflow:auto}.promptCoreCard button{margin-top:18px}.promptCopyError{color:#ffcbad;line-height:1.7}
-    .promptEditorialClosing{padding:90px clamp(20px,7vw,105px) 100px;background:radial-gradient(ellipse at 70% 95%,#18376497,transparent 60%),#09111b;border-top:1px solid #ffffff26}.promptEditorialClosing>span{font-size:10px;color:#caff39;letter-spacing:.21em}.promptEditorialClosing h2{font-size:clamp(55px,10vw,140px);letter-spacing:-.09em;line-height:.89;margin:35px 0}.promptEditorialClosing h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1px #fff}.promptEditorialClosing>div{display:flex;align-items:center;justify-content:space-between;gap:30px}.promptEditorialClosing p{color:#b9c9da;font-size:14px;line-height:1.8;max-width:340px}.promptEditorialClosing a{display:inline-flex;align-items:center;gap:15px;padding:17px 22px;background:#caff39;color:#080c07;border-radius:99px;font-size:11px;font-weight:900}
-    .promptEditorialFooter{max-width:1600px;padding:32px clamp(20px,5vw,74px);margin:auto;display:flex;justify-content:space-between;gap:15px;flex-wrap:wrap;color:#9aa8b8;border-top:1px solid #ffffff27;font-size:10px;letter-spacing:.1em}.promptEditorialFooter a{color:#dbe5ef}
-    @media(max-width:1100px){.promptEditorialGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media(max-width:720px){.promptEditorialHero{padding-top:67px}.promptEditorialHero h1{font-size:clamp(61px,12vw,87px)}.promptEditorialLead,.promptEditorialSectionInfo{display:block}.promptEditorialLead>div{justify-content:flex-start;margin-top:27px}.promptEditorialSectionInfo>p{max-width:550px;margin-top:22px}.promptEditorialGrid{gap:14px}.promptEditorialCardContent{padding:18px}.promptEditorialNav>span{display:none}.promptCoreGrid{grid-template-columns:1fr}.promptEditorialClosing>div{display:block}.promptEditorialClosing a{margin-top:20px}}
-    @media(max-width:540px){.promptEditorialNav{padding:23px 18px}.promptEditorialNav>a:first-child{font-size:9px}.promptEditorialLogo{font-size:20px}.promptEditorialLogo small{font-size:9px}.promptEditorialHero{padding:60px 18px 55px}.promptEditorialHero h1{font-size:clamp(56px,13vw,76px);margin:29px 0}.promptEditorialLibrary{padding:12px 18px 85px}.promptEditorialTabs{gap:20px}.promptEditorialTabs button{font-size:9px;gap:7px}.promptEditorialSectionInfo{padding:50px 0 32px}.promptEditorialSectionInfo h2{font-size:46px}.promptEditorialGrid{grid-template-columns:1fr}.promptEditorialCardContent{padding:22px}.promptEditorialTitleLine h3{font-size:32px}.promptEditorialClosing{padding:72px 20px}.promptEditorialClosing h2{font-size:clamp(55px,13vw,81px)}}
-    @media(prefers-reduced-motion:reduce){.promptEditorialPage *{transition:none!important;scroll-behavior:auto!important}}
-  `}</style>
- </main>;
+ const[tab,setTab]=useState('workflows');
+ const[filter,setFilter]=useState('All');
+ const[copied,setCopied]=useState('');
+ const[error,setError]=useState('');
+ const items=filter==='All'?visualPrompts:visualPrompts.filter(item=>item.category===filter);
+ async function copy(value,key){try{await navigator.clipboard.writeText(value);setCopied(key);setError('')}catch{setError('Clipboard permission unavailable. You can select the text and copy it manually.')}}
+ return <main className="ideaPage"><IdeaHeader privateArea/><div className="idea-wrap">
+ <header className="idea-subhero"><IdeaKicker>K4K ACADEMY / CREATIVE TOOLKIT</IdeaKicker><h1 className="idea-display">THE PROMPT<br/>IS <em>NOT</em><br/>THE FINISH.</h1><p>The library isn't a secret shortcut. It's a set of real production instructions designed to help you direct, test and correct your own projects. Every prompt is editable and reusable.</p></header>
+ <section className="idea-section" style={{paddingTop:15}}><div className="idea-marker"><span>01 / CHOOSE YOUR WORKSPACE</span><span>TEXT FIRST / ZERO MEDIA EMBEDS</span></div>
+ <div style={{display:'flex',gap:13,alignItems:'center',flexWrap:'wrap',padding:'35px 0 45px'}}>
+  <button type="button" className={tab==='workflows'?'idea-button':'idea-button idea-outline'} onClick={()=>setTab('workflows')}>PRODUCTION TEMPLATES ({corePrompts.length})</button>
+  <button type="button" className={tab==='editorial'?'idea-button':'idea-button idea-outline'} onClick={()=>setTab('editorial')}>EDITORIAL BRIEFS ({visualPrompts.length})</button>
+ </div>
+ {tab==='workflows'?<>
+  <div className="idea-section-header" style={{marginTop:0}}><h2 className="idea-display">MAKE IT<br/><em>REPEATABLE.</em></h2><p>Core templates for character sheets, video motion, scenes, opening hooks, skin realism and revision notes. Replace placeholders, check usage rights, and review every output.</p></div>
+  <div className="idea-prompt-grid">{corePrompts.map((p,i)=><article key={p.title} className="idea-prompt-card"><div className="idea-eyebrow">TEMPLATE / {String(i+1).padStart(2,'0')} · {p.category}</div><h3>{p.title}</h3><p style={{fontSize:13,lineHeight:1.8,color:'#acaca4'}}>This is a working starting point. Adapt your inputs and review the result before accepting it.</p><pre>{p.body}</pre><button type="button" onClick={()=>copy(p.body,'core'+i)}>{copied==='core'+i?<Check size={16}/>:<Copy size={16}/>} {copied==='core'+i?'COPIED TO CLIPBOARD':'COPY FULL PROMPT'}</button></article>)}</div>
+ </>:<>
+  <div className="idea-section-header" style={{marginTop:0}}><h2 className="idea-display">WRITE THE<br/><em>VISUAL BRIEF.</em></h2><p>Nine creative briefs drawn from earlier K4K visual studies. The actual images have been removed from this website. Learn to describe lighting, framing and material choices without depending on thumbnails.</p></div>
+  <div style={{display:'flex',flexWrap:'wrap',gap:9,padding:'0 0 28px'}}>{filters.map(x=><button type="button" key={x} aria-pressed={filter===x} onClick={()=>setFilter(x)} className={filter===x?'idea-button':'idea-button idea-outline'} style={{minHeight:38,padding:'9px 14px',fontSize:10}}>{x.toUpperCase()}</button>)}</div>
+  <div className="idea-prompt-grid">{items.map(p=><article className="idea-prompt-card" key={p.slug}><div className="idea-eyebrow">CREATIVE BRIEF / {p.id} · {p.category}</div><h3>{p.title}</h3><p style={{fontSize:15,lineHeight:1.8,color:'#c3c3bc'}}>{p.caption}</p><details><summary className="idea-utility" style={{cursor:'pointer'}}>READ THE PRODUCTION BRIEF +</summary><pre>{p.body}</pre></details><button type="button" style={{marginTop:25}} onClick={()=>copy(p.body,'visual'+p.id)}>{copied==='visual'+p.id?<Check size={16}/>:<Copy size={16}/>} {copied==='visual'+p.id?'COPIED TO CLIPBOARD':'COPY FULL PROMPT'}</button></article>)}</div>
+ </>}
+ {error&&<p role="alert" className="idea-note" style={{color:'#ffbca2'}}>{error}</p>}
+ </section>
+ <section className="idea-section" style={{paddingTop:10}}><div className="idea-ethics"><div><IdeaKicker>PRODUCTION RULE</IdeaKicker><h3>YOUR INPUT<br/>IS YOUR JOB.</h3></div><div><p className="idea-body">Use consented images, properly licensed footage and original ideas. A prompt is not proof of quality: always examine the actual result, record model settings and make corrections. The original visual assets remain outside the redesigned site.</p><IdeaLink href="/academy/method" variant="outline">FOLLOW THE IDEA METHOD</IdeaLink></div></div></section>
+ </div><IdeaFooter privateArea/></main>;
 }
