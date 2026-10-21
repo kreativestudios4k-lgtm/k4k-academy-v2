@@ -1,41 +1,18 @@
 import Link from 'next/link';
-import {ArrowUpRight,ArrowRight,CheckCircle2} from 'lucide-react';
-import {IdeaHeader,IdeaFooter,IdeaKicker,IdeaLink} from '../../components/IdeaUI';
-import {ideaSteps,noHype} from '../../../lib/k4k-idea';
-export const metadata={title:'The K4K IDEA Method — Four Quality Gates',robots:{index:false,follow:false}};
-export default function IdeaMethod(){
-const log=`K4K IDEA / CREATIVE PRODUCTION RECORD
-
-I / INVESTIGATE
-Project objective:
-Who is this for?
-Reference material & permission:
-Target platform + one-shot length:
-
-D / DIRECT
-Subject and character identity:
-Wardrobe / proportions:
-Camera / action / light:
-Must remain unchanged:
-
-E / EXECUTE
-Model / tool:
-Inputs and prompt version:
-Duration, aspect ratio, credits:
-Test result and faults:
-
-A / AUDIT
-Opening / mid-point / ending:
-Face / hands / physics / background:
-Audio & source usage:
-What I changed:
-Final export / disclosure:`;
-return <main className="ideaPage"><IdeaHeader privateArea/><div className="idea-wrap">
- <header className="idea-subhero"><IdeaKicker>THE K4K STUDIO SYSTEM / 001</IdeaKicker><h1 className="idea-display">THE METHOD<br/>IS THE <em>VALUE.</em></h1><p>Four quality gates that make AI production teachable. Not a tool trick or a guarantee. A repeatable sequence of decisions, files and checks.</p><IdeaLink href="#first-step">LEARN THE FOUR STAGES</IdeaLink></header>
- <section className="idea-section" style={{paddingTop:30}}><div className="idea-marker"><span>00 / THE IDEA FORMULA</span><span>OUTPUTS OVER HYPE</span></div><div className="idea-method-grid" style={{borderColor:'#ffffff4a',marginTop:38}}>{ideaSteps.map(s=><a href={'#step-'+s.key} key={s.key} className="idea-method-card" style={{borderColor:'#ffffff35',minHeight:250,color:'#f2f2e8'}}><div><span className="numeral">{s.index} / 04</span><div className="letter" style={{color:'#d0ff6b',fontSize:'clamp(78px,9vw,145px)'}}>{s.key}</div></div><div><span className="stage" style={{color:'#d0ff6b'}}>{s.sub}</span><h3>{s.name}</h3></div></a>)}</div></section>
- <div id="first-step" className="idea-marker"><span>01 / THE FOUR GATES</span><span>MAKE A FILE AT EACH STAGE</span></div>
- {ideaSteps.map(s=><article id={'step-'+s.key} key={s.key} className="idea-step-article"><div className="step-num">GATE {s.index}<div className="idea-numbers" style={{fontSize:80,marginTop:35}}>{s.key}</div></div><div><h2>{s.name}<em>{s.sub}</em></h2></div><div><p style={{fontSize:19,color:'#f1f1e9'}}>{s.line}</p><p>{s.lead}</p><ol>{s.tasks.map(t=><li key={t}>{t}</li>)}</ol><div className="idea-step-artifact"><div><span>THE REQUIRED OUTPUT</span><strong>{s.artifact}</strong></div><div><span>PASS / FAIL CHECK</span><strong>{s.gate}</strong></div></div><p className="idea-note">Practical tools: {s.tool}</p></div></article>)}
- <section className="idea-section" id="record"><div className="idea-marker"><span>02 / YOUR PROJECT RECORD</span><span>ONE SHEET FOR EVERY PROJECT</span></div><div className="idea-section-header"><h2 className="idea-display">WRITE IT<br/><em>DOWN.</em></h2><p>Keeping a record turns a lucky generation into something you can actually improve. Copy the template before opening a generation platform.</p></div><div className="idea-brief"><div className="idea-brief-head"><span>K4K / PROJECT PRODUCTION LOG</span><span>REUSABLE TEMPLATE</span></div><div className="idea-brief-body"><h3>THE PRODUCTION PAPER TRAIL.</h3><pre>{log}</pre><Link href="/prompts" className="idea-utility" style={{color:'#d0ff6b'}}>GET CONTROLLED PROMPT TEMPLATES <ArrowUpRight size={16}/></Link></div></div></section>
- <section className="idea-section" style={{paddingTop:0}}><div className="idea-ethics"><div><IdeaKicker>HONEST PRACTICE</IdeaKicker><h3>WHAT THIS<br/>DOESN'T DO.</h3></div><div><ul>{noHype.map(s=><li key={s}>{s}</li>)}</ul><IdeaLink href="/academy/gallery" variant="outline">READ REAL PRODUCTION CASES</IdeaLink></div></div></section>
- </div><IdeaFooter privateArea/></main>
+import {ArrowUpRight,CheckCircle2,ClipboardList} from 'lucide-react';
+import {IdeaHeader} from '../../components/IdeaUI';
+import K4KReferencePhoto from '../../components/K4KReferencePhoto';
+import CopyLessonPrompt from '../topics/[slug]/CopyLessonPrompt';
+import {ideaSteps} from '../../../lib/k4k-idea';
+import {k4kLessons} from '../../../lib/k4k-course-v3';
+export const metadata={title:'The K4K IDEA Method — Academy',robots:{index:false,follow:false}};
+const template="K4K IDEA / PRODUCTION NOTE\n\nI — INVESTIGATE\nOne-sentence goal:\nInput photo or footage and usage permission:\nWhat must stay consistent:\nFinal platform and size:\n\nD — DIRECT\nIdentity / glasses / mask / proportions:\nChange exactly one thing:\nCamera / lighting / environment:\nInput image order and role:\n\nE — EXECUTE\nAI tool / model / version:\nPrompt version:\nNumber of attempts / credit budget:\nStrongest attempt and faults:\n\nA — AUDIT\nIdentity and anatomy review:\nBackground, clothing and object check:\nRights, disclosure and export:\nOne correction / final learning:";
+export default function Method(){
+ return <main className="k4k-classroom"><IdeaHeader privateArea/><div className="k4k-course-shell">
+ <nav className="k4k-course-breadcrumb"><Link href="/academy">← RETURN TO STUDIO</Link><span>K4K / OWN PRODUCTION METHOD</span></nav>
+ <header className="k4k-lesson-hero"><div><span className="k4k-course-kicker">FOUR DECISIONS · ONE REPEATABLE SYSTEM</span><h1>YOUR IDEA.<br/><span style={{color:'#caff39'}}>YOUR CONTROL.</span></h1><p className="k4k-lesson-subtitle">I → D → E → A</p><p>K4K IDEA is our way of learning through evidence. We don't promise a perfect image from a magic sentence; we ask the creator to choose references, direct one change, test it, and audit what really happened.</p><Link className="k4k-course-primary" href="/academy/lessons/reality-engine">START LAB 01 <ArrowUpRight size={16}/></Link></div><div className="k4k-lesson-photo"><K4KReferencePhoto index={1}/><span>YOUR CREATOR IDENTITY · THE CONSISTENT REFERENCE</span></div></header>
+ <section className="k4k-lesson-gates">{ideaSteps.map(x=><article className="k4k-lesson-gate" key={x.key}><div className="k4k-lesson-gate-symbol">{x.key}<span>GATE {x.index}</span></div><div><h2>{x.name}</h2><p>{x.lead}</p><ul>{x.tasks.map(t=><li key={t}>{t}</li>)}</ul><p style={{color:'#caff39'}}><b>REQUIRED OUTPUT:</b> {x.artifact}</p><p><b>PASS / FAIL:</b> {x.gate}</p></div></article>)}</section>
+ <section className="k4k-lesson-copy-section"><span className="k4k-course-kicker">COPY BEFORE YOU GENERATE</span><h2>YOUR PRODUCTION<br/><em>RECORD.</em></h2><p>Document reference order, the single variable to change, models tested and the final faults before you call a result complete.</p><div className="k4k-lesson-prompt-panel"><CopyLessonPrompt prompt={template}/></div></section>
+ <section className="k4k-course-module-section"><div className="k4k-course-section-head"><div><span className="k4k-course-kicker">PRACTISE THE METHOD</span><h2>FIVE<br/><em>LABS.</em></h2></div></div><div className="k4k-course-module-grid">{k4kLessons.map(l=><Link key={l.slug} href={'/academy/lessons/'+l.slug} className="k4k-course-module"><div className="k4k-course-module-visual"><K4KReferencePhoto index={l.image}/><span className="k4k-course-module-number">LAB {l.number}</span></div><div className="k4k-course-module-info"><small>{l.stage}</small><h3>{l.title}</h3><p>{l.subtitle}</p><span>OPEN LESSON <ArrowUpRight size={16}/></span></div></Link>)}</div></section>
+ </div></main>;
 }
