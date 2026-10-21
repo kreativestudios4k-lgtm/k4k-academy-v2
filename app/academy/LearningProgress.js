@@ -5,8 +5,11 @@ import {createClient} from '../../lib/supabase/client';
 import {CheckCircle2,ArrowRight,LoaderCircle} from 'lucide-react';
 
 const lessons=[
- {id:'workflow-001',name:'Dembow Party · Character Swap',href:'/academy/workflows/viral-character-swap'},
- {id:'workflow-002',name:'Puskás · Football Character Swap',href:'/academy/workflows/puskas-character-swap'}
+ {id:'k4k-v3-realism',name:'Lab 01 · The Reality Engine',href:'/academy/lessons/reality-engine'},
+ {id:'k4k-v3-wardrobe',name:'Lab 02 · The Wardrobe Lock',href:'/academy/lessons/wardrobe-lock'},
+ {id:'k4k-v3-scene',name:'Lab 03 · The Scene Transfer',href:'/academy/lessons/scene-transfer'},
+ {id:'k4k-v3-control',name:'Lab 04 · The Prompt Control Room',href:'/academy/lessons/prompt-control'},
+ {id:'k4k-v3-audit',name:'Lab 05 · The Final Quality Gate',href:'/academy/lessons/final-quality-gate'}
 ];
 
 export default function LearningProgress({workflowTwoAvailable=false}){
@@ -20,10 +23,10 @@ export default function LearningProgress({workflowTwoAvailable=false}){
  }catch{if(alive)setStatus('error')}})();return()=>{alive=false}},[]);
  const count=lessons.filter(x=>progress[x.id]).length;
  return <section className="learningProgress" aria-label="My workflow progress">
-  <div className="learningProgressTop"><div><small>YOUR LEARNING JOURNEY</small><h2>Pick up where you left off.</h2></div><strong>{status==='ready'?count+'/2':'—'} <span>completed</span></strong></div>
-  <div className="learningProgressTrack"><div style={{width:(count/2*100)+'%'}}/></div>
+  <div className="learningProgressTop"><div><small>YOUR K4K IDEA JOURNEY</small><h2>Track your K4K IDEA training.</h2></div><strong>{status==='ready'?count+'/'+lessons.length:'—'} <span>completed</span></strong></div>
+  <div className="learningProgressTrack"><div style={{width:(count/lessons.length*100)+'%'}}/></div>
   {status==='loading'?<p><LoaderCircle size={15}/> Loading your saved progress…</p>:status==='error'?<p>Progress could not be loaded right now. Your lessons are still available below.</p>:null}
-  <div className="learningProgressList">{lessons.map((lesson,i)=>{const locked=i===1&&!workflowTwoAvailable;return <Link key={lesson.id} href={lesson.href} className="learningProgressItem"><span className={progress[lesson.id]?'done':''}>{progress[lesson.id]?<CheckCircle2 size={20}/>:String(i+1).padStart(2,'0')}</span><div><b>{lesson.name}</b><small>{progress[lesson.id]?'Completed':locked?'Unlocks Monday 12 October':'Ready to learn'}</small></div><ArrowRight size={17}/></Link>})}</div>
+  <div className="learningProgressList">{lessons.map((lesson,i)=>{const locked=false;return <Link key={lesson.id} href={lesson.href} className="learningProgressItem"><span className={progress[lesson.id]?'done':''}>{progress[lesson.id]?<CheckCircle2 size={20}/>:String(i+1).padStart(2,'0')}</span><div><b>{lesson.name}</b><small>{progress[lesson.id]?'Completed':'Ready to learn'}</small></div><ArrowRight size={17}/></Link>})}</div>
  </section>;
 }
 
