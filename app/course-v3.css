@@ -18,7 +18,7 @@
 .k4k-course-pillrow{display:flex;flex-wrap:wrap;gap:10px}
 .k4k-course-pillrow span,.k4k-lesson-badges span{border:1px solid #caff3940;border-radius:100px;padding:10px 12px;font-size:9px;font-weight:850;letter-spacing:.08em;color:#d1dfc5;white-space:nowrap}
 .k4k-course-hero-media{height:clamp(360px,42vw,560px);position:relative;overflow:hidden;border:1px solid #caff3970;border-radius:22px;background:linear-gradient(135deg,#111e14,#0c0c0c);box-shadow:0 26px 70px #0008}
-.k4k-course-reference{background-image:url('/academy/k4k-reference-sprite.svg');background-size:300% 100%;background-repeat:no-repeat;background-color:#121915;overflow:hidden}
+.k4k-course-reference{background-image:url('/academy/k4k-reference-sprite.svg');background-size:300% auto;background-repeat:no-repeat;background-color:#121915;overflow:hidden}
 .k4k-course-hero-photo{width:100%;height:100%;filter:contrast(1.06) saturate(.84);transition:transform .6s}
 .k4k-course-hero-media:hover .k4k-course-hero-photo{transform:scale(1.035)}
 .k4k-course-hero-media::after{content:"";position:absolute;inset:55% 0 0;pointer-events:none;background:linear-gradient(transparent,#071006cc)}
