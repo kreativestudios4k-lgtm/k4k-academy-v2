@@ -511,3 +511,52 @@
  .k4k-carousel-action{flex-direction:column;align-items:stretch;margin:22px 0 0;gap:14px;padding:20px 0}
  .k4k-carousel-action .idea-button{justify-content:center}
 }
+
+
+/* Public Academy one-page landing and navigation correction — 21 Oct 2026.
+   Old global nav rules used absolute positioning and a full-width overlay,
+   blocking the Home and Create Account links. Scope fixes to new IDEA UI. */
+.idea-header .idea-desktop-nav{
+ position:static;top:auto;right:auto;left:auto;width:auto;height:auto;
+ padding:0;margin:0;border:0;z-index:auto;justify-content:flex-start;
+}
+.idea-header .idea-mobile-menu nav{
+ position:absolute;top:calc(100% + 14px);right:0;left:auto;
+ height:auto;width:min(82vw,320px);padding:9px;z-index:100;
+ justify-content:initial;
+}
+.idea-header .idea-nav-row{min-height:68px;gap:14px;position:relative}
+.idea-header .idea-header-actions{position:relative;z-index:4}
+.idea-header .idea-logo{position:relative;z-index:4}
+.ideaMember nav.idea-member-nav{position:static;top:auto;left:auto;width:100%;height:auto;z-index:auto}
+.k4kLanding{min-height:100svh;display:flex;flex-direction:column}
+.k4kLanding .k4k-market-carousel{
+ width:min(calc(100% - 36px),1120px);
+ margin-inline:auto;padding:clamp(12px,2vw,24px) 0 16px;
+}
+.k4kLanding .k4k-carousel-top{
+ align-items:center;justify-content:space-between;gap:14px;
+ margin:0 0 13px;
+}
+.k4kLanding .k4k-carousel-eyebrow{font-size:10px;letter-spacing:.13em;line-height:1.5}
+.k4kLanding .k4k-carousel-picture-wrap{width:min(100%,590px);flex:0 1 590px}
+.k4kLanding a.k4k-carousel-picture{display:block;cursor:pointer}
+.k4kLanding a.k4k-carousel-picture:focus-visible{outline:3px solid #d0ff6b;outline-offset:3px}
+.k4kLanding .k4k-carousel-footer{margin:12px 0 0}
+.k4kLanding .k4k-carousel-action{
+ max-width:690px;margin:13px auto 0;padding:14px 0 4px;
+}
+.k4kLanding .k4k-carousel-action p{margin:4px 0 0}
+@media(max-width:760px){
+ .k4kLanding .k4k-market-carousel{width:calc(100% - 24px);padding:11px 0 23px}
+ .k4kLanding .k4k-carousel-top{flex-direction:row;align-items:center;gap:8px;margin-bottom:10px}
+ .k4kLanding .k4k-carousel-eyebrow{font-size:9px;letter-spacing:.04em;max-width:126px}
+ .k4kLanding .k4k-market-switch{align-self:center}
+ .k4kLanding .k4k-market-switch button{padding:10px 11px;font-size:9px;letter-spacing:0}
+ .k4kLanding .k4k-carousel-picture-wrap{max-width:590px;flex:1 1 auto}
+ .k4kLanding .k4k-carousel-action{gap:11px;margin:10px 0 0;padding:15px 0 0}
+}
+@media(max-width:400px){
+ .k4kLanding .k4k-carousel-eyebrow{display:none}
+ .k4kLanding .k4k-carousel-top{justify-content:center}
+}
