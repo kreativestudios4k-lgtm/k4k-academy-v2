@@ -10,7 +10,7 @@ const emailOk=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const phoneOk=value=>{const clean=value.replace(/[\s()\-]/g,'');return /^\+?[0-9]{7,15}$/.test(clean)};
 
 export default function Login({initialMode='login'}){
- const[mode,setMode]=useState(initialMode==='register'?'register':'login');
+ const mode=initialMode==='register'?'register':'login';
  const[name,setName]=useState('');
  const[email,setEmail]=useState('');
  const[phone,setPhone]=useState('');
@@ -25,11 +25,9 @@ export default function Login({initialMode='login'}){
 
  useEffect(()=>{
   const query=new URLSearchParams(window.location.search);
-  if(query.get('mode')==='register'||query.get('tab')==='register')setMode('register');
   setCheckoutReturn(query.get('checkout')==='success');
   if(query.has('error'))setError('We could not finish the last sign-in. Please try again.');
  },[]);
- function switchMode(next){setMode(next);setError('');setMessage('');setPassword('');setShowPassword(false);setMagicSent(false)}
  async function submit(event){
   event.preventDefault();
   if(busy)return;
@@ -61,7 +59,7 @@ export default function Login({initialMode='login'}){
      window.location.replace('/membership-required');
      return;
     }
-    setMessage('Check your inbox to confirm your email address, then sign in using the password you created. If you already had an account, choose Sign in or Forgot password instead. Your account registration does not make a new payment.');
+    setMessage('Account created. Please confirm your email through the link we send you, then sign in. We will match that verified email to your paid Stripe subscription; you will not be charged again.');
     setPassword('');
    }else{
     const {data,error:authError}=await supabase.auth.signInWithPassword({email:address,password});
@@ -115,17 +113,13 @@ export default function Login({initialMode='login'}){
  return <main className="k4kAccount">
   <header className="k4kAccountHeader"><Link href="/" className="k4kAccountBrand">K4K<span>✳</span> <small>ACADEMY</small></Link><Link href="/" className="k4kAccountHome">BACK TO WEBSITE <ArrowRight size={15}/></Link></header>
   <div className="k4kAccountLayout">
-   <section className="k4kAccountIntro"><div className="k4kAccountEyebrow"><span/> YOUR CREATOR ACCOUNT</div><h1>GOOD IDEAS<br/>START <em>HERE.</em></h1><p>A simple account for your K4K lessons, production methods, saved progress and billing access.</p>
+   <section className="k4kAccountIntro"><div className="k4kAccountEyebrow"><span/> {mode==='register'?'POST-CHECKOUT / YOUR ACCOUNT':'EXISTING STUDENTS / LOGIN'}</div><h1>{mode==='register'?<>YOUR PLACE.<br/>YOUR <em>ACCOUNT.</em></>:<>WELCOME<br/><em>BACK.</em></>}</h1><p>{mode==='register'?'You have reached the post-checkout registration step. Use the exact email from your Stripe purchase to connect your membership after verification.':'Already purchased the course? Sign in with your Academy email and password to access your lessons.'}</p>
     <div className="k4kAccountFeatures"><div><span>01</span> One account, your own password</div><div><span>02</span> Your existing subscription stays connected</div><div><span>03</span> Learn, practise and review your work</div></div>
     <div className="k4kAccountSafe"><ShieldCheck size={18}/><span>Already purchased? Use the email from your Stripe receipt. You do not need to pay again.</span></div>
    </section>
    <section className="k4kAccountPanel" aria-label="K4K Academy account">
-    <div className="k4kAccountTabs" role="group" aria-label="Choose how to access your account">
-      <button type="button" aria-pressed={mode==='login'} className={mode==='login'?'selected':''} onClick={()=>switchMode('login')}>SIGN IN</button>
-      <button type="button" aria-pressed={mode==='register'} className={mode==='register'?'selected':''} onClick={()=>switchMode('register')}>CREATE ACCOUNT</button>
-    </div>
-    <div className="k4kAccountPanelHead"><span>YOUR MEMBER SPACE / K4K</span><h2>{mode==='login'?'Welcome back.':'Join the studio.'}</h2><p>{mode==='login'?'Enter your email and password to continue.':'Create your account with just a few details. You can join before or after subscribing.'}</p></div>
-    {checkoutReturn&&<div className="k4kAccountNotice" role="status"><CheckCircle2 size={19}/> Thanks for your purchase. {mode==='login'?'Sign in':'Register'} using the same email you used at checkout. No second payment is needed.</div>}
+    <div className="k4kAccountPanelHead"><span>YOUR MEMBER SPACE / K4K</span><h2>{mode==='login'?'Welcome back.':'Join the studio.'}</h2><p>{mode==='login'?'Enter your email and password to continue.':'Your payment comes first. Use the same email address from the Stripe receipt, then verify your email to activate course access.'}</p></div>
+    {checkoutReturn&&mode==='register'&&<div className="k4kAccountNotice" role="status"><CheckCircle2 size={19}/> You returned from Stripe. Create your account with your checkout email; course access is only activated after your subscription and email are verified.</div>}
     {message&&<div className="k4kAccountNotice" role="status"><Mail size={19}/>{message}</div>}
     {error&&<div className="k4kAccountError" role="alert">{error}</div>}
     <form className="k4kAccountForm" onSubmit={submit}>
@@ -145,9 +139,8 @@ export default function Login({initialMode='login'}){
      {mode==='register'&&<p className="k4kAccountHint">Use at least 8 characters. Your password is handled securely by our authentication provider.</p>}
      <button className="k4kAccountSubmit" type="submit" disabled={busy}>{busy?'PLEASE WAIT…':mode==='register'?'CREATE MY ACCOUNT':'SIGN IN'} <ArrowRight size={18}/></button>
     </form>
-    {mode==='register'?<p className="k4kAccountPolicy">By creating an account, you agree to our <Link href="/terms">Terms</Link> and acknowledge our <Link href="/privacy">Privacy Policy</Link>. Registration is free; Academy lessons require an active membership.</p>:<p className="k4kAccountHint" style={{marginTop:17}}>New to K4K? <button type="button" className="k4kAccountTextButton" onClick={()=>switchMode('register')}>Create your account</button>.</p>}
-    <div className="k4kAccountDivider"><span>OR</span></div>
-    <button type="button" className="k4kAccountGoogle" onClick={google} disabled={busy}><GoogleIcon/> CONTINUE WITH GOOGLE</button>
+    {mode==='register'?<p className="k4kAccountPolicy">By creating an account, you agree to our <Link href="/terms">Terms</Link> and acknowledge our <Link href="/privacy">Privacy Policy</Link>. No second payment is required. Your paid membership is checked after email verification.</p>:<p className="k4kAccountHint" style={{marginTop:17}}>New here? <Link href="/">Purchase access on the K4K Academy homepage</Link> first. Already paid but cannot access your account? Contact support below.</p>}
+    {mode==='login'&&<><div className="k4kAccountDivider"><span>OR</span></div><button type="button" className="k4kAccountGoogle" onClick={google} disabled={busy}><GoogleIcon/> CONTINUE WITH GOOGLE</button></>}
     {mode==='login'&&<div className="k4kAccountFallback"><button type="button" onClick={()=>setMagicOpen(x=>!x)} aria-expanded={magicOpen}>{magicOpen?'HIDE EMAIL LINK OPTION':'NO PASSWORD YET? USE A SECURE EMAIL LINK'} <ArrowRight size={14}/></button>{magicOpen&&<form onSubmit={magic}><p>For existing accounts without a password. Enter your account email above, then request one sign-in link.</p><button type="submit" disabled={busy}>{busy?'SENDING…':'EMAIL ME A LOGIN LINK'}</button>{magicSent&&<p role="status" className="k4kAccountNotice">Check your inbox for the newest login email.</p>}</form>}</div>}
     <p className="k4kAccountHelp">Having trouble with an existing payment? <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20Academy%20account%20support">Contact Academy support</a>. Don't pay again.</p>
    </section>
