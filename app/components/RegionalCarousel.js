@@ -23,11 +23,11 @@ export default function RegionalCarousel({initialMarket='eu',checkout,promotionA
  const go=(direction)=>setSlide(i=>(i+direction+slides.length)%slides.length);
  const selectMarket=(next)=>{setMarket(next);setSlide(0)};
  const copy=isBrazil
-  ?{heading:'COMECE A CRIAR',action:'VER A ACADEMY',note:'Primeiro mês com o código K4K70. A renovação é mensal. Confirme o preço final e a moeda no checkout.'}
-  :{heading:'START CREATING',action:'EXPLORE MEMBERSHIP',note:'Use K4K70 for your first month. The subscription renews monthly. Confirm your final price and currency at checkout.'};
- return <section className="k4k-market-carousel" aria-label="K4K Academy regional image gallery">
+  ?{heading:'COMECE A CRIAR',action:'ENTRAR NA ACADEMY',note:'Primeiro mês com o código K4K70. A renovação é mensal. Confirme o preço final e a moeda no checkout.'}
+  :{heading:'START CREATING',action:'JOIN THE ACADEMY',note:'Use K4K70 for your first month. The subscription renews monthly. Confirm your final price and currency at checkout.'};
+ return <section className="k4k-market-carousel" id="join" aria-label="K4K Academy regional image gallery">
   <div className="k4k-carousel-top">
-   <div><span className="k4k-carousel-eyebrow">K4K ACADEMY / CREATOR SCHOOL</span><h1 className="k4k-carousel-title">YOUR CREATIVE<br/><em>STARTING POINT.</em></h1></div>
+   <span className="k4k-carousel-eyebrow">K4K ACADEMY / CREATOR SCHOOL</span>
    <div className="k4k-market-switch" role="group" aria-label="Select your market">
     <button type="button" aria-pressed={!isBrazil} className={!isBrazil?'selected':''} onClick={()=>selectMarket('eu')}>UK / EUROPE · £</button>
     <button type="button" aria-pressed={isBrazil} className={isBrazil?'selected':''} onClick={()=>selectMarket('br')}>BRASIL · R$</button>
@@ -41,7 +41,9 @@ export default function RegionalCarousel({initialMarket='eu',checkout,promotionA
    >
     {slide===0&&!promotionActive?
      <div className="k4k-carousel-expired-cover"><span>K4K ACADEMY</span><strong>LEARN TO<br/>CREATE WITH<br/><em>INTENTION.</em></strong><p>The K4K Academy course and practical workflows are open for new members.</p><p>Subscription price and currency confirmed at checkout.</p></div>
-     :<div className="k4k-carousel-picture" key={current.key+'-'+market} role="img" aria-label={current.label} style={{backgroundImage:`url("${sprite}")`,backgroundPosition:current.position}}/>
+     :slide===0
+      ?<a className="k4k-carousel-picture" key={current.key+'-'+market} href={checkout} aria-label={isBrazil?'Entrar na K4K Academy — abrir pagamento Stripe':'Join K4K Academy — open secure Stripe checkout'} style={{backgroundImage:`url("${sprite}")`,backgroundPosition:current.position}}/>
+      :<div className="k4k-carousel-picture" key={current.key+'-'+market} role="img" aria-label={current.label} style={{backgroundImage:`url("${sprite}")`,backgroundPosition:current.position}}/>
     }
    </div>
    <button type="button" className="k4k-carousel-arrow" aria-label="Next picture" onClick={()=>go(1)}><ChevronRight size={23}/></button>
