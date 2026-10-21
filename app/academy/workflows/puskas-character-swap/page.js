@@ -1,27 +1,2 @@
-'use client';
-import Link from 'next/link';
-import {useState} from 'react';
-import {ArrowUpRight,Copy,Check} from 'lucide-react';
-import {IdeaHeader,IdeaFooter,IdeaKicker,IdeaLink} from '../../../components/IdeaUI';
-import {CompleteWorkflowButton} from '../../LearningProgress';
-const prompt=`Use the uploaded reference video as the exact motion and camera guide, and use the supplied multi-angle character sheet as the ONLY replacement character identity.
-
-Replace the main football player in the video with the small-statured man in the reference sheet. Keep his natural, compact body height and proportions in EVERY frame. Never scale him up to match the original player's height. Maintain the same realistic face, hairstyle, skin texture, yellow Brazil jersey with green trim, orange captain armband, black shorts, bright orange socks and black trainers shown in the character sheet.
-
-Preserve the original football action, dribbling, ball contact, acceleration, body language, reactions, camera tracking, shot composition, field, background players, stadium atmosphere, shadows and scene timing. The replacement player's foot-to-ball interaction must remain physically plausible at his own body scale. Preserve motion blur, depth of field and the original lighting. Keep character identity consistent from front, side and back views.
-
-Avoid artificial faces, stretched limbs, floating feet, body enlargement, identity drift, jersey changes, duplicated players, ball distortion, jump cuts and camera changes. Output a natural live-action-looking football recreation.`;
-export default function FootballLesson(){
-const[copied,setCopied]=useState(false);
-async function copy(){try{await navigator.clipboard.writeText(prompt);setCopied(true)}catch{setCopied(false)}}
-return <main className="ideaPage"><IdeaHeader privateArea/><div className="idea-wrap">
-<header className="ideaModuleHero"><IdeaKicker>PRODUCTION EXERCISE 002 / SPORTING PHYSICS</IdeaKicker><h1>THE BALL<br/>DOESN'T <em>LIE.</em></h1><p>Recreating a football scene is a technical exercise in body scale, camera movement and physically believable ball contact. A visually impressive frame is not enough.</p><p className="idea-note">The original video, result and character image are intentionally not embedded on the redesigned site. Prepare and use football footage you have permission to transform.</p></header>
-<div className="idea-metric-strip"><div><strong>01</strong><span>CHARACTER IDENTITY TO KEEP STABLE</span></div><div><strong>03</strong><span>CONTACT FRAMES TO REVIEW</span></div><div><strong>04</strong><span>IDEA STAGES TO COMPLETE</span></div></div>
-<section className="ideaModuleSection"><span className="idea-kicker">I / INVESTIGATE</span><h2>Choose a short, reviewable play.</h2><p>Use original or properly licensed footage of one clear football action. Study the player's start position, run-up, the moment the foot contacts the ball and the follow-through. Mark those timestamps before starting a generation.</p></section>
-<section className="ideaModuleSection"><span className="idea-kicker">D / DIRECT</span><h2>Protect height and physics.</h2><p>The previous K4K test used a compact character wearing a yellow football shirt, orange socks and dark shorts. Write an identity lock so the replacement never becomes taller or changes footwear between shots.</p><ul><li>Keep body scale natural in all camera angles.</li><li>Measure the relation between foot and ball, not just facial realism.</li><li>Keep background players, framing and the field in the same positions.</li></ul></section>
-<section className="ideaModuleSection"><span className="idea-kicker">E / EXECUTE</span><h2>Recreate the timing.</h2><p>In a compatible motion-reference tool, upload your permitted source video and the character reference sheet. Test the shortest useful segment. Review source and generated video at the same timestamps; credits may incur external charges.</p>
-<div className="idea-brief"><div className="idea-brief-head"><span>FOOTBALL MOTION CONTROL / MODEL PROMPT</span><span>HISTORICAL K4K EXAMPLE</span></div><div className="idea-brief-body"><pre>{prompt}</pre><button type="button" onClick={copy} className="idea-button">{copied?'PROMPT COPIED':'COPY & ADAPT PROMPT'} {copied?<Check size={17}/>:<Copy size={17}/>}</button></div></div></section>
-<section className="ideaModuleSection"><span className="idea-kicker">A / AUDIT</span><h2>Review the contact—not the hype.</h2><div className="ideaModuleColumns"><div className="idea-bullet-card"><h3>FAILURE CHECKS</h3><ul><li>The football jumps without being kicked.</li><li>Feet float or slide across the pitch.</li><li>The subject grows when the camera moves.</li><li>Clothing, shadows or background people change unexpectedly.</li></ul></div><div className="idea-bullet-card"><h3>YOUR HANDOVER</h3><ul><li>Legal source clip and simple shot map.</li><li>One face/body reference with stable proportions.</li><li>Prompt and tested settings with approximate cost.</li><li>Final result and contact-frame QC notes.</li></ul></div></div><p>Export for the footage's actual format, use appropriate rights and clearly identify synthetic sports moments when publishing.</p></section>
-<section className="ideaModuleSection"><span className="idea-kicker">YOUR LEARNING RECORD</span><h2>Complete when you can explain your corrections.</h2><CompleteWorkflowButton lessonId="workflow-002"/><Link href="/academy" className="idea-utility">RETURN TO YOUR STUDIO <ArrowUpRight size={17}/></Link></section>
-</div><IdeaFooter privateArea/></main>
-}
+import {redirect} from 'next/navigation';
+export default function OldWorkflow(){redirect('/academy/lessons/final-quality-gate')}
