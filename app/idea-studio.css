@@ -1,4 +1,4 @@
-/* K4K Academy / IDEA editorial design system: no external images, videos or font assets. */
+/* K4K Academy / IDEA editorial design system; approved home carousel art is hosted locally. */
 .ideaSite,.ideaPage,.ideaMember{--iv:#e8e7df;--ib:#0b0b0b;--il:#d0ff6b;--im:#a6a69f;--ir:rgba(255,255,255,.23);color:var(--iv);background:#0b0b0b;font-family:Arial,Helvetica,sans-serif;min-height:100vh;isolation:isolate}
 .ideaSite *,.ideaPage *,.ideaMember *{box-sizing:border-box}
 .ideaSite a,.ideaPage a,.ideaMember a{text-decoration:none}
@@ -464,4 +464,50 @@
  .ideaMember .idea-metric-strip>div{padding:14px 15px}
  .ideaMember .idea-metric-strip strong{font-size:27px}
  .ideaMember .idea-syllabus-row{padding:18px 0}
+}
+
+
+/* K4K Academy home: one visible localised promo cover, followed by only
+   the clean pitch and locker-room images. Sprite stored with this project. */
+.k4k-market-carousel{padding:42px 0 58px;width:min(100% - 64px,1260px);margin:0 auto;color:#f7f7f3}
+.k4k-carousel-top{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:26px}
+.k4k-carousel-eyebrow{font-size:11px;letter-spacing:.22em;color:#d0ff6b;font-weight:800}
+.k4k-carousel-title{font-size:clamp(21px,3.1vw,43px);line-height:1.04;letter-spacing:-.05em;font-weight:900;margin:13px 0 0}
+.k4k-carousel-title em{font-style:normal;color:#d0ff6b}
+.k4k-market-switch{display:flex;align-items:center;gap:5px;padding:5px;border:1px solid #494942;border-radius:999px;background:#161613;flex-shrink:0}
+.k4k-market-switch button{appearance:none;border:0;border-radius:999px;background:transparent;color:#cecec9;padding:12px 16px;font:800 10px Arial,Helvetica,sans-serif;letter-spacing:.07em;cursor:pointer}
+.k4k-market-switch button.selected{background:#d0ff6b;color:#0a0a0a}
+.k4k-carousel-stage{display:flex;justify-content:center;align-items:center;gap:clamp(12px,3vw,42px);min-width:0}
+.k4k-carousel-picture-wrap{width:min(100%,535px);aspect-ratio:4/5;flex:0 1 535px;touch-action:pan-y;user-select:none;background:#101010}
+.k4k-carousel-picture{width:100%;height:100%;background-repeat:no-repeat;background-size:200% 200%;border:1px solid #292a25;animation:k4k-carousel-reveal .22s ease-out}
+@keyframes k4k-carousel-reveal{from{opacity:.77}to{opacity:1}}
+.k4k-carousel-arrow{display:flex;justify-content:center;align-items:center;width:48px;height:48px;flex-shrink:0;cursor:pointer;border:1px solid #55584c;color:#f4f4f2;background:#171714;border-radius:50%}
+.k4k-carousel-arrow:hover{color:#0a0a0a;background:#d0ff6b;border-color:#d0ff6b}
+.k4k-carousel-footer{display:flex;gap:20px;justify-content:center;align-items:center;margin:22px 0 0}
+.k4k-carousel-dots{display:flex;gap:10px;align-items:center}
+.k4k-carousel-dots button{appearance:none;cursor:pointer;border:1px solid #7d8071;background:transparent;border-radius:30px;width:27px;height:7px;padding:0;transition:width .2s ease,background .2s ease}
+.k4k-carousel-dots button.active{width:49px;background:#d0ff6b;border-color:#d0ff6b}
+.k4k-carousel-progress{font-size:12px;color:#a6a6a0;font-weight:700;letter-spacing:.17em}
+.k4k-carousel-action{display:flex;align-items:center;justify-content:space-between;gap:18px;max-width:720px;margin:34px auto 0;padding:25px 0;border-top:1px solid #ffffff36}
+.k4k-carousel-action strong{font-size:17px;font-weight:900;letter-spacing:.02em}
+.k4k-carousel-action p{color:#b8b8b1;font-size:12px;line-height:1.6;margin:9px 0 0;max-width:450px}
+.k4k-carousel-action .idea-button{white-space:nowrap;flex-shrink:0}
+.k4k-carousel-expired-cover{width:100%;height:100%;display:flex;flex-direction:column;justify-content:center;padding:9%;color:#111;background:radial-gradient(ellipse at 50% 45%,#fff 0%,#fafafa 69%,#d0ff6b 100%);border:2px solid #d0ff6b}
+.k4k-carousel-expired-cover>span{font-size:clamp(12px,2vw,19px);letter-spacing:.25em;font-weight:900}
+.k4k-carousel-expired-cover>strong{font-size:clamp(30px,5vw,69px);letter-spacing:-.07em;line-height:.95;margin:9% 0}
+.k4k-carousel-expired-cover>strong em{font-style:normal;color:#478100}
+.k4k-carousel-expired-cover p{font-size:clamp(12px,1.5vw,17px);line-height:1.5;margin:12px 0}
+@media(max-width:750px){
+ .k4k-market-carousel{width:min(100% - 28px,600px);padding:22px 0 40px}
+ .k4k-carousel-top{flex-direction:column;align-items:stretch;gap:17px;margin-bottom:21px}
+ .k4k-carousel-title{font-size:clamp(22px,6vw,31px);margin:9px 0 0}
+ .k4k-market-switch{align-self:start}
+ .k4k-market-switch button{font-size:10px;padding:11px 14px}
+ .k4k-carousel-stage{position:relative;gap:0}
+ .k4k-carousel-picture-wrap{flex:1 1 auto;max-width:535px}
+ .k4k-carousel-arrow{position:absolute;top:50%;transform:translateY(-50%);width:39px;height:39px;z-index:2;background:rgba(8,8,8,.78);border:1px solid #d0ff6b}
+ .k4k-carousel-arrow:first-child{left:5px}
+ .k4k-carousel-arrow:last-child{right:5px}
+ .k4k-carousel-action{flex-direction:column;align-items:stretch;margin:22px 0 0;gap:14px;padding:20px 0}
+ .k4k-carousel-action .idea-button{justify-content:center}
 }
