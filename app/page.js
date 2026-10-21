@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import {headers} from 'next/headers';
+import RegionalCarousel from './components/RegionalCarousel';
 import {ArrowUpRight,ArrowRight,ArrowDown,Check,ShieldCheck,MoveRight,Plus,Minus} from 'lucide-react';
 import {IdeaHeader,IdeaFooter,IdeaKicker,IdeaLink} from './components/IdeaUI';
 import {ideaSteps,studioCases,syllabus,noHype} from '../lib/k4k-idea';
@@ -9,25 +11,23 @@ const questions=[
  ['What will I actually learn?','How to write a brief, build consistent references, choose the right production method, test a short generation, detect faults and finish a responsible export.'],
  ['Is there a guarantee my videos will go viral?','No. We teach production and review methods. We do not guarantee views, followers, sales, employment or a flawless AI result.'],
  ['Are there lessons I can start today?','Yes. Members have access to six self-paced learning topics, reusable prompts, a practical production casebook and two project-specific workflow lessons. All training is text-first in this redesign.'],
- ['Where are the images and videos?','The new website deliberately does not display photos or video embeds. Learning examples are explained through detailed written production notes, prompts and quality-control steps. You produce and review your own files in your chosen tools.'],
+ ['Where are the images and videos?','The home gallery presents a small selection of K4K visuals. Training remains primarily text-first: lessons explain production decisions, prompts and quality checks. You produce and review your own files using the tools you choose.'],
  ['Can I cancel my membership?','Yes. Subscriptions renew monthly. You can manage renewal and cancellation through the secure Stripe billing portal. Your exact payment terms appear during checkout.'],
  ['What if I have already paid?','Do not buy again. Use the same email as your payment receipt to log in or contact Academy support for account access help.']
 ];
 
-export const revalidate=3600;
+export const dynamic='force-dynamic';
 export const metadata={title:'K4K Academy — Learn to Direct AI Video | IDEA Method',description:'Learn a practical, responsible AI video production method. Four stages: Investigate, Direct, Execute, Audit. Real prompts, quality gates and self-paced creator education.'};
-export default function Home(){
+export default async function Home({searchParams}){
+ const requestHeaders=await headers();
+ const params=await searchParams;
+ const marketOverride=typeof params?.market==='string'?params.market.toLowerCase():'';
+ const country=(requestHeaders.get('x-vercel-ip-country')||requestHeaders.get('cf-ipcountry')||'').toUpperCase();
+ const isBrazil=marketOverride==='br'||(marketOverride!=='eu'&&(country==='BR'||(!country&&/pt-BR/i.test(requestHeaders.get('accept-language')||''))));
  const showFirstMonthOffer=Date.now()<Date.UTC(2026,9,28,23,59,0);
  return <main className="ideaSite" id="top">
  <IdeaHeader/>
- <section className="idea-hero"><div className="idea-wrap idea-hero-main">
-  <IdeaKicker>K4K ACADEMY / THE SCHOOL FOR CREATIVE DIRECTION</IdeaKicker>
-  <h1 className="idea-xl">A BETTER<br/><span>IDEA</span> IS<br/>NOT ENOUGH.</h1>
-  <div className="idea-hero-bottom"><div className="idea-hero-actions"><IdeaLink href="#method">DISCOVER OUR METHOD</IdeaLink><IdeaLink href="#membership" variant="outline">EXPLORE MEMBERSHIP</IdeaLink></div>
-   <div className="idea-hero-side"><div className="idea-eyebrow">THE PRINCIPLE / 001</div><p>AI can produce an image. A creator must know what to ask for, what to keep, what to correct and when to stop. That's what we teach.</p></div>
-  </div>
-  <div className="idea-hero-meta"><span>NO SHORTCUTS. NO GUARANTEED VIRALITY.</span><span>SCROLL TO UNDERSTAND OUR PROCESS ↓</span><span>ONLINE / INTERNATIONAL</span></div>
- </div></section>
+ <RegionalCarousel initialMarket={isBrazil?'br':'eu'} checkout={checkout} promotionActive={showFirstMonthOffer}/>
  <section className="idea-light idea-section" id="method"><div className="idea-wrap"><div className="idea-marker"><span>01 / THE METHODOLOGY</span><span>FOUR STEPS · ONE STANDARD</span></div>
   <div className="idea-section-header"><h2 className="idea-display">GOOD WORK<br/>IS <em>DESIGNED.</em></h2><p>We developed K4K IDEA to teach something repeatable: the decisions behind an AI production. Four stages. Four outputs. Four points where you must check the quality before moving on.</p></div>
   <div className="idea-method-grid">{ideaSteps.map((s)=><Link key={s.key} href="/academy/method" className="idea-method-card"><div><div className="numeral">{s.index} / 04</div><div className="letter">{s.key}</div></div><div><span className="stage">{s.sub}</span><h3>{s.name}</h3><p>{s.line}</p></div></Link>)}</div>
