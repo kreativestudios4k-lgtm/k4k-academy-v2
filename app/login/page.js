@@ -9,8 +9,8 @@ function GoogleIcon(){return <svg viewBox="0 0 24 24" width="18" height="18" ari
 const emailOk=value=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 const phoneOk=value=>{const clean=value.replace(/[\s()\-]/g,'');return /^\+?[0-9]{7,15}$/.test(clean)};
 
-export default function Login(){
- const[mode,setMode]=useState('login');
+export default function Login({initialMode='login'}){
+ const[mode,setMode]=useState(initialMode==='register'?'register':'login');
  const[name,setName]=useState('');
  const[email,setEmail]=useState('');
  const[phone,setPhone]=useState('');
