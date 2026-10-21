@@ -14,8 +14,10 @@ const questions=[
  ['What if I have already paid?','Do not buy again. Use the same email as your payment receipt to log in or contact Academy support for account access help.']
 ];
 
+export const revalidate=3600;
 export const metadata={title:'K4K Academy — Learn to Direct AI Video | IDEA Method',description:'Learn a practical, responsible AI video production method. Four stages: Investigate, Direct, Execute, Audit. Real prompts, quality gates and self-paced creator education.'};
 export default function Home(){
+ const showFirstMonthOffer=Date.now()<Date.UTC(2026,9,28,23,59,0);
  return <main className="ideaSite" id="top">
  <IdeaHeader/>
  <section className="idea-hero"><div className="idea-wrap idea-hero-main">
@@ -50,7 +52,14 @@ export default function Home(){
  </div></section>
  <section className="idea-pricing" id="membership"><div className="idea-wrap"><div className="idea-marker"><span>05 / THE MEMBERSHIP</span><span>BUILD YOUR CREATIVE STANDARD</span></div>
   <div className="idea-price-grid"><div><h2>LEARN TO<br/>MAKE IT<br/><em style={{fontFamily:'Georgia,serif',fontWeight:400}}>count.</em></h2><p>Membership includes the IDEA method, six foundation-to-delivery topics, real production case studies, working prompt templates and existing practical workflow lessons.</p><p style={{fontSize:13,color:'#47572c'}}>No compulsory live bookings. No guaranteed earnings. No additional course charge for published member lessons.</p></div>
-   <div className="idea-price-card"><span>CREATOR MEMBERSHIP / MONTHLY</span><strong>£7.99<small> / MO</small></strong><p>Recurring membership. Secure checkout handled by Stripe. Final price, currency and terms are confirmed at checkout. External AI-tool credits are not included.</p><a className="idea-button" href={checkout}>BECOME A MEMBER <ArrowUpRight size={19}/></a><p style={{margin:'19px 0 0',fontSize:12}}><ShieldCheck size={14} style={{verticalAlign:'middle'}}/> Already paid? <Link href="/login" style={{color:'#d0ff6b',textDecoration:'underline'}}>Sign in to your account.</Link></p></div>
+   <div className="idea-price-card"><span>CREATOR MEMBERSHIP / MONTHLY</span><strong>£7.99<small> / MO</small></strong>
+    {showFirstMonthOffer&&<div style={{margin:'20px 0',padding:'18px 19px',border:'1px solid rgba(208,255,107,.55)',borderRadius:12,background:'rgba(208,255,107,.07)'}}>
+     <div style={{fontSize:11,fontWeight:800,letterSpacing:'0.08em',color:'#d0ff6b'}}>NEW MEMBER OFFER · UNTIL 28 OCTOBER</div>
+     <div style={{fontSize:27,fontWeight:900,lineHeight:1.2,margin:'9px 0'}}>70% OFF YOUR FIRST MONTH</div>
+     <p style={{fontSize:14,lineHeight:1.65,margin:'8px 0'}}>UK introductory price <strong>£2.40</strong> for the first month, then <strong>£7.99/month</strong> unless cancelled. For first-time paying customers only. Other currencies are shown at checkout.</p>
+     <p style={{fontSize:14,margin:'13px 0 0'}}>Enter code <code style={{fontWeight:800,color:'#d0ff6b',fontSize:17,letterSpacing:'0.04em'}}>K4K70</code> on the Stripe checkout page.</p>
+    </div>}
+    <p>Recurring membership. Secure checkout handled by Stripe. Final price, currency and terms are confirmed at checkout. External AI-tool credits are not included.</p><a className="idea-button" href={checkout}>{showFirstMonthOffer?'JOIN WITH CODE K4K70':'BECOME A MEMBER'} <ArrowUpRight size={19}/></a><p style={{margin:'19px 0 0',fontSize:12}}><ShieldCheck size={14} style={{verticalAlign:'middle'}}/> Already paid? <Link href="/login" style={{color:'#d0ff6b',textDecoration:'underline'}}>Sign in to your account.</Link></p></div>
   </div>
  </div></section>
  <section className="idea-section" id="questions"><div className="idea-wrap"><div className="idea-marker"><span>06 / THE QUESTIONS</span><span>NO SMALL PRINT GAMES</span></div><div className="idea-section-header"><h2 className="idea-display">BEFORE<br/>YOU <em>BEGIN.</em></h2><p>These are the questions that should be answered clearly before anyone pays for a course.</p></div>
