@@ -2,6 +2,7 @@ import './globals.css';
 import './idea-studio.css';
 import './course-v3.css';
 import './account-simple.css';
+import './character-swap-studio.css';
 export const metadata={
  metadataBase:new URL('https://kreativestudios4k.com'),
  title:{default:'K4K Academy | The IDEA Method for AI Video',template:'%s | K4K Academy'},
