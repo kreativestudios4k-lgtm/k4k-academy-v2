@@ -158,3 +158,9 @@
  .k4k-studio-hero h1{font-size:41px}
 }
 @media(prefers-reduced-motion:reduce){.k4k-creator-studio *{transition:none!important;scroll-behavior:auto!important}}
+
+
+.k4k-lesson-handoff-links{display:flex;align-items:center;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin:12px 0 4px}
+.k4k-lesson-handoff-links .k4k-course-primary{white-space:normal}
+.k4k-lesson-handoff-links .k4k-swap-higgsfield{margin:0}
+@media(max-width:730px){.k4k-lesson-handoff-links{justify-content:flex-start}}
