@@ -19,9 +19,9 @@ export default function Academy(){
     <div className="k4k-course-hero-copy">
      <div className="k4k-course-kicker">YOUR NEW CREATIVE STUDIO</div>
      <h1>YOUR IDEAS.<br/><em>YOUR SYSTEM.</em></h1>
-     <p>Learn real-world AI visual creation with your K4K masked creator as the reference. Build a believable image, control wardrobe, transfer scenes and write reliable prompts—all through one repeatable production method.</p>
-     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/lessons/reality-engine">START LESSON 01 <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/method">THE IDEA METHOD <ArrowRight size={17}/></Link></div>
-     <div className="k4k-course-pillrow"><span>05 PRACTICAL LABS</span><span>08 TESTABLE PROMPTS</span><span>YOUR OWN PACE</span></div>
+     <p>Start with our Viral Character Swap workflow: choose a short reference video, make a consistent character sheet, create the prompt, then swap characters in Higgsfield Genjutsu. Follow it with practical realism, wardrobe and scene-control labs.</p>
+     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/lessons/viral-character-swap">START VIRAL WORKFLOW 01 <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/method">THE IDEA METHOD <ArrowRight size={17}/></Link></div>
+     <div className="k4k-course-pillrow"><span>06 PRACTICAL LABS</span><span>GENJUTSU + ORIGINAL PROMPTS</span><span>YOUR OWN PACE</span></div>
     </div>
     <div className="k4k-course-hero-media">
      <K4KReferencePhoto index={0} className="k4k-course-hero-photo"/>
@@ -40,12 +40,27 @@ export default function Academy(){
      ].map(g=><div key={g[0]}><strong>{g[0]}</strong><span>{g[1]}</span><small>{g[2]}</small></div>)}</div>
    </section>
 
+   
+   <section className="k4k-featured-workflow" aria-label="Start with the Higgsfield Genjutsu Viral Character Swap">
+    <div className="k4k-featured-workflow-text">
+     <span className="k4k-course-kicker">NEW · K4K SIGNATURE WORKFLOW</span>
+     <h2>VIRAL CHARACTER<br/><em>SWAP.</em></h2>
+     <p>Learn the exact order: <b>Reference video → Character sheet → Prompt → Higgsfield Genjutsu → Generate → Audit.</b> Includes an Object Swap / Motion Transfer guide, two-person mapping examples and three copyable prompts.</p>
+     <Link href="/academy/lessons/viral-character-swap" className="k4k-course-primary">OPEN STEP-BY-STEP WORKFLOW <ArrowUpRight size={18}/></Link>
+    </div>
+    <div className="k4k-featured-workflow-visual">
+     <div><K4KReferencePhoto index={0}/><span>01 · VIDEO / MOVEMENT</span></div>
+     <div><K4KReferencePhoto index={1}/><span>02 · CHARACTER / IDENTITY</span></div>
+     <div><K4KReferencePhoto index={2}/><span>03 · RESULT / DIRECTION</span></div>
+    </div>
+   </section>
+
    <LearningProgress/>
 
    <section className="k4k-course-module-section" id="curriculum">
-    <div className="k4k-course-section-head"><div><span className="k4k-course-kicker">THE ACTUAL COURSE</span><h2>FIVE LABS.<br/><em>ONE SKILL SYSTEM.</em></h2></div><p>Step-by-step decisions, an original K4K prompt, a practical assignment and a quality check in every lesson.</p></div>
+    <div className="k4k-course-section-head"><div><span className="k4k-course-kicker">THE ACTUAL COURSE</span><h2>SIX LABS.<br/><em>ONE CREATOR METHOD.</em></h2></div><p>Step-by-step decisions, an original K4K prompt, a practical assignment and a quality check in every lesson.</p></div>
     <div className="k4k-course-module-grid">{k4kLessons.map(l=><Link href={'/academy/lessons/'+l.slug} className="k4k-course-module" key={l.slug}>
-     <div className="k4k-course-module-visual"><K4KReferencePhoto index={l.image}/><span className="k4k-course-module-number">LAB {l.number} / 05</span></div>
+     <div className="k4k-course-module-visual"><K4KReferencePhoto index={l.image}/><span className="k4k-course-module-number">LAB {l.number} / {String(k4kLessons.length).padStart(2,'0')}</span></div>
      <div className="k4k-course-module-info"><small>{l.stage} · {l.duration}</small><h3>{l.title}</h3><p>{l.subtitle}</p><span>OPEN PRACTICAL LESSON <ArrowUpRight size={16}/></span></div>
     </Link>)}</div>
    </section>
