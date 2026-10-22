@@ -3,14 +3,9 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../lib/supabase/client';
 import {CheckCircle2,ArrowRight,LoaderCircle} from 'lucide-react';
+import {k4kLessons} from '../../lib/k4k-course-v3';
 
-const lessons=[
- {id:'k4k-v3-realism',name:'Lab 01 · The Reality Engine',href:'/academy/lessons/reality-engine'},
- {id:'k4k-v3-wardrobe',name:'Lab 02 · The Wardrobe Lock',href:'/academy/lessons/wardrobe-lock'},
- {id:'k4k-v3-scene',name:'Lab 03 · The Scene Transfer',href:'/academy/lessons/scene-transfer'},
- {id:'k4k-v3-control',name:'Lab 04 · The Prompt Control Room',href:'/academy/lessons/prompt-control'},
- {id:'k4k-v3-audit',name:'Lab 05 · The Final Quality Gate',href:'/academy/lessons/final-quality-gate'}
-];
+const lessons=k4kLessons.map(l=>({id:l.id,name:'Lab '+l.number+' · '+l.title,href:'/academy/lessons/'+l.slug}));
 
 export default function LearningProgress({workflowTwoAvailable=false}){
  const [progress,setProgress]=useState({});const [status,setStatus]=useState('loading');
