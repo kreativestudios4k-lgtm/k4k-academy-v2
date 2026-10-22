@@ -124,7 +124,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   <div className="k4k-auth-centre">
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
-    <div className="k4k-auth-step">{registering?'STEP 2 OF 2 · PAYMENT COMPLETE':'K4K ACADEMY · MEMBERS AREA'}</div>
+    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K ACADEMY · MEMBERS AREA'}</div>
     <h1>{registering?'Create your account':'Welcome back'}</h1>
     <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Log in with the email you used to buy the course.'}</p>
 
