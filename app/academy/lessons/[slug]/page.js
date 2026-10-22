@@ -24,7 +24,7 @@ export default async function K4KLab({params}){
   {l.videoSteps&&<section className="k4k-swap-guide" id="step-by-step">
    <div className="k4k-swap-guide-header">
     <div><span className="k4k-course-kicker">THE EXACT K4K GENJUTSU WORKFLOW</span><h2>FROM REFERENCE VIDEO<br/><em>TO CHARACTER SWAP.</em></h2><p>Follow each step in order. This is a practical lesson—not an automated video generator. You perform the uploads and generation inside Higgsfield.</p></div>
-    <a className="k4k-swap-higgsfield" href="https://higgsfield.ai/genjutsu" target="_blank" rel="noopener noreferrer">OPEN HIGGSFIELD GENJUTSU <ArrowUpRight size={18}/></a>
+    <div className="k4k-lesson-handoff-links"><Link className="k4k-course-primary" href="/academy/studio">BUILD YOUR SWAP PROMPT <ArrowUpRight size={18}/></Link><a className="k4k-swap-higgsfield" href="https://higgsfield.ai/genjutsu" target="_blank" rel="noopener noreferrer">OPEN HIGGSFIELD <ArrowUpRight size={18}/></a></div>
    </div>
    <div className="k4k-swap-pipeline" aria-label="Video-to-video character swap sequence"><span>REFERENCE VIDEO</span><span>CHARACTER SHEET</span><span>SWAP PROMPT</span><span>GENJUTSU</span><span>FINAL VIDEO</span></div>
    <div className="k4k-swap-step-grid">{l.videoSteps.map(step=><article className="k4k-swap-step" key={step.number} id={'swap-step-'+step.number}>
