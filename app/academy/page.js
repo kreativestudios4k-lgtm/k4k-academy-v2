@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import {ArrowUpRight,ArrowRight,CheckCircle2,BookOpen,ShieldCheck,Image as ImageIcon,Lightbulb,LockKeyhole} from 'lucide-react';
+import {ArrowUpRight,ArrowRight,CheckCircle2,BookOpen,ShieldCheck,Image as ImageIcon,Lightbulb,LockKeyhole,Sparkles,Clapperboard} from 'lucide-react';
 import {IdeaHeader} from '../components/IdeaUI';
 import K4KReferencePhoto from '../components/K4KReferencePhoto';
 import GooglePasswordReminder from './GooglePasswordReminder';
@@ -20,7 +20,7 @@ export default function Academy(){
      <div className="k4k-course-kicker">YOUR NEW CREATIVE STUDIO</div>
      <h1>YOUR IDEAS.<br/><em>YOUR SYSTEM.</em></h1>
      <p>Start with our Viral Character Swap workflow: choose a short reference video, make a consistent character sheet, create the prompt, then swap characters in Higgsfield Genjutsu. Follow it with practical realism, wardrobe and scene-control labs.</p>
-     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/lessons/viral-character-swap">START VIRAL WORKFLOW 01 <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/method">THE IDEA METHOD <ArrowRight size={17}/></Link></div>
+     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/studio">OPEN CHARACTER SWAP STUDIO <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/lessons/viral-character-swap">STEP-BY-STEP LESSON <ArrowRight size={17}/></Link></div>
      <div className="k4k-course-pillrow"><span>06 PRACTICAL LABS</span><span>GENJUTSU + ORIGINAL PROMPTS</span><span>YOUR OWN PACE</span></div>
     </div>
     <div className="k4k-course-hero-media">
@@ -29,6 +29,12 @@ export default function Academy(){
      <div className="k4k-course-hero-note"><span>IDENTITY LOCK</span><strong>ONE PERSON.<br/>MORE CONTROL.</strong></div>
     </div>
    </header>
+
+   <section className="k4k-studio-dashboard-teaser" aria-label="Interactive Character Swap Studio">
+    <div><span className="k4k-course-kicker"><Sparkles size={16}/> NEW MEMBER WORKSPACE</span><h2>YOUR VIDEO.<br/><em>YOUR NEW CAST.</em></h2>
+     <p>Upload a reference video and one or two character sheets, assign LEFT / RIGHT roles, and generate an IDEA-method prompt for Higgsfield Genjutsu. Preview your files locally with no Academy upload and no AI-credit charge.</p></div>
+    <Link className="k4k-course-primary" href="/academy/studio"><Clapperboard size={19}/> OPEN SWAP STUDIO <ArrowUpRight size={17}/></Link>
+   </section>
 
    <section className="k4k-course-method-summary" aria-labelledby="idea-head">
     <div><span className="k4k-course-kicker">OUR ORIGINAL METHOD</span><h2 id="idea-head">THE <em>IDEA</em> STANDARD.</h2><p>Every visual goes through four intentional checks before delivery.</p></div>
