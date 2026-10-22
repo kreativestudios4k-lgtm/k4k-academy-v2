@@ -158,3 +158,69 @@
 .k4k-course-module-info{padding:18px}
 .k4k-lesson-progressbar a{font-size:9px;gap:8px}.k4k-lesson-progressbar b{font-size:28px}
 }
+
+
+/* K4K creator workflow: Genjutsu eight-stage video-to-character swap */
+.k4k-featured-workflow{display:grid;grid-template-columns:1.08fr .92fr;gap:30px;align-items:center;padding:clamp(25px,4vw,52px);margin:35px 0 22px;border-radius:19px;border:1px solid #caff3982;background:radial-gradient(ellipse at 87% 55%,#b1ff2526,transparent 57%),linear-gradient(135deg,#17230e,#0a100b);box-shadow:inset 0 1px #efffd022,0 24px 50px #0007}
+.k4k-featured-workflow-text{min-width:0}
+.k4k-featured-workflow h2{font-size:clamp(38px,4.8vw,69px);line-height:.91;letter-spacing:-.085em;margin:17px 0 21px}
+.k4k-featured-workflow h2 em,.k4k-swap-guide h2 em,.k4k-swap-prompt-section h2 em{color:#caff39;font-style:normal}
+.k4k-featured-workflow p{font-size:14px;color:#bfceb5;line-height:1.8;max-width:550px;margin-bottom:25px}
+.k4k-featured-workflow p b{color:#e6f9d2}
+.k4k-featured-workflow-visual{display:flex;align-items:center;justify-content:center;position:relative;min-height:270px;padding:25px 0}
+.k4k-featured-workflow-visual>div{flex:1 1 0;min-width:0;height:clamp(170px,24vw,280px);position:relative;border-radius:11px;overflow:hidden;background:#151e15;border:2px solid #caff39ad;box-shadow:0 23px 32px #000a;transform:rotate(-8deg);margin-right:-8%}
+.k4k-featured-workflow-visual>div:nth-child(2){transform:translateY(-10px) rotate(3deg);z-index:2}
+.k4k-featured-workflow-visual>div:nth-child(3){transform:translateY(13px) rotate(8deg);z-index:3;margin-right:0}
+.k4k-featured-workflow-visual .k4k-course-reference{height:100%;width:100%}
+.k4k-featured-workflow-visual>div::after{content:"";position:absolute;inset:57% 0 0;background:linear-gradient(transparent,#081009d9)}
+.k4k-featured-workflow-visual>div>span{position:absolute;bottom:12px;left:9px;right:8px;z-index:2;color:#caff39;font-size:8px;line-height:1.3;font-weight:900;letter-spacing:.04em}
+.k4k-swap-guide{padding:35px 0 65px;scroll-margin-top:85px}
+.k4k-swap-guide-header{display:flex;justify-content:space-between;align-items:end;gap:20px}
+.k4k-swap-guide-header>div{flex:1 1 500px}
+.k4k-swap-guide h2{font-size:clamp(37px,5vw,67px);line-height:.98;letter-spacing:-.07em;margin:15px 0 22px}
+.k4k-swap-guide-header p{max-width:660px;color:#c4d1b9;font-size:14px;line-height:1.8}
+.k4k-swap-higgsfield{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;border:1px solid #caff39;background:#caff39;color:#071108;padding:15px 19px;border-radius:11px;font-size:11px;font-weight:900;letter-spacing:.03em;margin-bottom:3px}
+.k4k-swap-higgsfield:hover{background:#e2ff9b}
+.k4k-swap-pipeline{display:flex;gap:0;justify-content:space-between;align-items:stretch;margin:32px 0 30px;overflow:hidden;border:1px solid #caff393b;background:#111910;border-radius:12px}
+.k4k-swap-pipeline span{display:flex;justify-content:center;align-items:center;flex:1 1 0;position:relative;padding:20px 14px;color:#caff39;font-size:10px;font-weight:900;letter-spacing:.08em;text-align:center;min-width:0}
+.k4k-swap-pipeline span:not(:last-child){border-right:1px solid #caff393a}
+.k4k-swap-pipeline span:not(:last-child)::after{content:"›";position:absolute;right:-6px;top:50%;transform:translateY(-50%);color:#caff39;background:#111910;font-size:22px;z-index:2;line-height:1}
+.k4k-swap-step-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.k4k-swap-step{display:flex;flex-direction:column;padding:clamp(19px,2.7vw,32px);background:#11170f;border:1px solid #ffffff28;border-radius:15px;scroll-margin-top:92px}
+.k4k-swap-step:hover{border-color:#caff3970}
+.k4k-swap-step-top{display:flex;align-items:center;gap:15px;margin-bottom:15px}
+.k4k-swap-step-top strong{color:#caff39;font-size:38px;font-weight:950;letter-spacing:-.075em;line-height:1}
+.k4k-swap-step-top>span{font-size:9px;font-weight:850;letter-spacing:.15em;color:#c4d4b9}
+.k4k-swap-step h3{font-size:clamp(25px,2.5vw,35px);line-height:1.05;letter-spacing:-.06em;margin:0 0 12px}
+.k4k-swap-step p{color:#bfccb8;font-size:13px;line-height:1.75}
+.k4k-swap-step ol{padding-left:22px;margin:14px 0 21px;color:#e8f1e0;font-size:12px;line-height:1.8}
+.k4k-swap-step li{margin:0 0 11px;padding-left:5px}
+.k4k-swap-step li::marker{color:#caff39;font-weight:850}
+.k4k-swap-output{margin-top:auto;border-top:1px solid #caff3943;padding-top:13px;display:grid;gap:6px}
+.k4k-swap-output b{color:#caff39;font-size:9px;letter-spacing:.12em}
+.k4k-swap-output span{color:#d9e9cb;font-size:12px;line-height:1.65}
+.k4k-swap-modes{display:grid;grid-template-columns:1fr 1fr;gap:17px;margin:22px 0 0}
+.k4k-swap-modes article{padding:22px;border-radius:14px;border:1px solid #caff394e;background:linear-gradient(135deg,#1c290e,#0c1209)}
+.k4k-swap-modes h3{font-size:30px;letter-spacing:-.055em;margin:11px 0 13px}
+.k4k-swap-modes p{font-size:13px;color:#bbcfb1;line-height:1.7;margin:0}
+.k4k-swap-source-note{border-left:3px solid #caff39;padding:14px 18px;background:#1b2915;border-radius:0 8px 8px 0;margin:24px 0 0;color:#bccfb2;font-size:12px;line-height:1.8}
+.k4k-swap-prompt-section{padding-top:32px;padding-bottom:30px;border-top:1px solid #caff393b;scroll-margin-top:92px}
+@media(max-width:1010px){.k4k-featured-workflow{grid-template-columns:1fr;gap:5px}.k4k-featured-workflow-visual{min-height:200px;padding:10px 8% 0}.k4k-featured-workflow-visual>div{height:240px}}
+@media(max-width:730px){
+.k4k-featured-workflow{padding:23px;margin-top:24px}
+.k4k-featured-workflow h2{font-size:42px}
+.k4k-featured-workflow-visual{min-height:180px}
+.k4k-featured-workflow-visual>div{height:clamp(140px,40vw,230px)}
+.k4k-swap-guide{padding:33px 0}
+.k4k-swap-guide-header{display:block}
+.k4k-swap-higgsfield{margin-top:15px;white-space:normal}
+.k4k-swap-pipeline{display:grid;grid-template-columns:repeat(2,1fr)}
+.k4k-swap-pipeline span{min-height:60px;font-size:9px}
+.k4k-swap-pipeline span:not(:last-child){border-right:0}
+.k4k-swap-pipeline span:nth-child(odd){border-right:1px solid #caff3936}
+.k4k-swap-pipeline span{border-bottom:1px solid #caff3936}
+.k4k-swap-pipeline span:not(:last-child)::after{display:none}
+.k4k-swap-step-grid,.k4k-swap-modes{grid-template-columns:1fr}
+.k4k-swap-step{padding:23px}
+.k4k-swap-step h3{font-size:29px}
+}
