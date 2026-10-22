@@ -66,7 +66,7 @@ export default function Academy(){
    </section>
 
    <section className="k4k-course-resources">
-    <div><BookOpen size={27}/><span>THE PROMPT VAULT</span><h3>Control every detail.</h3><p>Eight original K4K templates to copy and adapt. Identity, framing, light, wardrobe, environment, retouch and review.</p><Link href="/prompts">OPEN PROMPT VAULT <ArrowUpRight size={18}/></Link></div>
+    <div><BookOpen size={27}/><span>THE PROMPT VAULT</span><h3>Control every detail.</h3><p>Eleven original K4K templates to copy and adapt. Identity, framing, light, wardrobe, environment, retouch and review.</p><Link href="/prompts">OPEN PROMPT VAULT <ArrowUpRight size={18}/></Link></div>
     <div><ImageIcon size={27}/><span>YOUR REFERENCE STUDIO</span><h3>One creator. Three looks.</h3><p>Study the exact masked-creator examples used throughout these lessons: movement, identity and football atmosphere.</p><Link href="/academy/gallery">VIEW REFERENCE STUDY <ArrowUpRight size={18}/></Link></div>
    </section>
    <footer className="k4k-course-bottom">
