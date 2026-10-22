@@ -1,28 +1,41 @@
 import Link from 'next/link';
-import {ArrowRight,LockKeyhole,ShieldCheck} from 'lucide-react';
-import Login from '../login/page';
+import {ArrowRight,ShieldCheck,LockKeyhole} from 'lucide-react';
+import AcademyAuthForm from '../components/AcademyAuthForm';
+
 export const dynamic='force-dynamic';
-export const metadata={title:'Complete Your Purchase & Register — K4K Academy',robots:{index:false,follow:false}};
+export const metadata={
+ title:'Create Your Account — K4K Academy',
+ description:'Complete your K4K Academy account registration after a successful Stripe checkout.',
+ robots:{index:false,follow:false}
+};
+
+const checkoutUrl='https://buy.stripe.com/dRmbJ293u6d7egQ8CseEo0n';
+
 export default async function Register({searchParams}){
- const params=await searchParams;
- const checkout=typeof params?.checkout==='string'?params.checkout:'';
- const session=typeof params?.session_id==='string'?params.session_id:'';
- // A returned checkout URL only opens the account form. It never grants paid access.
- // Membership activation requires a verified email and an active Stripe-backed subscription.
- const fromCheckout=checkout==='success'&&/^cs_live_[A-Za-z0-9_]{8,170}$/.test(session);
- if(fromCheckout)return <Login initialMode="register"/>;
- return <main style={{minHeight:'100svh',background:'#070907',color:'#f2f6ee',display:'grid',placeItems:'center',padding:'28px',fontFamily:'Arial, sans-serif'}}>
-  <section style={{maxWidth:600,border:'1px solid #caff3958',borderRadius:18,padding:'clamp(26px,5vw,55px)',background:'#121a0f'}}>
-   <Link href="/" style={{textDecoration:'none',color:'#caff39',fontWeight:900,letterSpacing:3}}>K4K ACADEMY</Link>
-   <p style={{fontSize:11,color:'#caff39',fontWeight:900,letterSpacing:2,marginTop:36}}>STEP 01 — COMPLETE PAYMENT</p>
-   <h1 style={{fontSize:'clamp(36px,6vw,58px)',letterSpacing:'-.065em',lineHeight:1,margin:'15px 0'}}>PAY FIRST.<br/>THEN REGISTER.</h1>
-   <p style={{fontSize:15,lineHeight:1.8,color:'#c8d2c4'}}>Account registration opens automatically after your successful K4K Academy Stripe checkout. If you have already purchased, sign in with your payment email or contact support for help activating your account. Never pay twice.</p>
-   <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'27px 0'}}>
-    <Link href="https://buy.stripe.com/dRmbJ293u6d7egQ8CseEo0n" style={{display:'inline-flex',alignItems:'center',gap:9,background:'#caff39',color:'#0a1005',borderRadius:9,padding:'15px 18px',textDecoration:'none',fontSize:12,fontWeight:900}}>PURCHASE ACADEMY <ArrowRight size={17}/></Link>
-    <Link href="/login" style={{display:'inline-flex',alignItems:'center',gap:8,border:'1px solid #caff39',borderRadius:9,padding:'15px 18px',textDecoration:'none',color:'#caff39',fontSize:12,fontWeight:900}}>ALREADY PURCHASED? LOGIN</Link>
-   </div>
-   <p style={{fontSize:12,color:'#aebca7',lineHeight:1.7}}><ShieldCheck size={16} style={{display:'inline',verticalAlign:'middle'}}/> Secure payments are handled by Stripe. Student access is checked against verified email and an active paid subscription.</p>
-   <p style={{fontSize:12,color:'#b7c5b1'}}>Paid previously but never created a login? <a style={{color:'#caff39'}} href="mailto:hello@kreativestudios4k.com?subject=Paid%20Academy%20registration">Contact Academy support</a>.</p>
-  </section>
+ const query=await searchParams;
+ const sessionId=typeof query?.session_id==='string'?query.session_id:'';
+ const fromStripe=query?.checkout==='success'&&/^cs_live_[A-Za-z0-9_]{8,170}$/.test(sessionId);
+
+ // The secure client form independently verifies this signed-webhook receipt.
+ // A URL-shaped Stripe session ID alone is never proof of payment.
+ if(fromStripe)return <AcademyAuthForm mode="register" sessionId={sessionId}/>;
+
+ return <main className="k4k-auth-page">
+  <header className="k4k-auth-header">
+   <Link className="k4k-auth-brand" href="/">K4K<span>✳</span><small>ACADEMY</small></Link>
+   <Link href="/" className="k4k-auth-back">Home <ArrowRight size={15}/></Link>
+  </header>
+  <div className="k4k-auth-centre">
+   <section className="k4k-auth-card">
+    <div className="k4k-auth-icon"><LockKeyhole size={25}/></div>
+    <div className="k4k-auth-step">STEP 1 OF 2 · SECURE CHECKOUT</div>
+    <h1>Pay first, register next.</h1>
+    <p className="k4k-auth-subtitle">New Academy students purchase their membership through Stripe. After payment, we'll send you directly to a simple account form with your checkout email already filled in.</p>
+    <a className="k4k-auth-submit" href={checkoutUrl}>Buy K4K Academy <ArrowRight size={18}/></a>
+    <p className="k4k-auth-footer">Already purchased? <Link href="/login">Log in</Link></p>
+    <p className="k4k-auth-policy">If you've already paid but haven't registered, contact <a href="mailto:hello@kreativestudios4k.com?subject=Paid%20Academy%20account%20setup">Academy support</a> so we can help without charging you again.</p>
+   </section>
+   <p className="k4k-auth-support"><ShieldCheck size={16}/> Payments are processed securely by Stripe. Course access requires a verified paid membership.</p>
+  </div>
  </main>;
 }
