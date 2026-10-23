@@ -19,10 +19,6 @@
 .k4k3d-topline{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:25px 0 10px;position:relative;z-index:8}
 .k4k3d-eyebrow{display:flex;align-items:center;gap:11px;color:#b9c6b3;font-size:10px;letter-spacing:.19em;font-weight:850;line-height:1.5}
 .k4k3d-live-dot{display:inline-block;flex-shrink:0;width:7px;height:7px;background:var(--acid);border-radius:50%;box-shadow:0 0 0 5px #caff3b13,0 0 22px #caff3b8f}
-.k4k3d-market{display:flex;align-items:center;gap:4px;border:1px solid #caff3b3c;background:#0e130be8;border-radius:99px;padding:4px}
-.k4k3d-market button{background:transparent;border:0;color:#b6beb0;font-size:10px;letter-spacing:.04em;font-weight:850;border-radius:99px;cursor:pointer;min-height:37px;padding:0 15px;white-space:nowrap}
-.k4k3d-market button.active{background:var(--acid);color:#0a0d08;box-shadow:0 0 20px #b0ff2420}
-.k4k3d-market button:hover:not(.active){color:white;background:#caff3b14}
 .k4k3d-layout{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.05fr);gap:clamp(4px,2.2vw,34px);min-height:640px;align-items:center;padding:0 0 4px}
 .k4k3d-copy{min-width:0;position:relative;z-index:5;padding:22px 0 16px}
 .k4k3d-overline{display:flex;align-items:center;gap:14px;font-size:9px;font-weight:800;letter-spacing:.17em;color:#b0bba9}
@@ -120,8 +116,6 @@
  .k4k3d-shell{width:calc(100% - 32px)}
  .k4k3d-topline{padding:14px 0 6px;gap:6px}
  .k4k3d-eyebrow{font-size:8px;letter-spacing:.055em}
- .k4k3d-market{padding:3px;gap:2px}
- .k4k3d-market button{font-size:8px;min-height:33px;padding:0 9px;letter-spacing:0}
  .k4k3d-copy{padding-top:21px}
  .k4k3d-overline{font-size:8px}
  .k4k3d-title{font-size:clamp(43px,10.8vw,67px);margin:19px 0 15px}
@@ -168,4 +162,14 @@
  .k4k3d *,.k4k3d *::before,.k4k3d *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
  .k4k3d-person{transform:none}
  .k4k3d-scene{transform:none}
+}
+
+
+/* IP-localized currency selection: no country label or selector is rendered. */
+.k4k3d-topline{justify-content:flex-start}
+.k4k3d-now-local{font-size:clamp(18px,2.1vw,29px)!important;line-height:1.2;white-space:normal}
+.k4k3d-regular-local{font-size:clamp(21px,2.6vw,36px)!important;letter-spacing:-.035em!important}
+@media(max-width:650px){
+ .k4k3d-now-local{font-size:clamp(19px,5vw,27px)!important}
+ .k4k3d-regular-local{font-size:clamp(20px,5.2vw,31px)!important}
 }
