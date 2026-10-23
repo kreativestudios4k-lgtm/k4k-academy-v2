@@ -1,7 +1,7 @@
 'use client';
 
 import {useRef,useState} from 'react';
-import Link from 'next/link';
+import AuthNavLogout from './AuthNavLogout';
 import {ArrowUpRight,Check,Copy,Clapperboard,Layers3,ScanFace,TrendingUp,ShieldCheck,Sparkles,MousePointer2} from 'lucide-react';
 
 const image='/images/k4k-academy-carousel-sprite.webp';
@@ -12,8 +12,7 @@ const content={
   description:'Learn to create original AI videos with real workflows, stronger prompts and consistent character references. Build the skill, not just the effect.',
   features:['AI WORKFLOWS','PROMPT SYSTEMS','CHARACTER SHEETS','CREATOR STRATEGY'],
   highlight:'INTRODUCTORY OFFER',saving:'70% OFF',period:'YOUR FIRST MONTH',
-  firstPrice:'£2.40',usualPrice:'£7.99',perMonth:'/ MONTH',then:'Then £7.99/month. Cancel anytime.',
-  regularLabel:'CREATOR MEMBERSHIP',regularPrice:'£7.99',
+  regularLabel:'CREATOR MEMBERSHIP',
   code:'PROMO CODE',button:'JOIN K4K ACADEMY',
   account:'Already a member? Sign in',
   expiry:'New paying customers only · Ends 28 October 2026',
@@ -27,9 +26,7 @@ const content={
   description:'Aprenda a criar vídeos com IA usando workflows, prompts mais eficazes e referências consistentes de personagens. Desenvolva a técnica, não apenas o efeito.',
   features:['WORKFLOWS DE IA','SISTEMAS DE PROMPTS','FICHAS DE PERSONAGEM','ESTRATÉGIA CRIATIVA'],
   highlight:'OFERTA DE BOAS-VINDAS',saving:'70% OFF',period:'NO PRIMEIRO MÊS',
-  firstPrice:'R$15,00',usualPrice:'R$49,99',perMonth:'/ MÊS',
-  then:'Depois R$49,99/mês. Cancele quando quiser.',
-  regularLabel:'ASSINATURA MENSAL',regularPrice:'R$49,99',
+  regularLabel:'ASSINATURA MENSAL',
   code:'CÓDIGO PROMOCIONAL',button:'ENTRE PARA A ACADEMY',
   account:'Já é aluno? Entre na sua conta',
   expiry:'Somente novos clientes · Até 28 de outubro de 2026',
@@ -72,20 +69,11 @@ function CreatorArt({features,t}){
  </div>
 }
 
-export default function ImmersiveHero({initialMarket='eu',checkout,promotionActive=true}){
- const [market,setMarket]=useState(initialMarket==='br'?'br':'eu');
+export default function ImmersiveHero({locale='en',pricing,checkout,promotionActive=true}){
  const [copied,setCopied]=useState(false);
  const sceneRef=useRef(null);
- const t=content[market];
- const isBrazil=market==='br';
- function chooseMarket(next){
-  setMarket(next);setCopied(false);
-  if(typeof window!=='undefined'){
-   const url=new URL(window.location.href);
-   url.searchParams.set('market',next);
-   window.history.replaceState(null,'',url.pathname+url.search+url.hash);
-  }
- }
+ const isBrazil=locale==='pt-BR';
+ const t=content[isBrazil?'br':'eu'];
  function tilt(event){
   const area=sceneRef.current;if(!area||window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
   const rect=area.getBoundingClientRect();
@@ -108,10 +96,6 @@ export default function ImmersiveHero({initialMarket='eu',checkout,promotionActi
   <div className="k4k3d-shell">
    <div className="k4k3d-topline">
     <span className="k4k3d-eyebrow"><span className="k4k3d-live-dot"/>{t.eyebrow}</span>
-    <div className="k4k3d-market" role="group" aria-label="Select region and language">
-     <button type="button" className={!isBrazil?'active':''} aria-pressed={!isBrazil} onClick={()=>chooseMarket('eu')}>UK / EUROPE · £</button>
-     <button type="button" className={isBrazil?'active':''} aria-pressed={isBrazil} onClick={()=>chooseMarket('br')}>BRASIL · R$</button>
-    </div>
    </div>
    <div className="k4k3d-layout">
     <div className="k4k3d-copy">
@@ -131,11 +115,11 @@ export default function ImmersiveHero({initialMarket='eu',checkout,promotionActi
         <span className="k4k3d-period">{t.period}</span>
        </div>
        <div className="k4k3d-offer-right">
-        <span className="k4k3d-now">{t.firstPrice}</span>
-        <span className="k4k3d-strike">{t.usualPrice} {t.perMonth}</span>
-        <span className="k4k3d-renew">{t.then}</span>
+        <span className={pricing.verifiedPrice?"k4k3d-now":"k4k3d-now k4k3d-now-local"}>{pricing.firstPrice}</span>
+        <span className="k4k3d-strike">{pricing.regularPrice} {pricing.perMonth}</span>
+        <span className="k4k3d-renew">{pricing.renewText}</span>
        </div>
-      </div>:<div className="k4k3d-regular"><span>{t.regularLabel}</span><strong>{t.regularPrice}<small> {t.perMonth}</small></strong></div>}
+      </div>:<div className="k4k3d-regular"><span>{t.regularLabel}</span><strong className={pricing.verifiedPrice?"":"k4k3d-regular-local"}>{pricing.regularPrice}<small> {pricing.perMonth}</small></strong></div>}
       <div className="k4k3d-offer-controls">
        <a className="k4k3d-primary" href={checkout}>{t.button}<ArrowUpRight size={20}/></a>
        {promotionActive&&<button type="button" className="k4k3d-code" onClick={copyCode} aria-label="Copy promotion code K4K70"><span>{copied?t.copied:t.code}</span><strong>{copied?<Check size={16}/>:<Copy size={16}/>} K4K70</strong></button>}
@@ -143,7 +127,7 @@ export default function ImmersiveHero({initialMarket='eu',checkout,promotionActi
       <p className="k4k3d-disclaimer"><ShieldCheck size={15}/>{promotionActive?t.note:t.noPromoNote}</p>
       {promotionActive&&<small className="k4k3d-expires">{t.expiry}</small>}
      </div>
-     <Link className="k4k3d-signin" href="/login">{t.account} <ArrowUpRight size={14}/></Link>
+     <AuthNavLogout hero heroLoginText={t.account} heroStudioText={isBrazil?"Aceder à área do aluno":"Go to your studio"}/>
     </div>
     <div className="k4k3d-visual-shell" ref={sceneRef} onPointerMove={tilt} onPointerLeave={resetTilt}>
      <CreatorArt features={t.features} t={t}/>
