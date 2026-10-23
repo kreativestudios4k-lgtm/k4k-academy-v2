@@ -6,7 +6,7 @@ import {createClient} from '../../lib/supabase/client';
 
 // One source of truth for both login and logout links.
 // There is never a state where "LOG OUT" and "STUDENT LOGIN" appear together.
-export default function AuthNavLogout({mobile=false,hero=false,privateArea=false,heroLoginText='Already a member? Sign in',heroStudioText='Go to your studio'}){
+export default function AuthNavLogout({mobile=false,hero=false,footer=false,privateArea=false,heroLoginText='Already a member? Sign in',heroStudioText='Go to your studio'}){
  const [state,setState]=useState('loading');
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
@@ -38,6 +38,7 @@ export default function AuthNavLogout({mobile=false,hero=false,privateArea=false
  if(hero)return <Link className="k4k3d-signin" href={state==='signed-in'?'/academy':'/login'}>
   {state==='signed-in'?heroStudioText:heroLoginText} <ArrowUpRight size={14}/>
  </Link>;
+ if(footer)return <Link href={state==='signed-in'?'/academy':'/login'}>{state==='signed-in'?'YOUR STUDIO':'STUDENT LOGIN'} <ArrowUpRight size={16}/></Link>;
  if(state==='signed-out')return mobile
   ?<Link href="/login">STUDENT LOGIN</Link>
   :<Link className="idea-nav-cta" href="/login">STUDENT LOGIN <ArrowUpRight size={15}/></Link>;
