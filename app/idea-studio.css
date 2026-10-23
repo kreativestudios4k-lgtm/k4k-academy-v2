@@ -560,3 +560,19 @@
  .k4kLanding .k4k-carousel-eyebrow{display:none}
  .k4kLanding .k4k-carousel-top{justify-content:center}
 }
+
+
+/* Never show a Student Login link beside the signed-in Log Out button.
+   AuthNavLogout renders one mutually exclusive session state. */
+.idea-session-actions{display:inline-flex;align-items:center;gap:9px;min-width:0}
+.idea-session-actions .idea-nav-cta{margin-left:0}
+.idea-session-actions .idea-logout-wrap{display:inline-flex;align-items:center}
+.idea-mobile-menu .idea-logout-mobile>a{display:flex;align-items:center;color:#d0ff6b}
+@media(max-width:1200px){
+ .idea-session-actions{gap:7px}
+ .idea-session-actions .idea-nav-cta{padding-inline:12px}
+}
+@media(max-width:760px){
+ .idea-session-actions{gap:0}
+ .idea-session-actions .idea-nav-cta{display:none}
+}
