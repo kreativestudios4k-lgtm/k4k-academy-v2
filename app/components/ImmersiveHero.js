@@ -91,7 +91,7 @@ export default function ImmersiveHero({locale='en',pricing,checkout,promotionAct
   try{await navigator.clipboard.writeText('K4K70');setCopied(true)}
   catch{setCopied(false)}
  }
- return <section className="k4k3d" aria-label="K4K Academy AI video creative education" lang={t.lang}>
+ return <section className="k4k3d" aria-label={isBrazil?"K4K Academy: criação de vídeos com IA":"K4K Academy AI video creative education"} lang={t.lang}>
   <div className="k4k3d-grid" aria-hidden="true"/>
   <div className="k4k3d-shell">
    <div className="k4k3d-topline">
@@ -99,7 +99,7 @@ export default function ImmersiveHero({locale='en',pricing,checkout,promotionAct
    </div>
    <div className="k4k3d-layout">
     <div className="k4k3d-copy">
-     <div className="k4k3d-overline"><span>01 / 01</span><span className="k4k3d-overline-rule"/><span>CREATE WITH INTENTION</span></div>
+     <div className="k4k3d-overline"><span>01 / 01</span><span className="k4k3d-overline-rule"/><span>{isBrazil?'CRIE COM PROPÓSITO':'CREATE WITH INTENTION'}</span></div>
      <h1 className="k4k3d-title">
       <span>{t.first}</span>
       <strong>{t.second}</strong>
@@ -127,7 +127,7 @@ export default function ImmersiveHero({locale='en',pricing,checkout,promotionAct
       <p className="k4k3d-disclaimer"><ShieldCheck size={15}/>{promotionActive?t.note:t.noPromoNote}</p>
       {promotionActive&&<small className="k4k3d-expires">{t.expiry}</small>}
      </div>
-     <AuthNavLogout hero heroLoginText={t.account} heroStudioText={isBrazil?"Aceder à área do aluno":"Go to your studio"}/>
+     <AuthNavLogout hero heroLoginText={t.account} heroStudioText={isBrazil?"Acessar a área do aluno":"Go to your studio"}/>
     </div>
     <div className="k4k3d-visual-shell" ref={sceneRef} onPointerMove={tilt} onPointerLeave={resetTilt}>
      <CreatorArt features={t.features} t={t}/>
