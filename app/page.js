@@ -12,7 +12,8 @@ export const metadata={
  description:'Learn practical AI video creation, character consistency and production workflows with K4K Academy. Secure recurring membership and regional currency pricing verified at checkout.'
 };
 
-export default async function Home(){
+export default async function Home({searchParams}){
+ const query=await searchParams;
  const requestHeaders=await headers();
  // Vercel attaches this country code based on the visitor's IP at the edge.
  // It is processed on the server, not displayed and not written to a cookie.
@@ -20,9 +21,10 @@ export default async function Home(){
    requestHeaders.get('cf-ipcountry')||
    requestHeaders.get('x-k4k-country')||'';
  const pricing=getK4KDisplayPricing(country);
+ const displayLocale=query?.lang==='pt-BR'?'pt-BR':query?.lang==='en'?'en':pricing.locale;
  const showFirstMonthOffer=Date.now()<Date.UTC(2026,9,28,23,59,0);
  return <main className="ideaSite k4kLanding" id="top">
   <IdeaHeader/>
-  <ImmersiveHero locale={pricing.locale} pricing={pricing} checkout={checkout} promotionActive={showFirstMonthOffer}/>
+  <ImmersiveHero locale={displayLocale} pricing={pricing} checkout={checkout} promotionActive={showFirstMonthOffer}/>
  </main>;
 }
