@@ -18,9 +18,9 @@ export default function Academy(){
    <header className="k4k-course-hero">
     <div className="k4k-course-hero-copy">
      <div className="k4k-course-kicker">YOUR NEW CREATIVE STUDIO</div>
-     <h1>YOUR IDEAS.<br/><em>YOUR SYSTEM.</em></h1>
-     <p>Start with our Viral Character Swap workflow: choose a short reference video, make a consistent character sheet, create the prompt, then swap characters in Higgsfield Genjutsu. Follow it with practical realism, wardrobe and scene-control labs.</p>
-     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/studio">OPEN CHARACTER SWAP STUDIO <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/lessons/viral-character-swap">STEP-BY-STEP LESSON <ArrowRight size={17}/></Link></div>
+     <h1>LEARN AI VIDEO.<br/><em>STEP BY STEP.</em></h1>
+     <p>New here? Start with the guided lesson. Then open the Studio to practise with your own reference video and character sheets.</p>
+     <div className="k4k-course-hero-buttons"><Link className="k4k-course-primary" href="/academy/studio">CREATE MY FIRST VIDEO <ArrowUpRight size={17}/></Link><Link className="k4k-course-outline" href="/academy/lessons/viral-character-swap">START WITH LESSON 1 <ArrowRight size={17}/></Link></div>
      <div className="k4k-course-pillrow"><span>06 PRACTICAL LABS</span><span>GENJUTSU + ORIGINAL PROMPTS</span><span>YOUR OWN PACE</span></div>
     </div>
     <div className="k4k-course-hero-media">
@@ -31,13 +31,15 @@ export default function Academy(){
    </header>
 
    <section className="k4k-studio-dashboard-teaser" aria-label="Interactive Character Swap Studio">
-    <div><span className="k4k-course-kicker"><Sparkles size={16}/> NEW MEMBER WORKSPACE</span><h2>YOUR VIDEO.<br/><em>YOUR NEW CAST.</em></h2>
-     <p>Upload a reference video and one or two character sheets, assign LEFT / RIGHT roles, and generate an IDEA-method prompt for Higgsfield Genjutsu. Preview your files locally with no Academy upload and no AI-credit charge.</p></div>
-    <Link className="k4k-course-primary" href="/academy/studio"><Clapperboard size={19}/> OPEN SWAP STUDIO <ArrowUpRight size={17}/></Link>
+    <div><span className="k4k-course-kicker"><Sparkles size={16}/> NEW MEMBER WORKSPACE</span><h2>PRACTISE WHAT<br/><em>YOU LEARN.</em></h2>
+     <p>Already watched the lesson? Choose your video and character images to build a ready-to-copy prompt. Your files stay on your device.</p></div>
+    <Link className="k4k-course-primary" href="/academy/studio"><Clapperboard size={19}/> OPEN PRACTICE STUDIO <ArrowUpRight size={17}/></Link>
    </section>
 
+   <LearningProgress/>
+
    <section className="k4k-course-method-summary" aria-labelledby="idea-head">
-    <div><span className="k4k-course-kicker">OUR ORIGINAL METHOD</span><h2 id="idea-head">THE <em>IDEA</em> STANDARD.</h2><p>Every visual goes through four intentional checks before delivery.</p></div>
+    <div><span className="k4k-course-kicker">OUR ORIGINAL METHOD</span><h2 id="idea-head">YOUR 4 SIMPLE STEPS.</h2><p>Follow this sequence every time you make a video.</p></div>
     <div className="k4k-course-gates">{[
       ['I','INVESTIGATE','Choose the reference and objective'],
       ['D','DIRECT','Lock identity and define the change'],
@@ -61,10 +63,9 @@ export default function Academy(){
     </div>
    </section>
 
-   <LearningProgress/>
 
    <section className="k4k-course-module-section" id="curriculum">
-    <div className="k4k-course-section-head"><div><span className="k4k-course-kicker">THE ACTUAL COURSE</span><h2>SIX LABS.<br/><em>ONE CREATOR METHOD.</em></h2></div><p>Step-by-step decisions, an original K4K prompt, a practical assignment and a quality check in every lesson.</p></div>
+    <div className="k4k-course-section-head"><div><span className="k4k-course-kicker">THE ACTUAL COURSE</span><h2>CHOOSE YOUR<br/><em>NEXT LESSON.</em></h2></div><p>Each lesson has one goal, a prompt to copy and an exercise to complete.</p></div>
     <div className="k4k-course-module-grid">{k4kLessons.map(l=><Link href={'/academy/lessons/'+l.slug} className="k4k-course-module" key={l.slug}>
      <div className="k4k-course-module-visual"><K4KReferencePhoto index={l.image}/><span className="k4k-course-module-number">LAB {l.number} / {String(k4kLessons.length).padStart(2,'0')}</span></div>
      <div className="k4k-course-module-info"><small>{l.stage} · {l.duration}</small><h3>{l.title}</h3><p>{l.subtitle}</p><span>OPEN PRACTICAL LESSON <ArrowUpRight size={16}/></span></div>
