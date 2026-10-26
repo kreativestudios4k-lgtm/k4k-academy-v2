@@ -146,6 +146,7 @@ export default function CharacterSwapStudio(){
     <VideoReference file={video} onChange={file=>setFile('video',file)} onRemove={()=>resetFile('video')} onDuration={setDurationStable} duration={duration}/>
     {hasVideoLengthWarning&&<p className="k4k-studio-warning" role="status"><Info size={17}/> Genjutsu commonly accepts roughly 4–30 seconds. Trim this clip before using it on Higgsfield; current limits may differ.</p>}
     <div className="k4k-studio-tip"><ShieldCheck size={18}/> Media is previewed locally and is not uploaded to K4K Academy. You'll upload it again in Higgsfield.</div>
+    <div className="k4k-studio-tip" role="note"><Info size={18}/><span><strong>NEW: GENJUTSU LITE (20 OCT 2026).</strong> For quick, potentially lower-cost practice edits, Higgsfield now offers Genjutsu Lite. It uses only the first 15 seconds of a source video and preserves source audio. {duration!==null&&duration>15?'Your video is longer than 15 seconds: trim it first or choose standard Genjutsu to keep later action.':'Compare the credit cost with standard Genjutsu before generating.'} <a href="https://open.higgsfield.ai/models/higgsfield/genjutsu-light/object-swap/v1.0/playground" target="_blank" rel="noopener noreferrer">Read official Lite details</a>. This studio still prepares a prompt only; it does not run Lite or charge credits.</span></div>
    </section>
 
    <section className="k4k-studio-panel" aria-labelledby="k4k-studio-characters-heading">
