@@ -36,7 +36,7 @@ export default function Academy(){
     <Link className="k4k-course-primary" href="/academy/studio"><Clapperboard size={19}/> OPEN PRACTICE STUDIO <ArrowUpRight size={17}/></Link>
    </section>
 
-   <LearningProgress/>
+   <section style={{margin:"24px 0",padding:"24px",border:"1px solid #53617d",borderRadius:18}}><span className="k4k-course-kicker">NEW · SAFE PREVIEW</span><h2>TRY THE K4K AI GENERATOR.</h2><p>Explore viral templates, prepare character swaps and save project drafts. Rendering and credits are not connected yet.</p><Link className="k4k-course-primary" href="/academy/generator">OPEN GENERATOR PREVIEW <ArrowUpRight size={17}/></Link></section><LearningProgress/>
 
    <section className="k4k-course-method-summary" aria-labelledby="idea-head">
     <div><span className="k4k-course-kicker">OUR ORIGINAL METHOD</span><h2 id="idea-head">YOUR 4 SIMPLE STEPS.</h2><p>Follow this sequence every time you make a video.</p></div>
