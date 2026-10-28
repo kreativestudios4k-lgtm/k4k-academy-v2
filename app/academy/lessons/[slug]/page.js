@@ -4,6 +4,7 @@ import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ClipboardCheck,Clock3,Shi
 import {IdeaHeader} from '../../../components/IdeaUI';
 import K4KReferencePhoto from '../../../components/K4KReferencePhoto';
 import CopyLessonPrompt from '../../topics/[slug]/CopyLessonPrompt';
+import GenjutsuModePractice from './GenjutsuModePractice';
 import {CompleteWorkflowButton} from '../../LearningProgress';
 import {k4kLessons} from '../../../../lib/k4k-course-v3';
 export const dynamic='force-dynamic';
@@ -40,6 +41,8 @@ export default async function K4KLab({params}){
    </div>
    <p className="k4k-swap-source-note">Use only videos, music and likenesses you are allowed to transform. Higgsfield's supported length and credit price can change; the current generator's settings take priority.</p>
   </section>}
+
+  {l.videoSteps&&<GenjutsuModePractice/>}
 
   <div className="k4k-lesson-progressbar" aria-label="The four K4K IDEA learning stages">{[['I','INVESTIGATE'],['D','DIRECT'],['E','EXECUTE'],['A','AUDIT']].map(x=><a key={x[0]} href={'#stage-'+x[0]}><b>{x[0]}</b><span>{x[1]}</span></a>)}</div>
   <section className="k4k-lesson-gates" aria-label="Step-by-step IDEA exercises">
