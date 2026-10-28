@@ -17,10 +17,13 @@ export default function LearningProgress({workflowTwoAvailable=false}){
   if(alive){setProgress(Object.fromEntries((data||[]).map(x=>[x.lesson_id,!!x.completed])));setStatus('ready')}
  }catch{if(alive)setStatus('error')}})();return()=>{alive=false}},[]);
  const count=lessons.filter(x=>progress[x.id]).length;
+ const nextLesson=lessons.find(x=>!progress[x.id]);
+ const percent=lessons.length?Math.round(count/lessons.length*100):0;
  return <section className="learningProgress" aria-label="My workflow progress">
   <div className="learningProgressTop"><div><small>YOUR K4K IDEA JOURNEY</small><h2>Track your K4K IDEA training.</h2></div><strong>{status==='ready'?count+'/'+lessons.length:'—'} <span>completed</span></strong></div>
-  <div className="learningProgressTrack"><div style={{width:(count/lessons.length*100)+'%'}}/></div>
+  <div className="learningProgressTrack" role="progressbar" aria-label="Course completion" aria-valuemin={0} aria-valuemax={lessons.length} aria-valuenow={status==='ready'?count:0} aria-valuetext={status==='ready'?`${count} of ${lessons.length} lessons completed`:'Progress loading'}><div style={{width:percent+'%'}}/></div>
   {status==='loading'?<p><LoaderCircle size={15}/> Loading your saved progress…</p>:status==='error'?<p>Progress could not be loaded right now. Your lessons are still available below.</p>:null}
+  {status==='ready'&&nextLesson?<p><Link href={nextLesson.href}>CONTINUE LEARNING · {nextLesson.name} <ArrowRight size={16}/></Link></p>:status==='ready'&&lessons.length>0?<p role="status">All labs completed. Explore the Character Swap Studio to practise your skills.</p>:null}
   <div className="learningProgressList">{lessons.map((lesson,i)=>{const locked=false;return <Link key={lesson.id} href={lesson.href} className="learningProgressItem"><span className={progress[lesson.id]?'done':''}>{progress[lesson.id]?<CheckCircle2 size={20}/>:String(i+1).padStart(2,'0')}</span><div><b>{lesson.name}</b><small>{progress[lesson.id]?'Completed':'Ready to learn'}</small></div><ArrowRight size={17}/></Link>})}</div>
  </section>;
 }
