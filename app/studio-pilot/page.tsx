@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 const starter = [
  {title:"Football Video Call",views:"10M+",duration:"10s",slots:3},
  {title:"Backstage Football Scene",views:"12M",duration:"16s",slots:4},
@@ -11,11 +11,14 @@ export default function StudioPilot(){
  const [references,setReferences]=useState<File[]>([]);
  const [communityVideo,setCommunityVideo]=useState<File|null>(null);
  const [title,setTitle]=useState("");
+ const [apiStatus,setApiStatus]=useState("Checking server configuration…");
+ useEffect(()=>{let active=true;fetch("/api/studio/status",{cache:"no-store"}).then(async r=>{if(!r.ok)throw new Error("Status unavailable");return r.json()}).then(data=>{if(active)setApiStatus(data.configured?"Server credentials configured · generation locked":"Server credentials missing · generation locked")}).catch(()=>{if(active)setApiStatus("Status unavailable · generation locked")});return()=>{active=false}},[]);
  return <main style={{minHeight:"100vh",background:"#090911",color:"#f7f5ff",padding:"40px max(20px,5vw)",fontFamily:"system-ui,sans-serif"}}>
  <header style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:16,flexWrap:"wrap"}}>
  <strong style={{fontSize:22}}>✦ K4K <span style={{color:"#a78bfa"}}>AI STUDIO</span></strong>
  <span style={{border:"1px solid #514070",borderRadius:99,padding:"7px 12px",fontSize:12}}>PRIVATE PREVIEW · NO CHARGES</span>
  </header>
+ <p role="status" style={{color:"#c6b5ff",fontSize:13,marginTop:20}}>{apiStatus}</p>
  <section style={{textAlign:"center",padding:"55px 0 35px"}}>
  <div style={{color:"#ad91ff",fontSize:12,letterSpacing:3}}>CREATE • REMIX • SHARE</div>
  <h1 style={{fontSize:"clamp(30px,5vw,58px)",margin:"15px auto",maxWidth:750}}>Your next viral video starts here.</h1>
