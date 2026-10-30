@@ -25,10 +25,15 @@ async function main() {
         withPolling: true,
       },
     );
-    if (!result.isCompleted) {
+    // SDK response shapes can vary by version; validate at runtime without assuming V2Response fields.
+    const response: unknown = result;
+    const payload = response && typeof response === "object" ? response as Record<string, unknown> : {};
+    if (payload.isCompleted === false) {
       throw new Error("Generation did not complete (failed, canceled, or moderated).");
     }
-    const videoUrl = result.jobs?.[0]?.results?.raw?.url;
+    const jobs = Array.isArray(payload.jobs) ? payload.jobs : [];
+    const firstJob = jobs[0] as { results?: { raw?: { url?: unknown } } } | undefined;
+    const videoUrl = firstJob?.results?.raw?.url;
     if (typeof videoUrl !== "string" || !videoUrl.startsWith("https://")) {
       throw new Error("Completed without a valid video URL.");
     }
