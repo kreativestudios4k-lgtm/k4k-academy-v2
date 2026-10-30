@@ -18,7 +18,7 @@
     "ai": "7.0.123",
     "@ai-sdk/gateway": "4.0.103",
     "@ai-sdk/react": "4.0.102",
-    "@higgsfield/client": "^0.1.0"
+    "@higgsfield/client": "latest"
   },
   "devDependencies": {}
 }
