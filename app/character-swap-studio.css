@@ -164,3 +164,8 @@
 .k4k-lesson-handoff-links .k4k-course-primary{white-space:normal}
 .k4k-lesson-handoff-links .k4k-swap-higgsfield{margin:0}
 @media(max-width:730px){.k4k-lesson-handoff-links{justify-content:flex-start}}
+
+/* Scene-local direction stays readable on mobile and keyboard-accessible. */
+.k4k-studio-panel .k4k-studio-scene-plan{display:block;width:100%;min-height:125px;padding:12px 13px;resize:vertical;background:#090f09;border:1px solid #65765b;border-radius:9px;color:#eff6e9;font-size:13px;line-height:1.55;font-family:inherit;outline:0}
+.k4k-studio-panel .k4k-studio-scene-plan::placeholder{color:#8c9f87}
+.k4k-studio-panel .k4k-studio-scene-plan:focus-visible{border-color:#caff39;box-shadow:0 0 0 3px #caff391a}
