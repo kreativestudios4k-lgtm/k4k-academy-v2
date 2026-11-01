@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return NextResponse.json({ error: "Authentication is not configured." }, { status: 503, headers });
-  const supabase = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+  const supabase = createClient(url, key, { global: { headers: { Authorization: `Bearer ${token}` } }, auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user?.email || !data.user.email_confirmed_at) return NextResponse.json({ error: "Verified account required." }, { status: 401, headers });
   const admins = (process.env.K4K_STUDIO_ADMIN_EMAILS || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
