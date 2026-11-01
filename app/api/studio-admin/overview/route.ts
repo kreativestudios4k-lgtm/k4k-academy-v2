@@ -15,7 +15,10 @@ export async function GET(request: NextRequest) {
   if (error || !data.user?.email || !data.user.email_confirmed_at) return NextResponse.json({ error: "Verified account required." }, { status: 401, headers });
   const admins = (process.env.K4K_STUDIO_ADMIN_EMAILS || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
   if (!admins.includes(data.user.email.toLowerCase())) return NextResponse.json({ error: "Administrator access required." }, { status: 403, headers });
+  const { data: customerData, error: customerError } = await supabase.rpc("k4k_studio_admin_customers");
   return NextResponse.json({
+    customerData: customerError ? null : customerData,
+    customerDataError: customerError ? "Customer data unavailable. Check administrator permissions and database configuration." : null,
     administrator: { email: data.user.email },
     environment: process.env.VERCEL_ENV || "development",
     providerConfigured: Boolean(process.env.HF_CREDENTIALS),
@@ -23,7 +26,7 @@ export async function GET(request: NextRequest) {
     pilotEnabled: process.env.K4K_ENABLE_TEST_GENERATION === "true",
     allowlistedTesterCount: (process.env.K4K_GENERATION_TEST_USERS || "").split(",").filter(x => x.trim()).length,
     modules: [
-      { name: "Customers", status: "Not connected", detail: "Customer totals and records require a restricted server-side data source." },
+      { name: "Customers", status: customerError ? "Connection unavailable" : "Connected — read only", detail: customerError ? "Could not read Academy customer records." : "Existing Academy students and memberships are shown securely." },
       { name: "AI Generations", status: "Not connected", detail: "Generation history and job logs are not yet persisted." },
       { name: "API Usage", status: "Configuration only", detail: "Provider credentials and pilot state can be checked; spend requires metering." },
       { name: "Credits", status: "Not connected", detail: "No live credit ledger is connected to this preview." },
