@@ -166,5 +166,7 @@ export default function StudioPilot() {
 .k4k .usage-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.k4k .usage-grid span{background:#ffffff0b;border:1px solid #ffffff19;padding:14px;border-radius:11px;color:#c9bddb;font-size:11px;display:flex;flex-direction:column;gap:7px}.k4k .usage-grid strong{color:#e2d1ff;font-size:16px}
 @media(max-width:900px){.k4k .plan-grid{grid-template-columns:1fr;max-width:460px}.k4k .plan-card.featured{transform:none}.k4k .usage-panel{grid-template-columns:1fr}}
 @media(max-width:540px){.k4k .pricing-v2{padding:48px 16px!important}.k4k .usage-grid{grid-template-columns:1fr 1fr}.k4k .plan-card{padding:23px 20px}}
+
+@media(min-width:801px){.k4k .sidebar{width:236px!important;padding:28px 16px!important}.k4k .main{margin-left:236px!important}.k4k .sidebar nav{display:flex!important;flex-direction:column!important;gap:8px!important;margin-top:40px!important}.k4k .sidebar nav a{display:flex!important;align-items:center!important;gap:12px!important;white-space:nowrap!important;min-height:46px!important;padding:12px 13px!important;font-size:13px!important;line-height:1.2!important;width:100%!important}.k4k .sidebar nav a svg{flex-shrink:0}.k4k .sidebar .brand{white-space:nowrap!important}.k4k .sidebottom{border-top:1px solid #ffffff20!important;padding-top:14px!important}}
 `}</style></main>
 }
