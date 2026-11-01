@@ -1,5 +1,5 @@
 import {NextResponse} from "next/server";
-import {assessMotion} from "../../../../lib/k4k-motion-quality";
+import {assessMotion} from "../../../../../lib/k4k-motion-quality";
 export const runtime="nodejs";
 export async function POST(req:Request){
  const auth=req.headers.get("authorization")||"";
