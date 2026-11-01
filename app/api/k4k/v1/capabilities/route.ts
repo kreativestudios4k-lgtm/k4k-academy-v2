@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";
+export const runtime="nodejs";
+export async function GET(){return NextResponse.json({platform:"K4K APP",apiVersion:"v1",environment:"preview",features:[{id:"motion-transfer",status:"analysis-only"},{id:"character-swap",status:"planned"},{id:"object-swap",status:"planned"},{id:"image-to-video",status:"private-pilot"},{id:"templates",status:"preview"}],generation:{enabled:false,reason:"No approved public provider routing, atomic credits or cost controls"},billing:{enabled:false},limits:{maxImages:30,maxReferenceVideoBytes:100*1024*1024,preferredDurationSeconds:30}},{headers:{"Cache-Control":"no-store"}})}
