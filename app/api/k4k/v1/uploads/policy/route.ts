@@ -1,0 +1,3 @@
+import {NextResponse} from "next/server";
+export const runtime="nodejs";
+export async function GET(){return NextResponse.json({platform:"K4K APP",storage:{characterImages:{bucket:"studio-references",private:true,maxBytes:10485760,allowedMimeTypes:["image/jpeg","image/png","image/webp"],uploadRequiresAuthenticatedUser:true},generatedVideos:{bucket:"studio-outputs",private:true,maxBytes:104857600,allowedMimeTypes:["video/mp4"],providerWriteEnabled:false},referenceVideos:{bucket:null,available:false,reason:"No dedicated private reference-video bucket has been configured or security-tested."}},directUploadEndpointEnabled:false},{headers:{"Cache-Control":"no-store"}})}
