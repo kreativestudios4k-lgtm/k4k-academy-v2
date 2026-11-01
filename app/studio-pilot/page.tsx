@@ -179,5 +179,7 @@ export default function StudioPilot() {
 .k4k .sidebar nav a{min-height:48px!important;border:1px solid transparent!important;border-radius:13px!important;padding:13px 14px!important;transition:background .2s,border-color .2s!important}
 .k4k .sidebar nav a:hover{border-color:#a98bff48!important;background:#a277ff1b!important}
 }
+
+@media(min-width:801px){.k4k .sidebar .nav-caption{margin-top:78px!important;margin-bottom:22px!important}.k4k .sidebar nav{gap:15px!important}.k4k .sidebar nav a{min-height:52px!important;padding:15px 14px!important}.k4k .sidebar .brand{margin-bottom:0!important}}
 `}</style></main>
 }
