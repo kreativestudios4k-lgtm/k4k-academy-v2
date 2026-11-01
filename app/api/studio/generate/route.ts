@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   try{body=await request.json()}catch{return NextResponse.json({error:"Invalid request."},{status:400})}
   if(body.mode!=="image-to-video")return NextResponse.json({error:"Character Swap is not available in this API pilot."},{status:400});
   if(typeof body.prompt!=="string"||body.prompt.trim().length<8||body.prompt.length>1800)return NextResponse.json({error:"Enter a prompt between 8 and 1800 characters."},{status:400});
-  if(typeof body.referencePath!=="string"||!new RegExp(`^${user.id.replace(/[.*+?^$()|[\\]{}]/g,"\\$&")}/[a-f0-9-]+\\.(png|jpg|webp)$`,"i").test(body.referencePath))return NextResponse.json({error:"Invalid reference image path."},{status:400});
+  if(typeof body.referencePath!=="string" || !body.referencePath.startsWith(`${user.id}/`) || !/^[a-f0-9-]+\.(png|jpg|webp)$/i.test(body.referencePath.slice(user.id.length+1))) return NextResponse.json({error:"Invalid reference image path."},{status:400});
   const {data:signed,error:signError}=await supabase.storage.from("studio-references").createSignedUrl(body.referencePath,600);
   if(signError||!signed?.signedUrl)return NextResponse.json({error:"Reference image unavailable."},{status:400});
   try {
