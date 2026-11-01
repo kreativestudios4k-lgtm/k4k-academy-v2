@@ -27,6 +27,8 @@ export async function POST(request: NextRequest) {
   if(typeof body.referencePath!=="string" || !body.referencePath.startsWith(`${user.id}/`) || !/^[a-f0-9-]+\.(png|jpg|webp)$/i.test(body.referencePath.slice(user.id.length+1))) return NextResponse.json({error:"Invalid reference image path."},{status:400});
   const {data:signed,error:signError}=await supabase.storage.from("studio-references").createSignedUrl(body.referencePath,600);
   if(signError||!signed?.signedUrl)return NextResponse.json({error:"Reference image unavailable."},{status:400});
+  const {data: jobId, error: jobError} = await supabase.rpc("k4k_studio_pilot_job_start",{p_reference_path:body.referencePath,p_prompt:body.prompt.trim()});
+  if(jobError || typeof jobId!=="string")return NextResponse.json({error:"Unable to record generation request. No provider call was made."},{status:503});
   try {
     config({credentials});
     const result:unknown=await higgsfield.subscribe("bytedance/seedance-2.5/image-to-video",{
@@ -36,9 +38,13 @@ export async function POST(request: NextRequest) {
     const payload=result as {isCompleted?:boolean;jobs?:Array<{results?:{raw?:{url?:string}}}>};
     const videoUrl=payload?.jobs?.[0]?.results?.raw?.url;
     if(payload?.isCompleted===false||typeof videoUrl!=="string"||!videoUrl.startsWith("https://"))throw Error("Generation did not return a completed video.");
-    return NextResponse.json({videoUrl});
+    const {error: logError} = await supabase.rpc("k4k_studio_pilot_job_finish",{p_job_id:jobId,p_success:true,p_output_url:videoUrl});
+    if(logError)console.error("K4K generation completion log failed",logError.message);
+    return NextResponse.json({videoUrl,jobId});
   }catch(error){
     console.error("K4K pilot generation error",error instanceof Error?error.message:"unknown");
+    const {error: logError} = await supabase.rpc("k4k_studio_pilot_job_finish",{p_job_id:jobId,p_success:false,p_error:"Provider generation failed"});
+    if(logError)console.error("K4K generation failure log failed",logError.message);
     return NextResponse.json({error:"Video generation failed. No K4K credits were charged."},{status:502});
   }
 }
