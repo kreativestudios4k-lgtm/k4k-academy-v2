@@ -16,7 +16,9 @@ export async function GET(request: NextRequest) {
   const admins = (process.env.K4K_STUDIO_ADMIN_EMAILS || "").split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
   if (!admins.includes(data.user.email.toLowerCase())) return NextResponse.json({ error: "Administrator access required." }, { status: 403, headers });
   const { data: customerData, error: customerError } = await supabase.rpc("k4k_studio_admin_customers");
+  const { data: generationData, error: generationError } = await supabase.rpc("k4k_studio_admin_generation_summary");
   return NextResponse.json({
+    generationData: generationError ? null : generationData,
     customerData: customerError ? null : customerData,
     customerDataError: customerError ? "Customer data unavailable. Check administrator permissions and database configuration." : null,
     administrator: { email: data.user.email },
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
     allowlistedTesterCount: (process.env.K4K_GENERATION_TEST_USERS || "").split(",").filter(x => x.trim()).length,
     modules: [
       { name: "Customers", status: customerError ? "Connection unavailable" : "Connected — read only", detail: customerError ? "Could not read Academy customer records." : "Existing Academy students and memberships are shown securely." },
-      { name: "AI Generations", status: "Not connected", detail: "Generation history and job logs are not yet persisted." },
+      { name: "AI Generations", status: generationError ? "Connection unavailable" : "Connected — pilot", detail: generationError ? "Could not read generation jobs." : "Private pilot generation jobs and statuses are recorded in Supabase." },
       { name: "API Usage", status: "Configuration only", detail: "Provider credentials and pilot state can be checked; spend requires metering." },
       { name: "Credits", status: "Not connected", detail: "No live credit ledger is connected to this preview." },
       { name: "Payments", status: "Not connected", detail: "Stripe data is intentionally excluded from this pilot dashboard." },
