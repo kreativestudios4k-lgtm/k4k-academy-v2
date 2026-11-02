@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
+import GenjutsuPreflight from './GenjutsuPreflight';
 const templates=[
  {id:'swap',title:'Viral Character Swap',tag:'Reference video + character sheets',description:'Map replacement characters to people in your reference clip.'},
  {id:'award',title:"Ballon d’Or Moment",tag:'Football awards meme',description:'Plan a dramatic trophy reveal or funny award moment.'},
@@ -34,6 +35,7 @@ export default function GeneratorWorkspace(){
    <label style={{display:'block',margin:'18px 0 8px'}}>Reference video (local preview only)</label><input style={input} type="file" accept="video/*" onChange={e=>setVideo(e.target.files?.[0]?.name||'')}/>{video&&<p style={{fontSize:12}}>Selected: {video}</p>}
    <label style={{display:'block',margin:'18px 0 8px'}}>Character images (local preview only)</label><input style={input} type="file" accept="image/*" multiple onChange={e=>setImages(Array.from(e.target.files||[]).map(f=>f.name))}/>{images.length>0&&<p style={{fontSize:12}}>{images.length} image(s) selected</p>}
    <p style={{fontSize:12,color:'#aeb6c6'}}>Files never leave your device in this preview. They are not included when saving a draft.</p>
+   <GenjutsuPreflight imageCount={images.length} videoSelected={Boolean(video)}/>
    </div>
    <div style={box}><h2>3. Direct your scene</h2><p style={{color:'#c5ccda',fontSize:14}}>Describe what must stay the same and what should change.</p><textarea style={{...input,minHeight:175,resize:'vertical'}} value={prompt} onChange={e=>setPrompt(e.target.value)} placeholder="Keep the original camera motion and background. Replace the main character using image 1. Preserve the trophy and exact timing."/>
    <div style={{margin:'18px 0',borderTop:'1px solid #343b4b',paddingTop:15}}><h3>Precision Controls</h3><p style={{fontSize:13,color:'#c5ccda'}}>Lock what must not change. These instructions will be included in your generation prompt.</p><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:10}}>{Object.entries(locks).map(([name,on])=><label key={name} style={{fontSize:13,textTransform:'capitalize'}}><input type="checkbox" checked={on} onChange={e=>setLocks(v=>({...v,[name]:e.target.checked}))}/> {name}</label>)}</div><label style={{display:'block',margin:'16px 0 8px'}}>Who replaces whom?</label><textarea style={{...input,minHeight:85}} value={mapping} onChange={e=>setMapping(e.target.value)}/><button onClick={()=>{navigator.clipboard?.writeText(compiled).then(()=>setNotice('Precision prompt copied.')).catch(()=>setNotice('Copy unavailable in this browser.'))}} style={{...input,marginTop:12,cursor:'pointer'}}>Copy precision prompt</button><details style={{marginTop:12}}><summary>Review compiled instructions</summary><pre style={{whiteSpace:'pre-wrap',fontSize:12}}>{compiled}</pre></details></div><button onClick={save} style={{...input,background:'#a5baff',color:'#111827',fontWeight:800,cursor:'pointer',marginTop:14}}>Save project draft</button>
