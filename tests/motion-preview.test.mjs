@@ -5,12 +5,13 @@ const video={type:'video/mp4',size:1024*1024};
 const image={type:'image/png',size:500_000};
 const input={video,image,durationSeconds:5.2,mode:'replace',prompt:'Preserve timing'};
 
-test('valid local-only manifest is free and requires GPU for eventual rendering',()=>{
+test('valid local-only manifest is free while provider rendering remains unavailable',()=>{
  const r=inspectMotionInputs(input);
  assert.equal(r.ok,true);
  assert.equal(r.manifest.execution,'dry-run-only');
  assert.equal(r.manifest.estimatedChargeGbpPence,0);
- assert.equal(r.manifest.requiresGpuForRendering,true);
+ assert.equal(r.manifest.requiresGpuForRendering,false);
+ assert.equal(r.manifest.requiresProviderPayment,true);
  assert.equal(r.manifest.clipDurationSeconds,5.2);
 });
 test('both replacement and animation modes validate',()=>{
