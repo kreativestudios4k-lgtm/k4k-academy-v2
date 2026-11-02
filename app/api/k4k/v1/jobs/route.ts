@@ -9,7 +9,7 @@ export async function GET(req:Request){
  const sb=createClient(url,key,{global:{headers:{Authorization:`Bearer ${token}`}},auth:{persistSession:false,autoRefreshToken:false}});
  const {data:{user},error}=await sb.auth.getUser(token);
  if(error||!user)return NextResponse.json({error:"Invalid session"},{status:401});
- const {data,error:dbError}=await sb.from("studio_generation_jobs").select("id,template_id,status,provider,model,credits_reserved,created_at,updated_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(25);
+ const {data,error:dbError}=await sb.from("studio_generation_jobs").select("id,template_id,status,provider,model,credits_reserved,output_path,created_at,updated_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(25);
  if(dbError)return NextResponse.json({error:"Unable to retrieve jobs"},{status:503});
  return NextResponse.json({jobs:data??[],generationEnabled:false},{headers:{"Cache-Control":"no-store"}});
 }
