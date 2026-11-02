@@ -80,6 +80,7 @@ export default function CharacterSwapStudio(){
  const [keepAudio,setKeepAudio]=useState(true);
  const [subjectDetail,setSubjectDetail]=useState('');
  const [creativeNote,setCreativeNote]=useState('');
+ const [scenePlan,setScenePlan]=useState('');
  const [generated,setGenerated]=useState('');
  const [error,setError]=useState('');
  const [copied,setCopied]=useState(false);
@@ -110,7 +111,7 @@ export default function CharacterSwapStudio(){
   if(!sheet1){setError('Add a character sheet for @Image1.');return;}
   if(needsSecond&&!sheet2){setError('Add a second character sheet for @Image2.');return;}
   try{
-   const output=makeK4KSwapPrompt({mode,count,position1,position2,format,keepScene,keepOutfits,keepAudio,subjectDetail,creativeNote});
+   const output=makeK4KSwapPrompt({mode,count,position1,position2,format,keepScene,keepOutfits,keepAudio,subjectDetail,creativeNote,scenePlan});
    setError('');setGenerated(output);setCopied(false);
    requestAnimationFrame(()=>resultRef.current?.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'}));
   }catch(e){setError(e.message||'Please check the character positions.');}
@@ -202,7 +203,10 @@ export default function CharacterSwapStudio(){
       <input id="studio-direction" maxLength={340} value={creativeNote} onChange={event=>update(setCreativeNote,event.target.value)} placeholder="e.g. Keep original football celebration"/>
      </div>
     </div>
-    <div className="k4k-studio-checkboxes">
+    <label className="k4k-studio-select-label" htmlFor="studio-scene-plan">Scene-by-scene instructions (optional, up to five scenes)</label>
+     <textarea id="studio-scene-plan" className="k4k-studio-scene-plan" rows={5} maxLength={800} value={scenePlan} onChange={event=>update(setScenePlan,event.target.value)} placeholder={'Scene 1: Algeria flag\nScene 2: White studio with Real Madrid crest\nScene 3: RM kit reveal\nScene 4: Final reveal\nScene 5: Football match — keep stadium background'}/>
+     <p className="k4k-studio-ready-note">One scene per line, in video order. Background and kit changes apply only to the scenes you name. This only prepares text; it does not generate video.</p>
+     <div className="k4k-studio-checkboxes">
      <label><input type="checkbox" checked={keepScene} onChange={event=>update(setKeepScene,event.target.checked)}/> <span>Preserve the original environment</span></label>
      <label><input type="checkbox" checked={keepOutfits} onChange={event=>update(setKeepOutfits,event.target.checked)}/> <span>Keep exact clothing from each sheet</span></label>
      <label><input type="checkbox" checked={keepAudio} onChange={event=>update(setKeepAudio,event.target.checked)}/> <span>Keep original audio if supported</span></label>
