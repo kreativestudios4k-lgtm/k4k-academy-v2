@@ -3,6 +3,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,ArrowUpRight,Check,CheckCircle2,ClipboardCopy,Clapperboard,Copy,Download,FileVideo,Film,ImagePlus,Info,Layers3,LockKeyhole,Play,RefreshCcw,ShieldCheck,Sparkles,UploadCloud,Video,Wallet, X, Zap} from 'lucide-react';
+import PromptCoach from './PromptCoach';
 import {K4K_CHARACTER_POSITIONS,K4K_VIDEO_MODES,makeK4KSwapPrompt} from '../../../lib/k4k-studio-prompt';
 
 const MAX_VIDEO=250*1024*1024;
@@ -207,6 +208,7 @@ export default function CharacterSwapStudio(){
      <label><input type="checkbox" checked={keepOutfits} onChange={event=>update(setKeepOutfits,event.target.checked)}/> <span>Keep exact clothing from each sheet</span></label>
      <label><input type="checkbox" checked={keepAudio} onChange={event=>update(setKeepAudio,event.target.checked)}/> <span>Keep original audio if supported</span></label>
     </div>
+    <PromptCoach prompt={[subjectDetail,creativeNote].filter(Boolean).join(". ")} mapping={count===2?`Person ${position1} → image 1; person ${position2} → image 2`:`Person ${position1} → image 1`} locks={{identity:true,motion:true,background:keepScene}} imageCount={Number(Boolean(sheet1))+Number(Boolean(needsSecond&&sheet2))} videoSelected={Boolean(video)}/>
     <button type="button" className="k4k-studio-generate" onClick={generate} disabled={!ready}>
      <Sparkles size={20}/> GENERATE MY GENJUTSU PROMPT <ArrowUpRight size={19}/>
     </button>
