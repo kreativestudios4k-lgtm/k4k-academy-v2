@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import GenjutsuPreflight from './GenjutsuPreflight';
+import PromptCoach from './PromptCoach';
 const templates=[
  {id:'swap',title:'Viral Character Swap',tag:'Reference video + character sheets',description:'Map replacement characters to people in your reference clip.'},
  {id:'award',title:"Ballon d’Or Moment",tag:'Football awards meme',description:'Plan a dramatic trophy reveal or funny award moment.'},
@@ -42,6 +43,7 @@ export default function GeneratorWorkspace(){
    <button disabled style={{...input,opacity:.5,marginTop:10,cursor:'not-allowed'}}>Generate video — API connection pending</button>
    {notice&&<p role="status" style={{color:'#a5e6bb'}}>{notice}</p>}
    <p style={{fontSize:12,color:'#aeb6c6'}}>Generation credits: not enabled. No balance is assigned or deducted.</p>
+   <PromptCoach prompt={prompt} mapping={mapping} locks={locks} imageCount={images.length} videoSelected={Boolean(video)}/>
    <Link href="/academy/studio" style={{color:'#b6caff'}}>Open existing prompt builder →</Link>
    </div>
   </div>
