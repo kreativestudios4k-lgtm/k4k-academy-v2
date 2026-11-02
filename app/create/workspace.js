@@ -34,6 +34,15 @@ export default function Workspace({template}){
   const result=simulateK4KJourney({model,mode,prompt,imageCount:images.length,hasTemplate:template!==null||Boolean(videoRef)});
   setDemo(result);setError(result.ok?'':result.error);
  }
+ function toggleReferenceAudio(event){
+  const video=event.currentTarget;
+  video.muted=!video.muted;
+  if(!video.muted)window.dispatchEvent(new CustomEvent('k4k:video-audio',{detail:video}));
+  video.play().catch(()=>{});
+ }
+ function handleReferenceKey(event){
+  if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleReferenceAudio(event);}
+ }
  const hasMotionTemplate=template!==null&&mode==='Character swap';
  const motionUrl=hasMotionTemplate?`/videos/template-${template}.mp4`:videoRef?.url;
  return <main className="cw">
@@ -45,7 +54,7 @@ export default function Workspace({template}){
     <div className="cw-tabs" role="group" aria-label="Creation mode">{modes.map(x=><button type="button" key={x} aria-pressed={mode===x} onClick={()=>setCreationMode(x)}>{x}</button>)}</div>
     <div className="cw-step"><span>01 / CHOOSE THE MODEL</span><label>{mode==='Character swap'?'Motion transfer':'Creation model'}<select value={model} onChange={e=>{setModel(e.target.value);setDemo(null);}}>{modelsForMode(mode).map(m=><option key={m} value={m}>{m}</option>)}</select></label><p className="cw-note">{mode==='Character swap'?'Designed for reference-driven movements and character replacements.':'Designed for original video concepts and image animation.'}</p></div>
     <div className="cw-step"><span>02 / BRING YOUR REFERENCES</span>
-     {mode==='Character swap'&&(hasMotionTemplate?<div className="cw-reference"><strong>✓ K4K motion template loaded</strong><p className="cw-note">You don't need to upload this reference again.</p><video muted autoPlay loop playsInline preload="metadata" aria-label="Silent reference video" poster={`/videos/template-${template}.webp`} src={motionUrl}/><Link href="/templates">Change template ↗</Link></div>:<label className="cw-upload">Motion reference video<input type="file" accept="video/mp4,video/quicktime,video/webm" onChange={chooseVideo}/><small>MP4, MOV or WebM · up to 100 MB · local preview only</small></label>)}
+     {mode==='Character swap'&&(hasMotionTemplate?<div className="cw-reference"><strong>✓ K4K motion template loaded</strong><p className="cw-note">You don't need to upload this reference again.</p><video muted autoPlay loop playsInline preload="metadata" aria-label="Motion reference. Click or press Enter to toggle embedded audio." title="Click to toggle sound" tabIndex={0} onClick={toggleReferenceAudio} onKeyDown={handleReferenceKey} poster={`/videos/template-${template}.webp`} src={motionUrl}/><Link href="/templates">Change template ↗</Link></div>:<label className="cw-upload">Motion reference video<input type="file" accept="video/mp4,video/quicktime,video/webm" onChange={chooseVideo}/><small>MP4, MOV or WebM · up to 100 MB · local preview only</small></label>)}
      {mode!=='Text to video'&&<label className="cw-upload">{mode==='Character swap'?'New character reference images':'Image to animate'}<input type="file" accept="image/png,image/jpeg,image/webp" multiple={mode==='Character swap'} onChange={files}/><small>{mode==='Character swap'?'1–4 JPG, PNG or WebP images':'1 JPG, PNG or WebP image'} · 15 MB each · not uploaded</small></label>}
      <div className="cw-images">{images.map((x,i)=><figure key={x.url}><img src={x.url} alt={`Reference ${i+1}: ${x.name}`}/><figcaption>Reference {i+1}</figcaption></figure>)}</div>
      {videoRef&&mode==='Character swap'&&template===null&&<p className="cw-note">✓ Video selected: {videoRef.name}</p>}
@@ -58,7 +67,7 @@ export default function Workspace({template}){
     <p className="cw-note">Simulation only — this does not make a finished AI video.</p><Link className="cw-help" href="/academy/studio">Open Academy Prompt Studio ↗</Link>
    </section>
    <section className="cw-results"><div><span className="cw-label">YOUR CREATIVE CANVAS</span><h2>{mode==='Character swap'?'The motion stays. Your cast changes.':mode==='Image to video'?'Give your image a new rhythm.':'Bring an original scene to life.'}</h2><p>{hasMotionTemplate?'Your selected K4K reference is already loaded. Add a character image, set the direction and test the flow.':mode==='Character swap'?'Choose a reference clip and a new character to plan a motion remix.':'Build your video concept in a dedicated studio mode.'}</p>
-    {mode==='Character swap'&&motionUrl&&<video muted autoPlay loop playsInline preload="metadata" aria-label="Silent reference video" poster={hasMotionTemplate?`/videos/template-${template}.webp`:undefined} src={motionUrl}/>}
+    {mode==='Character swap'&&motionUrl&&<video muted autoPlay loop playsInline preload="metadata" aria-label="Motion reference. Click or press Enter to toggle embedded audio." title="Click to toggle sound" tabIndex={0} onClick={toggleReferenceAudio} onKeyDown={handleReferenceKey} poster={hasMotionTemplate?`/videos/template-${template}.webp`:undefined} src={motionUrl}/>}
     {mode==='Image to video'&&images.length>0&&<img className="cw-canvas-image" src={images[0].url} alt="Selected image-to-video reference"/>}
     {demo?.ok?<div className="cw-demo-result" role="status"><strong>Beta workflow validated · £0 charged</strong><p>Mode: {demo.mode}. Model: {demo.model}. These steps are simulated, not real AI generation.</p><ol>{demo.steps.map(s=><li key={s}>{s}</li>)}</ol><p>Real output appears here only when verified API billing and credit protection go live.</p></div>:<div className="cw-placeholder"><span>✳</span><strong>Preview canvas</strong><p>Choose references and run the £0 simulation to see your preparation checks.</p></div>}
    </div></section>
