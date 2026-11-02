@@ -36,7 +36,7 @@ export default function VideoPreview({index,title}){
    <source src={`/videos/template-${index}.mp4`} type="video/mp4"/>
   </video>
   <button type="button" className="k4k-sound-toggle" aria-pressed={soundOn} aria-label={soundOn?`Mute ${title}`:`Turn on sound for ${title}`} onClick={toggleSound}>
-   {soundOn?'🔊 Sound on':'🔇 Turn sound on'}
+   {soundOn?'Sound on':'Turn sound on'}
   </button>
  </>;
 }
