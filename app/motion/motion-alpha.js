@@ -32,18 +32,18 @@ export default function MotionAlpha(){
  return <main className="km">
   <header className="km-header"><Link href="/">K4K ✳ APP</Link><span>EXPERIMENTAL MOTION LAB</span><Link href="/create">Create Studio ↗</Link></header>
   <section className="km-hero">
-    <div className="km-eyebrow"><span className="km-dot" /> THREE MOTION ENGINES · PRIVATE PREVIEW · £0 TEST MODE</div>
+    <div className="km-eyebrow"><span className="km-dot" /> K4K AI MODELS · PRIVATE PREVIEW · £0 TEST MODE</div>
     <h1>Every movement.<br/><em>A new character.</em></h1>
-    <p>Compare K4K Motion (Wan 2.2 Animate), Genjutsu Light and Genjutsu Pro in one studio. No model is connected for paid rendering yet. Your files stay inside this browser during the free preview.</p>
+    <p>Choose K4K Create for reference-driven video, K4K Motion Lite for affordable motion transfer, or K4K Motion Pro for premium character transformation. No model is connected for paid rendering yet. Your files stay inside this browser during the free preview.</p>
     <div className="km-badges"><span>Zero credits deducted</span><span>No GPU connected</span><span>No uploads or paid calls</span></div>
   </section>
   <div className="km-layout">
    <section className="km-panel">
     <h2>01 / Choose your AI engine</h2>
     <div className="km-engines" role="group" aria-label="AI generation engine">
-     {Object.entries(MOTION_ENGINES).map(([id,item])=><button key={id} type="button" aria-pressed={engine===id} onClick={()=>{setEngine(id);setResult(null);}}><strong>{item.label}</strong><small>{id==='wan'?'Open-source · GPU cost to be benchmarked':id==='light'?'Higgsfield API · lower-cost option':'Higgsfield API · premium option'}</small></button>)}
+     {Object.entries(MOTION_ENGINES).map(([id,item])=><button key={id} type="button" aria-pressed={engine===id} onClick={()=>{setEngine(id);setResult(null);}}><strong>{item.label}</strong><small>{id==='wan'?'Reference-to-video · exact swaps not guaranteed':id==='light'?'Higgsfield API · lower-cost option':'Higgsfield API · premium option'}</small></button>)}
     </div>
-    <div className="km-estimate">{engine==='wan'?'GPU cost: not measured yet':Number.isFinite(duration)?'Indicative API list price: $'+(estimateProviderUsdMills(engine,Math.min(10,Math.max(2,duration)))/1000).toFixed(2):'Upload a clip to see an indicative API cost'} <span>Preview only · £0 charged</span></div>
+    <div className="km-estimate">{engine==='wan'?'Provider quote pending · reference-to-video':Number.isFinite(duration)?'Indicative API list price: $'+(estimateProviderUsdMills(engine,Math.min(10,Math.max(2,duration)))/1000).toFixed(2):'Upload a clip to see an indicative API cost'} <span>Preview only · £0 charged</span></div>
     <h2>02 / Choose your motion</h2>
     <div className="km-toggle" role="group" aria-label="Motion mode">
      <button type="button" aria-pressed={mode==='replace'} onClick={()=>{setMode('replace');setResult(null);}}>Replace in scene<small>Keep the original background</small></button>
@@ -66,7 +66,7 @@ export default function MotionAlpha(){
      <article><div className="km-media"><LocalMedia file={image} kind="image" /></div><small>CHARACTER REFERENCE</small><strong>{image?.name||'No character selected'}</strong></article>
     </div>
     {result && <div className="km-result" role="status" aria-live="polite">
-      {result.ok ? <><strong>✓ Free workflow validation passed</strong><p>Ready for a future provider test. This preview has not generated a video.</p><dl><dt>Engine</dt><dd>{result.manifest.engine}</dd><dt>Mode</dt><dd>{result.manifest.mode}</dd><dt>Clip</dt><dd>{result.manifest.clipDurationSeconds}s</dd><dt>Charge today</dt><dd>£0.00</dd><dt>Estimated provider cost</dt><dd>{result.manifest.estimatedProviderUsdMills===null?'GPU benchmark pending':'$'+(result.manifest.estimatedProviderUsdMills/1000).toFixed(2)+' list price'}</dd><dt>Execution</dt><dd>Dry run only</dd></dl></>
+      {result.ok ? <><strong>✓ Free workflow validation passed</strong><p>Ready for a future provider test. Reference-to-video is not guaranteed to copy every movement. No video has been generated.</p><dl><dt>Engine</dt><dd>{MOTION_ENGINES[result.manifest.engineKey].label}</dd><dt>Mode</dt><dd>{result.manifest.mode}</dd><dt>Clip</dt><dd>{result.manifest.clipDurationSeconds}s</dd><dt>Charge today</dt><dd>£0.00</dd><dt>Estimated provider cost</dt><dd>{result.manifest.estimatedProviderUsdMills===null?'GPU benchmark pending':'$'+(result.manifest.estimatedProviderUsdMills/1000).toFixed(2)+' list price'}</dd><dt>Execution</dt><dd>Dry run only</dd></dl></>
        : <><strong>Check these inputs</strong><ul>{result.errors.map(error=><li key={error}>{error}</li>)}</ul></>}
     </div>}
     {!result && <div className="km-wait"><span>PREVIEW STAGE</span><h3>Shape the next move.</h3><p>Upload the two inputs, select a mode and validate the workflow. Rendering becomes available only after approved GPU/provider setup and cost testing.</p></div>}
