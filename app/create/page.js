@@ -1,0 +1,13 @@
+import Link from 'next/link';
+const tools=[
+ ['Text to Video','Create a clip from a written scene.','prompt'],
+ ['Image to Video','Animate a still or starting frame.','image'],
+ ['Motion Control','Use a reference performance to guide movement.','motion'],
+ ['Character Swap','Recast a subject while preserving scene timing.','swap'],
+ ['Object Swap','Replace a selected object or wardrobe element.','object'],
+ ['Lip Sync','Match a talking character to speech.','lipsync'],
+ ['Video Extend','Continue an existing clip.','extend'],
+ ['Upscale & Reframe','Prepare output for vertical or widescreen publishing.','upscale']
+];
+export const metadata={title:'Create — K4K APP',description:'Choose a K4K AI video creation workflow.'};
+export default function CreatePage(){return <main style={{background:'#09090d',color:'#f7f5ff',minHeight:'100vh',padding:'36px max(5%,calc((100vw - 1100px)/2))',fontFamily:'Arial,sans-serif'}}><header style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:16}}><Link href="/" style={{color:'#c9adff',fontWeight:900,fontSize:24,textDecoration:'none'}}>K4K APP</Link><Link href="/academy" style={{color:'#aaa',textDecoration:'none'}}>My Academy ↗</Link></header><div style={{margin:'90px 0 48px'}}><span style={{color:'#b79aff',fontSize:12,letterSpacing:3}}>CREATOR WORKSPACE</span><h1 style={{fontSize:'clamp(40px,6vw,70px)',letterSpacing:-3,margin:'18px 0'}}>What will you create?</h1><p style={{color:'#a4a2ae',maxWidth:650,lineHeight:1.7}}>Explore professional AI video workflows. Tools requiring a provider connection are clearly marked as planned. Existing members can continue using the Character Swap Studio.</p></div><section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:16}}>{tools.map(([name,description,id])=><article key={id} style={{background:'#19171f',border:'1px solid #34303e',borderRadius:18,padding:25,minHeight:200,display:'flex',flexDirection:'column',justifyContent:'space-between'}}><div><div style={{color:'#bda3ff',fontSize:12,letterSpacing:2}}>{id==='swap'?'AVAILABLE WORKSPACE':'INTEGRATION PLANNED'}</div><h2 style={{fontSize:22,margin:'18px 0 10px'}}>{name}</h2><p style={{color:'#aaa6b4',fontSize:13,lineHeight:1.6}}>{description}</p></div>{id==='swap'?<Link href="/academy/studio" style={{color:'#d6c5ff',marginTop:20}}>Open studio ↗</Link>:<span style={{color:'#77717f',fontSize:12,marginTop:20}}>Coming after API validation</span>}</article>)}</section><p style={{marginTop:45,color:'#898493',fontSize:12}}>Existing subscriptions, payment methods and account access remain unchanged on this preview branch.</p></main>}
