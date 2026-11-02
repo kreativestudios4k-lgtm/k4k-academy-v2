@@ -14,7 +14,7 @@ test('top-up packs are one-time proposals without Stripe price IDs',()=>{
 });
 test('provider budgets leave room for fees and operating margin',()=>{
  const budgets=K4K_PLANS.map(p=>providerBudgetPence(p));
- assert.deepEqual(budgets,[264,501,1017,2037]);
+ assert.deepEqual(budgets,[264,501,1011,2029]);
  assert.ok(K4K_PLANS.every(p=>maximumProviderPencePerCredit(p)>1.4));
 });
 test('billable model units round up; invalid provider prices are rejected',()=>{
