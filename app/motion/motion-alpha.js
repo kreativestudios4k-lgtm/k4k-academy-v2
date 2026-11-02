@@ -43,7 +43,8 @@ export default function MotionAlpha(){
     <div className="km-engines" role="group" aria-label="AI generation engine">
      {Object.entries(MOTION_ENGINES).map(([id,item])=><button key={id} type="button" aria-pressed={engine===id} onClick={()=>{setEngine(id);setResult(null);}}><strong>{item.label}</strong><small>{id==='wan'?'Open-source · GPU cost to be benchmarked':id==='light'?'Higgsfield API · lower-cost option':'Higgsfield API · premium option'}</small></button>)}
     </div>
-    <div className="km-estimate">{engine==='wan'?'GPU cost: not measured yet':Number.isFinite(duration)?'Indicative API list price: 
+    <div className="km-estimate">{engine==='wan'?'GPU cost: not measured yet':Number.isFinite(duration)?'Indicative API list price: $'+(estimateProviderUsdMills(engine,Math.min(10,Math.max(2,duration)))/1000).toFixed(2):'Upload a clip to see an indicative API cost'} <span>Preview only · £0 charged</span></div>
+    <h2>02 / Choose your motion</h2>
     <div className="km-toggle" role="group" aria-label="Motion mode">
      <button type="button" aria-pressed={mode==='replace'} onClick={()=>{setMode('replace');setResult(null);}}>Replace in scene<small>Keep the original background</small></button>
      <button type="button" aria-pressed={mode==='animate'} onClick={()=>{setMode('animate');setResult(null);}}>Animate character<small>Transfer body and face motion</small></button>
