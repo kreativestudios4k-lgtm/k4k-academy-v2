@@ -10,7 +10,7 @@ const templates=[
  {name:'The Boss',description:'Take the lead in the scene.',people:1,seconds:null,tag:'POPULAR'},
  {name:'Press Room',description:'Your character in the headlines.',people:1,seconds:null,tag:'TRENDING'},
  {name:'Metro Entrance',description:'Own the entrance.',people:1,seconds:null,tag:'NEW'},
- {name:'The Group Call',description:'Your crew takes over.',people:4,seconds:null,tag:'POPULAR'},
+ {name:'The Meeting',description:'The viral meeting that reached 2.2M Instagram views.',people:3,seconds:10,tag:'2.2M VIEWS',instagramViews:2210238},
  {name:'Training Ground',description:'Your next viral sports moment.',people:1,seconds:null,tag:'NEW'}
 ];
 export default function MobileTemplateFeed(){
@@ -26,7 +26,7 @@ export default function MobileTemplateFeed(){
  <div className="k4k-feed-shade"/>
  <div className="k4k-feed-actions"><button type="button" onClick={()=>setMuted(x=>!x)} aria-label={muted?'Turn sound on':'Mute video'}>{muted?'🔇':'🔊'}</button><button type="button" onClick={()=>setShowInfo(x=>!x)} aria-label="Template details">ⓘ<small>Tips</small></button><Link href={`/create?template=${index}`} aria-label="Add character photos">♙<small>{item.people} photo{item.people===1?'':'s'}</small></Link></div>
  {showInfo&&index===active&&<div className="k4k-feed-info"><strong>How it works</strong><p>Choose this template, add your character reference photos, and prepare your scene in K4K Motion. AI generation is not yet enabled.</p><button type="button" onClick={()=>setShowInfo(false)}>Close</button></div>}
- <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.tag}</span><h2>{item.name}</h2><p>{item.description}</p><div className="k4k-feed-meta">{item.people} character photo{item.people===1?'':'s'} · Video template</div><Link className="k4k-feed-cta" href={`/create?template=${index}`}>✦ Use this template</Link></div>
+ <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.tag}</span><h2>{item.name}</h2><p>{item.description}</p><div className="k4k-feed-meta">{item.instagramViews?item.instagramViews.toLocaleString('en-GB')+' Instagram views · ':''}{item.people} character photo{item.people===1?'':'s'} · {item.seconds?item.seconds+'s · ':''}Video template</div><Link className="k4k-feed-cta" href={`/create?template=${index}`}>✦ Use this template</Link></div>
  </section>)}
  </div>
  <nav className="k4k-feed-nav" aria-label="Mobile navigation"><Link href="/k4k-app" className="selected"><span>⌂</span>Home</Link><Link href="/create"><span>▦</span>Videos</Link><Link className="k4k-feed-create" href="/create"><span>✦</span>Create</Link><Link href="/creator-beta/pricing"><span>◎</span>Credits</Link><Link href="/academy"><span>♙</span>Login</Link></nav>
