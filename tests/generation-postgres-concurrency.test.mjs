@@ -33,11 +33,17 @@ test('atomic credit ledger: real concurrent PostgreSQL connections', {
   t.after(async () => {await pool.end(); await admin.end();});
 
   // Fail closed instead of dropping or rewriting any existing database objects.
+  // Require a genuinely disposable database, not merely one missing our two
+  // expected objects. Refuse to write if ANY user-defined relation exists.
   const preflight = await admin.query(
-    "select to_regclass('public.studio_credit_accounts') as accounts, " +
+    "select (select count(*)::int from pg_class c join pg_namespace n " +
+    "on n.oid=c.relnamespace where n.nspname not in " +
+    "('pg_catalog','information_schema') and n.nspname !~ '^pg_toast' " +
+    "and c.relkind in ('r','p','v','m','S','f')) as relation_count, " +
     "to_regnamespace('k4k_generation') as ledger_schema"
   );
-  assert.equal(preflight.rows[0].accounts, null, 'Test database must be empty');
+  assert.equal(preflight.rows[0].relation_count, 0,
+    'Refusing to modify a database containing user-defined relations');
   assert.equal(preflight.rows[0].ledger_schema, null, 'Ledger schema already exists');
   await admin.query(
     "do $$ begin " +
