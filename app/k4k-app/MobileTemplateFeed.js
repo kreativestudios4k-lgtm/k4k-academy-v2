@@ -3,7 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 const templates=[
  {name:'Squad Anthem',description:'Put your squad in the spotlight.',people:4,seconds:null,tag:'FEATURED'},
- {name:'The Arrival',description:'Make an unforgettable entrance.',people:1,seconds:null,tag:'TRENDING'},
+ {name:'Dame Ombro',description:'The viral moment with 12.9M TikTok views.',people:1,seconds:16.04,tag:'12.9M VIEWS',tiktokViews:12900000},
  {name:'Touchline Energy',description:'Bring your character to the action.',people:1,seconds:null,tag:'TRENDING'},
  {name:'Celebration Crew',description:'Your friends. Your celebration.',people:4,seconds:null,tag:'POPULAR'},
  {name:'Money Spread',description:'Turn a moment into your own story.',people:1,seconds:null,tag:'TRENDING'},
@@ -26,7 +26,7 @@ export default function MobileTemplateFeed(){
  <div className="k4k-feed-shade"/>
  <div className="k4k-feed-actions"><button type="button" onClick={()=>setMuted(x=>!x)} aria-label={muted?'Turn sound on':'Mute video'}>{muted?'🔇':'🔊'}</button><button type="button" onClick={()=>setShowInfo(x=>!x)} aria-label="Template details">ⓘ<small>Tips</small></button><Link href={`/create?template=${index}`} aria-label="Add character photos">♙<small>{item.people} photo{item.people===1?'':'s'}</small></Link></div>
  {showInfo&&index===active&&<div className="k4k-feed-info"><strong>How it works</strong><p>Choose this template, add your character reference photos, and prepare your scene in K4K Motion. AI generation is not yet enabled.</p><button type="button" onClick={()=>setShowInfo(false)}>Close</button></div>}
- <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.tag}</span><h2>{item.name}</h2><p>{item.description}</p><div className="k4k-feed-meta">{item.instagramViews?item.instagramViews.toLocaleString('en-GB')+' Instagram views · ':''}{item.people} character photo{item.people===1?'':'s'} · {item.seconds?item.seconds+'s · ':''}Video template</div><Link className="k4k-feed-cta" href={`/create?template=${index}`}>✦ Use this template</Link></div>
+ <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.tag}</span><h2>{item.name}</h2><p>{item.description}</p><div className="k4k-feed-meta">{item.tiktokViews?item.tiktokViews.toLocaleString('en-GB')+' TikTok views · ':item.instagramViews?item.instagramViews.toLocaleString('en-GB')+' Instagram views · ':''}{item.people} character photo{item.people===1?'':'s'} · {item.seconds?item.seconds+'s · ':''}Video template</div><Link className="k4k-feed-cta" href={`/create?template=${index}`}>✦ Use this template</Link></div>
  </section>)}
  </div>
  <nav className="k4k-feed-nav" aria-label="Mobile navigation"><Link href="/k4k-app" className="selected"><span>⌂</span>Home</Link><Link href="/create"><span>▦</span>Videos</Link><Link className="k4k-feed-create" href="/create"><span>✦</span>Create</Link><Link href="/creator-beta/pricing"><span>◎</span>Credits</Link><Link href="/academy"><span>♙</span>Login</Link></nav>
