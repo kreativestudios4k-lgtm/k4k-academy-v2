@@ -1,14 +1,9 @@
 import Link from 'next/link';
+import {CREATOR_PLANS,introductoryMonthlyPence} from '../../../lib/server/creator-beta-pricing.mjs';
 
 export const metadata={title:'K4K APP | Creator Beta Pricing Preview'};
-const plans=[
- {name:'Starter',monthly:799},
- {name:'Creator',monthly:1499},
- {name:'Pro',monthly:2999},
- {name:'Studio',monthly:5999},
-];
+const plans=CREATOR_PLANS;
 const money=p=>(p/100).toLocaleString('en-GB',{style:'currency',currency:'GBP'});
-const discount=50;
 export default function BetaPricing(){
  return <main style={{minHeight:'100vh',background:'#080912',color:'#f7f7fb',padding:'44px max(20px,5vw)',fontFamily:'Arial,sans-serif'}}>
   <header style={{display:'flex',justifyContent:'space-between',gap:16,alignItems:'center',flexWrap:'wrap'}}>
@@ -24,8 +19,8 @@ export default function BetaPricing(){
    {plans.map(plan=><article key={plan.name} style={{border:'1px solid #303146',borderRadius:18,padding:24,background:'#151626'}}>
     <h2 style={{fontSize:20}}>{plan.name}</h2>
     <p style={{color:'#a9aabc'}}>Proposed beta rate</p>
-    <p style={{fontSize:36,fontWeight:800,margin:'8px 0'}}>{money(plan.monthly*(100-discount)/100)}<span style={{fontSize:14,color:'#aaa'}}> / month</span></p>
-    <p style={{color:'#b5b5c8'}}>Regular price: {money(plan.monthly)} / month</p>
+    <p style={{fontSize:36,fontWeight:800,margin:'8px 0'}}>{money(introductoryMonthlyPence(plan.monthlyPence))}<span style={{fontSize:14,color:'#aaa'}}> / month</span></p>
+    <p style={{color:'#b5b5c8'}}>Regular price: {money(plan.monthlyPence)} / month</p>
     <p style={{color:'#d2c8ff',fontSize:13}}>Credit allowance pending provider cost verification</p>
     <div style={{border:'1px solid #51496e',borderRadius:10,padding:12,textAlign:'center',marginTop:22,color:'#c5baff'}}>Checkout not enabled</div>
    </article>)}
