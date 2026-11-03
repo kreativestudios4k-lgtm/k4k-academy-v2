@@ -31,7 +31,7 @@ Use a conservative **1.4p provider-cost ceiling per K4K credit** across all tier
 - Dedicated `K4K_STRIPE_TEST_SECRET_KEY` starts with `sk_test_` (never a live secret).
 - `K4K_PRICING_PREVIEW_URL` is the HTTPS preview origin; request Origin must match exactly.
 - Supabase `auth.getUser()` resolves an authenticated user whose **app_metadata** includes `k4k_pricing_tester: true`; normal students cannot use the test route.
-- An allowlisted `K4K_STRIPE_TEST_PRICE_STARTER|CREATOR|PRO|STUDIO` references a verified Stripe **test-mode** recurring price.
+- An allowlisted `K4K_STRIPE_TEST_PRICE_STARTER|CREATOR|PRO|STUDIO` references a Stripe **test-mode** recurring price. Before creating any session, the server retrieves the actual Stripe Price and checks `livemode=false`, active status, GBP amount matching the selected plan, monthly licensed/per-unit recurring billing, and no quantity transformation or trial period. Any mismatch fails closed.
 
 All plan IDs and Stripe Price IDs are resolved server-side. No billing-related frontend button is enabled. No live Stripe products, prices, subscriptions, webhooks, payment links, checkout sessions or Supabase balances were created/changed by this PR.
 
@@ -39,6 +39,6 @@ All plan IDs and Stripe Price IDs are resolved server-side. No billing-related f
 
 ## Verification
 
-`node --test tests/k4k-app-pricing.test.mjs`
+`node --test tests/k4k-app-pricing.test.mjs tests/stripe-preview-guard.test.mjs`
 
-Run `npm run build` in CI or an isolated writable worktree. Test both the disabled endpoint and test-mode authenticated cohort on a protected preview URL. Do not use a real card or billable provider calls.
+The two guard tests were run locally with Node 22 using synthetic Stripe responses. No Stripe API request or checkout session was made. Run `npm run build` in CI or an isolated writable worktree. Test both the disabled endpoint and test-mode authenticated cohort on a protected preview URL. Do not use a real card or billable provider calls.
