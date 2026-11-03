@@ -32,7 +32,9 @@ Do not paste the database password into logs or commit it. `K4K_PG_MODULE` may b
 3. Three simultaneous requests obey the two-active-job limit.
 4. Concurrent terminal failures refund exactly once.
 5. A second user cannot read the first user's job.
+6. Reusing a request key with changed credits or input fails without another debit.
+7. Anonymous and authenticated roles cannot call the server-only reservation function.
 
-The tests use independent `pg` pool connections and the real SQL proposal, with no fake ledger or in-memory lock. They intentionally **do not** activate generation. Running them successfully is necessary but not sufficient for release: the hosted migration still needs review, provider pricing and ownership verification, authenticated routes, bounded reconciliation, and a separate explicitly authorized live smoke test.
+The seven scenarios include concurrent spending and refunds, idempotency conflicts, and role-denial checks. The tests use independent `pg` pool connections and the real SQL proposal, with no fake ledger or in-memory lock. They intentionally **do not** activate generation. Running them successfully is necessary but not sufficient for release: the hosted migration still needs review, provider pricing and ownership verification, authenticated routes, bounded reconciliation, and a separate explicitly authorized live smoke test.
 
 If `K4K_ISOLATED_POSTGRES_URL` is absent, Node marks this test as **skipped**. A skip is **not a passing concurrency validation**.
