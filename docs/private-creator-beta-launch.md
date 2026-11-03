@@ -41,3 +41,11 @@ This is a rollout plan, not proof that any route, database migration, provider c
 - `validateCreatorFeedback` accepts only `bug`, `quality`, `workflow`, `suggestion`, requires a 10–2000-character message, and optionally a UUID job reference.
 - **Not yet wired:** feedback HTTP endpoint, server-verified session, per-user job ownership, durable feedback storage, admin moderation, rate limiting and consent. Do not accept user-provided `userId` or treat a submitted `jobId` as proof of ownership.
 - When wiring persistence, require a signed-in invited creator; derive identity from the server session, verify job ownership, rate-limit, and use owner-scoped RLS policies. Do not create a live feedback table without separate review.
+
+## Feedback API implementation (2026-11-03)
+- Preview route: `POST /api/creator-beta/feedback`; requires `Authorization: Bearer <Supabase access token>` and a verified non-anonymous user.
+- Separate default-off `K4K_CREATOR_FEEDBACK_ENABLED=true` flag; a valid invited user is still required.
+- JSON body: `{"category":"bug","message":"Describe the problem (10–2000 chars)","jobId":null}`.
+- The RLS SQL proposal is at `db/proposals/creator-beta-feedback.sql`, **not applied**. It intentionally permits only null job IDs until job ownership checks are implemented.
+- Before enabling: confirm deployed env key names, apply reviewed migration to a **disposable preview database**, add distributed rate limiting, test RLS cross-user isolation and actual insert with creator session. Until then the endpoint should remain disabled.
+- No email invites are sent, no public creator onboarding is activated, no Stripe or affiliate changes.
