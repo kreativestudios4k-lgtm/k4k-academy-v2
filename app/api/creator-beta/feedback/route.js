@@ -13,7 +13,7 @@ export async function POST(request) {
   const token = request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   if (!token) return json({error:'AUTH_REQUIRED'},401);
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key=(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   if (!url || !key) return json({error:'SERVICE_NOT_CONFIGURED'},503);
   const supabase=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data:{user}={},error:authError}=await supabase.auth.getUser(token);
