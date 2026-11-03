@@ -12,7 +12,8 @@
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/e25c789f-6f86-4a78-afad-c8af4df1bcd5.mp4",
       "posterUrl": null,
       "audio": true,
-      "mediaId": "e25c789f-6f86-4a78-afad-c8af4df1bcd5"
+      "mediaId": "e25c789f-6f86-4a78-afad-c8af4df1bcd5",
+      "requiredPhotos": 1
     },
     {
       "id": "top-002",
@@ -24,7 +25,8 @@
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/0f38f9a0-be93-489a-893c-9cec4c18e421.mp4",
       "posterUrl": null,
       "audio": true,
-      "mediaId": "0f38f9a0-be93-489a-893c-9cec4c18e421"
+      "mediaId": "0f38f9a0-be93-489a-893c-9cec4c18e421",
+      "requiredPhotos": 1
     },
     {
       "id": "top-003",
@@ -36,7 +38,8 @@
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/74d44c03-479c-46e7-ae82-d524372c1c87.mp4",
       "posterUrl": null,
       "audio": true,
-      "mediaId": "74d44c03-479c-46e7-ae82-d524372c1c87"
+      "mediaId": "74d44c03-479c-46e7-ae82-d524372c1c87",
+      "requiredPhotos": 3
     }
   ],
   "trending": [
@@ -48,7 +51,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/17f30487-dc1b-4969-a094-81dcc802d778.mp4",
       "posterUrl": null,
-      "mediaId": "17f30487-dc1b-4969-a094-81dcc802d778"
+      "mediaId": "17f30487-dc1b-4969-a094-81dcc802d778",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-002",
@@ -58,7 +62,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/531f6960-fbb7-430a-bb85-6f33b144f1d5.mp4",
       "posterUrl": null,
-      "mediaId": "531f6960-fbb7-430a-bb85-6f33b144f1d5"
+      "mediaId": "531f6960-fbb7-430a-bb85-6f33b144f1d5",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-003",
@@ -68,7 +73,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/c49398b6-7737-4440-b4a6-062b0fde783e.mp4",
       "posterUrl": null,
-      "mediaId": "c49398b6-7737-4440-b4a6-062b0fde783e"
+      "mediaId": "c49398b6-7737-4440-b4a6-062b0fde783e",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-004",
@@ -78,7 +84,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/4808c74c-c47c-47b0-9949-3ba6551d67f4.mp4",
       "posterUrl": null,
-      "mediaId": "4808c74c-c47c-47b0-9949-3ba6551d67f4"
+      "mediaId": "4808c74c-c47c-47b0-9949-3ba6551d67f4",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-005",
@@ -88,7 +95,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/7a56c6d9-fd77-4808-a00d-554fb2e3b3af.mp4",
       "posterUrl": null,
-      "mediaId": "7a56c6d9-fd77-4808-a00d-554fb2e3b3af"
+      "mediaId": "7a56c6d9-fd77-4808-a00d-554fb2e3b3af",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-006",
@@ -98,7 +106,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/c4292efa-d3c3-4bf1-8c3f-e7da2ac4f863.mp4",
       "posterUrl": null,
-      "mediaId": "c4292efa-d3c3-4bf1-8c3f-e7da2ac4f863"
+      "mediaId": "c4292efa-d3c3-4bf1-8c3f-e7da2ac4f863",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-007",
@@ -108,7 +117,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/92af7e88-3418-4ad3-a3fc-b55baee4f875.mp4",
       "posterUrl": null,
-      "mediaId": "92af7e88-3418-4ad3-a3fc-b55baee4f875"
+      "mediaId": "92af7e88-3418-4ad3-a3fc-b55baee4f875",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-008",
@@ -118,7 +128,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/70dbc433-d991-4317-8def-9d40cab5f3f5.mp4",
       "posterUrl": null,
-      "mediaId": "70dbc433-d991-4317-8def-9d40cab5f3f5"
+      "mediaId": "70dbc433-d991-4317-8def-9d40cab5f3f5",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-009",
@@ -128,7 +139,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/81954ef8-529b-4fb6-8023-3c9fd9cd554a.mp4",
       "posterUrl": null,
-      "mediaId": "81954ef8-529b-4fb6-8023-3c9fd9cd554a"
+      "mediaId": "81954ef8-529b-4fb6-8023-3c9fd9cd554a",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-010",
@@ -138,7 +150,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/f535f077-2a7d-46d9-b92b-de8d1861a172.mp4",
       "posterUrl": null,
-      "mediaId": "f535f077-2a7d-46d9-b92b-de8d1861a172"
+      "mediaId": "f535f077-2a7d-46d9-b92b-de8d1861a172",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-011",
@@ -148,7 +161,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/e5a404dc-4b0d-4628-8412-e00340048195.mp4",
       "posterUrl": null,
-      "mediaId": "e5a404dc-4b0d-4628-8412-e00340048195"
+      "mediaId": "e5a404dc-4b0d-4628-8412-e00340048195",
+      "requiredPhotos": 1
     },
     {
       "id": "trending-012",
@@ -158,7 +172,8 @@
       "audio": true,
       "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/ed5b1fb6-1748-4a62-bc52-7d0197a9190f.mp4",
       "posterUrl": null,
-      "mediaId": "ed5b1fb6-1748-4a62-bc52-7d0197a9190f"
+      "mediaId": "ed5b1fb6-1748-4a62-bc52-7d0197a9190f",
+      "requiredPhotos": 1
     }
   ]
 }
