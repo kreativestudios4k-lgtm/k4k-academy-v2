@@ -18,9 +18,10 @@ export async function POST(request) {
   const supabase=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data:{user}={},error:authError}=await supabase.auth.getUser(token);
   if (authError || !user || user.is_anonymous) return json({error:'AUTH_REQUIRED'},401);
-  const gate=getGenerationBetaGate({...process.env,K4K_GENERATION_BETA_ENABLED:'true',K4K_GENERATION_E2E_VERIFIED:'true'});
-  const authorization=gate.authorize({userId:user.id});
-  if (!authorization.allowed) return json({error:authorization.reason},403);
+  const gate=getGenerationBetaGate(process.env);
+  if (gate.invitedCount > gate.cohortLimit) return json({error:'BETA_COHORT_LIMIT_EXCEEDED'},503);
+  const invited=(process.env.K4K_GENERATION_BETA_USER_IDS||'').split(',').map(x=>x.trim().toLowerCase());
+  if (!invited.includes(user.id.toLowerCase())) return json({error:'BETA_ACCESS_DENIED'},403);
   const length=Number(request.headers.get('content-length')||0);
   if (length>8192) return json({error:'PAYLOAD_TOO_LARGE'},413);
   let input;
