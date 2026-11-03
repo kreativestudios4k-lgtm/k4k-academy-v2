@@ -1,5 +1,59 @@
 'use client';
-import {useState,useEffect} from 'react';
+import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import './workspace.css';
-export default function Workspace({template}){const [mode,setMode]=useState(template===null?'Text to video':'Character swap');const [prompt,setPrompt]=useState('');const [images,setImages]=useState([]);const [error,setError]=useState('');const [model,setModel]=useState('K4K Pro');const [aspect,setAspect]=useState('9:16');const [duration,setDuration]=useState(5);useEffect(()=>()=>images.forEach(x=>URL.revokeObjectURL(x.url)),[images]);function files(e){const chosen=Array.from(e.target.files||[]);if(chosen.length>4||chosen.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size>15*1024*1024)){setError('Choose up to four JPG, PNG or WebP images, under 15 MB each.');return}setError('');setImages(chosen.map(f=>({name:f.name,url:URL.createObjectURL(f)})))}return <main className="cw"><header><Link href="/">K4K ✳ APP</Link><Link href="/templates">Explore templates</Link><span className="cw-beta-pill">PRIVATE BETA · 25 CREATORS</span><Link href="/academy">Student access ↗</Link></header><div className="cw-layout"><section className="cw-settings"><p className="cw-label">K4K APP · AI VIDEO STUDIO</p><h1>Create video <span className="cw-title-star">✦</span></h1><div className="cw-section-label">GENERATION MODE</div><div className="cw-tabs">{['Text to video','Image to video','Character swap'].map(x=><button key={x} aria-pressed={mode===x} onClick={()=>setMode(x)}>{x}</button>)}</div><div className="cw-section-label">MODEL & SETTINGS</div><label>AI Model<select value={model} onChange={e=>setModel(e.target.value)}><option>K4K Pro</option><option>K4K Lite</option></select></label><p className="cw-note">Choose Pro or Lite. Video generation remains disabled until provider limits, API and credits are verified.</p><div className="cw-options"><label>Aspect ratio<select value={aspect} onChange={e=>setAspect(e.target.value)}><option>9:16</option><option>16:9</option><option>1:1</option></select></label><label>Video duration <strong>{duration} seconds</strong><input type="range" min="3" max="30" step="1" value={duration} onChange={e=>setDuration(Number(e.target.value))} aria-label="Video duration in seconds"/><small>3–30 seconds · actual availability depends on model</small></label></div>{template!==null&&<div className="cw-reference"><span>✓ Template reference selected</span><video controls playsInline preload="metadata" poster={`/videos/template-${template}.webp`} src={`/videos/template-${template}.mp4`}/></div>}{mode!=='Text to video'&&<label className="cw-upload">{mode==='Character swap'?'Your replacement characters':'Your reference images'}<input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={files}/><small>Up to 4 images · 15 MB each · local preview</small></label>}<div className="cw-images">{images.map((x,i)=><figure key={x.url}><img src={x.url} alt={`Reference ${i+1}: ${x.name}`}/><figcaption>Image {i+1}</figcaption></figure>)}</div><div className="cw-section-label">CREATIVE DIRECTION</div><label>Prompt<textarea value={prompt} maxLength={1800} onChange={e=>setPrompt(e.target.value)} placeholder={mode==='Character swap'?'Replace the main character with image 1. Preserve the original motion, camera and timing.':'Describe the subject, action, camera movement and atmosphere…'}/></label><span className="cw-note">{prompt.length}/1800</span>{error&&<p role="alert">{error}</p>}<div className="cw-status"><strong>Private beta · preview mode</strong><p>Provider connection and credit accounting must be verified before paid generation is enabled. Your references remain in this browser.</p></div><button className="cw-generate" disabled>✦ Generate {model} video · Coming soon</button><Link className="cw-help" href="/academy/studio">Open Academy Prompt Studio ↗</Link></section><section className="cw-results"><div className="cw-canvas-panel"><div className="cw-canvas-toolbar"><span className="cw-label">CREATION HISTORY</span><span className="cw-label">{model.toUpperCase()} · {aspect} · {duration}s</span></div><div className="cw-empty-icon" aria-hidden="true">✦</div><h2>{template===null?'From an idea to a moving story.':'The motion is ready. Bring your character.'}</h2><p>{template===null?'Start with a prompt or reference image.':'Your selected template is already loaded as the video reference.'}</p>{template!==null&&<video controls playsInline preload="none" poster={`/videos/template-${template}.webp`} src={`/videos/template-${template}.mp4`}/>}<small>Completed generations will appear here once the API is enabled.</small></div></section></div></main>}
+const modes=['Motion transfer','Object swap'];
+const showcase=[0,1,2,3,4,5];
+export default function Workspace({template}){
+ const [mode,setMode]=useState('Motion transfer');
+ const [model,setModel]=useState('Motion Pro');
+ const [duration,setDuration]=useState(5);
+ const [quality,setQuality]=useState('720p');
+ const [prompt,setPrompt]=useState('');
+ const [showPrompt,setShowPrompt]=useState(false);
+ const [references,setReferences]=useState([]);
+ const [motion,setMotion]=useState(null);
+ const [error,setError]=useState('');
+ useEffect(()=>()=>{references.forEach(x=>URL.revokeObjectURL(x.url));if(motion?.url)URL.revokeObjectURL(motion.url)},[references,motion]);
+ function addImages(event){
+  const chosen=Array.from(event.target.files||[]);
+  if(chosen.length+references.length>30||chosen.some(x=>!['image/jpeg','image/png','image/webp'].includes(x.type)||x.size>15*1024*1024)){setError('Maximum 30 JPG, PNG or WebP images, 15 MB each.');return}
+  setError('');setReferences(old=>[...old,...chosen.map(x=>({name:x.name,url:URL.createObjectURL(x)}))]);event.target.value='';
+ }
+ function addMotion(event){
+  const file=event.target.files?.[0];if(!file)return;
+  if(!file.type.startsWith('video/')||file.size>150*1024*1024){setError('Choose a video file under 150 MB.');return}
+  setError('');setMotion({name:file.name,url:URL.createObjectURL(file)});
+ }
+ const selectedVideo=motion?.url||(template!==null?`/videos/template-${template}.mp4`:null);
+ return <main className="km">
+  <header className="km-top"><Link href="/k4k-app" className="km-brand">K4K<span> APP</span></Link><nav><Link href="/k4k-app">Explore</Link><Link href="/templates">Templates</Link><span className="km-active">Motion</span><Link href="/creator-beta/pricing">Pricing</Link></nav><div className="km-topright"><span className="km-beta">PRIVATE BETA</span><Link href="/academy">Student access ↗</Link></div></header>
+  <div className="km-body">
+   <aside className="km-sidebar">
+    <div className="km-side-tabs"><span className="km-tab-on">Create Video</span><span>Edit Video</span><span>Motion Control</span></div>
+    <div className="km-side-content">
+     <div className="km-promo"><div className="km-promo-art">✦ <span>CREATE THE NEXT VIRAL MOMENT</span></div><strong>K4K MOTION</strong><small>Reality manipulation, made simple</small></div>
+     <div className="km-switch">{modes.map(x=><button key={x} type="button" className={mode===x?'selected':''} onClick={()=>setMode(x)}>{x==='Motion transfer'?'◉':'◇'} {x}</button>)}</div>
+     <label className="km-upload-box"><span className="km-upload-icon">▣</span><strong>{selectedVideo?'Change reference video':'Add a reference video'}</strong><small>Extract motion from a video · target 3–30 seconds</small><input type="file" accept="video/*" onChange={addMotion}/></label>
+     {selectedVideo&&<video className="km-side-video" controls playsInline src={selectedVideo}/>}
+     <label className="km-upload-box"><span className="km-upload-icon">♧</span><strong>Add your characters, products or clothes</strong><small>Up to 30 images · JPG, PNG, WebP</small><input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={addImages}/></label>
+     {references.length>0&&<div className="km-thumbs">{references.map((x,i)=><img src={x.url} alt={`Reference ${i+1}: ${x.name}`} key={x.url}/>)}</div>}
+     <label className="km-prompt-toggle">Prompt <input type="checkbox" checked={showPrompt} onChange={e=>setShowPrompt(e.target.checked)}/></label>
+     {showPrompt&&<textarea className="km-prompt" value={prompt} maxLength={2000} onChange={e=>setPrompt(e.target.value)} placeholder="Describe the motion, character replacement, camera and scene…"/>}
+     <label className="km-field">Model<select value={model} onChange={e=>setModel(e.target.value)}><option>Motion Pro</option><option>Motion Lite</option></select></label>
+     <div className="km-row"><label className="km-field">Quality<select value={quality} onChange={e=>setQuality(e.target.value)}><option>720p</option><option>480p</option><option>1080p</option></select></label><label className="km-field">Duration <span>{duration}s</span><input type="range" min="3" max="30" step="1" value={duration} onChange={e=>setDuration(Number(e.target.value))}/></label></div>
+     <small className="km-disclaimer">3–30s is a target range. Available lengths and quality depend on provider validation. No generation or charges in this preview.</small>
+     {error&&<p role="alert" className="km-error">{error}</p>}
+     <button className="km-generate" disabled>✦ Generate · Coming soon</button>
+    </div>
+   </aside>
+   <section className="km-main">
+    <div className="km-subnav"><span className="km-subnav-on">Motion Library</span><span>History</span><span>How it works</span></div>
+    <div className="km-intro"><div><p className="km-eyebrow">K4K MOTION STUDIO</p><h1>TURN ONE VIDEO INTO MANY</h1><p>Take the motion and recreate it with your own characters, locations and products. Keep the movement, make it yours.</p><Link href="/creator-beta/pricing" className="km-intro-cta">Explore creator plans ↗</Link></div><div className="km-feature-video"><video autoPlay muted loop playsInline preload="metadata" poster="/videos/template-0.webp" src="/videos/template-0.mp4"/></div></div>
+    <div className="km-library-head"><div><h2>Motion Library</h2><p>Choose a viral reference and create your own version</p></div><span className="km-library-pill">TRENDING TEMPLATES</span></div>
+    <div className="km-gallery">{showcase.map(i=><Link key={i} href={`/create?template=${i}`} className="km-gallery-card"><video muted loop playsInline autoPlay preload="none" poster={`/videos/template-${i}.webp`} src={`/videos/template-${i}.mp4`}/><span>Motion {String(i+1).padStart(2,'0')} <b>↗</b></span></Link>)}</div>
+    <p className="km-footnote">Template videos are previews. Generation is unavailable until the private beta is verified.</p>
+   </section>
+  </div>
+ </main>
+}
