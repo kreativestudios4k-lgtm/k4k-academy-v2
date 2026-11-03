@@ -32,7 +32,9 @@ export async function POST(request) {
   } catch {
     return json({error:'INVALID_FEEDBACK'},400);
   }
-  // Authenticated RLS enforces ownership, including the optional job reference.
+  // Job-linked feedback stays disabled until ownership verification is wired.
+  if (input.jobId !== null) return json({error:'JOB_FEEDBACK_NOT_READY'},422);
+  // Authenticated RLS restricts feedback rows to the submitting creator.
   const scoped=createClient(url,key,{global:{headers:{Authorization:`Bearer ${token}`}},auth:{persistSession:false,autoRefreshToken:false}});
   const {error}=await scoped.from('k4k_creator_beta_feedback').insert({
     user_id:user.id,category:input.category,message:input.message,job_id:input.jobId
