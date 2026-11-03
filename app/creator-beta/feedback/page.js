@@ -12,7 +12,7 @@ export default function CreatorFeedbackPage(){
   event.preventDefault();setBusy(true);setStatus('');
   try{
    const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
-   const key=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+   const key=(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
    if(!url||!key) throw new Error('Creator feedback is not configured yet.');
    const client=createClient(url,key);
    const {data:{session}}=await client.auth.getSession();
