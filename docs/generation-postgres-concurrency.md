@@ -39,3 +39,5 @@ Do not paste the database password into logs or commit it. `K4K_PG_MODULE` may b
 The seven scenarios include concurrent spending and refunds, idempotency conflicts, and role-denial checks. The tests use independent `pg` pool connections and the real SQL proposal, with no fake ledger or in-memory lock. They intentionally **do not** activate generation. Running them successfully is necessary but not sufficient for release: the hosted migration still needs review, provider pricing and ownership verification, authenticated routes, bounded reconciliation, and a separate explicitly authorized live smoke test.
 
 If `K4K_ISOLATED_POSTGRES_URL` is absent, Node marks this test as **skipped**. A skip is **not a passing concurrency validation**.
+
+Safety hardening: the harness now refuses to initialize if any user-defined relation already exists in the target database, rather than checking only the credit-account table. This is still not a substitute for a dedicated disposable local PostgreSQL instance.
