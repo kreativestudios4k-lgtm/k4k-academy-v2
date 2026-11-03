@@ -116,6 +116,36 @@ test('atomic credit ledger: real concurrent PostgreSQL connections', {
     assert.equal(await ledgerCount(user,'reserve'),1);
   });
 
+  await t.test('reused request key with different price or input is rejected without another debit', async () => {
+    const user=await account(100),key=randomUUID();
+    await reserve(user,key,30);
+    await assert.rejects(reserve(user,key,40), /Idempotency conflict/);
+    await assert.rejects(withService(c=>c.query(
+      'select public.k4k_generation_reserve($1::uuid,$2::uuid,$3::jsonb,$4::integer)',
+      [user,key,JSON.stringify({model:'changed',reference:'owned/test'}),30]
+    )), /Idempotency conflict/);
+    assert.equal(await balance(user),70);
+    assert.equal(await ledgerCount(user,'reserve'),1);
+  });
+
+  await t.test('unprivileged roles cannot reserve credits', async () => {
+    const user=await account(100),key=randomUUID();
+    for (const role of ['anon','authenticated']) {
+      const client=await pool.connect();
+      try {
+        await client.query('set role '+role);
+        await assert.rejects(client.query(
+          'select public.k4k_generation_reserve($1::uuid,$2::uuid,$3::jsonb,$4::integer)',
+          [user,key,JSON.stringify({model:'synthetic'}),30]
+        ), /permission denied|Server only/i);
+      } finally {
+        try {await client.query('reset role');} finally {client.release();}
+      }
+    }
+    assert.equal(await balance(user),100);
+    assert.equal(await ledgerCount(user,'reserve'),0);
+  });
+
   await t.test('three simultaneous jobs respect the two-active-job limit', async () => {
     const user=await account(100);
     const results=await Promise.allSettled([
