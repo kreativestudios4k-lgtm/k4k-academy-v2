@@ -35,3 +35,9 @@
 - Do not remove existing customer access or alter balances as a rollback action.
 
 This is a rollout plan, not proof that any route, database migration, provider call or deployment is live.
+
+## Cohort and feedback implementation (preview only)
+- The server-side beta gate rejects any allowlist exceeding **10 distinct valid UUIDs**; do not turn on beta or E2E verification flags until the generator passes release gates.
+- `validateCreatorFeedback` accepts only `bug`, `quality`, `workflow`, `suggestion`, requires a 10–2000-character message, and optionally a UUID job reference.
+- **Not yet wired:** feedback HTTP endpoint, server-verified session, per-user job ownership, durable feedback storage, admin moderation, rate limiting and consent. Do not accept user-provided `userId` or treat a submitted `jobId` as proof of ownership.
+- When wiring persistence, require a signed-in invited creator; derive identity from the server session, verify job ownership, rate-limit, and use owner-scoped RLS policies. Do not create a live feedback table without separate review.
