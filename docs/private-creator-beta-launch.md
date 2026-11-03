@@ -49,3 +49,10 @@ This is a rollout plan, not proof that any route, database migration, provider c
 - The RLS SQL proposal is at `db/proposals/creator-beta-feedback.sql`, **not applied**. It intentionally permits only null job IDs until job ownership checks are implemented.
 - Before enabling: confirm deployed env key names, apply reviewed migration to a **disposable preview database**, add distributed rate limiting, test RLS cross-user isolation and actual insert with creator session. Until then the endpoint should remain disabled.
 - No email invites are sent, no public creator onboarding is activated, no Stripe or affiliate changes.
+
+## Creator-facing preview UI
+- Feedback page: `/creator-beta/feedback`, linked from `/k4k-app`.
+- Browser obtains a Supabase access token from the current client session, sends it to the API; server verifies it independently with `auth.getUser`.
+- The feedback form handles non-invited, unauthenticated and disabled states without promising submission.
+- No invitation emails, invite acceptance UI, actual cohort enrollment or creator feedback storage is live. Preview deploy and build remain unverified.
+- Before rollout, verify the application's configured Supabase publishable/anon key variable names, check preview-only database RLS, add server-side distributed rate limits, and test a signed-in invited account plus a non-invited account.
