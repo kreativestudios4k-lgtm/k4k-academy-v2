@@ -21,3 +21,21 @@ create policy k4k_creator_beta_feedback_select_own on public.k4k_creator_beta_fe
  for select to authenticated using ((select auth.uid())=user_id);
 -- Non-null job references intentionally blocked until server-side ownership verification exists.
 -- Rate-limit feedback at the API gateway before enabling this route.
+
+-- Per-creator write cap: reject more than 5 submissions per rolling hour.
+-- Security definer is deliberately avoided; this check runs as invoker under RLS.
+create or replace function public.k4k_creator_feedback_limit()
+returns trigger language plpgsql security invoker set search_path = public as $$
+begin
+ if (select count(*) from public.k4k_creator_beta_feedback
+     where user_id = new.user_id and created_at > now() - interval '1 hour') >= 5 then
+   raise exception 'Feedback rate limit exceeded' using errcode = 'P0001';
+ end if;
+ return new;
+end;
+$$;
+revoke all on function public.k4k_creator_feedback_limit() from public, anon, authenticated;
+drop trigger if exists k4k_creator_feedback_limit_trigger on public.k4k_creator_beta_feedback;
+create trigger k4k_creator_feedback_limit_trigger before insert on public.k4k_creator_beta_feedback
+for each row execute function public.k4k_creator_feedback_limit();
+-- For production-grade concurrency and anti-spam, also use gateway rate limiting.
