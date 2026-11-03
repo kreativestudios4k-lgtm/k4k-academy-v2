@@ -179,6 +179,25 @@ test('atomic credit ledger: real concurrent PostgreSQL connections', {
     assert.equal(await ledgerCount(user,'reserve'),1);
   });
 
+  await t.test('provider attachment rejects malformed or mismatched handles without changing credits', async () => {
+    const user=await account(100),job=await reserve(user,randomUUID(),25);
+    await withService(c=>c.query(
+      'select public.k4k_generation_submitting($1::uuid,$2::uuid)',[user,job.id]
+    ));
+    for (const [providerId,statusUrl] of [
+      ['../invalid','https://api.higgsfield.ai/requests/../invalid/status'],
+      ['valid_handle','https://attacker.example/requests/valid_handle/status']
+    ]) {
+      await assert.rejects(withService(c=>c.query(
+        'select public.k4k_generation_attach($1::uuid,$2::uuid,$3::text,$4::text)',
+        [user,job.id,providerId,statusUrl]
+      )), /Invalid provider ID/);
+    }
+    assert.equal(await balance(user),75);
+    assert.equal(await ledgerCount(user,'reserve'),1);
+    assert.equal(await ledgerCount(user,'refund'),0);
+  });
+
   await t.test('wrong user cannot read another account job', async () => {
     const owner=await account(),stranger=await account();
     const job=await reserve(owner,randomUUID(),15);
