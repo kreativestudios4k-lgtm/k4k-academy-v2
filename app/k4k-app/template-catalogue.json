@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "mediaStatus": "partially-hosted",
+  "mediaStatus": "all-15-hosted",
   "topPerforming": [
     {
       "id": "top-001",
@@ -9,9 +9,10 @@
       "platform": "TikTok",
       "views": 12900000,
       "durationSeconds": 16.04,
-      "videoUrl": null,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/e25c789f-6f86-4a78-afad-c8af4df1bcd5.mp4",
       "posterUrl": null,
-      "audio": true
+      "audio": true,
+      "mediaId": "e25c789f-6f86-4a78-afad-c8af4df1bcd5"
     },
     {
       "id": "top-002",
@@ -20,9 +21,10 @@
       "platform": "TikTok",
       "views": 4500000,
       "durationSeconds": 28.05,
-      "videoUrl": null,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/0f38f9a0-be93-489a-893c-9cec4c18e421.mp4",
       "posterUrl": null,
-      "audio": true
+      "audio": true,
+      "mediaId": "0f38f9a0-be93-489a-893c-9cec4c18e421"
     },
     {
       "id": "top-003",
@@ -31,9 +33,10 @@
       "platform": "Instagram",
       "views": 2210238,
       "durationSeconds": 10,
-      "videoUrl": null,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/74d44c03-479c-46e7-ae82-d524372c1c87.mp4",
       "posterUrl": null,
-      "audio": true
+      "audio": true,
+      "mediaId": "74d44c03-479c-46e7-ae82-d524372c1c87"
     }
   ],
   "trending": [
