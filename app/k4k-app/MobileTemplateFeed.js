@@ -11,7 +11,8 @@ const templates=[
  {name:'Press Room',description:'Your character in the headlines.',people:1,seconds:null,tag:'TRENDING'},
  {name:'Metro Entrance',description:'Own the entrance.',people:1,seconds:null,tag:'NEW'},
  {name:'The Meeting',description:'The viral meeting that reached 2.2M Instagram views.',people:3,seconds:10,tag:'2.2M VIEWS',instagramViews:2210238},
- {name:'Training Ground',description:'Your next viral sports moment.',people:1,seconds:null,tag:'NEW'}
+ {name:'Training Ground',description:'Your next viral sports moment.',people:1,seconds:null,tag:'NEW'},
+ {name:'Raidance',description:'A viral dance moment with 4.5M TikTok views.',people:1,seconds:28.05,tag:'4.5M VIEWS',tiktokViews:4500000}
 ];
 export default function MobileTemplateFeed(){
  const [active,setActive]=useState(0),[muted,setMuted]=useState(true),[showInfo,setShowInfo]=useState(false);
