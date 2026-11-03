@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '../../../../lib/supabase/server';
 import {getPlan} from '../../../../lib/k4k-app-pricing.mjs';
+import {isExpectedStripeTestPrice,isSafeStripeTestCheckoutSession} from '../../../../lib/server/stripe-preview-guard.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const disabled=()=>NextResponse.json({error:'Preview checkout is disabled.'},{status:503,headers:{'Cache-Control':'no-store'}});
@@ -25,7 +26,20 @@ export async function POST(request){
  const plan=getPlan(body?.planId);
  if(!plan)return NextResponse.json({error:'Unknown plan'},{status:400});
  const priceId=process.env['K4K_STRIPE_TEST_PRICE_'+plan.id.toUpperCase()];
- if(!priceId?.startsWith('price_'))return disabled();
+ if(typeof priceId!=='string'||!/^price_[A-Za-z0-9]+$/.test(priceId))return disabled();
+
+ // Fail closed on test-price misconfiguration: verify the actual Stripe object
+ // matches the selected plan, currency, amount, interval and non-metered billing.
+ let priceResponse,price;
+ try{
+  priceResponse=await fetch('https://api.stripe.com/v1/prices/'+encodeURIComponent(priceId),{
+   headers:{Authorization:'Bearer '+key},cache:'no-store',signal:AbortSignal.timeout(8000)
+  });
+  if(!priceResponse.ok)return disabled();
+  price=await priceResponse.json();
+ }catch{return NextResponse.json({error:'Test price verification unavailable'},{status:502,headers:{'Cache-Control':'no-store'}});}
+ if(!isExpectedStripeTestPrice(price,plan,priceId))return disabled();
+
  const form=new URLSearchParams({
   mode:'subscription','line_items[0][price]':priceId,'line_items[0][quantity]':'1',
   client_reference_id:user.id,
@@ -35,10 +49,10 @@ export async function POST(request){
   cancel_url:baseUrl.origin+'/pricing?preview_checkout=cancel'
  });
  let response;
- try{response=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/x-www-form-urlencoded'},body:form.toString(),cache:'no-store'});}
- catch{return NextResponse.json({error:'Test checkout unavailable'},{status:502});}
- if(!response.ok)return NextResponse.json({error:'Test checkout unavailable'},{status:502});
+ try{response=await fetch('https://api.stripe.com/v1/checkout/sessions',{method:'POST',headers:{Authorization:'Bearer '+key,'Content-Type':'application/x-www-form-urlencoded'},body:form.toString(),cache:'no-store',signal:AbortSignal.timeout(8000)});}
+ catch{return NextResponse.json({error:'Test checkout unavailable'},{status:502,headers:{'Cache-Control':'no-store'}});}
+ if(!response.ok)return NextResponse.json({error:'Test checkout unavailable'},{status:502,headers:{'Cache-Control':'no-store'}});
  const session=await response.json();
- if(typeof session.url!=='string'||!session.url.startsWith('https://checkout.stripe.com/'))return NextResponse.json({error:'Invalid checkout response'},{status:502});
+ if(!isSafeStripeTestCheckoutSession(session))return NextResponse.json({error:'Invalid checkout response'},{status:502,headers:{'Cache-Control':'no-store'}});
  return NextResponse.json({url:session.url,mode:'test'},{headers:{'Cache-Control':'no-store'}});
 }
