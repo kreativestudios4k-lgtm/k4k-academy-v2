@@ -25,7 +25,7 @@ export default function ComingSoon(){return <main style={{minHeight:'100vh',back
    <div><h2 style={{fontSize:30,margin:'0 0 12px'}}>Squad anthem</h2>
     <p style={{color:'#c2bfd2',lineHeight:1.7}}>A viral group-video remix template. Watch the example now; character replacement and AI video generation are coming soon.</p>
     <p style={{color:'#bbaeff',fontWeight:700}}>COMING SOON · GENERATION DISABLED</p>
-    <Link href="/k4k-app" style={{color:'#ded6ff'}}>Browse current template previews →</Link>
+    <Link href="/create?template=0" style={{color:'#ded6ff'}}>Open creator workspace preview →</Link>
    </div>
   </div>
  </section>
