@@ -22,6 +22,6 @@ export default function MobileTemplateFeed(){
  <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.category==='Top Performing'?'TOP VIEWED':'TRENDING'}</span><h2>{item.title}</h2><p>{item.views?`${prettyViews(item.views)} ${item.platform} views`:'Trending video reference'}</p><div className="k4k-feed-meta">{item.durationSeconds?item.durationSeconds+'s · ':''}K4K Motion template</div><Link className="k4k-feed-cta" href="/create">✦ Explore K4K Motion</Link></div>
  </section>)}
  </div>
- <nav className="k4k-feed-nav" aria-label="Navigation"><Link href="/k4k-app" className="selected"><span>⌂</span>Home</Link><Link href="/create"><span>▦</span>Videos</Link><Link className="k4k-feed-create" href="/create"><span>✦</span>Create</Link><Link href="/creator-beta/pricing"><span>◎</span>Credits</Link><Link href="/academy"><span>♙</span>Login</Link></nav>
+ <nav className="k4k-feed-nav" aria-label="Navigation"><Link href="/k4k-app" className="selected"><span>⌂</span>Home</Link><Link href="/k4k-app/videos"><span>▦</span>Videos</Link><Link className="k4k-feed-create" href="/k4k-app/creator"><span>✦</span>Creator</Link><Link href="/k4k-app/credits"><span>◎</span>Credits</Link><Link href="/k4k-app/account"><span>♙</span>Account</Link></nav>
  </div>;
 }
