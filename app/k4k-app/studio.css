@@ -46,3 +46,33 @@
  .k4k-feed-pill{font-size:10px;margin-bottom:8px}
  .k4k-feed-info{left:15px;right:15px;top:28%;max-width:none}
 }
+
+/* Editorial desktop wings framing the centered portrait feed. */
+.k4k-desktop-rail{display:none}
+@media(min-width:1100px){
+ .k4k-mobile-feed{background:radial-gradient(ellipse at 12% 38%,#283319 0%,transparent 36%),radial-gradient(ellipse at 90% 62%,#1c2715 0%,transparent 34%),#080a09}
+ .k4k-desktop-rail{display:flex;position:absolute;z-index:3;top:12%;bottom:115px;width:calc((100vw - 460px)/2 - 55px);max-width:380px;flex-direction:column;color:#f4f7ed;pointer-events:auto}
+ .k4k-desktop-rail-left{left:max(25px,calc((100vw - 460px)/4 - 175px));justify-content:center}
+ .k4k-desktop-rail-right{right:max(25px,calc((100vw - 460px)/4 - 175px));justify-content:center}
+ .k4k-rail-eyebrow{font-size:10px;letter-spacing:2.2px;font-weight:800;color:#dfff38;margin-bottom:23px}
+ .k4k-desktop-rail h2{font-size:clamp(29px,3vw,51px);letter-spacing:-2px;line-height:1.02;margin:0 0 20px;font-weight:900}
+ .k4k-desktop-rail h2 em{font-style:normal;color:#dfff38}
+ .k4k-desktop-rail p{color:#adb6a7;font-size:13px;line-height:1.8;max-width:290px}
+ .k4k-rail-line{height:1px;background:linear-gradient(90deg,#dfff38,#ffffff15);margin:24px 0;max-width:270px}
+ .k4k-rail-label{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#d1d7c9;margin:8px 0}
+ .k4k-rail-link{color:#dfff38;text-decoration:none;font-size:13px;font-weight:800;margin-top:26px}
+ .k4k-rail-feature{display:flex;gap:15px;padding:18px 0;border-bottom:1px solid #ffffff24;align-items:center}
+ .k4k-rail-feature>span{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid #dfff3860;border-radius:12px;color:#dfff38;font-size:22px}
+ .k4k-rail-feature strong{display:block;font-size:12px;letter-spacing:1px}
+ .k4k-rail-feature small{display:block;color:#a7b09f;font-size:11px;margin-top:6px}
+ .k4k-rail-invite{margin-top:26px;border:1px solid #dfff3840;border-radius:17px;padding:20px;background:#dfff380b}
+ .k4k-rail-invite strong{font-size:12px;letter-spacing:1px;color:#dfff38}
+ .k4k-rail-invite p{margin:8px 0 15px}
+ .k4k-rail-invite a{color:#dfff38;font-size:12px;font-weight:800;text-decoration:none}
+}
+@media(min-width:1100px) and (max-width:1350px){
+ .k4k-desktop-rail{width:calc((100vw - 460px)/2 - 55px)}
+ .k4k-desktop-rail-left{left:25px}
+ .k4k-desktop-rail-right{right:25px}
+ .k4k-desktop-rail h2{font-size:32px}
+}
