@@ -28,7 +28,7 @@ export default function TemplateCreator({template}){
  <Link className="k4k-recreate-upgrade" href="/k4k-app/credits">✦ Credits</Link>
  <button type="button" className="k4k-recreate-sound" onClick={()=>setSound(v=>!v)} aria-label={sound?'Mute':'Unmute'}>{sound?'🔊':'🔇'}</button></div>
  <section className="k4k-recreate-panel"><div className="k4k-recreate-handle"/>
- <header><span>ⓘ</span><div><h1>Recreate this video</h1><p>{template.title} · K4K Motion</p></div><Link href="/k4k-app">✕</Link></header>
+ <header><span>ⓘ</span><div><h1>Recreate this video</h1><p>{template.title} · K4K APP</p></div><Link href="/k4k-app">✕</Link></header>
  <p className="k4k-recreate-instructions">Upload a photo for each person you want to replace. Add as many character slots as you need; people you don't select should remain unchanged.</p>
  <div className="k4k-recreate-slots">{characters.map((c,i)=><div className="k4k-recreate-slot" key={c.id}>
  {c.photo?<><img src={c.photo.url} alt={`Replacement character ${i+1}`}/><button type="button" className="k4k-recreate-remove" onClick={()=>removePhoto(c.id)} aria-label={`Remove photo ${i+1}`}>✕</button><span>Character {i+1}</span></>:<label><input type="file" accept="image/*" onChange={e=>choose(e,c.id)}/><strong>＋</strong><span>Photo {i+1}</span></label>}
