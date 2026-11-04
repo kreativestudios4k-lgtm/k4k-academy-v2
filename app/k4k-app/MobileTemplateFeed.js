@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import catalogue from './template-catalogue.json';
-import {useK4KLocale,LanguageSwitcher,labels} from './locale';
+import {useK4KLocale,labels} from './locale';
 const items=[...catalogue.topPerforming.map(x=>({...x,category:'Top Performing'})),...catalogue.trending.map(x=>({...x,category:'Trending Now'}))];
 const prettyViews=n=>n>=1000000?(n/1000000).toFixed(1).replace(/\\.0$/,'')+'M':n.toLocaleString('en-GB');
 export default function MobileTemplateFeed(){const {locale}=useK4KLocale();const tr=labels[locale]||labels.en;
@@ -13,7 +13,7 @@ export default function MobileTemplateFeed(){const {locale}=useK4KLocale();const
  function selectFilter(value){setFilter(value);setActive(0);setShowInfo(false);if(scroller.current)scroller.current.scrollTop=0;}
  function onScroll(event){const el=event.currentTarget;const index=Math.max(0,Math.min(visible.length-1,Math.round(el.scrollTop/el.clientHeight)));if(index!==active){setActive(index);setShowInfo(false);}}
  return <div className="k4k-mobile-feed">
- <header className="k4k-feed-top"><Link href="/k4k-app" className="k4k-feed-brand">✦ K4K <b>APP</b></Link><div className="k4k-feed-tabs"><button type="button" className={filter==='Trending Now'?'is-active':''} onClick={()=>selectFilter('Trending Now')}>{tr.Trending}</button><button type="button" className={filter==='Top Performing'?'is-active':''} onClick={()=>selectFilter('Top Performing')}>{tr.Top}</button><button type="button" className={filter==='All'?'is-active':''} onClick={()=>selectFilter('All')}>{tr.All}</button></div><LanguageSwitcher/></header>
+ <header className="k4k-feed-top"><Link href="/k4k-app" className="k4k-feed-brand">✦ K4K <b>APP</b></Link><div className="k4k-feed-tabs"><button type="button" className={filter==='Trending Now'?'is-active':''} onClick={()=>selectFilter('Trending Now')}>{tr.Trending}</button><button type="button" className={filter==='Top Performing'?'is-active':''} onClick={()=>selectFilter('Top Performing')}>{tr.Top}</button><button type="button" className={filter==='All'?'is-active':''} onClick={()=>selectFilter('All')}>{tr.All}</button></div></header>
  <div className="k4k-feed-scroll" ref={scroller} onScroll={onScroll}>
  {visible.map((item,index)=><section className="k4k-feed-slide" key={item.id}>
  {item.videoUrl?<video ref={el=>{videos.current[index]=el}} className="k4k-feed-video" onClick={e=>{e.currentTarget.muted=false;setMuted(false);e.currentTarget.play().catch(()=>{});}} poster={item.posterUrl||undefined} src={item.videoUrl} autoPlay={index===0} muted={muted} loop playsInline preload={index<2?'metadata':'none'} aria-label={item.title}/>:<div className="k4k-feed-pending"><span>✦</span><strong>{item.title}</strong><small>Video preview being prepared</small></div>}
