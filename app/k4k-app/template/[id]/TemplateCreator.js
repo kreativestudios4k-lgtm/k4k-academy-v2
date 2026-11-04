@@ -12,17 +12,17 @@ export default function TemplateCreator({template}){
  useEffect(()=>{if(video.current)video.current.muted=!sound},[sound]);
  function choose(e,id){
   const file=e.target.files?.[0];if(!file)return;
-  if(!file.type.startsWith('image/')){alert('Select an image.');return}
+  if(!['image/png','image/jpeg','image/webp'].includes(file.type)){alert('Select an image.');return}
   if(file.size>10*1024*1024){alert('Choose an image under 10 MB.');return}
   const url=URL.createObjectURL(file);objectUrls.current.add(url);
-  setCharacters(prev=>prev.map(c=>c.id===id?{...c,photo:{url,name:file.name}}:c));
+  setCharacters(prev=>prev.map(c=>{if(c.id!==id)return c;if(c.photo?.url){URL.revokeObjectURL(c.photo.url);objectUrls.current.delete(c.photo.url)}return {...c,photo:{url,name:file.name}}}));
   e.target.value='';
  }
- function removePhoto(id){setCharacters(prev=>prev.map(c=>c.id===id?{...c,photo:null}:c))}
- function addCharacter(){setCharacters(prev=>[...prev,{id:nextId.current++,photo:null}])}
+ function removePhoto(id){setCharacters(prev=>prev.map(c=>{if(c.id!==id)return c;if(c.photo?.url){URL.revokeObjectURL(c.photo.url);objectUrls.current.delete(c.photo.url)}return {...c,photo:null,target:null}}))}
+ function addCharacter(){setCharacters(prev=>prev.length>=30?prev:[...prev,{id:nextId.current++,photo:null}])}
  function startMapping(id){setSelectedId(id);setMapping(true);video.current?.pause()}
  function markPerson(event){if(!mapping)return;const bounds=event.currentTarget.getBoundingClientRect();const x=Math.round((event.clientX-bounds.left)/bounds.width*100);const y=Math.round((event.clientY-bounds.top)/bounds.height*100);const timestamp=video.current?.currentTime||0;setCharacters(prev=>prev.map(c=>c.id===selectedId?{...c,target:{x,y,timestamp}}:c));setMapping(false)}
- function removeCharacter(id){setCharacters(prev=>prev.length>1?prev.filter(c=>c.id!==id):prev)}
+ function removeCharacter(id){setCharacters(prev=>{if(prev.length<=1)return prev;const removed=prev.find(c=>c.id===id);if(removed?.photo?.url){URL.revokeObjectURL(removed.photo.url);objectUrls.current.delete(removed.photo.url)}return prev.filter(c=>c.id!==id)})}
  const filled=characters.filter(c=>c.photo).length;
  const estimate=model==='wan'?Math.ceil(duration*2):model==='light'?Math.ceil(duration*6):Math.ceil(duration*19);
  const supported=model==='wan'||(model==='light'&&duration<=15)||(model==='genjutsu'&&duration>=5);
@@ -40,7 +40,7 @@ export default function TemplateCreator({template}){
  <button type="button" className="k4k-recreate-map-button" onClick={()=>startMapping(c.id)}>{c.target?'✓ Person marked · Change':'◎ Select person in video'}</button>
  {characters.length>1&&<button type="button" className="k4k-recreate-delete-slot" onClick={()=>removeCharacter(c.id)} aria-label={`Delete character slot ${i+1}`}>Remove slot</button>}
  </div>)}
- <button type="button" className="k4k-recreate-add-slot" onClick={addCharacter}><strong>＋</strong><span>Add character</span></button>
+ <button type="button" className="k4k-recreate-add-slot" onClick={addCharacter} disabled={characters.length>=30}><strong>＋</strong><span>{characters.length>=30?'30 character limit reached':'Add character'}</span></button>
  </div>
  <p className="k4k-recreate-instructions">Pause and mark each person directly on the video. This saves a reference point for the future AI mapping engine; it does not track movement yet.</p><p className="k4k-recreate-count">{filled} replacement {filled===1?'photo':'photos'} selected · {characters.length} {characters.length===1?'slot':'slots'}</p>
  <div className="k4k-recreate-quote"><label>Video duration <strong>{duration} seconds</strong><input type="range" min="3" max="30" step="1" value={duration} onChange={e=>setDuration(Number(e.target.value))}/></label><label>Generation model <select value={model} onChange={e=>setModel(e.target.value)}><option value="wan">Wan — general video</option><option value="light">Genjutsu Light — character replacement</option><option value="genjutsu">Genjutsu — premium replacement</option></select></label><strong>{supported?`${estimate} estimated K4K credits`:'Duration not supported by this model'}</strong><small>Planning estimate only. No live provider quote, credit reservation or paid generation. A compatible model must be confirmed for the chosen duration.</small>{filled>0&&!allMapped&&<small>Mark each uploaded character in the video before generating.</small>}</div>
