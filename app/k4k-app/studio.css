@@ -24,3 +24,25 @@
 
 /* Catalog feed states, including uploaded-but-not-hosted originals */
 .k4k-feed-tabs button{appearance:none;background:transparent;border:0;color:#ffffffb8;font:inherit;font-size:inherit;font-weight:inherit;cursor:pointer;padding:0}.k4k-feed-tabs button.is-active{color:#fff}.k4k-feed-pending{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:15px;text-align:center;padding:25px;background:radial-gradient(ellipse at 50% 40%,#3c4b1e 0%,#1a2116 30%,#080b09 75%)}.k4k-feed-pending>span{font-size:90px;color:#dfff38;filter:drop-shadow(0 0 32px #c4ff2c60)}.k4k-feed-pending strong{font-size:clamp(32px,5vw,60px);letter-spacing:-2px}.k4k-feed-pending small{font-size:14px;color:#c3c8bd}.k4k-feed-tabs{gap:22px!important}.k4k-feed-top{gap:15px}.k4k-feed-actions button:focus-visible,.k4k-feed-tabs button:focus-visible{outline:2px solid #dfff38;outline-offset:5px}@media(max-width:700px){.k4k-feed-tabs{font-size:14px;gap:20px!important}.k4k-feed-pending>span{font-size:68px}}
+
+
+/* Desktop discovery: portrait TikTok frame, never stretch source video across monitor. */
+@media(min-width:701px){
+ .k4k-mobile-feed{background:#090b0a}
+ .k4k-feed-scroll{max-width:460px;margin:0 auto;border-left:1px solid #ffffff18;border-right:1px solid #ffffff18;background:#080a09}
+ .k4k-feed-slide{width:100%;isolation:isolate}
+ .k4k-feed-video{object-fit:contain;background:#080a09}
+ .k4k-feed-shade{background:linear-gradient(180deg,#0008 0%,transparent 27%,#0002 48%,#000d 100%)}
+ .k4k-feed-top{left:50%;right:auto;width:min(460px,100%);transform:translateX(-50%);padding:20px 15px;flex-direction:column;justify-content:flex-start;gap:13px}
+ .k4k-feed-brand{font-size:25px}
+ .k4k-feed-tabs{font-size:14px}
+ .k4k-feed-actions{right:12px;bottom:250px}
+ .k4k-feed-actions button{width:48px;min-height:48px;font-size:25px}
+ .k4k-feed-bottom{left:17px;right:17px;bottom:15px;max-width:none}
+ .k4k-feed-bottom h2{font-size:clamp(30px,3vw,43px);letter-spacing:-1.4px;margin:5px 0 8px}
+ .k4k-feed-bottom p{font-size:13px;margin-bottom:5px}
+ .k4k-feed-meta{font-size:12px;margin-bottom:12px}
+ .k4k-feed-cta{max-width:none;min-height:54px;font-size:16px}
+ .k4k-feed-pill{font-size:10px;margin-bottom:8px}
+ .k4k-feed-info{left:15px;right:15px;top:28%;max-width:none}
+}
