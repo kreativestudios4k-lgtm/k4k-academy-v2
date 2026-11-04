@@ -5,7 +5,7 @@ import './template.css';
 export default function TemplateCreator({template}){
  const nextId=useRef(1);
  const [characters,setCharacters]=useState([{id:0,photo:null}]);
- const [sound,setSound]=useState(false);
+ const [sound,setSound]=useState(false);const [mapping,setMapping]=useState(false);const [selectedId,setSelectedId]=useState(0);
  const video=useRef(null);
  const objectUrls=useRef(new Set());
  useEffect(()=>()=>{objectUrls.current.forEach(url=>URL.revokeObjectURL(url));objectUrls.current.clear()},[]);
@@ -20,10 +20,12 @@ export default function TemplateCreator({template}){
  }
  function removePhoto(id){setCharacters(prev=>prev.map(c=>c.id===id?{...c,photo:null}:c))}
  function addCharacter(){setCharacters(prev=>[...prev,{id:nextId.current++,photo:null}])}
+ function startMapping(id){setSelectedId(id);setMapping(true);video.current?.pause()}
+ function markPerson(event){if(!mapping)return;const bounds=event.currentTarget.getBoundingClientRect();const x=Math.round((event.clientX-bounds.left)/bounds.width*100);const y=Math.round((event.clientY-bounds.top)/bounds.height*100);const timestamp=video.current?.currentTime||0;setCharacters(prev=>prev.map(c=>c.id===selectedId?{...c,target:{x,y,timestamp}}:c));setMapping(false)}
  function removeCharacter(id){setCharacters(prev=>prev.length>1?prev.filter(c=>c.id!==id):prev)}
  const filled=characters.filter(c=>c.photo).length;
  return <main className="k4k-recreate">
- <div className="k4k-recreate-video">{template.videoUrl&&<video ref={video} src={template.videoUrl} playsInline autoPlay loop muted controls={false}/>}
+ <div className="k4k-recreate-video">{template.videoUrl&&<video ref={video} src={template.videoUrl} playsInline autoPlay loop muted controls={false}/>}<div className={mapping?'k4k-recreate-mark-area is-mapping':'k4k-recreate-mark-area'} onClick={markPerson}>{characters.filter(c=>c.target).map((c,i)=><span key={c.id} className="k4k-recreate-marker" style={{left:c.target.x+'%',top:c.target.y+'%'}}>{characters.findIndex(item=>item.id===c.id)+1}</span>)}{mapping&&<span className="k4k-recreate-mark-help">Tap the person you want to replace</span>}</div>
  <Link className="k4k-recreate-back" href="/k4k-app" aria-label="Back">‹</Link>
  <Link className="k4k-recreate-upgrade" href="/k4k-app/credits">✦ Credits</Link>
  <button type="button" className="k4k-recreate-sound" onClick={()=>setSound(v=>!v)} aria-label={sound?'Mute':'Unmute'}>{sound?'🔊':'🔇'}</button></div>
@@ -32,12 +34,13 @@ export default function TemplateCreator({template}){
  <p className="k4k-recreate-instructions">Upload a photo for each person you want to replace. Add as many character slots as you need; people you don't select should remain unchanged.</p>
  <div className="k4k-recreate-slots">{characters.map((c,i)=><div className="k4k-recreate-slot" key={c.id}>
  {c.photo?<><img src={c.photo.url} alt={`Replacement character ${i+1}`}/><button type="button" className="k4k-recreate-remove" onClick={()=>removePhoto(c.id)} aria-label={`Remove photo ${i+1}`}>✕</button><span>Character {i+1}</span></>:<label><input type="file" accept="image/*" onChange={e=>choose(e,c.id)}/><strong>＋</strong><span>Photo {i+1}</span></label>}
+ <button type="button" className="k4k-recreate-map-button" onClick={()=>startMapping(c.id)}>{c.target?'✓ Person marked · Change':'◎ Select person in video'}</button>
  {characters.length>1&&<button type="button" className="k4k-recreate-delete-slot" onClick={()=>removeCharacter(c.id)} aria-label={`Delete character slot ${i+1}`}>Remove slot</button>}
  </div>)}
  <button type="button" className="k4k-recreate-add-slot" onClick={addCharacter}><strong>＋</strong><span>Add character</span></button>
  </div>
- <p className="k4k-recreate-count">{filled} replacement {filled===1?'photo':'photos'} selected · {characters.length} {characters.length===1?'slot':'slots'}</p>
+ <p className="k4k-recreate-instructions">Pause and mark each person directly on the video. This saves a reference point for the future AI mapping engine; it does not track movement yet.</p><p className="k4k-recreate-count">{filled} replacement {filled===1?'photo':'photos'} selected · {characters.length} {characters.length===1?'slot':'slots'}</p>
  <button type="button" className="k4k-recreate-generate" disabled title="Generation is disabled in preview">{filled===0?'Upload a photo to begin':'Generation coming soon'}</button>
- <p className="k4k-recreate-notice">Character-to-person mapping and AI generation are not yet connected. Uploads stay in this browser session and are not submitted or charged.</p>
+ <p className="k4k-recreate-notice">Manual reference points are preview-only. Automatic tracking and AI generation are not connected. Uploads stay in this browser session and are not submitted or charged.</p>
  </section></main>
 }
