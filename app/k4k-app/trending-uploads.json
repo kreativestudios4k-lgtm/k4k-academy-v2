@@ -1,0 +1,90 @@
+{
+  "status": "media-upload-pending",
+  "collection": "Trending Now",
+  "videos": [
+    {
+      "id": "trending-001",
+      "title": "Bad Boyz",
+      "sourceFilename": "TUTORIAL 👇🏻1) Open site higgsfield.ai on your browser2) Find Genjutsu 3) Upload your original .mp4",
+      "durationSeconds": 27.03,
+      "audio": true
+    },
+    {
+      "id": "trending-002",
+      "title": "Brazil Dance",
+      "sourceFilename": "É domingo em 😮‍💨 #trend #política #reel #fy.mp4",
+      "durationSeconds": 15.7,
+      "audio": true
+    },
+    {
+      "id": "trending-003",
+      "title": "Stromae",
+      "sourceFilename": "higgsfield-a92cd010-4099-42d7-8cb9-0590be76e3a3(1).mp4",
+      "durationSeconds": 29.04,
+      "audio": true
+    },
+    {
+      "id": "trending-004",
+      "title": "Ozil",
+      "sourceFilename": "higgsfield-c2c47089-1339-4940-b64a-81c019936e9f(1).mp4",
+      "durationSeconds": 15.04,
+      "audio": true
+    },
+    {
+      "id": "trending-005",
+      "title": "Fancy Coffee",
+      "sourceFilename": "POV- Your first time in a fancy cafe(2).mp4",
+      "durationSeconds": 21.1,
+      "audio": true
+    },
+    {
+      "id": "trending-006",
+      "title": "ChatGPT",
+      "sourceFilename": "export_1793730834399.mp4",
+      "durationSeconds": 12.05,
+      "audio": true
+    },
+    {
+      "id": "trending-007",
+      "title": "Burning Bridges",
+      "sourceFilename": "export_1793731990294(1).mp4",
+      "durationSeconds": 29.05,
+      "audio": true
+    },
+    {
+      "id": "trending-008",
+      "title": "Topo Gigio",
+      "sourceFilename": "B3B8E81C-DB6E-4F8B-96AB-11A93D87532D(1).mp4",
+      "durationSeconds": 11.03,
+      "audio": true
+    },
+    {
+      "id": "trending-009",
+      "title": "Yamal",
+      "sourceFilename": "v24044gl0000db7vq77og65km6k4spvg.mp4",
+      "durationSeconds": 15.05,
+      "audio": true
+    },
+    {
+      "id": "trending-010",
+      "title": "Arreiaaaa",
+      "sourceFilename": "El Clásico is about to begin and  Mbappé and Lamine Yamal are already fighting over the Ballon d(1).mp4",
+      "durationSeconds": 30.14,
+      "audio": true
+    },
+    {
+      "id": "trending-011",
+      "title": "Confz",
+      "sourceFilename": "Still confused how this happened 😵‍💫😂 #AI #louisthoreaux #thatchedatnight(1).mp4",
+      "durationSeconds": 25.2,
+      "audio": true
+    },
+    {
+      "id": "trending-012",
+      "title": "Berreta",
+      "sourceFilename": "higgsfield-6a45b403-6a0a-4c6e-84bc-0a8e5de85c09(2).mp4",
+      "durationSeconds": 30.04,
+      "audio": true
+    }
+  ]
+}
