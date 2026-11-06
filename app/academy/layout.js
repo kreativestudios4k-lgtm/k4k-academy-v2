@@ -16,7 +16,6 @@ export default function AcademyLayout({children}) {
    <nav aria-label="Member area" style={navStyle}>
     <Link href="/academy">ACADEMY</Link>
     <Link href="/academy/updates">UPDATES</Link>
-    <Link href="/academy/affiliate">AFFILIATE</Link>
    </nav>
    {children}
   </>
