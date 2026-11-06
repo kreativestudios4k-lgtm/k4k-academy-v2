@@ -7,6 +7,7 @@ This test intentionally creates an isolated schema and disposable users/jobs rat
 touching existing auth.users, customer balances, or real provider calls.
 """
 import os, sys, uuid
+from urllib.parse import urlsplit, unquote
 from concurrent.futures import ThreadPoolExecutor
 try:
     import psycopg
@@ -15,9 +16,18 @@ except ImportError:
 
 url = os.getenv("K4K_TEST_DATABASE_URL")
 if not url:
-    sys.exit("SKIPPED (NOT PASSED): K4K_TEST_DATABASE_URL not set")
+    sys.exit("BLOCKED (NOT PASSED): K4K_TEST_DATABASE_URL not set")
 if os.getenv("K4K_DISPOSABLE_DATABASE_CONFIRMED") != "YES":
     sys.exit("BLOCKED: set K4K_DISPOSABLE_DATABASE_CONFIRMED=YES after verifying the target is disposable")
+# Refuse shared/production-looking endpoints even if confirmation was accidentally set.
+# The database name must be purpose-created and the host must be local.
+parsed = urlsplit(url)
+db_name = unquote(parsed.path.lstrip("/"))
+host = (parsed.hostname or "").lower()
+if parsed.scheme not in ("postgres", "postgresql") or not db_name.startswith("k4k_test_"):
+    sys.exit("BLOCKED: database must be explicitly named k4k_test_*")
+if host not in ("localhost", "127.0.0.1", "::1"):
+    sys.exit("BLOCKED: only a local disposable PostgreSQL host is allowed")
 schema = "k4k_test_" + uuid.uuid4().hex[:12]
 with psycopg.connect(url, autocommit=True) as conn:
     conn.execute(f'CREATE SCHEMA "{schema}"')
