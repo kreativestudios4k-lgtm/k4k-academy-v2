@@ -60,7 +60,7 @@ function CreatorArt({features,t}){
    </defs>
    <image href={image} x="0" y="0" width="1280" height="1600" clipPath="url(#k4k3d-person-clip)" mask="url(#k4k3d-subject-fade)"/>
   </svg>
-  <div className="k4k3d-orbit-tag k4k3d-tag-top" aria-hidden="true"><Sparkles size={15}/> K4K · 4K</div>
+  <div className="k4k3d-orbit-tag k4k3d-tag-top" aria-hidden="true"><Sparkles size={15}/> K4K {'·'} 4K</div>
   <div className="k4k3d-floating-card k4k3d-float-one"><Clapperboard size={19}/><span>{features[0]}</span><span className="k4k3d-card-indicator"/></div>
   <div className="k4k3d-floating-card k4k3d-float-two"><Layers3 size={19}/><span>{features[1]}</span><span className="k4k3d-card-indicator"/></div>
   <div className="k4k3d-floating-card k4k3d-float-three"><ScanFace size={19}/><span>{features[2]}</span><span className="k4k3d-card-indicator"/></div>
@@ -133,7 +133,7 @@ export default function ImmersiveHero({locale='en',pricing,checkout,promotionAct
      <CreatorArt features={t.features} t={t}/>
     </div>
    </div>
-   <div className="k4k3d-endline"><span className="k4k3d-end-mark">✳</span><span>{t.hint}</span><span className="k4k3d-end-spacer"/><span>KREATIVESTUDIOS4K.COM</span><MousePointer2 size={14}/></div>
+   <div className="k4k3d-endline"><span className="k4k3d-end-mark">{'✳'}</span><span>{t.hint}</span><span className="k4k3d-end-spacer"/><span>KREATIVESTUDIOS4K.COM</span><MousePointer2 size={14}/></div>
   </div>
  </section>;
 }
