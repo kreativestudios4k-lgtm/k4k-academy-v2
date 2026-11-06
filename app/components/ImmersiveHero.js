@@ -8,9 +8,9 @@ const image='/images/k4k-academy-carousel-sprite.webp';
 const content={
  eu:{
   lang:'en',eyebrow:'AI CREATIVE PRODUCTION / K4K ACADEMY',
-  first:'YOUR',second:'AI STYLE',third:'NEEDS A',fourth:'SYSTEM.',
-  description:'Learn to create original AI videos with real workflows, stronger prompts and consistent character references. Build the skill, not just the effect.',
-  features:['AI WORKFLOWS','PROMPT SYSTEMS','CHARACTER SHEETS','CREATOR STRATEGY'],
+  first:'YOUR AI VIDEO',second:'WITHOUT',third:'THE',fourth:'GUESSWORK.',
+  description:'Learn the exact workflows K4K uses for consistent characters, controlled prompts and finished AI video. Step by step, with copyable prompts you can use straight away.',
+  features:['CHARACTER SWAP','PROMPT VAULT','IDENTITY LOCK','CREATOR WORKFLOWS'],
   highlight:'INTRODUCTORY OFFER',saving:'70% OFF',period:'YOUR FIRST MONTH',
   regularLabel:'CREATOR MEMBERSHIP',
   code:'PROMO CODE',button:'JOIN K4K ACADEMY',
@@ -18,13 +18,13 @@ const content={
   expiry:'New paying customers only · Ends 28 October 2026',
   note:'Secure Stripe checkout. Enter K4K70 before paying. Final pricing, currency and renewal terms appear at checkout.',
   noPromoNote:'Secure Stripe checkout. Final pricing, currency and renewal terms appear at checkout.',
-  hint:'A creative process you can repeat',copied:'COPIED',visualLabel:'CREATIVE DIRECTION / IN MOTION'
+  hint:'Learn the method. Then repeat it.',copied:'COPIED',visualLabel:'CREATIVE DIRECTION / IN MOTION'
  },
  br:{
   lang:'pt-BR',eyebrow:'PRODUÇÃO CRIATIVA COM IA / K4K ACADEMY',
-  first:'SEU',second:'ESTILO IA',third:'PRECISA DE',fourth:'UM SISTEMA.',
-  description:'Aprenda a criar vídeos com IA usando workflows, prompts mais eficazes e referências consistentes de personagens. Desenvolva a técnica, não apenas o efeito.',
-  features:['WORKFLOWS DE IA','SISTEMAS DE PROMPTS','FICHAS DE PERSONAGEM','ESTRATÉGIA CRIATIVA'],
+  first:'SEU VÍDEO',second:'DE IA',third:'SEM',fourth:'ADIVINHAÇÃO.',
+  description:'Aprenda os fluxos que a K4K usa para personagens consistentes, prompts controlados e vídeos de IA finalizados. Passo a passo, com prompts prontos para copiar e usar agora.',
+  features:['SWAP DE PERSONAGEM','BIBLIOTECA DE PROMPTS','TRAVA DE IDENTIDADE','FLUXOS CRIATIVOS'],
   highlight:'OFERTA DE BOAS-VINDAS',saving:'70% OFF',period:'NO PRIMEIRO MÊS',
   regularLabel:'ASSINATURA MENSAL',
   code:'CÓDIGO PROMOCIONAL',button:'ENTRE PARA A ACADEMY',
@@ -32,7 +32,7 @@ const content={
   expiry:'Somente novos clientes · Até 28 de outubro de 2026',
   note:'Pagamento seguro pelo Stripe. Digite K4K70 antes de pagar. Confira preço, moeda e renovação no checkout.',
   noPromoNote:'Pagamento seguro pelo Stripe. Confira preço, moeda e renovação no checkout.',
-  hint:'Um processo criativo que você pode repetir',copied:'COPIADO',visualLabel:'DIREÇÃO CRIATIVA / EM MOVIMENTO'
+  hint:'Aprenda o método. Depois repita.',copied:'COPIADO',visualLabel:'DIREÇÃO CRIATIVA / EM MOVIMENTO'
  }
 };
 
