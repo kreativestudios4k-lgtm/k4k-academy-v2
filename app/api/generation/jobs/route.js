@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {createGenerationStore} from '../../../../lib/server/generation-store.mjs';
+import {createStudioReadStore} from '../../../../lib/server/studio-job-reader.mjs';
 import {getOwnedJobHistory} from '../../../../lib/server/generation-job-history.mjs';
 import {JobStatusError} from '../../../../lib/server/generation-job-status.mjs';
 
@@ -26,7 +26,7 @@ export async function GET(request) {
  }
 
  const {searchParams} = new URL(request.url);
- const store = createGenerationStore(
+ const store = createStudioReadStore(
   createClient(url, serviceKey, {auth: {persistSession: false, autoRefreshToken: false}})
  );
 
