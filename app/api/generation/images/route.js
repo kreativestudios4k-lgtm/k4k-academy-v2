@@ -5,7 +5,7 @@ import {quoteImage} from '../../../../lib/server/image-generation-pricing.mjs';
 export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
-const MODEL = 'gemini-3.1-flash-image';
+const MODEL = 'gemini-3.1-flash-image-preview';
 
 // Quote-only route. It does NOT call the provider, reserve credits or store images.
 // Generation stays off unless K4K_IMAGE_GENERATION_ENABLED=true, and that flag must

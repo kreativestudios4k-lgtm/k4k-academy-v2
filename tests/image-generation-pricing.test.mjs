@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {quoteImage} from '../lib/server/image-generation-pricing.mjs';
 
-const MODEL = 'gemini-3.1-flash-image';
+const MODEL = 'gemini-3.1-flash-image-preview';
 
 test('1K image with two reference photos costs one credit', () => {
   const q = quoteImage({model: MODEL, resolution: '1K', referenceImageCount: 2});
