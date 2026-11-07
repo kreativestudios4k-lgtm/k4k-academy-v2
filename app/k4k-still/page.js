@@ -6,6 +6,78 @@ import {MESSAGES, SUPPORTED_LOCALES, resolveLocale} from '../../lib/i18n/k4k-sti
 
 const LANGUAGE_LABELS = {en: 'EN', 'pt-BR': 'PT', es: 'ES'};
 const LOCALE_KEY = 'k4kStillLocale';
+const ASPECTS = ['9:16', '1:1', '16:9'];
+const DEFAULT_OPTIONS = {realism: true, candid: false, selfie: false, face: false, antiDistortion: true};
+
+// Labels for the controls added on top of the base page copy in lib/i18n/k4k-still.mjs.
+const LABELS = {
+  en: {
+    aspect: 'Aspect ratio',
+    aspectOptions: {'9:16': 'Vertical 9:16', '1:1': 'Square 1:1', '16:9': 'Horizontal 16:9'},
+    presets: 'Scene presets',
+    presetCafe: 'Simple café',
+    presetBeach: 'Beach at sunset',
+    presetStreet: 'Urban street',
+    presetCafeText: 'A relaxed café table by a window, natural daylight',
+    presetBeachText: 'A beach at sunset, soft warm light on the sand',
+    presetStreetText: 'A city street at dusk, shop lights and passing people',
+    options: 'Options',
+    realism: 'Natural colours and detail',
+    realismHint: 'True-to-life colour, no artificial boosting.',
+    candid: 'Candid moment',
+    candidHint: 'Relaxed, unposed, everyday framing.',
+    selfie: 'Selfie angle',
+    selfieHint: 'Front-facing with the arm extended, no lens distortion.',
+    face: 'Face detail',
+    faceHint: 'Sharp, natural facial features.',
+    antiDistortion: 'Structural accuracy',
+    antiDistortionHint: 'Correct perspective, limbs and backgrounds.',
+  },
+  'pt-BR': {
+    aspect: 'Proporção',
+    aspectOptions: {'9:16': 'Vertical 9:16', '1:1': 'Quadrado 1:1', '16:9': 'Horizontal 16:9'},
+    presets: 'Cenas prontas',
+    presetCafe: 'Café simples',
+    presetBeach: 'Praia ao pôr do sol',
+    presetStreet: 'Rua urbana',
+    presetCafeText: 'Uma mesa de café tranquila perto de uma janela, luz natural do dia',
+    presetBeachText: 'Uma praia ao pôr do sol, luz quente e suave sobre a areia',
+    presetStreetText: 'Uma rua da cidade ao entardecer, luzes de lojas e pessoas passando',
+    options: 'Opções',
+    realism: 'Cores e detalhes naturais',
+    realismHint: 'Cores fiéis à realidade, sem saturação artificial.',
+    candid: 'Momento espontâneo',
+    candidHint: 'Natural, sem pose, com enquadramento do dia a dia.',
+    selfie: 'Ângulo de selfie',
+    selfieHint: 'De frente, com o braço estendido, sem distorção de lente.',
+    face: 'Detalhes do rosto',
+    faceHint: 'Traços faciais nítidos e naturais.',
+    antiDistortion: 'Precisão estrutural',
+    antiDistortionHint: 'Perspectiva, membros e fundos corretos.',
+  },
+  es: {
+    aspect: 'Proporción',
+    aspectOptions: {'9:16': 'Vertical 9:16', '1:1': 'Cuadrado 1:1', '16:9': 'Horizontal 16:9'},
+    presets: 'Escenas rápidas',
+    presetCafe: 'Café sencillo',
+    presetBeach: 'Playa al atardecer',
+    presetStreet: 'Calle urbana',
+    presetCafeText: 'Una mesa de café tranquila junto a una ventana, luz natural del día',
+    presetBeachText: 'Una playa al atardecer, luz cálida y suave sobre la arena',
+    presetStreetText: 'Una calle de la ciudad al anochecer, luces de tiendas y gente que pasa',
+    options: 'Opciones',
+    realism: 'Colores y detalles naturales',
+    realismHint: 'Colores fieles a la realidad, sin saturación artificial.',
+    candid: 'Momento espontáneo',
+    candidHint: 'Natural, sin pose, con encuadre cotidiano.',
+    selfie: 'Ángulo de selfie',
+    selfieHint: 'De frente, con el brazo extendido, sin distorsión de lente.',
+    face: 'Detalle del rostro',
+    faceHint: 'Rasgos faciales nítidos y naturales.',
+    antiDistortion: 'Precisión estructural',
+    antiDistortionHint: 'Perspectiva, extremidades y fondos correctos.',
+  },
+};
 
 function getSupabase() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -17,6 +89,8 @@ export default function K4KStillPage() {
   const [locale, setLocale] = useState('en');
   const [prompt, setPrompt] = useState('');
   const [resolution, setResolution] = useState('1K');
+  const [aspect, setAspect] = useState('9:16');
+  const [options, setOptions] = useState(DEFAULT_OPTIONS);
   const [status, setStatus] = useState(null); // {kind: 'estimate' | 'error', credits?, text}
   const [busy, setBusy] = useState(false);
 
@@ -37,6 +111,7 @@ export default function K4KStillPage() {
   }, []);
 
   const t = MESSAGES[locale];
+  const L = LABELS[locale];
 
   function chooseLocale(next) {
     if (!SUPPORTED_LOCALES.includes(next)) return;
@@ -46,6 +121,10 @@ export default function K4KStillPage() {
     } catch {
       // Storage may be unavailable; the choice still applies for this visit.
     }
+  }
+
+  function toggleOption(key) {
+    setOptions((current) => ({...current, [key]: !current[key]}));
   }
 
   async function generate() {
@@ -62,7 +141,7 @@ export default function K4KStillPage() {
       const res = await fetch('/api/generation/images', {
         method: 'POST',
         headers: {'Content-Type': 'application/json', Authorization: `Bearer ${token}`},
-        body: JSON.stringify({resolution, referenceImageCount: 0}),
+        body: JSON.stringify({resolution, aspectRatio: aspect, referenceImageCount: 0}),
       });
       const body = await res.json().catch(() => ({}));
       if (res.status === 401) {
@@ -79,6 +158,14 @@ export default function K4KStillPage() {
       setBusy(false);
     }
   }
+
+  const optionRows = [
+    ['realism', L.realism, L.realismHint],
+    ['candid', L.candid, L.candidHint],
+    ['selfie', L.selfie, L.selfieHint],
+    ['face', L.face, L.faceHint],
+    ['antiDistortion', L.antiDistortion, L.antiDistortionHint],
+  ];
 
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
@@ -111,6 +198,26 @@ export default function K4KStillPage() {
           </div>
 
           <div>
+            <p className="mb-2 text-sm font-medium text-slate-300">{L.presets}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                [L.presetCafe, L.presetCafeText],
+                [L.presetBeach, L.presetBeachText],
+                [L.presetStreet, L.presetStreetText],
+              ].map(([name, text]) => (
+                <button
+                  key={name}
+                  type="button"
+                  onClick={() => setPrompt(text)}
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-2 py-2 text-left text-xs text-slate-300 hover:bg-slate-800"
+                >
+                  {name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
             <label htmlFor="scene" className="mb-2 block text-sm font-medium text-slate-300">
               {t.promptLabel}
             </label>
@@ -122,6 +229,25 @@ export default function K4KStillPage() {
               placeholder={t.promptPlaceholder}
               className="w-full rounded-xl border border-slate-700 bg-slate-900 p-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+
+          <div>
+            <p className="mb-2 text-sm font-medium text-slate-300">{L.aspect}</p>
+            <div className="grid grid-cols-3 gap-2">
+              {ASPECTS.map((ratio) => (
+                <button
+                  key={ratio}
+                  type="button"
+                  onClick={() => setAspect(ratio)}
+                  aria-pressed={aspect === ratio}
+                  className={`rounded-lg px-2 py-2 text-xs ${
+                    aspect === ratio ? 'bg-blue-600 text-white' : 'border border-slate-700 bg-slate-900 text-slate-300 hover:bg-slate-800'
+                  }`}
+                >
+                  {L.aspectOptions[ratio]}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div>
@@ -138,6 +264,29 @@ export default function K4KStillPage() {
               <option value="2K">2K</option>
               <option value="4K">4K</option>
             </select>
+          </div>
+
+          <div>
+            <p className="mb-2 text-sm font-medium text-slate-300">{L.options}</p>
+            <div className="space-y-2">
+              {optionRows.map(([key, title, hint]) => (
+                <label
+                  key={key}
+                  className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-800 bg-slate-900 p-3"
+                >
+                  <input
+                    type="checkbox"
+                    checked={options[key]}
+                    onChange={() => toggleOption(key)}
+                    className="mt-1 h-4 w-4"
+                  />
+                  <span>
+                    <span className="block text-sm text-slate-200">{title}</span>
+                    <span className="block text-xs text-slate-500">{hint}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
           </div>
 
           <div>
