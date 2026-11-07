@@ -1,0 +1,65 @@
+import {NextResponse} from 'next/server';
+import {createClient} from '@supabase/supabase-js';
+import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
+
+export const runtime = 'nodejs';
+
+const NO_STORE = {'Cache-Control': 'no-store'};
+
+function json(body, status) {
+  return NextResponse.json(body, {status, headers: NO_STORE});
+}
+
+// Creates a Stripe test-mode subscription Checkout session for a signed-in user.
+// The browser sends only plan and currency. The price is resolved on the server.
+export async function POST(request) {
+  const token = request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
+  if (!token) return json({error: 'UNAUTHENTICATED'}, 401);
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !publishableKey) return json({error: 'UNAVAILABLE'}, 503);
+
+  const auth = createClient(url, publishableKey, {auth: {persistSession: false, autoRefreshToken: false}});
+  const {data: {user} = {}, error} = await auth.auth.getUser(token);
+  if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({error: 'INVALID_REQUEST'}, 400);
+  }
+
+  const priceId = resolvePrice(body?.plan, body?.currency);
+  if (!priceId) return json({error: 'INVALID_PLAN'}, 400);
+
+  const secret = process.env.STRIPE_SECRET_KEY;
+  if (!secret) return json({error: 'UNAVAILABLE'}, 503);
+  try {
+    assertTestModeKey(secret);
+  } catch {
+    return json({error: 'LIVE_CHECKOUT_DISABLED'}, 503);
+  }
+
+  // Block a second subscription while an active membership exists.
+  const scoped = createClient(url, publishableKey, {
+    global: {headers: {Authorization: `Bearer ${token}`}},
+    auth: {persistSession: false, autoRefreshToken: false},
+  });
+  const {data: membership} = await scoped.from('memberships').select('status').eq('user_id', user.id).maybeSingle();
+  if (membership && ['active', 'trialing'].includes(membership.status)) {
+    return json({error: 'ALREADY_SUBSCRIBED'}, 409);
+  }
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+    method: 'POST',
+    headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
+    body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: body.currency}).toString(),
+  });
+  if (!res.ok) return json({error: 'CHECKOUT_FAILED'}, 502);
+
+  const session = await res.json();
+  return json({url: session.url}, 200);
+}
