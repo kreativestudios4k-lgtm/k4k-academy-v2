@@ -6,7 +6,7 @@ Requires psycopg 3 and a dedicated disposable database. Never use Academy produc
 This test intentionally creates an isolated schema and disposable users/jobs rather than
 touching existing auth.users, customer balances, or real provider calls.
 """
-import os, sys, uuid
+import os, sys, uuid, re
 from urllib.parse import urlsplit, unquote
 from concurrent.futures import ThreadPoolExecutor
 try:
@@ -24,8 +24,14 @@ if os.getenv("K4K_DISPOSABLE_DATABASE_CONFIRMED") != "YES":
 parsed = urlsplit(url)
 db_name = unquote(parsed.path.lstrip("/"))
 host = (parsed.hostname or "").lower()
-if parsed.scheme not in ("postgres", "postgresql") or not db_name.startswith("k4k_test_"):
+# Reject URI options entirely: libpq query parameters such as host, hostaddr,
+# service or options can override the apparent localhost target. Reject fragments too.
+if parsed.query or parsed.fragment:
+    sys.exit("BLOCKED: URI query parameters and fragments are forbidden for disposable DB safety")
+if parsed.scheme not in ("postgres", "postgresql") or not re.fullmatch(r"k4k_test_[A-Za-z0-9_]+", db_name):
     sys.exit("BLOCKED: database must be explicitly named k4k_test_*")
+if parsed.port is not None and not (1 <= parsed.port <= 65535):
+    sys.exit("BLOCKED: invalid local PostgreSQL port")
 if host not in ("localhost", "127.0.0.1", "::1"):
     sys.exit("BLOCKED: only a local disposable PostgreSQL host is allowed")
 schema = "k4k_test_" + uuid.uuid4().hex[:12]
