@@ -23,6 +23,12 @@ test('every price ends in .99', () => {
   }
 });
 
+test('every plan includes the Academy', () => {
+  for (const plan of Object.keys(PLAN_PRICES)) {
+    assert.equal(PLAN_PRICES[plan].includesAcademy, true, plan);
+  }
+});
+
 test('unknown plans and currencies are rejected', () => {
   assert.throws(() => getPlanPrice('premium', 'GBP'), /Unknown plan/);
   assert.throws(() => getPlanPrice('starter', 'JPY'), /Currency is not approved/);
