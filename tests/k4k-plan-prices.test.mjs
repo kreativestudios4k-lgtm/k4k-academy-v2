@@ -29,6 +29,25 @@ test('every plan includes the Academy', () => {
   }
 });
 
+test('each plan has one TEST price ID per currency, all unique', () => {
+  const seen = new Set();
+  for (const plan of Object.keys(PLAN_PRICES)) {
+    const ids = PLAN_PRICES[plan].stripePriceIds;
+    for (const currency of PLAN_CURRENCIES) {
+      assert.match(ids[currency], /^price_[A-Za-z0-9]+$/, `${plan} ${currency}`);
+      assert.ok(!seen.has(ids[currency]), `duplicate ${ids[currency]}`);
+      seen.add(ids[currency]);
+    }
+  }
+  assert.equal(seen.size, 16);
+});
+
+test('each plan has a Stripe product ID', () => {
+  for (const plan of Object.keys(PLAN_PRICES)) {
+    assert.match(PLAN_PRICES[plan].productId, /^prod_[A-Za-z0-9]+$/, plan);
+  }
+});
+
 test('unknown plans and currencies are rejected', () => {
   assert.throws(() => getPlanPrice('premium', 'GBP'), /Unknown plan/);
   assert.throws(() => getPlanPrice('starter', 'JPY'), /Currency is not approved/);
@@ -37,4 +56,5 @@ test('unknown plans and currencies are rejected', () => {
 test('price table is frozen', () => {
   assert.ok(Object.isFrozen(PLAN_PRICES));
   assert.ok(Object.isFrozen(PLAN_PRICES.starter));
+  assert.ok(Object.isFrozen(PLAN_PRICES.starter.stripePriceIds));
 });
