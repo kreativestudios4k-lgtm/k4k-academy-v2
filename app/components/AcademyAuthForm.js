@@ -86,7 +86,9 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    }
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
-   const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':'/membership-required';
+  const requested=new URLSearchParams(window.location.search).get('next');
+  const safeNext=requested&&requested.startsWith('/')&&!requested.startsWith('//')?requested:null;
+  const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':(safeNext||'/membership-required');
    window.location.assign(next);
   }catch(err){
    const reason=String(err?.message||'');

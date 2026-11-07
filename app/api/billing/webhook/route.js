@@ -1,13 +1,15 @@
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
+import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
+import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 
 export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
 
-// Events that will change access or billing records. They are refused with 503
-// until the database writes are approved, so Stripe keeps retrying them.
-const PENDING_EVENTS = new Set([
+// Until the database migration is approved and SUPABASE_SERVICE_ROLE_KEY is set,
+// subscription events are refused with 503 so Stripe keeps retrying them.
+const SUBSCRIPTION_EVENTS = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
@@ -33,8 +35,21 @@ export async function POST(request) {
     return NextResponse.json({error: 'INVALID_PAYLOAD'}, {status: 400, headers: NO_STORE});
   }
 
-  if (PENDING_EVENTS.has(event.type)) {
+  if (!SUBSCRIPTION_EVENTS.has(event.type)) {
+    return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
+  }
+
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !serviceKey) {
     return NextResponse.json({error: 'NOT_PROCESSING_YET', type: event.type}, {status: 503, headers: NO_STORE});
   }
-  return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
+
+  try {
+    const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey}));
+    return NextResponse.json({received: true, type: event.type, ...result}, {status: 200, headers: NO_STORE});
+  } catch (error) {
+    // Any failure returns 503 so Stripe retries the event later.
+    return NextResponse.json({error: 'RETRY', reason: String(error?.message || 'UNKNOWN')}, {status: 503, headers: NO_STORE});
+  }
 }
