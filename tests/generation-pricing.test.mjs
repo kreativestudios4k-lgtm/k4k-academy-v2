@@ -2,11 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {quoteGeneration} from '../lib/server/generation-pricing.mjs';
 
-test('Wan 720p 5s clip uses the Higgsfield rate and the 2.5x floor', () => {
-  const q = quoteGeneration({model: 'wan3_0_prime', resolution: '720p', outputSeconds: 5});
+test('Genjutsu Light 480p with 5s output and no source bills output only', () => {
+  const q = quoteGeneration({model: 'genjutsu_light', resolution: '480p', outputSeconds: 5});
   assert.equal(q.billableSeconds, 5);
-  assert.equal(q.providerMaxUsdMills, 700);
-  assert.equal(q.credits, 10);
+  assert.equal(q.providerMaxUsdMills, 250);
+  assert.equal(q.credits, 4);
 });
 
 test('Genjutsu Light bills source video alongside the output', () => {
@@ -23,9 +23,10 @@ test('Genjutsu Light 720p with 10s output and 15s source costs 34 credits', () =
 });
 
 test('fractional source video is rounded up to whole billable seconds', () => {
-  const q = quoteGeneration({model: 'wan3_0_prime', resolution: '480p', outputSeconds: 5, inputVideoSeconds: 4.2});
+  const q = quoteGeneration({model: 'genjutsu_light', resolution: '480p', outputSeconds: 5, inputVideoSeconds: 4.2});
   assert.equal(q.billableSeconds, 10);
-  assert.equal(q.providerMaxUsdMills, 680);
+  assert.equal(q.providerMaxUsdMills, 500);
+  assert.equal(q.credits, 7);
 });
 
 test('Genjutsu 720p bills only the source seconds, at $0.681 per second', () => {
@@ -54,19 +55,23 @@ test('Genjutsu rejects sources under 4 seconds and over the $7 cap', () => {
   assert.throws(() => quoteGeneration({model: 'genjutsu', resolution: '1080p', inputVideoSeconds: 5}), /cost cap/);
 });
 
-test('unknown models and resolutions are rejected, not undercharged', () => {
-  assert.throws(() => quoteGeneration({model: 'genjutsu-pro', resolution: '720p', outputSeconds: 5}), /not approved/);
-  assert.throws(() => quoteGeneration({model: 'other/model', resolution: '720p', outputSeconds: 5}), /not approved/);
-  assert.throws(() => quoteGeneration({model: 'wan3_0_prime', resolution: '4k', outputSeconds: 5}), /not approved/);
+test('Light over the $7 cap is rejected at 1080p', () => {
+  assert.throws(
+    () => quoteGeneration({model: 'genjutsu_light', resolution: '1080p', outputSeconds: 30, inputVideoSeconds: 15}),
+    /cost cap/,
+  );
 });
 
-test('requests over the provider cost cap are rejected', () => {
-  assert.throws(() => quoteGeneration({model: 'wan3_0_prime', resolution: '1080p', outputSeconds: 30}), /cost cap/);
+test('unapproved models and resolutions are rejected, including Wan', () => {
+  assert.throws(() => quoteGeneration({model: 'wan3_0_prime', resolution: '720p', outputSeconds: 5}), /not approved/);
+  assert.throws(() => quoteGeneration({model: 'genjutsu-pro', resolution: '720p', outputSeconds: 5}), /not approved/);
+  assert.throws(() => quoteGeneration({model: 'other/model', resolution: '720p', outputSeconds: 5}), /not approved/);
+  assert.throws(() => quoteGeneration({model: 'genjutsu_light', resolution: '4k', outputSeconds: 5}), /not approved/);
 });
 
 test('out-of-range or non-integer durations are rejected', () => {
   for (const outputSeconds of [1, 31, 4.5, '5', undefined]) {
-    assert.throws(() => quoteGeneration({model: 'wan3_0_prime', resolution: '720p', outputSeconds}), /Output must/);
+    assert.throws(() => quoteGeneration({model: 'genjutsu_light', resolution: '720p', outputSeconds}), /Output must/);
   }
   for (const inputVideoSeconds of [-1, 16, NaN, '5']) {
     assert.throws(
@@ -78,7 +83,7 @@ test('out-of-range or non-integer durations are rejected', () => {
 });
 
 test('quotes are frozen and carry a pricing revision', () => {
-  const q = quoteGeneration({model: 'wan3_0_prime', resolution: '720p', outputSeconds: 5});
+  const q = quoteGeneration({model: 'genjutsu_light', resolution: '480p', outputSeconds: 5});
   assert.equal(q.pricingRevision, 'higgsfield-list-2026-11-06');
   assert.ok(Object.isFrozen(q));
 });
