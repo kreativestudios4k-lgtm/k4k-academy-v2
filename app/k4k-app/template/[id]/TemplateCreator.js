@@ -8,10 +8,10 @@ export default function TemplateCreator({template}){
  const [recreateOpen,setRecreateOpen]=useState(false);
  const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.floor(template.durationSeconds||10))));const [model,setModel]=useState('wan');const [sound,setSound]=useState(false);const [mapping,setMapping]=useState(false);const [selectedId,setSelectedId]=useState(0);
  const video=useRef(null);
- useEffect(()=>{if(!recreateOpen){setMapping(false);video.current?.play().catch(()=>{});}else{video.current?.pause();}},[recreateOpen]);
+ useEffect(()=>{if(!recreateOpen){if(!mapping)video.current?.play().catch(()=>{});}else{video.current?.pause();}},[recreateOpen,mapping]);
  useEffect(()=>{
   if(!recreateOpen)return;
-  const onKeyDown=(event)=>{if(event.key==='Escape')setRecreateOpen(false)};
+  const onKeyDown=(event)=>{if(event.key==='Escape'){setRecreateOpen(false);setMapping(false)}};
   document.addEventListener('keydown',onKeyDown);
   return ()=>document.removeEventListener('keydown',onKeyDown);
  },[recreateOpen]);
@@ -28,8 +28,8 @@ export default function TemplateCreator({template}){
  }
  function removePhoto(id){setCharacters(prev=>prev.map(c=>{if(c.id!==id)return c;if(c.photo?.url){URL.revokeObjectURL(c.photo.url);objectUrls.current.delete(c.photo.url)}return {...c,photo:null,target:null}}))}
  function addCharacter(){setCharacters(prev=>prev.length>=30?prev:[...prev,{id:nextId.current++,photo:null}])}
- function startMapping(id){setSelectedId(id);setMapping(true);video.current?.pause()}
- function markPerson(event){if(!mapping)return;const bounds=event.currentTarget.getBoundingClientRect();const x=Math.round((event.clientX-bounds.left)/bounds.width*100);const y=Math.round((event.clientY-bounds.top)/bounds.height*100);const timestamp=video.current?.currentTime||0;setCharacters(prev=>prev.map(c=>c.id===selectedId?{...c,target:{x,y,timestamp}}:c));setMapping(false)}
+ function startMapping(id){setSelectedId(id);setRecreateOpen(false);setMapping(true);video.current?.pause()}
+ function markPerson(event){if(!mapping)return;const bounds=event.currentTarget.getBoundingClientRect();const x=Math.round((event.clientX-bounds.left)/bounds.width*100);const y=Math.round((event.clientY-bounds.top)/bounds.height*100);const timestamp=video.current?.currentTime||0;setCharacters(prev=>prev.map(c=>c.id===selectedId?{...c,target:{x,y,timestamp}}:c));setMapping(false);setRecreateOpen(true)}
  function removeCharacter(id){setCharacters(prev=>{if(prev.length<=1)return prev;const removed=prev.find(c=>c.id===id);if(removed?.photo?.url){URL.revokeObjectURL(removed.photo.url);objectUrls.current.delete(removed.photo.url)}return prev.filter(c=>c.id!==id)})}
  const filled=characters.filter(c=>c.photo).length;
  const estimate=model==='wan'?Math.ceil(duration*2):model==='light'?Math.ceil(duration*6):Math.ceil(duration*19);
