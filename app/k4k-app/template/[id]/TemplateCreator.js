@@ -9,6 +9,12 @@ export default function TemplateCreator({template}){
  const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.floor(template.durationSeconds||10))));const [model,setModel]=useState('wan');const [sound,setSound]=useState(false);const [mapping,setMapping]=useState(false);const [selectedId,setSelectedId]=useState(0);
  const video=useRef(null);
  useEffect(()=>{if(!recreateOpen){setMapping(false);video.current?.play().catch(()=>{});}else{video.current?.pause();}},[recreateOpen]);
+ useEffect(()=>{
+  if(!recreateOpen)return;
+  const onKeyDown=(event)=>{if(event.key==='Escape')setRecreateOpen(false)};
+  document.addEventListener('keydown',onKeyDown);
+  return ()=>document.removeEventListener('keydown',onKeyDown);
+ },[recreateOpen]);
  const objectUrls=useRef(new Set());
  useEffect(()=>()=>{objectUrls.current.forEach(url=>URL.revokeObjectURL(url));objectUrls.current.clear()},[]);
  useEffect(()=>{if(video.current)video.current.muted=!sound},[sound]);
