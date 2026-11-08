@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""K4K credit-ledger concurrency integration test (disposable PostgreSQL ONLY).
+"""K4K SYNTHETIC credit-ledger concurrency test (disposable PostgreSQL ONLY).
 
 Run with: K4K_TEST_DATABASE_URL=postgresql://... python3 tests/integration/test_credit_concurrency.py
 Requires psycopg 3 and a dedicated disposable database. Never use Academy production.
-This test intentionally creates an isolated schema and disposable users/jobs rather than
+IMPORTANT: This exercises simplified inline reserve/refund functions, NOT the actual\ndb/proposals/generation-credit-ledger.sql RPCs. Passing is NOT the Stage 5\nreal-ledger concurrency gate. The proposal needs its own multi-connection suite.\nThis test intentionally creates an isolated schema and disposable users/jobs rather than
 touching existing auth.users, customer balances, or real provider calls.
 """
 import os, sys, uuid, re
@@ -106,7 +106,7 @@ try:
     with psycopg.connect(url,autocommit=True) as conn:
         assert conn.execute(f'SELECT balance FROM "{schema}".accounts WHERE user_id=%s',(user,)).fetchone()[0]==10
         assert conn.execute(f'SELECT count(*) FROM "{schema}".ledger WHERE job_id=%s',(winning_job,)).fetchone()[0]==2
-    print("PASS: concurrent overspend, idempotent reservation, cross-user rejection, concurrent refunds, ledger and balance")
+    print("PASS (SYNTHETIC ONLY): concurrent overspend, idempotent reservation, cross-user rejection, concurrent refunds, ledger and balance")\n    print("RELEASE GATE STILL BLOCKED: actual generation-credit-ledger.sql RPCs have NOT been concurrency-tested")
 finally:
     with psycopg.connect(url,autocommit=True) as conn:
         conn.execute(f'DROP SCHEMA IF EXISTS "{schema}" CASCADE')
