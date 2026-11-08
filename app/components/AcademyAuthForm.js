@@ -120,15 +120,15 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
 
  return <main className="k4k-auth-page">
   <header className="k4k-auth-header">
-   <Link className="k4k-auth-brand" href="/" aria-label="K4K Academy home">K4K<span>✳</span> <small>ACADEMY</small></Link>
+   <Link className="k4k-auth-brand" href="/" aria-label="K4K APP home">K4K<span>✳</span> <small>APP</small></Link>
    <Link href="/" className="k4k-auth-back">Home <ArrowRight size={15}/></Link>
   </header>
   <div className="k4k-auth-centre">
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
-    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K ACADEMY · MEMBERS AREA'}</div>
-    <h1>{registering?'Create your account':'Welcome back'}</h1>
-    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Log in with the email you used to buy the course.'}</p>
+    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K APP · CREATOR ACCESS'}</div>
+    <h1>{registering?'Create your account':'Your next creation starts here.'}</h1>
+    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to your K4K account to continue creating and learning.'}</p>
 
     {registering&&lookup!=='verified'&&<div className="k4k-auth-verify" role="status">
      {lookup==='loading'?<><RefreshCw size={19} className="k4k-auth-spin"/>Checking your Stripe payment…</>:
