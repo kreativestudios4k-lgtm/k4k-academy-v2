@@ -18,6 +18,19 @@ const SUBSCRIPTION_EVENTS = new Set([
   'invoice.payment_failed',
 ]);
 
+// Manual invoices and non-subscription checkouts never change memberships or credits,
+// so they are acknowledged without needing the database.
+function isNonSubscriptionEvent(event) {
+  const object = event?.data?.object;
+  if (event.type === 'invoice.paid' || event.type === 'invoice.payment_failed') {
+    return !object?.subscription;
+  }
+  if (event.type === 'checkout.session.completed') {
+    return object?.mode !== 'subscription';
+  }
+  return false;
+}
+
 export async function POST(request) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return NextResponse.json({error: 'UNAVAILABLE'}, {status: 503, headers: NO_STORE});
@@ -37,6 +50,13 @@ export async function POST(request) {
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
+  }
+
+  if (isNonSubscriptionEvent(event)) {
+    return NextResponse.json(
+      {received: true, type: event.type, handled: false, reason: 'NOT_SUBSCRIPTION'},
+      {status: 200, headers: NO_STORE},
+    );
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
