@@ -54,3 +54,42 @@
 @keyframes k4k-auth-spin{to{transform:rotate(360deg)}}
 @media(max-width:440px){.k4k-auth-header{height:65px}.k4k-auth-brand{font-size:21px}.k4k-auth-centre{margin-top:20px}.k4k-auth-brand small{font-size:10px}.k4k-auth-card{padding:23px}.k4k-auth-subtitle{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.k4k-auth-spin{animation:none}.k4k-auth-submit{transition:none}}
+
+
+/* K4K APP sea-blue login refresh — presentation only, auth logic unchanged */
+.k4k-auth-page{background:radial-gradient(ellipse at 50% -15%,#bdeef6 0%,#eaf9fc 43%,#f7fcfd 85%);color:#123d52}
+.k4k-auth-header{border-bottom:1px solid #a6dce6}
+.k4k-auth-brand{color:#123d52}
+.k4k-auth-brand>span{color:#168caf}
+.k4k-auth-brand small{border-color:#a2cfdb;color:#37768a}
+.k4k-auth-back{color:#326a7e}
+.k4k-auth-back:hover{color:#087fa4}
+.k4k-auth-card{background:#ffffffee;border:1px solid #b9e5ed;border-radius:24px;box-shadow:0 22px 70px #12678320}
+.k4k-auth-icon{border-color:#a8dce9;color:#087fa4;background:#e2f7fb;border-radius:15px}
+.k4k-auth-step{color:#087fa4}
+.k4k-auth-card h1{color:#123d52}
+.k4k-auth-subtitle{color:#567b8b}
+.k4k-auth-form label{color:#234c60}
+.k4k-auth-form input{background:#f4fbfd;border:1px solid #b4d9e4;color:#123d52;border-radius:12px}
+.k4k-auth-form input:focus{border-color:#168caf;box-shadow:0 0 0 3px #79d3e833}
+.k4k-auth-form input::placeholder{color:#779eac}
+.k4k-auth-form input:read-only{background:#e5f5fa;border-color:#79c4d8;color:#184f67}
+.k4k-auth-label-row a,.k4k-auth-footer a,.k4k-auth-policy a,.k4k-auth-support a{color:#087fa4}
+.k4k-auth-password button{color:#477b8c}
+.k4k-auth-inline-note,.k4k-auth-policy{color:#597e8c}
+.k4k-auth-submit{background:#168fb7;color:white;border-radius:12px}
+.k4k-auth-submit:hover{background:#08799f}
+.k4k-auth-divider{color:#6b94a2}
+.k4k-auth-divider::before,.k4k-auth-divider::after{background:#c4e2e9}
+.k4k-auth-google{background:#fff;border:1px solid #b4d9e4;border-radius:12px;color:#123d52}
+.k4k-auth-google:hover{border-color:#168caf;background:#f2fbfd}
+.k4k-auth-footer,.k4k-auth-support{color:#547e8e}
+.k4k-auth-support svg{color:#168caf}
+.k4k-auth-success{background:#e6f8f4;border-color:#7dcbbb;color:#185e50}
+.k4k-auth-success svg{color:#168e76}
+.k4k-auth-error{background:#fff2f1;border-color:#f0b5b2;color:#9a312e}
+.k4k-auth-verify{background:#eaf8fc;border-color:#acdce9;color:#225568}
+.k4k-auth-verify svg{color:#168caf}
+.k4k-auth-verify button{background:#168fb7;color:white}
+.k4k-auth-verify a{color:#087fa4}
+.k4k-auth-page :is(a,button,input):focus-visible{outline:3px solid #289fc5;outline-offset:3px}
