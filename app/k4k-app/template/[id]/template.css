@@ -31,3 +31,11 @@
 .k4k-recreate-quote select{border-color:#4b7889}
 .k4k-recreate-panel :focus-visible,.k4k-template-viewer-meta button:focus-visible{outline:3px solid #79d3e8;outline-offset:3px}
 @media(min-width:800px){.k4k-recreate{max-width:600px}.k4k-recreate-video{height:100dvh}.k4k-recreate-panel{max-width:600px}}
+
+
+/* Keep the original vivid lime-green accents on video previews and Recreate UI. */
+.k4k-recreate-upgrade,.k4k-template-viewer-meta button,.k4k-recreate-generate,.k4k-recreate-add-slot,.k4k-recreate-marker{background:#d9ff3d;color:#111!important}
+.k4k-template-viewer-meta>span,.k4k-recreate-map-button,.k4k-recreate-quote>strong{color:#d9ff3d}
+.k4k-recreate-add-slot{border-color:#d9ff3d;background:#252528}
+.k4k-recreate-quote input{accent-color:#d9ff3d}
+.k4k-recreate-panel :focus-visible,.k4k-template-viewer-meta button:focus-visible{outline-color:#d9ff3d}
