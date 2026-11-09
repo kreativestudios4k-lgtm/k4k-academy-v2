@@ -39,3 +39,22 @@
 .k4k-recreate-add-slot{border-color:#d9ff3d;background:#252528}
 .k4k-recreate-quote input{accent-color:#d9ff3d}
 .k4k-recreate-panel :focus-visible,.k4k-template-viewer-meta button:focus-visible{outline-color:#d9ff3d}
+
+
+/* Template player and character picker use the same neon-black K4K theme. */
+.k4k-recreate{background:radial-gradient(ellipse at top,#14291a,#060b08 70%);color:#f6fff2}
+.k4k-recreate-video{background:#070b08}
+.k4k-recreate-video video{background:#060c08}
+.k4k-recreate-panel{background:#0f1b11;border:1px solid #3b5e35;box-shadow:0 -20px 70px #000b,0 0 40px #9aff1010}
+.k4k-recreate-panel header>span,.k4k-sheet-close{background:#1c321e;color:#e9ffe6}
+.k4k-recreate-handle{background:#6d964b}
+.k4k-recreate-slot{background:#172819;border:1px solid #45613a}
+.k4k-recreate-instructions,.k4k-recreate-count,.k4k-recreate-panel header p{color:#b7cbb3}
+.k4k-recreate-quote{background:#172719;border:1px solid #3e5a35}
+.k4k-recreate-quote select{background:#0b160c;color:#ecffe4;border:1px solid #517f41}
+.k4k-recreate-upgrade,.k4k-template-viewer-meta button,.k4k-recreate-generate,.k4k-recreate-marker{background:#c7ff36;color:#0d1508!important;box-shadow:0 0 24px #a9ff2135}
+.k4k-recreate-add-slot{background:#1c2d19;color:#c7ff36;border-color:#c7ff36}
+.k4k-recreate-map-button{color:#c7ff36;background:#1b2a1d}
+.k4k-template-viewer-meta>span,.k4k-recreate-quote>strong{color:#c7ff36}
+.k4k-recreate-quote input{accent-color:#c7ff36}
+.k4k-recreate-panel :focus-visible,.k4k-recreate a:focus-visible,.k4k-template-viewer-meta button:focus-visible{outline:3px solid #c7ff36;outline-offset:3px}
