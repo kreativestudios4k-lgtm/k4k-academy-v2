@@ -7,10 +7,10 @@ import catalogue from '../template-catalogue.json';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 
-const MAX_VIDEO=150*1024*1024;
+const MAX_VIDEO=50*1024*1024;
 const MAX_IMAGE=10*1024*1024;
 const IMAGE_TYPES=['image/png','image/jpeg','image/webp'];
-const VIDEO_TYPES=['video/mp4','video/webm','video/quicktime'];
+const VIDEO_TYPES=['video/mp4'];
 function useLocalPreview(){
  const [file,setFile]=useState(null);
  const [url,setUrl]=useState('');
@@ -37,12 +37,12 @@ export default function Creator(){
   if(!savedReference||savingDraft)return;
   setSavingDraft(true);setDraftMessage('');
   try{
-   if(!character.file||character.file!==savedReference.file||extraImages.length!==savedReference.extraFiles.length||extraImages.some((item,i)=>item.file!==savedReference.extraFiles[i]))throw new Error('Attachments changed. Save all current images again before saving the draft.');
+   if(!character.file||character.file!==savedReference.file||(video.file&&video.file!==savedReference.videoFile)||extraImages.length!==savedReference.extraFiles.length||extraImages.some((item,i)=>item.file!==savedReference.extraFiles[i]))throw new Error('Attachments changed. Save all current images again before saving the draft.');
    const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();
    if(authError||!user||user.id!==savedReference.userId)throw new Error('Please sign in again to save your draft.');
-   const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:savedReference.paths,main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
+   const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:savedReference.paths,reference_video_path:savedReference.videoPath,main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
    if(error)throw error;
-   setDraftMessage('Draft saved: '+data.id+'. All '+savedReference.paths.length+' image attachments and your prompt are saved privately. The video remains local. No generation started and no credits charged.');await loadHistory();
+   setDraftMessage('Draft saved: '+data.id+'. All '+savedReference.paths.length+' image attachments and your prompt are saved privately. Reference video saved privately when supplied. No generation started and no credits charged.');await loadHistory();
   }catch(e){setDraftMessage(e?.message||'Unable to save draft.')}finally{setSavingDraft(false)}
  }
  async function saveReference(){
@@ -63,13 +63,20 @@ export default function Creator(){
     if(uploadError)throw uploadError;
     paths.push(path);
    }
-   setSavedReference({paths,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)});
-   setUploadMessage(files.length+' reference image(s) saved privately. No AI generation or credit charge occurred.');
+   let videoPath=null;
+   if(video.file){
+    if(video.file.type!=='video/mp4'||video.file.size>MAX_VIDEO)throw new Error('Reference video must be MP4, maximum 50 MB.');
+    videoPath=user.id+'/'+crypto.randomUUID()+'.mp4';
+    const {error:videoError}=await client.storage.from('studio-videos').upload(videoPath,video.file,{contentType:'video/mp4',upsert:false});
+    if(videoError)throw videoError;
+   }
+   setSavedReference({paths,videoPath,videoFile:video.file,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)});
+   setUploadMessage(files.length+' image(s)'+(videoPath?' and reference video':'')+' saved privately. No AI generation or credit charge occurred.');
   }catch(e){setUploadMessage(e?.message||'Unable to save reference image.')}finally{setUploading(false)}
  }
  const pt=locale==='pt',es=locale==='es';
  const copy=pt?{title:'Estúdio de criação',intro:'Prepare seu vídeo e sua foto. O vídeo fica no navegador; você pode salvar a foto na sua conta.',reference:'Vídeo de referência',image:'Foto do personagem',prompt:'Instruções criativas (opcional)',placeholder:'Descreva o personagem, o cenário ou o resultado desejado...',model:'Modelo de geração',ready:'Prévia pronta para geração',waiting:'Adicione um vídeo e uma imagem para preparar seu projeto',disabled:'Geração de IA ainda desativada — nenhum crédito será cobrado.',back:'Explorar templates',video:'Escolher vídeo',photo:'Escolher foto',remove:'Remover',privacy:'O vídeo fica neste navegador. A foto só é enviada ao armazenamento privado se você clicar em Salvar.',limit:'Arquivo inválido ou acima do limite permitido.'}:es?{title:'Estudio de creación',intro:'Prepara tu vídeo y foto. El vídeo permanece en tu navegador; puedes guardar la foto en tu cuenta.',reference:'Vídeo de referencia',image:'Foto del personaje',prompt:'Instrucciones creativas (opcional)',placeholder:'Describe el resultado deseado...',model:'Modelo de generación',ready:'Vista previa lista',waiting:'Añade un vídeo y una imagen',disabled:'Generación desactivada — no se cobran créditos.',back:'Explorar plantillas',video:'Elegir vídeo',photo:'Elegir foto',remove:'Quitar',privacy:'El vídeo permanece en tu navegador. La foto solo se sube si eliges guardarla.',limit:'Archivo no válido o demasiado grande.'}:{title:'Creator Studio',intro:'Prepare a reference video and character image. Video stays in your browser; you can choose to save the image privately.',reference:'Reference video',image:'Character photo',prompt:'Creative instructions (optional)',placeholder:'Describe the character, scene, or result you want...',model:'Generation model',ready:'Project ready for generation',waiting:'Add a video and an image to prepare your project',disabled:'AI generation is disabled — no credits will be charged.',back:'Explore templates',video:'Choose video',photo:'Choose photo',remove:'Remove',privacy:'Video stays in this browser. Your image is uploaded to private storage only if you choose Save reference.',limit:'Invalid file or file exceeds the size limit.'};
- function choose(event,target,kind,max){const file=event.target.files?.[0];setError('');if(!file)return;if(!(kind==='image'?IMAGE_TYPES:VIDEO_TYPES).includes(file.type)||file.size>max){setError(copy.limit);event.target.value='';return;}target.setFile(file);if(kind==='image'){setSavedReference(null);setDraftMessage('')}}
+ function choose(event,target,kind,max){const file=event.target.files?.[0];setError('');if(!file)return;if(!(kind==='image'?IMAGE_TYPES:VIDEO_TYPES).includes(file.type)||file.size>max){setError(copy.limit);event.target.value='';return;}target.setFile(file);setSavedReference(null);setDraftMessage('')}
 
   return <PreviewShell active="Creator">
  <main className="k4k-own-generator k4k-creator-layout">
@@ -86,7 +93,7 @@ export default function Creator(){
    <div className="k4k-own-upload">
     <div className="k4k-own-drop">
      {(video.url||selectedPreset)?<video src={video.url||selectedPreset.videoUrl} controls playsInline preload="metadata" aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4, WebM or MOV · up to 150 MB</small></>}
-     <label className="k4k-own-select k4k-own-video-picker">＋ Choose video<input type="file" accept="video/mp4,video/webm,video/quicktime" aria-label="Upload reference video" onChange={e=>{if(e.target.files?.length){setSelectedPreset(null);choose(e,video,'video',MAX_VIDEO)}}}/></label>
+     <label className="k4k-own-select k4k-own-video-picker">＋ Choose video<input type="file" accept="video/mp4" aria-label="Upload reference video" onChange={e=>{if(e.target.files?.length){setSelectedPreset(null);choose(e,video,'video',MAX_VIDEO)}}}/></label>
     </div>
     {selectedPreset&&<button type="button" className="k4k-own-clear-preset" onClick={()=>setSelectedPreset(null)}>Clear selected preset</button>}
     {video.file&&<div className="k4k-own-file"><span>{video.file.name}</span><button type="button" onClick={()=>video.setFile(null)}>Remove</button></div>}
@@ -117,7 +124,7 @@ export default function Creator(){
    <p>These are preview settings. Actual model support, credits and output quality require provider verification.</p>
    <button type="button" className="k4k-own-done" onClick={()=>setOptionsOpen(false)}>Done</button>
   </section></div>}
-  <section className="k4k-own-drafts"><h2>Save your project</h2><p>Your video and additional images remain in this browser. Your selected images can be saved privately in this preview; the video remains local.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save all images privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
+  <section className="k4k-own-drafts"><h2>Save your project</h2><p>Save your character images and optional MP4 reference video privately to your account. Maximum video size: 50 MB. No generation or charges.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save reference media privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
  </main>
  </PreviewShell>;
 }
