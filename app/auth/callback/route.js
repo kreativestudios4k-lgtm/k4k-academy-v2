@@ -7,7 +7,9 @@ export async function GET(request){
  // Only the dedicated recovery flow may enter the password editor.
  // All regular email/Google sign-ins continue to the membership gate.
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
- const target=new URL(isPasswordRecovery?'/update-password':'/membership-required',origin);
+ const next=searchParams.get('next');
+ const safeNext=next&&next.startsWith('/')&&!next.startsWith('//')&&!next.includes('\\')?next:null;
+ const target=new URL(isPasswordRecovery?'/update-password':(safeNext||'/membership-required'),origin);
  if(!code)return NextResponse.redirect(new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin));
  let response=NextResponse.redirect(target);
  const supabase=createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{
