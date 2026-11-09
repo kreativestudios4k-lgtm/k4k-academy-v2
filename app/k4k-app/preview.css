@@ -91,3 +91,23 @@
 .k4k-light .k4k-workspace-error,.k4k-light [role="alert"]{color:#ffaaa8!important}
 .k4k-light a:focus-visible,.k4k-light button:focus-visible,.k4k-light input:focus-visible,.k4k-light select:focus-visible,.k4k-light textarea:focus-visible{outline:3px solid var(--k4k-neon);outline-offset:3px}
 .k4k-light button:disabled{cursor:not-allowed;opacity:.65}
+
+
+/* Unified K4K header and honest support contact dock */
+.k4k-light .k4k-global-header{max-width:none;width:100%;min-height:76px;padding:14px clamp(18px,4vw,64px);background:#0b150e;color:#f5fff0;border-bottom:1px solid #b9ff3a40;flex-wrap:nowrap}
+.k4k-light .k4k-global-brand{display:inline-flex;align-items:center;gap:11px;color:#f5fff0;font-size:21px;white-space:nowrap}
+.k4k-light .k4k-global-brand img{display:block;object-fit:contain}
+.k4k-light .k4k-global-brand b{color:#caff39}
+.k4k-light .k4k-global-header nav{justify-content:flex-end;gap:12px;min-width:0}
+.k4k-light .k4k-global-header nav a{color:#e9f5e3}
+.k4k-support-dock{position:fixed;right:24px;bottom:100px;z-index:9998;font-family:Arial,Helvetica,sans-serif}
+.k4k-support-fab{display:flex;align-items:center;gap:9px;border:1px solid #caff39;background:#caff39;color:#14210d;border-radius:100px;padding:14px 19px;box-shadow:0 12px 40px #0005;cursor:pointer;font-size:14px;font-weight:850}
+.k4k-support-fab:focus-visible,.k4k-support-panel a:focus-visible,.k4k-support-panel button:focus-visible{outline:3px solid #80baff;outline-offset:3px}
+.k4k-support-panel{position:absolute;right:0;bottom:calc(100% + 14px);width:min(350px,calc(100vw - 32px));padding:20px;border:1px solid #415c38;border-radius:20px;background:#101b12;color:#f7fff3;box-shadow:0 20px 60px #0008}
+.k4k-support-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:18px}
+.k4k-support-panel-head button{background:transparent;border:0;color:#fff;cursor:pointer;padding:7px}
+.k4k-light .k4k-support-panel p{color:#becdb7;font-size:13px;margin:12px 0 18px}
+.k4k-support-panel a{display:flex;align-items:center;gap:11px;background:#1d2b1d;border:1px solid #ffffff24;color:#f7fff3!important;border-radius:12px;padding:14px;margin-top:10px;font-size:14px;font-weight:750}
+.k4k-support-panel a:hover{border-color:#caff39}
+.k4k-support-panel small{display:block;color:#aebba9;margin-top:15px;font-size:11px;line-height:1.5}
+@media(max-width:640px){.k4k-light .k4k-global-header{min-height:65px;padding:12px 16px}.k4k-light .k4k-global-brand{font-size:18px}.k4k-support-dock{right:15px;bottom:calc(90px + env(safe-area-inset-bottom))}.k4k-support-fab{padding:13px 15px}.k4k-support-fab span{display:none}}
