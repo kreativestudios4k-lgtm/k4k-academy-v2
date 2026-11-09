@@ -1,8 +1,20 @@
 {
-  "version": 6,
-  "mediaStatus": "18-hosted-videos",
+  "version": 7,
+  "mediaStatus": "19-hosted-videos",
   "topPerforming": [],
   "trending": [
+    {
+      "id": "k4k-019",
+      "title": "New K4K Original",
+      "sourceFilename": "13B23693-D8D4-43AE-9AF7-B197B879B2AA.mp4",
+      "durationSeconds": 9.93,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/a2332535-c187-4f86-931c-f37a237bba68.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "a2332535-c187-4f86-931c-f37a237bba68",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional one-photo slot; review subject count before enabling generation."
+    },
     {
       "id": "k4k-001",
       "title": "Turkish Tea Gone Wrong 😂",
