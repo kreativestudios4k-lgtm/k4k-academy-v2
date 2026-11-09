@@ -83,9 +83,9 @@ const copy={
  }
 };
 function shortViews(n){return n>=1000000?(n/1000000).toFixed(1).replace(/\.0$/,'')+'M':(n||0).toLocaleString('en-GB');}
-function PreviewVideo({item,featured=false,register}){
+function PreviewVideo({item,featured=false,register,onActivate}){
  const ref=useRef(null);
- function startMuted(){if(ref.current){ref.current.muted=true;ref.current.play().catch(()=>{});}}
+ function startMuted(){if(ref.current?.paused){ref.current.muted=true;ref.current.play().catch(()=>{});}}
  function pause(){if(ref.current&&ref.current.muted)ref.current.pause();}
  return <video
   ref={el=>{ref.current=el;register?.(item.id,el)}}
@@ -96,7 +96,7 @@ function PreviewVideo({item,featured=false,register}){
   onMouseEnter={startMuted} onMouseLeave={pause}
   onClick={event=>{
    const current=event.currentTarget;
-   if(current.muted){current.muted=false;current.volume=1;current.play().catch(()=>{});}
+   if(current.muted){onActivate?.(item.id);current.muted=false;current.volume=1;current.play().catch(()=>{});}
    else if(current.paused)current.play().catch(()=>{});else current.pause();
   }}
   aria-label={item.title+' video preview — tap to enable sound'}
@@ -110,6 +110,7 @@ export default function LandingExperience(){
  const [expanded,setExpanded]=useState(false);
  const videoRefs=useRef(new Map());
  const register=(id,element)=>{if(element)videoRefs.current.set(id,element);else videoRefs.current.delete(id);};
+ const activateAudio=id=>{videoRefs.current.forEach((player,key)=>{if(key!==id){player.muted=true;player.pause();}});};
  const filtered=allTemplates.filter(item=>(filter==='all'||item.kind===filter)&&item.title.toLowerCase().includes(search.toLowerCase().trim()));
  const visible=expanded||search?filtered:filtered.slice(0,8);
  const hero=allTemplates[0];
@@ -130,14 +131,14 @@ export default function LandingExperience(){
      <div className="k4k-hero-micro"><span className="k4k-micro-symbol">✦</span><span>{t.mini}</span></div>
     </div>
     <div className="k4k-hero-media">
-     <div className="k4k-hero-video-wrap"><PreviewVideo item={hero} featured register={register}/><div className="k4k-hero-media-top"><span>01 / K4K ORIGINALS</span><span className="k4k-media-dot">● PREVIEW</span></div><div className="k4k-hero-media-bottom"><div><small>TRENDING SCENE</small><strong>{hero.title}</strong></div><Link href={'/k4k-app/template/'+hero.id} aria-label={'Open '+hero.title}>↗</Link></div></div>
+     <div className="k4k-hero-video-wrap"><PreviewVideo item={hero} featured register={register} onActivate={activateAudio}/><div className="k4k-hero-media-top"><span>01 / K4K ORIGINALS</span><span className="k4k-media-dot">● PREVIEW</span></div><div className="k4k-hero-media-bottom"><div><small>TRENDING SCENE</small><strong>{hero.title}</strong></div><Link href={'/k4k-app/template/'+hero.id} aria-label={'Open '+hero.title}>↗</Link></div></div>
      <div className="k4k-hero-vertical-text" aria-hidden="true">RECREATE / REIMAGINE / REPEAT</div>
     </div>
    </section>
    <section id="templates" className="k4k-landing-section k4k-template-section">
     <div className="k4k-section-heading"><div><span className="k4k-overline">{t.discoverLabel}</span><h2>{t.discoverTitle}<span>.</span></h2><p>{t.discoverText}</p></div><Link href="/k4k-app/creator" className="k4k-section-link">{t.studio} ↗</Link></div>
     <div className="k4k-filter-row"><div className="k4k-filters" role="group" aria-label="Filter templates">{[['all',t.all],['trending',t.trending],['top',t.top]].map(([key,label])=><button type="button" key={key} aria-pressed={filter===key} className={filter===key?'selected':''} onClick={()=>{setFilter(key);setExpanded(false)}}>{label}</button>)}</div><label className="k4k-search"><span aria-hidden="true">⌕</span><input type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder={t.search} aria-label={t.search}/></label></div>
-    <div className="k4k-template-grid">{visible.map((item,index)=><article className="k4k-template-card" key={item.id}><div className="k4k-template-frame"><PreviewVideo item={item} register={register}/><span className="k4k-template-badge">{item.kind==='top'?t.top:t.trending}</span><span className="k4k-template-index">{String(index+1).padStart(2,'0')}</span></div><div className="k4k-template-card-body"><div><h3>{item.title}</h3><p>{item.views?shortViews(item.views)+' '+t.views:(item.durationSeconds?Math.round(item.durationSeconds)+'s video reference':'K4K APP template')}</p></div><Link href={'/k4k-app/template/'+item.id} aria-label={t.use+': '+item.title}>↗</Link></div><Link className="k4k-template-use" href={'/k4k-app/template/'+item.id}>{t.use} <span aria-hidden="true">↗</span></Link></article>)}</div>
+    <div className="k4k-template-grid">{visible.map((item,index)=><article className="k4k-template-card" key={item.id}><div className="k4k-template-frame"><PreviewVideo item={item} register={register} onActivate={activateAudio}/><span className="k4k-template-badge">{item.kind==='top'?t.top:t.trending}</span><span className="k4k-template-index">{String(index+1).padStart(2,'0')}</span></div><div className="k4k-template-card-body"><div><h3>{item.title}</h3><p>{item.views?shortViews(item.views)+' '+t.views:(item.durationSeconds?Math.round(item.durationSeconds)+'s video reference':'K4K APP template')}</p></div><Link href={'/k4k-app/template/'+item.id} aria-label={t.use+': '+item.title}>↗</Link></div><Link className="k4k-template-use" href={'/k4k-app/template/'+item.id}>{t.use} <span aria-hidden="true">↗</span></Link></article>)}</div>
     {filtered.length===0?<p className="k4k-empty-results">No matching templates. Try another search.</p>:null}
     {!search&&filtered.length>8?<div className="k4k-showmore"><button type="button" onClick={()=>setExpanded(v=>!v)}>{expanded?t.showLess:t.viewAll} <span aria-hidden="true">{expanded?'↑':'↓'}</span></button></div>:null}
    </section>
