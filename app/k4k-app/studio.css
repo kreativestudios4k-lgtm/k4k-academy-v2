@@ -144,3 +144,14 @@
  .k4k-discovery-tabs{margin-bottom:20px}
 }
 @media(prefers-reduced-motion:reduce){.market-cta,.market-tile,.market-use{transition:none}}
+
+
+/* Finish neon-black tool directory and template card presentation. */
+.k4k-market .market-tile{background:linear-gradient(165deg,#14251a,#0d160f);border:1px solid #2b4c2b;border-radius:18px;padding:8px;box-shadow:0 15px 35px #0006;overflow:hidden}
+.k4k-market .market-tile:hover{border-color:#7ea951;box-shadow:0 12px 35px #000a,0 0 28px #a4ff2017}
+.k4k-market .market-tile .market-video{border-radius:12px}
+.k4k-market .market-tile p{color:#b2c5a9;font-size:13px;line-height:1.6;padding:0 8px}
+.k4k-market .market-tile p b{color:#c7ff36}
+.k4k-market .market-use{margin:0 8px 12px}
+.k4k-market .market-tile-caption{padding-left:8px;padding-right:8px}
+@media(max-width:700px){.k4k-market .market-tile{padding:5px;border-radius:13px}.k4k-market .market-use{margin:0 4px 9px}}
