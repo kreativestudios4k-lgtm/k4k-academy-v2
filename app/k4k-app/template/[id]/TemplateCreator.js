@@ -15,6 +15,8 @@ export default function TemplateCreator({template}){
  const [mappingId,setMappingId]=useState(null);
  const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.round(template.durationSeconds||10))));
  const [model,setModel]=useState('motion');
+ const [quality,setQuality]=useState('pro');
+ const minimumPhotos=Math.max(1,Math.min(MAX_PHOTOS,Number(template.requiredImages)||1));
  const [consent,setConsent]=useState(false);
  const [error,setError]=useState('');
  const [showHelp,setShowHelp]=useState(true);
@@ -42,7 +44,7 @@ export default function TemplateCreator({template}){
  }));}
  function addCharacter(){if(characters.length<MAX_PHOTOS)setCharacters(old=>[...old,{id:nextId.current++,photo:null,target:null}]);}
  function removeCharacter(id){setCharacters(old=>{
-  if(old.length<=1)return old;
+  if(old.length<=minimumPhotos)return old;
   const removed=old.find(item=>item.id===id);
   if(removed?.photo?.url){URL.revokeObjectURL(removed.photo.url);objectUrls.current.delete(removed.photo.url);}
   return old.filter(item=>item.id!==id);
@@ -59,6 +61,7 @@ export default function TemplateCreator({template}){
  }
  const uploaded=characters.filter(item=>item.photo).length;
  const mapped=characters.filter(item=>item.photo&&item.target).length;
+ const requiredReady=characters.slice(0,minimumPhotos).every(item=>Boolean(item.photo&&item.target));
  return <main className="k4k-recreate k4k-template-workflow">
   <header className="k4k-template-header"><Link href="/k4k-app" className="k4k-template-logo"><span>✦</span> K4K <b>APP</b></Link><nav aria-label="Template navigation"><Link href="/k4k-app">{tr('Explore','Explorar','Explorar')}</Link><Link href="/k4k-app/videos">{tr('My projects','Meus projetos','Mis proyectos')}</Link><Link href="/k4k-app/credits">{tr('Credits','Créditos','Créditos')}</Link></nav></header>
   <div className="k4k-template-breadcrumb"><Link href="/k4k-app">← {tr('Back to all templates','Voltar aos templates','Volver a las plantillas')}</Link><span> / </span><strong>{template.title}</strong></div>
@@ -77,21 +80,21 @@ export default function TemplateCreator({template}){
    <section className="k4k-template-editor" aria-label={tr('Prepare a video','Prepare seu vídeo','Prepara tu vídeo')}>
     <div className="k4k-template-editor-top"><span>01 / {tr('PERSONALISE THE SCENE','PERSONALIZE A CENA','PERSONALIZA LA ESCENA')}</span><span className="k4k-template-preview-pill">● PREVIEW ONLY</span></div>
     <h2>{tr('Put yourself in the scene.','Entre no vídeo.','Entra en el vídeo.')}</h2>
-    <p className="k4k-template-editor-lead"><strong>{template.requiredImages||1} {tr('recommended replacement photos','fotos recomendadas para substituição','fotos recomendadas para reemplazo')}.</strong> {' '}{tr('Upload a clear photo of each person you want in the reference video. Each slot represents one replacement.','Envie uma foto nítida de cada pessoa que deseja colocar no vídeo.','Sube una foto clara de cada persona que quieras colocar en el vídeo.')}</p>
+    <p className="k4k-template-editor-lead"><strong>{minimumPhotos} {tr('required replacement photos','fotos obrigatórias para substituição','fotos obligatorias para reemplazo')}.</strong> {' '}{tr('Upload a clear photo of each person you want in the reference video. Each slot represents one replacement.','Envie uma foto nítida de cada pessoa que deseja colocar no vídeo.','Sube una foto clara de cada persona que quieras colocar en el vídeo.')}</p>
     <div className="k4k-template-progress"><strong>{uploaded}/{characters.length} {tr('photos ready','fotos prontas','fotos listas')}</strong><span>{mapped} {tr('positions marked','posições marcadas','posiciones marcadas')}</span></div>
     <div className="k4k-template-progress-track"><div style={{width:(uploaded/Math.max(characters.length,1)*100)+'%'}}/></div>
     <div className="k4k-template-character-grid">
     {characters.map((item,index)=><div className="k4k-template-character" key={item.id}>
-     <div className="k4k-template-character-name"><strong>{tr('Character','Personagem','Personaje')} {index+1}</strong>{characters.length>1&&<button type="button" onClick={()=>removeCharacter(item.id)} aria-label={'Remove character '+(index+1)}>✕</button>}</div>
+     <div className="k4k-template-character-name"><strong>{tr('Character','Personagem','Personaje')} {index+1}</strong>{index>=minimumPhotos&&<button type="button" onClick={()=>removeCharacter(item.id)} aria-label={'Remove character '+(index+1)}>✕</button>}</div>
      {item.photo?<div className="k4k-template-photo"><img src={item.photo.url} alt={tr('Photo for character ','Foto do personagem ','Foto del personaje ')+(index+1)}/><button type="button" onClick={()=>removePhoto(item.id)}>{tr('Change photo','Trocar foto','Cambiar foto')}</button></div>:<label className="k4k-template-upload"><input type="file" accept="image/png,image/jpeg,image/webp" onChange={event=>choose(event,item.id)}/><span aria-hidden="true">＋</span><strong>{tr('Upload photo','Enviar foto','Subir foto')}</strong><small>JPG / PNG / WEBP</small></label>}
      <button type="button" className={item.target?'k4k-template-map-button mapped':'k4k-template-map-button'} onClick={()=>startMapping(item.id)} disabled={!item.photo}>{item.target?'✓ '+tr('Position selected','Posição selecionada','Posición seleccionada'):'◎ '+tr('Select person in video','Marcar pessoa no vídeo','Marcar persona en vídeo')}</button>
     </div>)}
     {characters.length<MAX_PHOTOS&&<button type="button" className="k4k-template-new-character" onClick={addCharacter}><span aria-hidden="true">＋</span><strong>{tr('Add character','Adicionar personagem','Añadir personaje')}</strong><small>{tr('Up to 30 images','Até 30 imagens','Hasta 30 imágenes')}</small></button>}
     </div>
     {error&&<p className="k4k-template-error" role="alert">{error}</p>}
-    <div className="k4k-template-settings"><div className="k4k-template-field"><label htmlFor="k4k-template-model">{tr('Creation mode','Modo de criação','Modo de creación')}</label><select id="k4k-template-model" value={model} onChange={event=>setModel(event.target.value)}><option value="motion">K4K Motion · Preview</option><option value="swap">K4K Character Swap · Preview</option></select></div><div className="k4k-template-field"><label htmlFor="k4k-template-duration">{tr('Target duration','Duração alvo','Duración objetivo')} <strong>{duration}s</strong></label><input id="k4k-template-duration" type="range" min="3" max="30" step="1" value={duration} onChange={event=>setDuration(Number(event.target.value))}/></div></div>
+    <div className="k4k-template-settings"><div className="k4k-template-field"><label htmlFor="k4k-template-quality">{tr("Generation quality","Qualidade de geração","Calidad de generación")}</label><select id="k4k-template-quality" value={quality} onChange={event=>setQuality(event.target.value)}><option value="lite">Lite · Preview</option><option value="pro">Pro · Preview</option><option value="premium">Premium · Preview</option></select></div><div className="k4k-template-field"><label htmlFor="k4k-template-model">{tr('Creation mode','Modo de criação','Modo de creación')}</label><select id="k4k-template-model" value={model} onChange={event=>setModel(event.target.value)}><option value="motion">K4K Motion · Preview</option><option value="swap">K4K Character Swap · Preview</option></select></div><div className="k4k-template-field"><label htmlFor="k4k-template-duration">{tr('Target duration','Duração alvo','Duración objetivo')} <strong>{duration}s</strong></label><input id="k4k-template-duration" type="range" min="3" max="30" step="1" value={duration} onChange={event=>setDuration(Number(event.target.value))}/></div></div>
     <label className="k4k-template-consent"><input type="checkbox" checked={consent} onChange={event=>setConsent(event.target.checked)}/><span>{tr('I have permission to use every person’s photo and understand results may vary.','Tenho autorização para usar as fotos das pessoas e entendo que o resultado pode variar.','Tengo permiso para usar las fotos y entiendo que los resultados pueden variar.')}</span></label>
-    <button type="button" className="k4k-template-disabled-generate" disabled>{uploaded===0?tr('Upload photos to prepare a project','Envie fotos para preparar seu projeto','Sube fotos para preparar tu proyecto'):!consent?tr('Review permission before generating','Confirme a autorização antes de gerar','Confirma el permiso antes de generar'):tr('AI generation coming soon','Geração de IA em breve','Generación de IA próximamente')}</button>
+    <button type="button" className="k4k-template-disabled-generate" disabled>{!requiredReady?tr('Upload and map all required characters','Envie e marque todos os personagens obrigatórios','Sube y marca todos los personajes obligatorios'):!consent?tr('Review permission before generating','Confirme a autorização antes de gerar','Confirma el permiso antes de generar'):tr('AI generation coming soon','Geração de IA em breve','Generación de IA próximamente')}</button>
     <p className="k4k-template-safety">{tr('This is a preview only. Photos stay in your browser; no AI requests, charges or credit reservations are made.','Esta é uma prévia. As fotos ficam no navegador; não há geração, cobrança ou reserva de créditos.','Esto es una vista previa. Las fotos quedan en tu navegador; no se hacen cargos ni generación.')}</p>
     <Link className="k4k-template-creator-link" href="/k4k-app/creator">{tr('Open advanced Creator Studio','Abrir estúdio avançado','Abrir estudio avanzado')} ↗</Link>
     <div className="k4k-template-help"><button type="button" aria-expanded={showHelp} onClick={()=>setShowHelp(v=>!v)}>{tr('How this works','Como funciona','Cómo funciona')}<span aria-hidden="true">{showHelp?'−':'+'}</span></button>{showHelp&&<ol><li>{tr('Upload one clear image for each replacement.','Envie uma foto nítida para cada personagem.','Sube una foto clara por persona.')}</li><li>{tr('Select the position to mark your character in the preview.','Marque cada personagem na prévia do vídeo.','Marca cada personaje en la vista previa.')}</li><li>{tr('Your selections stay local while generation is being validated.','As seleções ficam locais enquanto a geração é validada.','Las elecciones quedan locales mientras validamos la generación.')}</li></ol>}</div>
