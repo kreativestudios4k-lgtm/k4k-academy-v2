@@ -24,6 +24,7 @@ export default function Creator(){
  useEffect(()=>()=>{extraUrlRegistry.current.forEach(url=>URL.revokeObjectURL(url));extraUrlRegistry.current.clear()},[]);
  function addExtraImages(event){const incoming=Array.from(event.target.files||[]);event.target.value='';if(incoming.length+extraImages.length+(character.file?1:0)>30||incoming.some(file=>!IMAGE_TYPES.includes(file.type)||file.size>MAX_IMAGE)){setError('Maximum 30 JPG, PNG or WebP images, 10 MB each.');return;}setError('');const next=incoming.map(file=>{const url=URL.createObjectURL(file);extraUrlRegistry.current.add(url);return {file,url};});setExtraImages(old=>[...old,...next]);}
  function removeExtraImage(index){setExtraImages(old=>old.filter((item,i)=>{if(i===index){URL.revokeObjectURL(item.url);extraUrlRegistry.current.delete(item.url);}return i!==index;}));}
+ const [optionsOpen,setOptionsOpen]=useState(false),[style,setStyle]=useState('None'),[batchSize,setBatchSize]=useState(1);
  const [error,setError]=useState('');
  const [prompt,setPrompt]=useState('');
  const [model,setModel]=useState('standard');
@@ -65,54 +66,43 @@ export default function Creator(){
  const needsImage=activeTab!=='Text to Video';
  const ready=(!needsVideo||Boolean(video.file))&&(!needsImage||Boolean(character.file));
  return <PreviewShell active="Creator">
-  <section className="k4k-creator-heading"><div><span className="k4k-workspace-eyebrow">✦ K4K APP / CREATOR STUDIO</span><h1>{copy.title}<span>.</span></h1><p>{copy.intro}</p></div><Link href="/k4k-app/videos">▦ {pt?'Meus projetos':es?'Mis proyectos':'My projects'} ↗</Link></section>
-  <div className="k4k-creator-modes" role="group" aria-label="Choose your creation workflow">{['Motion Transfer','Character Swap','Image to Video','Text to Video'].map(tab=><button type="button" key={tab} aria-pressed={activeTab===tab} className={tab===activeTab?'selected':''} onClick={()=>setActiveTab(tab)}>{tab}</button>)}</div>
-  <p className="k4k-creator-mode-note">● {activeTab} · {pt?'Prévia do fluxo. Geração de IA desativada.':es?'Flujo en vista previa. Generación de IA desactivada.':'Workflow preview. AI generation is not enabled yet.'}</p>
-  <div className="k4k-creator-layout">
-   <div className="k4k-creator-primary">
-    {needsVideo&&<section className="k4k-card k4k-creator-block">
-     <div className="k4k-creator-block-title"><span>01 / REFERENCE</span><h2>{copy.reference}</h2><p>{pt?'Envie um vídeo de referência para o movimento e a cena.':es?'Sube un vídeo de referencia para el movimiento y la escena.':'Upload a reference video to guide the scene and motion.'}</p></div>
-     <div className="k4k-creator-media">
-      {video.url?<video src={video.url} controls playsInline preload="metadata" aria-label="Reference video preview"/>:<div className="k4k-creator-placeholder"><span>▶</span><strong>REFERENCE VIDEO</strong><small>MP4 / WEBM / MOV · MAX 150MB</small></div>}
-     </div>
-     <label className="k4k-creator-file-label">{copy.video}<input type="file" accept="video/mp4,video/webm,video/quicktime" onChange={e=>choose(e,video,'video',MAX_VIDEO)}/></label>
-     {video.file&&<div className="k4k-creator-file-status"><small>{video.file.name} · {(video.file.size/1048576).toFixed(1)} MB</small><button type="button" onClick={()=>video.setFile(null)}>{copy.remove}</button></div>}
-    </section>}
-    {needsImage&&<section className="k4k-card k4k-creator-block">
-     <div className="k4k-creator-block-title"><span>{needsVideo?'02':'01'} / CHARACTER</span><h2>{copy.image}</h2><p>{pt?'Escolha fotos nítidas dos personagens que quer criar.':es?'Elige fotos claras de los personajes.':'Choose clear character images. Each image remains yours.'}</p></div>
-     <div className="k4k-creator-media k4k-creator-photo-preview">
-      {character.url?<img src={character.url} alt="Primary character reference"/>:<div className="k4k-creator-placeholder"><span>✦</span><strong>YOUR CHARACTER</strong><small>JPG / PNG / WEBP · MAX 10MB</small></div>}
-     </div>
-     <label className="k4k-creator-file-label">{copy.photo}<input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>choose(e,character,'image',MAX_IMAGE)}/></label>
-     {character.file&&<div className="k4k-creator-file-status"><small>{character.file.name} · {(character.file.size/1048576).toFixed(1)} MB</small><button type="button" onClick={()=>{character.setFile(null);setSavedReference(null);setDraftMessage('')}}>{copy.remove}</button></div>}
-     <div className="k4k-creator-gallery"><div><strong>Character gallery · {extraImages.length+(character.file?1:0)} / 30</strong><p>Additional references are local to this browser; they are not uploaded automatically.</p></div><input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={addExtraImages} aria-label="Add character references" />
-     {extraImages.length>0&&<div className="k4k-creator-gallery-grid">{extraImages.map((item,index)=><div key={item.url}><img src={item.url} alt={'Additional character reference '+(index+1)}/><button type="button" onClick={()=>removeExtraImage(index)} aria-label={'Remove reference '+(index+1)}>✕</button></div>)}</div>}</div>
-     {character.file&&<button type="button" onClick={saveReference} disabled={uploading} className="k4k-creator-save">{uploading?'Saving…':pt?'Salvar referência privada':es?'Guardar referencia privada':'Save primary reference privately'}</button>}
-     {uploadMessage&&<p role="status" className="k4k-creator-message">{uploadMessage}</p>}
-     {savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft} className="k4k-creator-draft">{savingDraft?'Saving…':pt?'Salvar rascunho':es?'Guardar borrador':'Save project draft'}</button>}
-     {draftMessage&&<p role="status" className="k4k-creator-message">{draftMessage}</p>}
-    </section>}
-    <section className="k4k-card k4k-creator-block">
-     <div className="k4k-creator-block-title"><span>{needsVideo?'03':needsImage?'02':'01'} / SETTINGS</span><h2>{copy.model}</h2><p>{pt?'Escolha as configurações para preparar o projeto.':es?'Selecciona los ajustes para preparar el proyecto.':'Choose your creative settings before you save the project.'}</p></div>
-     <div className="k4k-creator-settings"><label>Mode<select value={model} onChange={e=>setModel(e.target.value)}><option value="standard">K4K Standard · Preview</option><option value="premium">K4K Premium · Preview</option></select></label><label>Quality<select value={quality} onChange={e=>setQuality(e.target.value)}><option>480p</option><option>720p</option><option>1080p</option></select></label><label>Target duration · {duration}s<input type="range" min="3" max="30" step="1" value={duration} onChange={e=>setDuration(Number(e.target.value))}/></label></div>
-     <label className="k4k-creator-prompt-label">{copy.prompt}<textarea value={prompt} onChange={e=>setPrompt(e.target.value.slice(0,1200))} maxLength={1200} rows={4} placeholder={copy.placeholder}/></label>
-     {error&&<p role="alert" className="k4k-creator-error">{error}</p>}
-     <p className="k4k-creator-ready">{ready?copy.ready:copy.waiting}</p>
-     <button type="button" disabled className="k4k-creator-generate">✦ {copy.disabled}</button>
-     <p className="k4k-creator-privacy"><small>{copy.privacy}</small></p>
-    </section>
+ <main className="k4k-own-generator">
+  <div className="k4k-own-back"><Link href="/k4k-app">← Explore</Link><Link href="/k4k-app/videos">My videos ↗</Link></div>
+  <section className="k4k-own-sheet" aria-label="Create your own video">
+   <div className="k4k-own-handle" aria-hidden="true"/>
+   <header className="k4k-own-title"><span className="k4k-own-info" title="Custom reference-video generator">ⓘ</span><div><h1>Create a video</h1><p>K4K APP · Own Video Generator</p></div><Link href="/k4k-app" aria-label="Close creator">✕</Link></header>
+   <div className="k4k-own-upload">
+    <label className="k4k-own-drop">
+     {video.url?<video src={video.url} controls playsInline preload="metadata" onClick={e=>e.preventDefault()} aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4, WebM or MOV · up to 150 MB</small><span className="k4k-own-select">＋ Choose video</span></>}
+     <input type="file" accept="video/mp4,video/webm,video/quicktime" aria-label="Upload reference video" onChange={e=>choose(e,video,'video',MAX_VIDEO)}/>
+    </label>
+    {video.file&&<div className="k4k-own-file"><span>{video.file.name}</span><button type="button" onClick={()=>video.setFile(null)}>Remove</button></div>}
+    <Link className="k4k-own-presets" href="/k4k-app#templates">＋ Select from presets</Link>
    </div>
-   <aside className="k4k-creator-aside">
-    <section className="k4k-card k4k-creator-sidecard">
-     <div className="k4k-creator-sidecard-head"><div><span className="k4k-workspace-eyebrow">SAVED WORK</span><h2>My Generations</h2></div><button type="button" onClick={loadHistory}>↻ Refresh</button></div>
-     {historyState&&<p role="status">{historyState}</p>}
-     {history.map(job=><div className="k4k-creator-job" key={job.id}><span>{job.model||'Preview'} · {new Date(job.created_at).toLocaleDateString()}</span><strong>{job.status}</strong></div>)}
-     <Link href="/k4k-app/videos">View all projects ↗</Link>
-    </section>
-    <section className="k4k-card k4k-creator-sidecard"><span className="k4k-workspace-eyebrow">YOUR NEXT STORY</span><h2>Start from a viral template.</h2><p>Choose a scene, select the characters and prepare a new project in the K4K template studio.</p><Link className="k4k-creator-library" href="/k4k-app#templates">Explore templates ↗</Link></section>
-    <section className="k4k-card k4k-creator-sidecard"><span className="k4k-workspace-eyebrow">ACCOUNT & SUPPORT</span><p>Need help with references, drafts or your account?</p><Link href="/k4k-app/support">Contact K4K Support ↗</Link></section>
-   </aside>
-  </div>
+   <h2 className="k4k-own-subtitle">Attachments <span>{extraImages.length+(character.file?1:0)} / 30</span></h2>
+   <div className="k4k-own-upload">
+    <label className="k4k-own-drop k4k-own-attachments">
+     <span className="k4k-own-icons"><span>♙</span><span>♧</span><span>⬡</span></span>
+     <strong>Add your characters, products or clothes</strong><small>Up to 30 images · JPG, PNG or WebP</small>
+     <input type="file" accept="image/png,image/jpeg,image/webp" multiple aria-label="Add reference images" onChange={e=>{const files=Array.from(e.target.files||[]);e.target.value='';if(!files.length)return;if(files.length+extraImages.length+(character.file?1:0)>30||files.some(f=>!IMAGE_TYPES.includes(f.type)||f.size>MAX_IMAGE)){setError('Maximum 30 images, 10 MB each.');return;}setError('');if(!character.file){character.setFile(files[0]);files.shift();setSavedReference(null);}if(files.length){const next=files.map(file=>{const url=URL.createObjectURL(file);extraUrlRegistry.current.add(url);return {file,url};});setExtraImages(old=>[...old,...next]);}}}/>
+    </label>
+    {(character.url||extraImages.length>0)&&<div className="k4k-own-thumbnails">{character.url&&<div><img src={character.url} alt="Main character"/><button type="button" onClick={()=>{character.setFile(null);setSavedReference(null)}} aria-label="Remove main character">×</button></div>}{extraImages.map((item,i)=><div key={item.url}><img src={item.url} alt={'Reference '+(i+2)}/><button type="button" onClick={()=>removeExtraImage(i)} aria-label={'Remove reference '+(i+2)}>×</button></div>)}</div>}
+   </div>
+   {error&&<p role="alert" className="k4k-own-error">{error}</p>}
+   <div className="k4k-own-bottom"><button type="button" className="k4k-own-generate" disabled aria-label="Generation not yet enabled">Generate ✦</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
+   <p className="k4k-own-safety">Preview only · AI generation disabled · No credits charged</p>
+  </section>
+  {optionsOpen&&<div className="k4k-own-modal-backdrop" onClick={()=>setOptionsOpen(false)}><section className="k4k-own-modal" role="dialog" aria-modal="true" aria-label="Generation options" onClick={e=>e.stopPropagation()}><div className="k4k-own-handle"/><header><h2>Options</h2><button type="button" aria-label="Close options" onClick={()=>setOptionsOpen(false)}>✕</button></header>
+   <label>Quality <select value={model} onChange={e=>setModel(e.target.value)}><option value="lite">Lite</option><option value="pro">Pro</option><option value="premium">Premium</option></select></label>
+   <label>Resolution <select value={quality} onChange={e=>setQuality(e.target.value)}><option>480p</option><option>720p</option><option>1080p</option></select></label>
+   <label>Prompt <textarea value={prompt} onChange={e=>setPrompt(e.target.value.slice(0,1200))} maxLength={1200} rows={3} placeholder="Optional — describe what to change and what must stay the same"/></label>
+   <label>Style <select value={style} onChange={e=>setStyle(e.target.value)}><option>None</option><option>Cinematic</option><option>Realistic</option></select></label>
+   <label>Mode <select value={activeTab} onChange={e=>setActiveTab(e.target.value)}><option>Motion Transfer</option><option>Character Swap</option></select></label>
+   <label>Batch size <select value={batchSize} onChange={e=>setBatchSize(Number(e.target.value))}><option value={1}>1 video</option><option value={2}>2 videos</option><option value={3}>3 videos</option></select></label>
+   <p>These are preview settings. Actual model support, credits and output quality require provider verification.</p>
+   <button type="button" className="k4k-own-done" onClick={()=>setOptionsOpen(false)}>Done</button>
+  </section></div>}
+  <section className="k4k-own-drafts"><h2>Save your project</h2><p>Your video and additional images remain in this browser. Only your primary image can be saved privately in this preview.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save primary image privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
+ </main>
  </PreviewShell>;
-
 }
