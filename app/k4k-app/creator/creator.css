@@ -165,3 +165,25 @@
 .k4k-light .k4k-own-modal-backdrop{z-index:140}
 .k4k-light .k4k-own-drafts{max-width:750px;margin:26px auto}
 @media(max-width:600px){.k4k-light .k4k-own-generator{display:block}.k4k-light .k4k-own-preset-grid{max-height:none;gap:7px}.k4k-light .k4k-own-preset-card{min-height:150px}.k4k-light .k4k-own-creator-backdrop .k4k-own-sheet{max-height:90dvh;border-radius:26px 26px 0 0;padding:16px}.k4k-light .k4k-own-start{right:15px;bottom:82px}}
+
+
+/* Compact desktop settings dialog: fits above bottom navigation */
+@media(min-width:701px){
+.k4k-light .k4k-own-modal-backdrop{align-items:center;padding:24px 24px 92px}
+.k4k-light .k4k-own-modal{width:min(100%,560px);max-height:min(690px,calc(100dvh - 132px));border-radius:22px;padding:14px 20px 18px}
+.k4k-light .k4k-own-modal .k4k-own-handle{display:none}
+.k4k-light .k4k-own-modal header{margin-bottom:8px}
+.k4k-light .k4k-own-modal header h2{font-size:20px}
+.k4k-light .k4k-own-modal header button{width:34px;height:34px}
+.k4k-light .k4k-own-modal label{padding:9px 0;gap:12px;font-size:13px}
+.k4k-light .k4k-own-modal select,.k4k-light .k4k-own-modal textarea{padding:7px 9px;font-size:13px;max-width:62%}
+.k4k-light .k4k-own-modal textarea{width:62%;min-height:52px}
+.k4k-light .k4k-own-modal p{margin:9px 0;font-size:11px}
+.k4k-light .k4k-own-modal .k4k-own-done{padding:10px}
+}
+@media(max-width:700px){
+.k4k-light .k4k-own-modal{max-height:calc(100dvh - 70px);padding:14px 16px 18px}
+.k4k-light .k4k-own-modal header{margin-bottom:8px}
+.k4k-light .k4k-own-modal label{padding:10px 0;font-size:13px}
+.k4k-light .k4k-own-modal select,.k4k-light .k4k-own-modal textarea{font-size:13px}
+}
