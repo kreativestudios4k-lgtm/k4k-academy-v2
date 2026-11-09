@@ -136,3 +136,11 @@
 @media(min-width:901px){.k4k-light .k4k-own-sheet{position:sticky;top:20px;max-height:calc(100dvh - 45px);overflow-y:auto;scrollbar-width:thin}.k4k-light .k4k-own-drop{min-height:175px}.k4k-light .k4k-own-attachments{min-height:155px}}
 @media(max-width:900px){.k4k-light .k4k-own-generator{display:flex;flex-direction:column;max-width:700px}.k4k-light .k4k-own-back,.k4k-light .k4k-own-presets-gallery,.k4k-light .k4k-own-sheet,.k4k-light .k4k-own-drafts{width:100%}.k4k-light .k4k-own-preset-grid{max-height:450px}.k4k-light .k4k-own-preset-card{aspect-ratio:4/3;min-height:150px}}
 @media(max-width:600px){.k4k-light .k4k-own-presets-gallery{padding:14px}.k4k-light .k4k-own-preset-grid{gap:7px;max-height:440px}.k4k-light .k4k-own-preset-card{min-height:145px}.k4k-light .k4k-own-gallery-tabs button{font-size:12px;padding:10px 12px}}
+
+
+/* Video playback must remain interactive; picker only covers its own button. */
+.k4k-light .k4k-own-drop:has(.k4k-own-video-picker){cursor:default}
+.k4k-light .k4k-own-video-picker{position:relative;display:inline-flex;cursor:pointer;overflow:hidden}
+.k4k-light .k4k-own-video-picker input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.k4k-light .k4k-own-drop video{z-index:2;pointer-events:auto}
+.k4k-light .k4k-own-preset-card:focus-visible,.k4k-light .k4k-own-options-button:focus-visible,.k4k-light .k4k-own-video-picker:focus-within{outline:3px solid #d5ff4b;outline-offset:3px}
