@@ -37,12 +37,12 @@ export default function Creator(){
   if(!savedReference||savingDraft)return;
   setSavingDraft(true);setDraftMessage('');
   try{
-   if(!character.file||character.file!==savedReference.file)throw new Error('Save your current primary image before saving a draft.');
+   if(!character.file||character.file!==savedReference.file||extraImages.length!==savedReference.extraFiles.length||extraImages.some((item,i)=>item.file!==savedReference.extraFiles[i]))throw new Error('Attachments changed. Save all current images again before saving the draft.');
    const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();
    if(authError||!user||user.id!==savedReference.userId)throw new Error('Please sign in again to save your draft.');
-   const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:[savedReference.path],main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
+   const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:savedReference.paths,main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
    if(error)throw error;
-   setDraftMessage('Draft saved: '+data.id+'. Only the primary uploaded image and prompt are saved. Video and additional images remain local. No generation started and no credits charged.');await loadHistory();
+   setDraftMessage('Draft saved: '+data.id+'. All '+savedReference.paths.length+' image attachments and your prompt are saved privately. The video remains local. No generation started and no credits charged.');await loadHistory();
   }catch(e){setDraftMessage(e?.message||'Unable to save draft.')}finally{setSavingDraft(false)}
  }
  async function saveReference(){
@@ -53,11 +53,18 @@ export default function Creator(){
    const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();
    if(authError||!user)throw new Error('Sign in to your K4K APP account before saving an image.');
    if(!IMAGE_TYPES.includes(character.file.type)||character.file.size>MAX_IMAGE)throw new Error(copy.limit);
-   const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[character.file.type];
-   const path=user.id+'/'+crypto.randomUUID()+'.'+extension;
-   const {error:uploadError}=await client.storage.from('studio-references').upload(path,character.file,{contentType:character.file.type,upsert:false});
-   if(uploadError)throw uploadError;
-   setSavedReference({path,userId:user.id,file:character.file});setUploadMessage('Reference saved privately to your account. No AI generation or credit charge occurred.');
+   const files=[character.file,...extraImages.map(item=>item.file)];
+   if(files.length>30||files.some(file=>!IMAGE_TYPES.includes(file.type)||file.size>MAX_IMAGE))throw new Error('Maximum 30 JPG, PNG or WebP images, 10 MB each.');
+   const paths=[];
+   for(const file of files){
+    const extension={'image/jpeg':'jpg','image/png':'png','image/webp':'webp'}[file.type];
+    const path=user.id+'/'+crypto.randomUUID()+'.'+extension;
+    const {error:uploadError}=await client.storage.from('studio-references').upload(path,file,{contentType:file.type,upsert:false});
+    if(uploadError)throw uploadError;
+    paths.push(path);
+   }
+   setSavedReference({paths,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)});
+   setUploadMessage(files.length+' reference image(s) saved privately. No AI generation or credit charge occurred.');
   }catch(e){setUploadMessage(e?.message||'Unable to save reference image.')}finally{setUploading(false)}
  }
  const pt=locale==='pt',es=locale==='es';
@@ -110,7 +117,7 @@ export default function Creator(){
    <p>These are preview settings. Actual model support, credits and output quality require provider verification.</p>
    <button type="button" className="k4k-own-done" onClick={()=>setOptionsOpen(false)}>Done</button>
   </section></div>}
-  <section className="k4k-own-drafts"><h2>Save your project</h2><p>Your video and additional images remain in this browser. Only your primary image can be saved privately in this preview.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save primary image privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
+  <section className="k4k-own-drafts"><h2>Save your project</h2><p>Your video and additional images remain in this browser. Your selected images can be saved privately in this preview; the video remains local.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save all images privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
  </main>
  </PreviewShell>;
 }
