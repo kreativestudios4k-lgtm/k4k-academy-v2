@@ -17,7 +17,7 @@ test('existing reservation never submits another paid provider request',async()=
  await assert.rejects(lifecycle.run(input),/RESERVATION_NOT_NEW/);
  assert.equal(submitted,0);
 });
-test('new reservation submission failure triggers exactly one refund attempt',async()=>{
+test('ambiguous provider failure preserves reserved credits for reconciliation',async()=>{
  let refunds=0;const lifecycle=createGenerationLifecycle({enabled:true,providerEnabled:true,priceCredits:()=>3,submissionRecorder:{record:async()=>{}},ledger:{reserve:async()=>({newlyReserved:true}),finish:async()=>{refunds++}},provider:{submit:async()=>{throw Error('mock failure')}}});
  await assert.rejects(lifecycle.run(input),/PROVIDER_SUBMISSION_UNCERTAIN/);
  assert.equal(refunds,0);
