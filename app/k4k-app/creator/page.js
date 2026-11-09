@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import './creator.css';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
+import catalogue from '../template-catalogue.json';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 
@@ -24,6 +25,7 @@ export default function Creator(){
  useEffect(()=>()=>{extraUrlRegistry.current.forEach(url=>URL.revokeObjectURL(url));extraUrlRegistry.current.clear()},[]);
  function addExtraImages(event){const incoming=Array.from(event.target.files||[]);event.target.value='';if(incoming.length+extraImages.length+(character.file?1:0)>30||incoming.some(file=>!IMAGE_TYPES.includes(file.type)||file.size>MAX_IMAGE)){setError('Maximum 30 JPG, PNG or WebP images, 10 MB each.');return;}setError('');const next=incoming.map(file=>{const url=URL.createObjectURL(file);extraUrlRegistry.current.add(url);return {file,url};});setExtraImages(old=>[...old,...next]);}
  function removeExtraImage(index){setExtraImages(old=>old.filter((item,i)=>{if(i===index){URL.revokeObjectURL(item.url);extraUrlRegistry.current.delete(item.url);}return i!==index;}));}
+ const [selectedPreset,setSelectedPreset]=useState(null),[presetFilter,setPresetFilter]=useState('trending');
  const [optionsOpen,setOptionsOpen]=useState(false),[style,setStyle]=useState('None'),[batchSize,setBatchSize]=useState(1);
  const [error,setError]=useState('');
  const [prompt,setPrompt]=useState('');
@@ -68,16 +70,22 @@ export default function Creator(){
  return <PreviewShell active="Creator">
  <main className="k4k-own-generator k4k-creator-layout">
   <div className="k4k-own-back"><Link href="/k4k-app">← Explore</Link><Link href="/k4k-app/videos">My videos ↗</Link></div>
-  <section className="k4k-own-sheet" aria-label="Create your own video">
+  <section className="k4k-own-presets-gallery" aria-label="Video presets">
+  <div className="k4k-own-gallery-heading"><span>✦ K4K APP</span><h1>Discover video presets</h1><p>Pick a trend to use as your motion reference, or upload your own video in the editor.</p></div>
+  <div className="k4k-own-gallery-tabs" role="group" aria-label="Preset categories"><button type="button" className={presetFilter==='trending'?'active':''} onClick={()=>setPresetFilter('trending')}>↗ Community trending</button><button type="button" className={presetFilter==='new'?'active':''} onClick={()=>setPresetFilter('new')}>◷ Community new</button></div>
+  <div className="k4k-own-preset-grid">{(presetFilter==='trending'?catalogue.trending:[...catalogue.trending].reverse()).map((preset,index)=><button key={preset.id} type="button" className={'k4k-own-preset-card'+(selectedPreset?.id===preset.id?' selected':'')} onClick={()=>{setSelectedPreset(preset);video.setFile(null);setError('')}} aria-pressed={selectedPreset?.id===preset.id} title={preset.title}><video src={preset.videoUrl} muted playsInline preload="metadata" poster={preset.posterUrl||undefined} aria-hidden="true"/><span className="k4k-own-preset-caption"><strong>{preset.title}</strong><small>{preset.requiredImages} {preset.requiredImages===1?'photo':'photos'} · {Math.round(preset.durationSeconds)}s</small></span></button>)}</div>
+ </section>
+ <section className="k4k-own-sheet" aria-label="Create your own video">
    <div className="k4k-own-handle" aria-hidden="true"/>
    <header className="k4k-own-title"><span className="k4k-own-info" title="Custom reference-video generator">ⓘ</span><div><h1>Create a video</h1><p>K4K APP · Own Video Generator</p></div><Link href="/k4k-app" aria-label="Close creator">✕</Link></header>
    <div className="k4k-own-upload">
     <label className="k4k-own-drop">
-     {video.url?<video src={video.url} controls playsInline preload="metadata" onClick={e=>e.preventDefault()} aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4, WebM or MOV · up to 150 MB</small><span className="k4k-own-select">＋ Choose video</span></>}
-     <input type="file" accept="video/mp4,video/webm,video/quicktime" aria-label="Upload reference video" onChange={e=>choose(e,video,'video',MAX_VIDEO)}/>
+     {(video.url||selectedPreset)?<video src={video.url||selectedPreset.videoUrl} controls playsInline preload="metadata" onClick={e=>e.preventDefault()} aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4, WebM or MOV · up to 150 MB</small><span className="k4k-own-select">＋ Choose video</span></>}
+     <input type="file" accept="video/mp4,video/webm,video/quicktime" aria-label="Upload reference video" onChange={e=>{setSelectedPreset(null);choose(e,video,'video',MAX_VIDEO)}}/>
     </label>
+    {selectedPreset&&<button type="button" className="k4k-own-clear-preset" onClick={()=>setSelectedPreset(null)}>Clear selected preset</button>}
     {video.file&&<div className="k4k-own-file"><span>{video.file.name}</span><button type="button" onClick={()=>video.setFile(null)}>Remove</button></div>}
-    <Link className="k4k-own-presets" href="/k4k-app#templates">＋ Select from presets</Link>
+    <p className="k4k-own-preset-hint">{selectedPreset?'Selected: '+selectedPreset.title+' · '+selectedPreset.requiredImages+' character photos':'Select any video from the presets gallery'}</p>
    </div>
    <h2 className="k4k-own-subtitle">Attachments <span>{extraImages.length+(character.file?1:0)} / 30</span></h2>
    <div className="k4k-own-upload">
