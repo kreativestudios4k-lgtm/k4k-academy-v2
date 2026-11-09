@@ -29,10 +29,36 @@ export default function Creator(){
  const [error,setError]=useState('');
  const [prompt,setPrompt]=useState('');
  const [model,setModel]=useState('pro');
+ const [preflightBusy,setPreflightBusy]=useState(false),[preflightResult,setPreflightResult]=useState(null),[preflightError,setPreflightError]=useState('');
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
  const [history,setHistory]=useState([]),[historyState,setHistoryState]=useState('');
  async function loadHistory(){setHistoryState('Loading your generation history…');try{const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Sign in to view your generation history.');const {data,error}=await client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);if(error)throw error;setHistory(data||[]);setHistoryState(data?.length?'':'No generation drafts or jobs yet.');}catch(e){setHistoryState(e?.message||'Could not load history.')}}
+ async function checkGenerationEstimate(){
+  setPreflightError('');setPreflightResult(null);
+  if(preflightBusy)return;
+  const source=video.file;
+  if(!source){setPreflightError('Upload an MP4 reference video to estimate generation. Gallery presets cannot be estimated until saved as owned media.');return;}
+  const imageCount=extraImages.length+(character.file?1:0);
+  if(imageCount<1||imageCount>8){setPreflightError('Choose between 1 and 8 character images for either model.');return;}
+  setPreflightBusy(true);
+  try{
+   const duration=await new Promise((resolve,reject)=>{
+    const objectUrl=URL.createObjectURL(source),element=document.createElement('video');
+    const cleanup=()=>{element.removeAttribute('src');element.load();URL.revokeObjectURL(objectUrl)};
+    element.preload='metadata';element.onloadedmetadata=()=>{const seconds=element.duration;cleanup();Number.isFinite(seconds)&&seconds>0?resolve(seconds):reject(new Error('Cannot read video duration.'))};
+    element.onerror=()=>{cleanup();reject(new Error('Cannot read video metadata.'))};element.src=objectUrl;
+   });
+   if(model==='lite'&&duration>15)throw new Error('K4K Lite supports up to 15 seconds. Trim your video before generating.');
+   if(model==='pro'&&(duration<4||duration>30))throw new Error('K4K Pro requires a video between 4 and 30 seconds.');
+   const client=createClient();const {data:{session},error:sessionError}=await client.auth.getSession();
+   if(sessionError||!session?.access_token)throw new Error('Sign in to check generation costs.');
+   const response=await fetch('/api/generation/preflight',{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({tier:model,resolution:quality,sourceSeconds:duration,imageCount})});
+   const result=await response.json();
+   if(!response.ok)throw new Error(result.error||'Unable to estimate provider cost.');
+   setPreflightResult(result);
+  }catch(e){setPreflightError(e?.message||'Could not estimate cost.')}finally{setPreflightBusy(false)}
+ }
  async function saveDraft(){
   if(!savedReference||savingDraft)return;
   setSavingDraft(true);setDraftMessage('');
@@ -74,6 +100,7 @@ export default function Creator(){
    setUploadMessage(files.length+' image(s)'+(videoPath?' and reference video':'')+' saved privately. No AI generation or credit charge occurred.');
   }catch(e){setUploadMessage(e?.message||'Unable to save reference image.')}finally{setUploading(false)}
  }
+ useEffect(()=>{setPreflightResult(null);setPreflightError('')},[model,quality,video.file,character.file,extraImages]);
  const pt=locale==='pt',es=locale==='es';
  const copy=pt?{title:'Estúdio de criação',intro:'Prepare seu vídeo e sua foto. O vídeo fica no navegador; você pode salvar a foto na sua conta.',reference:'Vídeo de referência',image:'Foto do personagem',prompt:'Instruções criativas (opcional)',placeholder:'Descreva o personagem, o cenário ou o resultado desejado...',model:'Modelo de geração',ready:'Prévia pronta para geração',waiting:'Adicione um vídeo e uma imagem para preparar seu projeto',disabled:'Geração de IA ainda desativada — nenhum crédito será cobrado.',back:'Explorar templates',video:'Escolher vídeo',photo:'Escolher foto',remove:'Remover',privacy:'O vídeo fica neste navegador. A foto só é enviada ao armazenamento privado se você clicar em Salvar.',limit:'Arquivo inválido ou acima do limite permitido.'}:es?{title:'Estudio de creación',intro:'Prepara tu vídeo y foto. El vídeo permanece en tu navegador; puedes guardar la foto en tu cuenta.',reference:'Vídeo de referencia',image:'Foto del personaje',prompt:'Instrucciones creativas (opcional)',placeholder:'Describe el resultado deseado...',model:'Modelo de generación',ready:'Vista previa lista',waiting:'Añade un vídeo y una imagen',disabled:'Generación desactivada — no se cobran créditos.',back:'Explorar plantillas',video:'Elegir vídeo',photo:'Elegir foto',remove:'Quitar',privacy:'El vídeo permanece en tu navegador. La foto solo se sube si eliges guardarla.',limit:'Archivo no válido o demasiado grande.'}:{title:'Creator Studio',intro:'Prepare a reference video and character image. Your images and optional MP4 reference video can be saved privately.',reference:'Reference video',image:'Character photo',prompt:'Creative instructions (optional)',placeholder:'Describe the character, scene, or result you want...',model:'Generation model',ready:'Project ready for generation',waiting:'Add a video and an image to prepare your project',disabled:'AI generation is disabled — no credits will be charged.',back:'Explore templates',video:'Choose video',photo:'Choose photo',remove:'Remove',privacy:'Video stays in this browser. Images and an optional MP4 video are uploaded to private storage only when you choose Save reference media.',limit:'Invalid file or file exceeds the size limit.'};
  function choose(event,target,kind,max){const file=event.target.files?.[0];setError('');if(!file)return;if(!(kind==='image'?IMAGE_TYPES:VIDEO_TYPES).includes(file.type)||file.size>max){setError(copy.limit);event.target.value='';return;}target.setFile(file);setSavedReference(null);setDraftMessage('')}
@@ -112,6 +139,9 @@ export default function Creator(){
    {error&&<p role="alert" className="k4k-own-error">{error}</p>}
    <div className="k4k-own-bottom"><button type="button" className="k4k-own-generate" disabled aria-label="Generation not yet enabled">Generate with {model==='lite'?'K4K Lite':'K4K Pro'} ✦</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
    <p className="k4k-own-safety">Preview only · {model==='lite'?'K4K Lite (up to 15s)':'K4K Pro (4–30s)'} · AI generation disabled · No credits charged</p>
+   <button type="button" className="k4k-own-done" onClick={checkGenerationEstimate} disabled={preflightBusy}>{preflightBusy?'Checking…':'Check estimated generation cost'}</button>
+   {preflightError&&<p role="alert" className="k4k-own-error">{preflightError}</p>}
+   {preflightResult&&<p role="status">{preflightResult.model} · {preflightResult.resolution} · Estimated provider cost: ${preflightResult.estimatedProviderUsd.toFixed(2)} USD. This is not a customer price or credit quote. No generation or charge occurred.</p>}
   </section></div>}
   {assetsOpen&&<div className="k4k-own-modal-backdrop" onClick={()=>setAssetsOpen(false)}><section className="k4k-own-modal k4k-own-assets-modal" role="dialog" aria-modal="true" aria-label="Choose attachments" onClick={e=>e.stopPropagation()}><div className="k4k-own-handle"/><header><h2>Attachments</h2><button type="button" onClick={()=>setAssetsOpen(false)} aria-label="Close attachments">✕</button></header><p>Upload clear photos of your characters, products or clothes. Maximum 30 images, 10 MB each.</p><label className="k4k-own-assets-picker">＋ Upload images<input type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={e=>{const files=Array.from(e.target.files||[]);e.target.value='';if(files.length+extraImages.length+(character.file?1:0)>30||files.some(f=>!IMAGE_TYPES.includes(f.type)||f.size>MAX_IMAGE)){setError('Maximum 30 images, 10 MB each.');return;}setError('');if(!character.file&&files.length){character.setFile(files.shift());setSavedReference(null);setDraftMessage('');}const next=files.map(file=>{const url=URL.createObjectURL(file);extraUrlRegistry.current.add(url);return {file,url};});setExtraImages(old=>[...old,...next]);}}/></label><div className="k4k-own-assets-grid">{character.url&&<img src={character.url} alt="Primary reference"/>}{extraImages.map((item,i)=><img src={item.url} key={item.url} alt={'Reference '+(i+2)}/>)}</div><button type="button" className="k4k-own-done" onClick={()=>setAssetsOpen(false)}>Done · {extraImages.length+(character.file?1:0)} selected</button></section></div>}
   {optionsOpen&&<div className="k4k-own-modal-backdrop" onClick={()=>setOptionsOpen(false)}><section className="k4k-own-modal" role="dialog" aria-modal="true" aria-label="Generation options" onClick={e=>e.stopPropagation()}><div className="k4k-own-handle"/><header><h2>Options</h2><button type="button" aria-label="Close options" onClick={()=>setOptionsOpen(false)}>✕</button></header>
