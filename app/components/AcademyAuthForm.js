@@ -2,7 +2,7 @@
 
 import {useCallback,useEffect,useState} from 'react';
 import Link from 'next/link';
-import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
+import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,MessageCircle,X,HelpCircle} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
 import catalogue from '../k4k-app/template-catalogue.json';
@@ -30,6 +30,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
  const [lookup,setLookup]=useState(registering?'loading':'not-needed');
  const [message,setMessage]=useState('');
  const [error,setError]=useState('');
+ const [supportOpen,setSupportOpen]=useState(false);
 
  const verifyCheckout=useCallback(async()=>{
   if(!registering||!sessionId)return;
@@ -188,7 +189,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
-   <p className="k4k-auth-support"><ShieldCheck size={16}/> Need account help? <a href="mailto:hello@kreativestudios4k.com">Contact Academy support</a>. Don't pay twice.</p>
+   <div className="k4k-auth-support-dock"><button type="button" className="k4k-auth-support-fab" aria-label={supportOpen?"Close support":"Open support"} aria-expanded={supportOpen} aria-controls="k4k-auth-support-panel" onClick={()=>setSupportOpen(v=>!v)}>{supportOpen?<X size={21}/>:<MessageCircle size={21}/>}<span>Support</span></button>{supportOpen&&<section id="k4k-auth-support-panel" className="k4k-auth-support-panel" aria-label="Account support"><div className="k4k-auth-support-panel-head"><strong>How can we help?</strong><button type="button" onClick={()=>setSupportOpen(false)} aria-label="Close support"><X size={18}/></button></div><p>Need help signing in or creating your account?</p><Link href="/k4k-app/support"><HelpCircle size={17}/> Help centre & FAQs</Link><a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20Account%20Support"><Mail size={17}/> Email K4K support</a><small>Already paid? Please contact us before making another payment.</small></section>}</div>
   </div>
  </main>;
 }
