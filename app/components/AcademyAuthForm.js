@@ -124,7 +124,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
 
  return <main className="k4k-auth-page kx-auth">
   <header className="k4k-auth-header">
-   <Link className="k4k-auth-brand" href="/" aria-label="K4K APP home">K4K<span>✳</span> <small>APP</small></Link>
+   <Link className="k4k-auth-brand" href="/" aria-label="K4K APP home"><span className="kx-brand-mark" aria-hidden="true">K<span>✳</span></span><span className="kx-brand-name">K4K <small>APP</small></span></Link>
    <Link href="/" className="k4k-auth-back">Home <ArrowRight size={15}/></Link>
   </header>
   <div className="k4k-auth-centre kx-auth-grid">
