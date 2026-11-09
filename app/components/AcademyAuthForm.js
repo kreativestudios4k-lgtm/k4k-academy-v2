@@ -5,6 +5,9 @@ import Link from 'next/link';
 import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
+import catalogue from '../k4k-app/template-catalogue.json';
+const featuredClips=[...catalogue.trending,...catalogue.topPerforming].filter(item=>item.videoUrl).slice(0,3);
+const videoHooks=['TURN ONE PHOTO INTO A SCENE','YOUR IDEAS. NOW IN MOTION.','CREATE THE NEXT VIRAL MOMENT'];
 
 const isEmail=(value)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 function GoogleIcon(){
@@ -126,14 +129,18 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   </header>
   <div className="k4k-auth-centre kx-auth-grid">
    <aside className="kx-stage" aria-hidden="true">
-    <p className="kx-stage-kicker">Scene 01 · 00:03 · Storyboard</p>
-    <div className="kx-frames">
-     <div className="kx-frame kx-frame-a"><span>Wide</span></div>
-     <div className="kx-frame kx-frame-b"><span>Close</span></div>
-     <div className="kx-frame kx-frame-c"><span>Cut</span></div>
+    <p className="kx-stage-kicker">K4K APP · AI VIDEO STUDIO</p>
+    <h2 className="kx-stage-title">Your imagination. <em>On screen.</em></h2>
+    <p className="kx-stage-copy">Create bold AI videos, transform characters and bring your next big idea to life.</p>
+    <div className="kx-showreel" aria-label="Examples of K4K video templates">
+     {featuredClips.map((clip,i)=><div className="kx-showreel-card" key={clip.id}>
+      <video src={clip.videoUrl} autoPlay muted loop playsInline preload="metadata" aria-label={clip.title}/>
+      <span className="kx-showreel-shade" aria-hidden="true"/>
+      <span className="kx-showreel-number">0{i+1} / K4K ORIGINAL</span>
+      <strong>{videoHooks[i]}</strong>
+     </div>)}
     </div>
-    <h2 className="kx-stage-title">Plan the shot. <em>Then make it move.</em></h2>
-    <p className="kx-stage-copy">Build your scenes frame by frame and keep your characters consistent from one clip to the next.</p>
+    <p className="kx-showreel-footnote">Real template previews · Videos play muted on loop</p>
    </aside>
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
