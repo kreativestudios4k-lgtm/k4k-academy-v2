@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test:billing": "node --test tests/stripe-invoice-safety.test.mjs"
+    "test:billing": "node --test tests/stripe-invoice-safety.test.mjs",
+    "test:journey": "node --test tests/customer-journey.test.mjs",
+    "prebuild": "npm run test:journey"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.103",
