@@ -5,7 +5,7 @@ const user='11111111-1111-4111-8111-111111111111';
 const job='22222222-2222-4222-8222-222222222222';
 const key='33333333-3333-4333-8333-333333333333';
 test('reservation and completion are disabled by default without any RPC',async()=>{
- const calls=[];const ledger=createGuardedGenerationLedger({rpc:async(...args)=>{calls.push(args);return {data:{ok:true},error:null}}});
+ const calls=[];const ledger=createGuardedGenerationLedger({rpc:async(...args)=>{calls.push(args);return {data:{ok:true,newly_reserved:true},error:null}}});
  await assert.rejects(ledger.reserve(user,job,key,10),/GENERATION_DISABLED/);
  await assert.rejects(ledger.finish(user,job,'failed'),/GENERATION_DISABLED/);
  assert.equal(calls.length,0);
@@ -25,4 +25,16 @@ test('invalid credits and outcomes fail before RPC',async()=>{
 test('database errors fail closed',async()=>{
  const ledger=createGuardedGenerationLedger({rpc:async()=>({data:null,error:{message:'failure'}})},{enabled:true});
  await assert.rejects(ledger.reserve(user,job,key,1),/GENERATION_LEDGER_UNAVAILABLE/);
+});
+
+test('new reservation flag maps to lifecycle contract and retry stays false',async()=>{
+ let newReservation=true;
+ const ledger=createGuardedGenerationLedger({rpc:async()=>({data:{newly_reserved:newReservation,status:'reserved'},error:null})},{enabled:true});
+ assert.equal((await ledger.reserve(user,job,key,2)).newlyReserved,true);
+ newReservation=false;
+ assert.equal((await ledger.reserve(user,job,key,2)).newlyReserved,false);
+});
+test('missing reservation idempotency contract fails closed',async()=>{
+ const ledger=createGuardedGenerationLedger({rpc:async()=>({data:{status:'reserved'},error:null})},{enabled:true});
+ await assert.rejects(ledger.reserve(user,job,key,2),/RESERVATION_CONTRACT_INVALID/);
 });
