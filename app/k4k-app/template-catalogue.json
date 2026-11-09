@@ -1,6 +1,6 @@
 {
-  "version": 5,
-  "mediaStatus": "10-hosted-replacement-uploaded",
+  "version": 6,
+  "mediaStatus": "18-hosted-videos",
   "topPerforming": [],
   "trending": [
     {
@@ -122,6 +122,102 @@
       "mediaId": "efb4dfc3-be3a-4b60-98ab-1f0709ad3910",
       "requiredImages": 4,
       "characterCountReview": "Replacement-photo count confirmed by creator."
+    },
+    {
+      "id": "k4k-011",
+      "title": "Dance Challenge",
+      "sourceFilename": "33729.mp4",
+      "durationSeconds": 21.43,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/3bdabaf1-ef04-41ae-a7a3-3aa6ef58b497.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "3bdabaf1-ef04-41ae-a7a3-3aa6ef58b497",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-012",
+      "title": "Safari Surprise 😂",
+      "sourceFilename": "A legenda é com vocês! 😂#viral #viralreels #viralvideos #cristianlopes #ia.mp4",
+      "durationSeconds": 9.43,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/75b8be3d-4b06-4494-a8e3-4fd1a2ea851a.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "75b8be3d-4b06-4494-a8e3-4fd1a2ea851a",
+      "requiredImages": 2,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-013",
+      "title": "Hotline Bling Dance",
+      "sourceFilename": "hotline bling his way🤯… creating using @syntx_global @syntx_creators 👉 Code „CVL15“ = 🔥15% OF.mp4",
+      "durationSeconds": 14.7,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/1494cc77-a70d-44b8-80bc-2df810a3b9f1.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "1494cc77-a70d-44b8-80bc-2df810a3b9f1",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-014",
+      "title": "Coach Reaction",
+      "sourceFilename": "higgsfield-a01d799e-186c-4d84-acb2-a8399ad4fb72(1).mp4",
+      "durationSeconds": 9.04,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/c5a2c874-f739-44ea-9f37-d2e095aeec1b.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "c5a2c874-f739-44ea-9f37-d2e095aeec1b",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-015",
+      "title": "Flamengo Angel",
+      "sourceFilename": "higgsfield-a80161a0-3f0d-48d7-ab03-8eec65c5820d(1).mp4",
+      "durationSeconds": 22.06,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/1068fef2-baf2-4610-b868-4b99571d1694.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "1068fef2-baf2-4610-b868-4b99571d1694",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-016",
+      "title": "Kitchen Surprise",
+      "sourceFilename": "2F5DB97A-4E7E-4FA9-87AB-3A8C00309608.mov",
+      "durationSeconds": 10.03,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/543783b5-89ed-49ec-8a91-e2e307265fc5.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "543783b5-89ed-49ec-8a91-e2e307265fc5",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-017",
+      "title": "Bridge Scene",
+      "sourceFilename": "higgsfield-9a763001-538b-41c6-b1bc-5d174eb9ceb7(1).mp4",
+      "durationSeconds": 15.04,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/2e8146f8-a6e2-415b-87d1-b9d5906fa5d3.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "2e8146f8-a6e2-415b-87d1-b9d5906fa5d3",
+      "requiredImages": 1,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+    },
+    {
+      "id": "k4k-018",
+      "title": "He Tweakin’",
+      "sourceFilename": "He Tweakin’(1).mp4",
+      "durationSeconds": 15.14,
+      "videoUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3Fzv4wKUSDX4s66inQmCD1u4yFc/d9490915-df2d-427c-9f6d-833f0cff7e5e.mp4",
+      "posterUrl": null,
+      "audio": true,
+      "mediaId": "d9490915-df2d-427c-9f6d-833f0cff7e5e",
+      "requiredImages": 2,
+      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
     }
   ]
 }
