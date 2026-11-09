@@ -9,7 +9,8 @@
     "test:billing": "node --test tests/stripe-invoice-safety.test.mjs",
     "test:journey": "node --test tests/customer-journey.test.mjs",
     "prebuild": "npm run test:journey && npm run test:theme && npm run test:billing",
-    "test:theme": "node --test tests/theme.test.mjs"
+    "test:theme": "node --test tests/theme.test.mjs",
+    "test:all": "node --test tests/*.test.mjs tests/integration/*.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.103",
