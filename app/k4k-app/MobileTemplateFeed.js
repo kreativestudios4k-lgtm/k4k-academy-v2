@@ -16,20 +16,21 @@ export default function MobileTemplateFeed(){
  const scroll=useRef(null),videos=useRef(new Map());
  const list=mode==='trending'?library.slice(0,10):library;
  const selected=list[Math.min(active,list.length-1)];
+ const requiredPhotos=item=>Math.max(1,Math.min(30,Number(item.requiredImages||item.peopleCount||item.charactersCount||1)));
  useEffect(()=>{const root=scroll.current;if(!root)return;const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting&&entry.intersectionRatio>=.65)setActive(Number(entry.target.dataset.slide));},{root,threshold:[.65]});root.querySelectorAll('[data-slide]').forEach(el=>observer.observe(el));return()=>observer.disconnect();},[mode]);
  useEffect(()=>{videos.current.forEach((video,i)=>{if(!video)return;const playing=i===active&&!tips;video.muted=!playing||!audio;if(playing)video.play().catch(()=>{});else video.pause();});},[active,audio,tips,mode]);
  useEffect(()=>{if(!tips)return;const onKey=e=>{if(e.key==='Escape')setTips(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[tips]);
  function setTab(next){setMode(next);setActive(0);setAudio(false);videos.current.forEach(v=>v?.pause());videos.current.clear();scroll.current?.scrollTo({top:0});}
  if(!library.length)return <div className="k4k-reels-empty">No video templates available.</div>;
  return <div className="k4k-reels">
-  <header className="k4k-reels-header"><Link href="/k4k-app" className="k4k-reels-logo">✦ K4K <b>APP</b></Link><div className="k4k-reels-tabs"><button className={mode==='trending'?'active':''} onClick={()=>setTab('trending')} aria-pressed={mode==='trending'}>{t.trending}</button><button className={mode==='all'?'active':''} onClick={()=>setTab('all')} aria-pressed={mode==='all'}>{t.all}</button></div></header>
+  <header className="k4k-reels-header"><Link href="/k4k-app" className="k4k-reels-logo"><img src="/k4k-mark.svg" width="32" height="32" alt="" /><span>K4K <b>APP</b><small>CREATE · SWAP · GENERATE</small></span></Link><div className="k4k-reels-tabs"><button className={mode==='trending'?'active':''} onClick={()=>setTab('trending')} aria-pressed={mode==='trending'}>{t.trending}</button><button className={mode==='all'?'active':''} onClick={()=>setTab('all')} aria-pressed={mode==='all'}>{t.all}</button></div></header>
   <main className="k4k-reels-scroll" ref={scroll}>
    {list.map((item,i)=><section className="k4k-reels-slide" data-slide={i} key={item.id} aria-label={item.title}>
     <video ref={el=>{if(el)videos.current.set(i,el);else videos.current.delete(i)}} src={item.videoUrl} poster={item.posterUrl||undefined} muted loop playsInline preload={Math.abs(i-active)<=1?'metadata':'none'} onClick={()=>setAudio(x=>!x)} aria-label={'Tap to toggle sound for '+item.title}/>
     <div className="k4k-reels-overlay"/>
     {active===i&&<span className="k4k-reels-sound" aria-hidden="true">{audio?'♪':'♪̸'}</span>}
-    <aside className="k4k-reels-actions"><div><span aria-hidden="true">♙</span>1 {t.photos}</div><button onClick={()=>setTips(true)}><span aria-hidden="true">ⓘ</span>{t.tips}</button></aside>
-    <div className="k4k-reels-caption"><span className="k4k-reels-badge">✦ {t.exclusive}</span><h1>{item.title}</h1><p>{Math.round(item.durationSeconds||10)}s · 1 {t.people}</p><Link href={'/k4k-app/template/'+encodeURIComponent(item.id)} className="k4k-reels-cta">✦ {t.use}</Link></div>
+    <aside className="k4k-reels-actions"><div><span aria-hidden="true">♙</span>{requiredPhotos(item)} {t.photos}{requiredPhotos(item)>1?'s':''}</div><button onClick={()=>setTips(true)}><span aria-hidden="true">ⓘ</span>{t.tips}</button></aside>
+    <div className="k4k-reels-caption"><span className="k4k-reels-badge">✦ {t.exclusive}</span><h1>{item.title}</h1><p>{Math.round(item.durationSeconds||10)}s · {requiredPhotos(item)} {t.people}</p><Link href={'/k4k-app/template/'+encodeURIComponent(item.id)} className="k4k-reels-cta">✦ {t.use}</Link></div>
    </section>)}
   </main>
   <nav className="k4k-reels-nav" aria-label="Main navigation"><Link href="/k4k-app" aria-current="page"><span>⌂</span>{t.home}</Link><Link href="/k4k-app/videos"><span>▦</span>{t.videos}</Link><Link href="/k4k-app/creator" className="k4k-reels-create"><span>✦</span>{t.creator}</Link><Link href="/k4k-app/credits"><span>◎</span>{t.credits}</Link><Link href="/k4k-app/account"><span>♙</span>{t.account}</Link></nav>
