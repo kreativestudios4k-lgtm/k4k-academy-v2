@@ -92,7 +92,7 @@ function PreviewVideo({item,featured=false,register}){
   src={item.videoUrl}
   className={featured?'k4k-videoframe-video k4k-videoframe-featured':'k4k-videoframe-video'}
   poster={item.posterUrl||undefined}
-  muted loop playsInline preload={featured?'metadata':'none'}
+  muted autoPlay={featured} loop playsInline preload={featured?'auto':'metadata'}
   onMouseEnter={startMuted} onMouseLeave={pause}
   onClick={event=>{
    const current=event.currentTarget;
