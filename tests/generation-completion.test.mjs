@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createGenerationCompletion} from '../lib/server/generation-completion.mjs';
 const userId='11111111-1111-4111-8111-111111111111',jobId='22222222-2222-4222-8222-222222222222',providerJobId='mock-provider';
-const outputPath=userId+'/33333333-3333-4333-8333-333333333333.mp4';
+const outputPath=userId+'/'+jobId+'.mp4';
 const request={userId,jobId,providerJobId,outcome:'completed',outputPath};
 function fixture(overrides={}){
  const calls=[];
@@ -37,5 +37,11 @@ test('failure refunds without output only for owned processing job',async()=>{
 test('completed job cannot settle twice through coordinator',async()=>{
  const {completion,calls}=fixture({job:{status:'completed'}});
  await assert.rejects(completion.settle(request),/INVALID_JOB_STATE/);
+ assert.equal(calls.length,0);
+});
+
+test('rejects another job output even within the same user folder',async()=>{
+ const {completion,calls}=fixture();
+ await assert.rejects(completion.settle({...request,outputPath:userId+'/33333333-3333-4333-8333-333333333333.mp4'}),/INVALID_OUTPUT/);
  assert.equal(calls.length,0);
 });
