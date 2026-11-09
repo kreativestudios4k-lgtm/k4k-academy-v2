@@ -24,6 +24,9 @@ export async function POST(request){
  if(job.status!=='draft'||!['lite','pro'].includes(job.model))return reply({error:'INVALID_JOB_STATE'},409);
  try{
   const verified=await verifyStudioMedia({client:admin,userId:user.id,referencePaths:job.reference_paths,videoPath:job.reference_video_path});
-  return reply({jobId:job.id,mediaVerified:true,durationVerified:verified.durationVerified,images:verified.images,generationEnabled:false,creditsReserved:0,note:'Private media verified. Duration and provider billing still require trusted verification; generation disabled.'},200);
+  const seconds=verified.durationSeconds;
+  const validDuration=job.model==='lite'?seconds<=15:seconds>=4&&seconds<=30;
+  if(!validDuration)return reply({error:'MODEL_DURATION_OUT_OF_RANGE',durationSeconds:seconds},422);
+  return reply({jobId:job.id,mediaVerified:true,durationVerified:true,durationSeconds:seconds,images:verified.images,generationEnabled:false,creditsReserved:0,note:'Private media and MP4 duration verified. Paid generation remains disabled.'},200);
  }catch{return reply({error:'MEDIA_VERIFICATION_FAILED'},422)}
 }
