@@ -166,7 +166,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}
     <p className="k4k-auth-footer">
-     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K APP? <Link href="/k4k-app/coming-soon">Request creator access</Link></>}
+     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K APP? <Link href="/k4k-app/credits">Explore plans</Link></>}
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
