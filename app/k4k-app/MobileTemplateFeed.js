@@ -2,42 +2,37 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import catalogue from './template-catalogue.json';
-import {useK4KLocale,labels} from './locale';
-const items=[...catalogue.topPerforming.map(x=>({...x,category:'Top Performing'})),...catalogue.trending.map(x=>({...x,category:'Trending Now'}))];
-const prettyViews=n=>n>=1000000?(n/1000000).toFixed(1).replace(/\\.0$/,'')+'M':n.toLocaleString('en-GB');
-export default function MobileTemplateFeed(){const {locale}=useK4KLocale();const tr=labels[locale]||labels.en;
- const [active,setActive]=useState(0),[muted,setMuted]=useState(true),[showInfo,setShowInfo]=useState(false),[filter,setFilter]=useState('Trending Now');
- const videos=useRef([]),scroller=useRef(null);
- const visible=items.filter(item=>filter==='All'||item.category===filter);
- useEffect(()=>{videos.current.forEach((video,i)=>{if(!video)return;video.muted=i!==active||muted;if(i===active)video.play().catch(()=>{});else video.pause();});},[muted,active,filter]);
- function handleVideoTap(event){
-  const current=event.currentTarget;
-  // Browsers require a user gesture before an autoplaying video can become audible.
-  if(current.muted){
-   current.muted=false;
-   current.volume=1;
-   setMuted(false);
-   if(current.paused)current.play().catch(()=>{});
-   return;
-  }
-  if(current.paused)current.play().catch(()=>{});
-  else current.pause();
- }
- function selectFilter(value){videos.current.forEach(video=>{if(video){video.pause();video.muted=true;}});videos.current=[];setFilter(value);setActive(0);setShowInfo(false);if(scroller.current)scroller.current.scrollTop=0;}
- function onScroll(event){const el=event.currentTarget;const index=Math.max(0,Math.min(visible.length-1,Math.round(el.scrollTop/el.clientHeight)));if(index!==active){setActive(index);setShowInfo(false);}}
- return <div className="k4k-mobile-feed">
- <aside className="k4k-desktop-rail k4k-desktop-rail-left" aria-label="K4K creator studio introduction"><div className="k4k-rail-eyebrow">✦ K4K APP / CREATOR STUDIO</div><h2>MAKE THE<br/><em>MOMENT</em><br/>YOURS.</h2><p>Discover trending scenes. Replace characters. Create your own viral story.</p><div className="k4k-rail-line"/><span className="k4k-rail-label">01 / DISCOVER</span><span className="k4k-rail-label">02 / RECREATE</span><span className="k4k-rail-label">03 / GO VIRAL</span><Link href="/k4k-app/support" className="k4k-rail-link">Help &amp; support ↗</Link></aside>
- <aside className="k4k-desktop-rail k4k-desktop-rail-right" aria-label="K4K creator tools"><span className="k4k-rail-eyebrow">THE NEXT GENERATION</span><h2>YOUR IDEAS.<br/><em>NO LIMITS.</em></h2><div className="k4k-rail-feature"><span>↗</span><div><strong>CHARACTER SWAP</strong><small>Put yourself in the scene</small></div></div><div className="k4k-rail-feature"><span>✧</span><div><strong>MOTION TRANSFER</strong><small>Bring every movement to life</small></div></div><div className="k4k-rail-feature"><span>▣</span><div><strong>VIRAL TEMPLATES</strong><small>Start with what is trending</small></div></div><div className="k4k-rail-invite"><strong>CREATOR WORKSPACE</strong><p>Create an account, prepare drafts and save your projects.</p><Link href="/k4k-app/creator">Open Creator Studio ↗</Link></div></aside>
- <header className="k4k-feed-top"><Link href="/k4k-app" className="k4k-feed-brand">✦ K4K <b>APP</b></Link><div className="k4k-feed-tabs"><button type="button" className={filter==='Trending Now'?'is-active':''} onClick={()=>selectFilter('Trending Now')}>{tr.Trending}</button><button type="button" className={filter==='Top Performing'?'is-active':''} onClick={()=>selectFilter('Top Performing')}>{tr.Top}</button><button type="button" className={filter==='All'?'is-active':''} onClick={()=>selectFilter('All')}>{tr.All}</button></div></header>
- <div className="k4k-feed-scroll" ref={scroller} onScroll={onScroll}>
- {visible.map((item,index)=><section className="k4k-feed-slide" key={item.id}>
- {item.videoUrl?<video ref={el=>{videos.current[index]=el}} className="k4k-feed-video" onClick={handleVideoTap} poster={item.posterUrl||undefined} src={item.videoUrl} autoPlay={index===0} muted={muted||index!==active} loop playsInline preload={index<2?'metadata':'none'} aria-label={item.title}/>:<div className="k4k-feed-pending"><span>✦</span><strong>{item.title}</strong><small>Video preview being prepared</small></div>}
- <div className="k4k-feed-shade"/>
- <div className="k4k-feed-actions"><button type="button" onClick={()=>setShowInfo(x=>!x)} aria-label="Template details">ⓘ<small>{tr.Info}</small></button></div>
- {showInfo&&index===active&&<div className="k4k-feed-info"><strong>{item.title}</strong><p>{item.views?`${prettyViews(item.views)} views on ${item.platform}. `:''}This video is a hosted K4K template preview. Automatic character generation is not enabled yet.</p><button type="button" onClick={()=>setShowInfo(false)}>{tr.Close}</button></div>}
- <div className="k4k-feed-bottom"><span className="k4k-feed-pill">✦ {item.category==='Top Performing'?'TOP VIEWED':'TRENDING'}</span><h2>{item.title}</h2><p>{item.views?`${prettyViews(item.views)} ${item.platform} views`:'Trending video reference'}</p><div className="k4k-feed-meta">{item.durationSeconds?item.durationSeconds+'s · ':''}K4K APP template</div><Link className="k4k-feed-cta" href={`/k4k-app/template/${item.id}`}>✦ {tr.Use}</Link></div>
- </section>)}
- </div>
- <nav className="k4k-feed-nav" aria-label="Navigation"><Link href="/k4k-app" className="selected"><span>⌂</span>Explore</Link><Link href="/k4k-app/videos"><span>▦</span>Projects</Link><Link className="k4k-feed-create" href="/k4k-app/creator"><span>✦</span>Create</Link><Link href="/k4k-app/credits"><span>◎</span>Plans</Link><Link href="/k4k-app/account"><span>♙</span>Account</Link></nav>
+import {useK4KLocale} from './locale';
+
+const library=[...catalogue.trending,...catalogue.topPerforming].filter(x=>x.videoUrl);
+const words={
+ en:{trending:'Trending',all:'View all',photos:'photo',tips:'Tips',use:'Use this template',home:'Home',videos:'Videos',creator:'Creator',credits:'Credits',account:'Account',exclusive:'K4K Original',how:'How it works',step1:'Upload one clear, front-facing photo per person.',step2:'Select Use this template to prepare your creation.',step3:'The output can vary from the reference. Only use photos you have permission to use.',notice:'AI generation is not enabled yet. No credits are charged for previewing templates.',close:'Close tips',people:'people'},
+ pt:{trending:'Em alta',all:'Ver todos',photos:'foto',tips:'Dicas',use:'Usar este template',home:'Início',videos:'Vídeos',creator:'Criador',credits:'Créditos',account:'Entrar',exclusive:'Original K4K',how:'Como funciona',step1:'Envie uma foto nítida e de frente por pessoa.',step2:'Toque em Usar este template para preparar sua criação.',step3:'O resultado pode variar. Use apenas fotos autorizadas.',notice:'A geração de IA ainda não está ativa. Nenhum crédito é cobrado na prévia.',close:'Fechar dicas',people:'pessoas'},
+ es:{trending:'Tendencias',all:'Ver todos',photos:'foto',tips:'Consejos',use:'Usar esta plantilla',home:'Inicio',videos:'Vídeos',creator:'Creador',credits:'Créditos',account:'Cuenta',exclusive:'Original K4K',how:'Cómo funciona',step1:'Sube una foto clara y frontal por persona.',step2:'Toca Usar esta plantilla para preparar tu creación.',step3:'El resultado puede variar. Usa solo fotos autorizadas.',notice:'La generación de IA todavía no está activa. La vista previa no consume créditos.',close:'Cerrar consejos',people:'personas'}
+};
+export default function MobileTemplateFeed(){
+ const {locale}=useK4KLocale(),t=words[locale]||words.en;
+ const [mode,setMode]=useState('trending'),[active,setActive]=useState(0),[audio,setAudio]=useState(false),[tips,setTips]=useState(false);
+ const scroll=useRef(null),videos=useRef(new Map());
+ const list=mode==='trending'?library.slice(0,10):library;
+ const selected=list[Math.min(active,list.length-1)];
+ useEffect(()=>{const root=scroll.current;if(!root)return;const observer=new IntersectionObserver(entries=>{for(const entry of entries)if(entry.isIntersecting&&entry.intersectionRatio>=.65)setActive(Number(entry.target.dataset.slide));},{root,threshold:[.65]});root.querySelectorAll('[data-slide]').forEach(el=>observer.observe(el));return()=>observer.disconnect();},[mode]);
+ useEffect(()=>{videos.current.forEach((video,i)=>{if(!video)return;const playing=i===active&&!tips;video.muted=!playing||!audio;if(playing)video.play().catch(()=>{});else video.pause();});},[active,audio,tips,mode]);
+ useEffect(()=>{if(!tips)return;const onKey=e=>{if(e.key==='Escape')setTips(false)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[tips]);
+ function setTab(next){setMode(next);setActive(0);setAudio(false);videos.current.forEach(v=>v?.pause());videos.current.clear();scroll.current?.scrollTo({top:0});}
+ if(!library.length)return <div className="k4k-reels-empty">No video templates available.</div>;
+ return <div className="k4k-reels">
+  <header className="k4k-reels-header"><Link href="/k4k-app" className="k4k-reels-logo">✦ K4K <b>APP</b></Link><div className="k4k-reels-tabs"><button className={mode==='trending'?'active':''} onClick={()=>setTab('trending')} aria-pressed={mode==='trending'}>{t.trending}</button><button className={mode==='all'?'active':''} onClick={()=>setTab('all')} aria-pressed={mode==='all'}>{t.all}</button></div></header>
+  <main className="k4k-reels-scroll" ref={scroll}>
+   {list.map((item,i)=><section className="k4k-reels-slide" data-slide={i} key={item.id} aria-label={item.title}>
+    <video ref={el=>{if(el)videos.current.set(i,el);else videos.current.delete(i)}} src={item.videoUrl} poster={item.posterUrl||undefined} muted loop playsInline preload={Math.abs(i-active)<=1?'metadata':'none'} onClick={()=>setAudio(x=>!x)} aria-label={'Tap to toggle sound for '+item.title}/>
+    <div className="k4k-reels-overlay"/>
+    {active===i&&<span className="k4k-reels-sound" aria-hidden="true">{audio?'♪':'♪̸'}</span>}
+    <aside className="k4k-reels-actions"><div><span aria-hidden="true">♙</span>1 {t.photos}</div><button onClick={()=>setTips(true)}><span aria-hidden="true">ⓘ</span>{t.tips}</button></aside>
+    <div className="k4k-reels-caption"><span className="k4k-reels-badge">✦ {t.exclusive}</span><h1>{item.title}</h1><p>{Math.round(item.durationSeconds||10)}s · 1 {t.people}</p><Link href={'/k4k-app/template/'+encodeURIComponent(item.id)} className="k4k-reels-cta">✦ {t.use}</Link></div>
+   </section>)}
+  </main>
+  <nav className="k4k-reels-nav" aria-label="Main navigation"><Link href="/k4k-app" aria-current="page"><span>⌂</span>{t.home}</Link><Link href="/k4k-app/videos"><span>▦</span>{t.videos}</Link><Link href="/k4k-app/creator" className="k4k-reels-create"><span>✦</span>{t.creator}</Link><Link href="/k4k-app/credits"><span>◎</span>{t.credits}</Link><Link href="/k4k-app/account"><span>♙</span>{t.account}</Link></nav>
+  {tips&&<div className="k4k-reels-modal-backdrop" onClick={()=>setTips(false)}><section role="dialog" aria-modal="true" aria-labelledby="k4k-reels-dialog-title" className="k4k-reels-modal" onClick={e=>e.stopPropagation()}><button className="k4k-reels-close" aria-label={t.close} onClick={()=>setTips(false)}>×</button><h2 id="k4k-reels-dialog-title">{t.tips} · {selected?.title}</h2><h3>{t.how}</h3><ol><li>{t.step1}</li><li>{t.step2}</li><li>{t.step3}</li></ol><p>{t.notice}</p></section></div>}
  </div>;
 }
