@@ -33,7 +33,7 @@ export default function PricingPage(){
 
   <section className="kx-pricing-hero">
    <p className="kx-pricing-kicker">Plans · Billed monthly · GBP</p>
-   <h1>Choose your <em>plan.</em></h1>
+   <h1 className="kx-hook">Pick the plan that <em>powers your next scene.</em></h1>
    <p>Every plan includes K4K Academy.</p>
   </section>
 
