@@ -209,3 +209,28 @@
 .k4k-mobile-feed .k4k-feed-bottom h2{text-shadow:0 0 24px #39ff1466}
 .kx-pricing-hero h1 em,.kx-stage-title em{text-shadow:0 0 22px #39ff1488}
 @media(prefers-reduced-motion:reduce){.kx-plan{transition:none}}
+
+
+/* K4K authentication clarity refresh: keep the existing auth/OAuth behaviour. */
+.kx-auth .k4k-auth-card{border:1px solid #ffffff24;border-radius:18px;background:#111611;box-shadow:0 24px 80px #0007;padding:clamp(28px,4vw,44px)}
+.kx-auth .k4k-auth-card h1{font-family:Arial,Helvetica,sans-serif;font-weight:800;letter-spacing:-.045em;font-size:clamp(30px,3.4vw,42px);line-height:1.12;margin:15px 0 12px;color:#f7f9f4}
+.kx-auth .k4k-auth-subtitle{font-size:14px;line-height:1.65;color:#b9c0b5;margin-bottom:28px}
+.kx-auth .k4k-auth-step{color:#caff39;font-size:11px;font-weight:800;letter-spacing:.11em}
+.kx-auth .k4k-auth-form label{display:block;color:#e6ebe1;font-size:12px;font-weight:700;letter-spacing:0;text-transform:none;margin-bottom:7px}
+.kx-auth .k4k-auth-form input{width:100%;min-height:48px;padding:13px 14px;background:#090e0a;border:1px solid #ffffff30;border-radius:9px;color:#fff;font-size:15px;transition:border-color .15s,box-shadow .15s}
+.kx-auth .k4k-auth-form input::placeholder{color:#909b8e}
+.kx-auth .k4k-auth-form input:focus,.kx-auth .k4k-auth-password input:focus{border:1px solid #caff39;outline:2px solid #caff3930;outline-offset:1px}
+.kx-auth .k4k-auth-password{position:relative}
+.kx-auth .k4k-auth-password input{border:1px solid #ffffff30;padding-right:48px}
+.kx-auth .k4k-auth-password button{position:absolute;right:8px;top:50%;transform:translateY(-50%);min-width:36px;min-height:36px;display:grid;place-items:center}
+.kx-auth .k4k-auth-label-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kx-auth .k4k-auth-label-row a{color:#caff39;font-size:12px}
+.kx-auth .k4k-auth-submit{min-height:50px;margin-top:22px;border-radius:9px;background:#caff39;color:#10170b;justify-content:center;gap:12px;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:800;letter-spacing:0;text-transform:none}
+.kx-auth .k4k-auth-submit:hover{background:#d9ff71;color:#10170b}
+.kx-auth .k4k-auth-google{min-height:48px;border-radius:9px;background:#171d17;border:1px solid #ffffff35;color:#f7f9f4;font-size:14px;font-weight:650}
+.kx-auth .k4k-auth-google:hover{border-color:#caff39}
+.kx-auth .k4k-auth-footer{font-size:13px;color:#bdc4b9}
+.kx-auth .k4k-auth-footer a{color:#caff39;font-weight:750}
+.kx-auth .k4k-auth-error{font-size:13px;line-height:1.5}
+@media(max-width:959px){.k4k-auth-page .kx-auth-grid{width:min(100% - 32px,480px)}}
+@media(max-width:520px){.kx-auth .k4k-auth-card{padding:25px 20px;border-radius:14px}.kx-auth .k4k-auth-card h1{font-size:32px}}
