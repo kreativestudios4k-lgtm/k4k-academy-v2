@@ -10,3 +10,5 @@ test('paid subscription invoice grants once when membership update succeeds',asy
 test('stale invoice never grants credits',async()=>{const s=store({applied:false});await handleStripeEvent(invoice(),s);assert.equal(s.grants,0)});
 test('non-renewal invoice never grants credits',async()=>{const s=store();const e=invoice();e.data.object.billing_reason='subscription_update';await handleStripeEvent(e,s);assert.equal(s.grants,0)});
 test('unknown price fails closed and event is not marked processed',async()=>{const s=store();const e=invoice();e.data.object.lines.data[0].price.id='price_unknown';await assert.rejects(()=>handleStripeEvent(e,s),/UNKNOWN_PRICE/);assert.equal(s.grants,0);assert.equal(await s.hasProcessedEvent(e.id),false)});
+
+test('unknown invoice price cannot mutate membership before validation',async()=>{let writes=0;const s=store();s.applyInvoiceStatus=async()=>{writes++;return {handled:true}};const e=invoice('in_unknown_price');e.data.object.lines.data[0].price.id='price_unknown';await assert.rejects(()=>handleStripeEvent(e,s),/UNKNOWN_PRICE/);assert.equal(writes,0);assert.equal(s.grants,0);assert.equal(await s.hasProcessedEvent(e.id),false)});
