@@ -34,15 +34,18 @@ test('dark background and input themes are present in the account workspace',()=
 });
 
 test('K4K homepage provides original template discovery and customer routes',()=>{
- const landing=source('app/k4k-app/LandingExperience.js');
+ const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/LandingExperience/);
- assert.doesNotMatch(homepage,/MobileTemplateFeed/);
+ assert.match(homepage,/MobileTemplateFeed/);
+ assert.match(feed,/template-catalogue\.json/);
+ assert.match(feed,/k4k-reels-scroll/);
+ assert.match(feed,/k4k-reels-cta/);
+ assert.match(feed,/k4k-mark\.svg/);
+ assert.match(feed,/CREATE · SWAP · GENERATE/);
  assert.match(source('app/k4k-app/landing.css'),/@media\(max-width:680px\)/);
- assert.match(landing,/template-catalogue\.json/);
- assert.match(landing,/href=\{'\/k4k-app\/template\/'/);
- assert.match(landing,/setFilter/);
- assert.match(landing,/\/k4k-app\/creator/);
+ assert.match(feed,/href=\{'\/k4k-app\/template\/'/);
+ assert.match(feed,/setTab/);
+ assert.match(feed,/\/k4k-app\/creator/);
 });
 test('template workflow does not trigger AI generation or credits',()=>{
  const template=source('app/k4k-app/template/[id]/TemplateCreator.js');
