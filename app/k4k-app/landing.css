@@ -229,3 +229,10 @@
 .k4k-reels-close{position:absolute;right:18px;top:15px;border:0;border-radius:50%;background:#e8e8e8;width:39px;height:39px;font-size:26px}
 @media(min-width:900px){.k4k-reels{background:#050705}.k4k-reels-scroll{max-width:510px;margin:auto;box-shadow:0 0 0 1px #30352c,0 0 100px #b6ff2610}.k4k-reels-header{left:50%;right:auto;transform:translateX(-50%);width:510px}.k4k-reels-nav{left:50%;right:auto;transform:translateX(-50%);width:510px}.k4k-reels-modal-backdrop{position:fixed}}
 @media(prefers-reduced-motion:reduce){.k4k-reels-scroll{scroll-behavior:auto}}
+
+/* K4K brand lockup — original app mark, compact slogan. */
+.k4k-reels-logo{display:flex;align-items:center;gap:9px;line-height:1;text-decoration:none}
+.k4k-reels-logo img{display:block;width:35px;height:35px;border-radius:9px;flex-shrink:0}
+.k4k-reels-logo>span{display:flex;flex-direction:column;gap:4px}
+.k4k-reels-logo small{font-size:8px;font-weight:800;letter-spacing:1.25px;color:#dce7d6}
+@media(max-width:390px){.k4k-reels-logo{font-size:22px}.k4k-reels-logo img{width:31px;height:31px}.k4k-reels-logo small{font-size:7px;letter-spacing:.8px}}
