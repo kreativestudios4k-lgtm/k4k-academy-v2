@@ -47,17 +47,32 @@ export async function POST(request) {
     global: {headers: {Authorization: `Bearer ${token}`}},
     auth: {persistSession: false, autoRefreshToken: false},
   });
-  const {data: membership} = await scoped.from('memberships').select('status').eq('user_id', user.id).maybeSingle();
+  const {data: membership, error: membershipError} = await scoped.from('memberships').select('status').eq('user_id', user.id).maybeSingle();
+  // Failure to read the subscription guard must not permit a duplicate Checkout.
+  if (membershipError) {
+    console.error('Checkout membership guard unavailable', {code: membershipError.code || 'unknown'});
+    return json({error: 'MEMBERSHIP_CHECK_UNAVAILABLE'}, 503);
+  }
   if (membership && ['active', 'trialing'].includes(membership.status)) {
     return json({error: 'ALREADY_SUBSCRIBED'}, 409);
   }
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
-  const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-    method: 'POST',
-    headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
-    body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: body.currency}).toString(),
-  });
+  // Keep Stripe test Checkout returning to this exact Preview deployment rather
+  // than a shared production site URL. Do not trust a client-supplied origin.
+  const requestUrl = new URL(request.url);
+  const origin = requestUrl.origin;
+  let res;
+  try {
+    res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+      method: 'POST',
+      headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
+      body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: body.currency}).toString(),
+      signal: AbortSignal.timeout(12000),
+    });
+  } catch (error) {
+    console.error('Stripe test checkout request failed', {type: error?.name === 'TimeoutError' ? 'timeout' : 'network_error'});
+    return json({error: 'STRIPE_UNREACHABLE'}, 502);
+  }
   if (!res.ok) {
     // Return only Stripe's machine-readable error category; never expose API keys or raw responses.
     const payload = await res.json().catch(() => ({}));
