@@ -14,11 +14,11 @@ export default function ComingSoon(){return <main style={{minHeight:'100vh',back
   <Link href="/academy" style={{color:'#d9ff3d'}}>Existing student access →</Link>
  </header>
  <section style={{maxWidth:780,margin:'80px auto 48px',textAlign:'center'}}>
-  <p style={{letterSpacing:3,fontSize:12,color:'#d9ff3d'}}>K4K APP · INVITE-ONLY CREATOR ACCESS</p>
+  <p style={{letterSpacing:3,fontSize:12,color:'#d9ff3d'}}>K4K APP · NEW GENERATION FEATURES</p>
   <h1 style={{fontSize:'clamp(42px,7vw,76px)',lineHeight:1.08,margin:'18px 0'}}>Create beyond limits.<br/><span style={{color:'#d9ff3d'}}>Coming soon.</span></h1>
-  <p style={{color:'#bfc5b8',fontSize:19,lineHeight:1.6}}>K4K APP is an AI video creation studio for viral templates, character replacement, image-to-video and text-to-video. Private creator invitations are planned; public access is not open yet.</p>
+  <p style={{color:'#bfc5b8',fontSize:19,lineHeight:1.6}}>K4K APP is an AI video creation studio for viral templates, character replacement, image-to-video and text-to-video. Public K4K accounts are available in preview. Paid video generation is not yet enabled.</p>
  </section>
- <div style={{maxWidth:780,margin:'0 auto 42px',textAlign:'center'}}><a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20Creator%20Invitation%20Interest" style={{display:'inline-block',background:'#d9ff3d',color:'#10130a',padding:'16px 26px',borderRadius:12,fontWeight:800,textDecoration:'none'}}>Request a creator invitation ↗</a><p style={{color:'#aab3a3',fontSize:13}}>Email hello@kreativestudios4k.com · Invitations are reviewed individually.</p></div>
+ <div style={{maxWidth:780,margin:'0 auto 42px',textAlign:'center'}}><a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20Creator%20Questions" style={{display:'inline-block',background:'#d9ff3d',color:'#10130a',padding:'16px 26px',borderRadius:12,fontWeight:800,textDecoration:'none'}}>Contact the creator team ↗</a><p style={{color:'#aab3a3',fontSize:13}}>Email hello@kreativestudios4k.com · Get help with your creator account and upcoming features.</p></div>
  <section style={{maxWidth:980,margin:'0 auto 42px',padding:24,border:'1px solid #414b28',borderRadius:20,background:'#151715'}}>
   <p style={{color:'#d9ff3d',fontSize:12,fontWeight:700,letterSpacing:2}}>FEATURED TEMPLATE · PREVIEW ONLY</p>
   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:24,alignItems:'center'}}>
