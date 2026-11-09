@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {K4K_MODELS,estimateK4KProviderCost} from '../../../../../lib/server/k4k-models.mjs';
+import {K4K_MODELS,estimateK4KProviderCost} from '../../../../lib/server/k4k-models.mjs';
 export const runtime='nodejs';
 const headers={'Cache-Control':'no-store'};
 const reply=(body,status=200)=>NextResponse.json(body,{status,headers});
