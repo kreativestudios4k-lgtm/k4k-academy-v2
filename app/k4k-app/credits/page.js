@@ -1,1 +1,78 @@
-'use client';import {useEffect,useState} from 'react';import Link from 'next/link';import PreviewShell from '../PreviewShell';import {createClient} from '../../../lib/supabase/client';import {useK4KLocale} from '../locale';const plans=[['Starter','15.99','For casual creators',80],['Creator','30.99','For regular creators',160],['Pro','65.99','For active creators',340],['Studio','134.99','For teams',700]];export default function Credits(){const [selected,setSelected]=useState(1);const [checkoutBusy,setCheckoutBusy]=useState(false);const [checkoutError,setCheckoutError]=useState('');const {locale}=useK4KLocale();const [market,setMarket]=useState(null);useEffect(()=>{let mounted=true;fetch('/api/k4k-region',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(mounted)setMarket(data?.country==='BR'?'BR':'INT')}).catch(()=>{if(mounted)setMarket('INT')});return()=>{mounted=false}},[]);const brazil=market==='BR';const amounts=brazil?['109,99','209,99','449,99','899,99']:['15.99','30.99','65.99','134.99'];const creditsByMarket=[80,160,340,700];const symbol=brazil?'R$ ':'£';async function startTestCheckout(){if(checkoutBusy)return;setCheckoutError('');setCheckoutBusy(true);try{const {data:{session},error:authError}=await createClient().auth.getSession();if(authError||!session?.access_token){window.location.assign('/login?next=%2Fk4k-app%2Fcredits');return}const response=await fetch('/api/billing/checkout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},body:JSON.stringify({plan:['starter','creator','pro','studio'][selected],currency:brazil?'BRL':'GBP'})});const result=await response.json();if(!response.ok||!result.url){setCheckoutError(result.error==='ALREADY_SUBSCRIBED'?'Your account already has an active subscription.':result.error==='UNAVAILABLE'||result.error==='LIVE_CHECKOUT_DISABLED'?'Test checkout is not configured yet. No payment was taken.':result.error==='CHECKOUT_FAILED'?`Stripe rejected checkout (${result.stripeCode || result.stripeType || 'CHECKOUT_FAILED'}). No payment was taken.`:result.error==='MEMBERSHIP_CHECK_UNAVAILABLE'?'We could not confirm your subscription status. Please retry later. No payment was taken.':result.error==='STRIPE_UNREACHABLE'?'Stripe test checkout is temporarily unreachable. Please retry later. No payment was taken.':result.error==='INVALID_PLAN'?'Selected plan is not configured (INVALID_PLAN). No payment was taken.':result.error==='UNAUTHENTICATED'?'Session expired. Please log in again (UNAUTHENTICATED).':result.error==='ALREADY_SUBSCRIBED'?'Your account already has an active subscription.':`Checkout failed (${String(result.error||'HTTP_'+response.status).replace(/[^A-Z0-9_]/gi,'').slice(0,48)}). No payment was taken.`);return}const target=new URL(result.url);if(target.protocol!=='https:'||target.hostname!=='checkout.stripe.com'){setCheckoutError('Unexpected checkout destination. No payment was taken.');return}window.location.assign(target.href)}catch{setCheckoutError('Unable to start test checkout. Please try again.')}finally{setCheckoutBusy(false)}}return <PreviewShell active="Credits"><h1>{locale==='en'?'Credits':'Créditos'}</h1><div style={{textAlign:'center',margin:'40px 0'}}><strong style={{background:'#d9ff3d',padding:'10px 18px',borderRadius:12}}>K4K APP PLANS</strong><h2 style={{fontSize:38}}>{locale==='pt'?'Crie mais.':locale==='es'?'Crea más.':'Create more.'} <span style={{color:'#c7ff36',textShadow:'0 0 24px #b6ff3470'}}>{locale==='pt'?'Viralize.':locale==='es'?'Hazte viral.':'Go viral.'}</span></h2><p>{brazil?'Planos mensais · BRL':locale==='es'?'Planes mensuales · GBP':'Proposed monthly plans · GBP'}</p></div><div className="k4k-card" style={{background:'radial-gradient(circle at 80% 15%,#3f6b25,#19391d 48%,#101a12)',border:'1px solid #537b33',color:'white'}}><span className="k4k-tag">PREVIEW OFFER</span><h2>{locale==='pt'?'Seu próximo vídeo viral começa aqui.':locale==='es'?'Tu próximo vídeo viral empieza aquí.':'Your next viral moment starts here.'}</h2><p style={{color:'white'}}>Proposed monthly allowances for 3–30-second videos. Different models and durations consume different credits. Final pricing requires live API quotes.</p></div>{plans.map(([name,price,description,credits],i)=><button type="button" key={name} onClick={()=>setSelected(i)} className={'k4k-card k4k-plan '+(selected===i?'active':'')}><div style={{display:'flex',justifyContent:'space-between',gap:12}}><div><h2 style={{margin:0}}>{selected===i?'◉':'○'} {name}</h2><p>{description}</p></div><div style={{textAlign:'right'}}>{i===1&&<span className="k4k-tag">Most popular</span>}{i===2&&<span className="k4k-tag">Best value</span>}<h2>{market?symbol+amounts[i]:'—'}</h2><small>per month</small></div></div><p><strong>{creditsByMarket[i]} {locale==='pt'?'créditos por mês':locale==='es'?'créditos al mes':'credits / month'}</strong></p><small>Credit charges depend on video duration (3–30 seconds), model and resolution. Actual generation is disabled until provider prices and safeguards are validated.</small></button>)}<div style={{background:'#172a1a',border:'1px solid #456934',color:'#edffe2',borderRadius:20,padding:20,textAlign:'center',fontWeight:800}}>{market?symbol+amounts[selected]:'—'} / {locale==='pt'?'mês':locale==='es'?'mes':'month'} · Stripe TEST mode only</div><button type="button" onClick={startTestCheckout} disabled={checkoutBusy||!market} style={{width:'100%',padding:16,background:'#d9ff3d',border:0,borderRadius:12,fontWeight:800,marginTop:16}}>{checkoutBusy?'Opening test checkout…':'Continue to Stripe test checkout'}</button>{checkoutError&&<p role="alert">{checkoutError}</p>}<p><Link href="/k4k-app/register">New creator? Create your K4K account</Link> · <Link href="/login?next=%2Fk4k-app%2Fcredits">Already registered? Log in</Link></p><p>Test checkout only: use Stripe test payment details. Credits are not issued or deducted until webhook and ledger verification passes. Existing Academy subscribers keep their current plans. No payments are collected here.</p><Link href="/academy">Existing student? Access Academy</Link></PreviewShell>}
+'use client';
+import {useEffect,useState} from 'react';
+import Link from 'next/link';
+import PreviewShell from '../PreviewShell';
+import {createClient} from '../../../lib/supabase/client';
+import {useK4KLocale} from '../locale';
+import './credits.css';
+
+const plans=[
+ {key:'starter',name:'Starter',gbp:'15.99',brl:'109,99',credits:80,description:'For first-time creators'},
+ {key:'creator',name:'Creator',gbp:'30.99',brl:'209,99',credits:160,description:'For consistent creators'},
+ {key:'pro',name:'Pro',gbp:'65.99',brl:'449,99',credits:340,description:'For serious storytelling'},
+ {key:'studio',name:'Studio',gbp:'134.99',brl:'899,99',credits:700,description:'For creative teams'},
+];
+export default function Credits(){
+ const {locale}=useK4KLocale();
+ const pt=locale==='pt',es=locale==='es';
+ const tr=(en,br,spa)=>pt?br:es?spa:en;
+ const [selected,setSelected]=useState('creator'),[market,setMarket]=useState(null);
+ const [checkoutBusy,setCheckoutBusy]=useState(false),[checkoutError,setCheckoutError]=useState('');
+ useEffect(()=>{let active=true;fetch('/api/k4k-region',{cache:'no-store'})
+  .then(response=>response.ok?response.json():null)
+  .then(data=>{if(active)setMarket(data?.country==='BR'?'BR':'INT')})
+  .catch(()=>{if(active)setMarket('INT')});
+  return()=>{active=false};
+ },[]);
+ const brazil=market==='BR',current=plans.find(plan=>plan.key===selected)||plans[1];
+ const symbol=brazil?'R$ ':'£';
+ const amount=plan=>!market?'—':symbol+(brazil?plan.brl:plan.gbp);
+ async function startTestCheckout(){
+  if(checkoutBusy)return;
+  setCheckoutBusy(true);setCheckoutError('');
+  try{
+   const {data:{session},error:authError}=await createClient().auth.getSession();
+   if(authError||!session?.access_token){window.location.assign('/login?next=%2Fk4k-app%2Fcredits');return;}
+   const response=await fetch('/api/billing/checkout',{
+    method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
+    body:JSON.stringify({plan:selected,currency:brazil?'BRL':'GBP'}),
+   });
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok||!result.url){
+    const reason=result.error||'HTTP_'+response.status;
+    const message={
+     ALREADY_SUBSCRIBED:'Your account already has an active subscription.',
+     UNAVAILABLE:'Test checkout is not configured. No payment was taken.',
+     LIVE_CHECKOUT_DISABLED:'Live checkout is disabled; no payment was taken.',
+     MEMBERSHIP_CHECK_UNAVAILABLE:'We cannot confirm your subscription status right now. No payment was taken.',
+     STRIPE_UNREACHABLE:'Stripe test checkout is temporarily unavailable. No payment was taken.',
+     INVALID_PLAN:'Selected plan is not configured. No payment was taken.',
+     UNAUTHENTICATED:'Your session expired. Please log in again.',
+    }[reason];
+    setCheckoutError(message||(reason==='CHECKOUT_FAILED'?'Stripe rejected test checkout ('+(result.stripeCode||result.stripeType||'unknown')+'). No payment was taken.':'Checkout could not be started ('+String(reason).replace(/[^A-Z0-9_]/gi,'').slice(0,48)+'). No payment was taken.'));
+    return;
+   }
+   const target=new URL(result.url);
+   if(target.protocol!=='https:'||target.hostname!=='checkout.stripe.com'){setCheckoutError('Unexpected checkout destination. No payment was taken.');return;}
+   window.location.assign(target.href);
+  }catch{setCheckoutError('Unable to start Stripe test checkout. No payment was taken.');}
+  finally{setCheckoutBusy(false);}
+ }
+ return <PreviewShell active="Credits">
+  <div className="k4k-pricing-page">
+   <section className="k4k-pricing-hero"><span className="k4k-workspace-eyebrow">✦ K4K APP / CREATOR PLANS</span><h1>{tr('Create more. Go further.','Crie mais. Vá além.','Crea más. Llega más lejos.')}<span>✦</span></h1><p>{tr('A simple home for templates, creative projects, your account and credits. Choose your future workflow.','Templates, projetos criativos, conta e créditos em um só lugar.','Plantillas, proyectos creativos, tu cuenta y tus créditos en un solo lugar.')}</p><div className="k4k-pricing-status"><span>● {tr('TEST MODE ONLY','SOMENTE MODO TESTE','SOLO MODO PRUEBA')}</span><span>{tr('Monthly plans · proposed generation allowances','Planos mensais · créditos de geração propostos','Planes mensuales · créditos de generación propuestos')}</span></div></section>
+   <div className="k4k-pricing-grid" role="group" aria-label="Choose a monthly plan">{plans.map(plan=><button type="button" key={plan.key} onClick={()=>{setSelected(plan.key);setCheckoutError('')}} className={'k4k-pricing-plan'+(plan.key===selected?' selected':'')} aria-pressed={plan.key===selected}>
+    <div className="k4k-pricing-plan-top"><span>{plan.name.toUpperCase()}</span>{plan.key==='creator'&&<strong>{tr('POPULAR','POPULAR','POPULAR')}</strong>}</div>
+    <div className="k4k-pricing-price">{amount(plan)}<small>/{tr('month','mês','mes')}</small></div>
+    <p>{plan.description}</p>
+    <div className="k4k-pricing-credits"><strong>{plan.credits}</strong><span>{tr('planned monthly generation credits','créditos mensais previstos','créditos mensuales previstos')}</span></div>
+    <ul><li>{tr('Template browsing and saved drafts','Templates e rascunhos','Plantillas y borradores')}</li><li>{tr('Creator workspace access','Acesso ao estúdio','Acceso al estudio')}</li><li>{tr('Academy included in planned plan','Academy incluída no plano previsto','Academy incluida en el plan previsto')}</li></ul>
+    <span className="k4k-pricing-select">{plan.key===selected?tr('Selected ✓','Selecionado ✓','Seleccionado ✓'):tr('Select plan','Escolher plano','Elegir plan')} <span aria-hidden="true">↗</span></span>
+   </button>)}</div>
+   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Stripe test checkout only. Do not expect generation credits until the verified webhook and ledger are activated.','Checkout Stripe somente em modo de teste. Os créditos só serão liberados após a validação do webhook e do extrato.','Checkout de Stripe solo en modo de prueba. Los créditos dependen de validar el webhook y el registro.')}</p></div><button type="button" disabled={!market||checkoutBusy} onClick={startTestCheckout}>{checkoutBusy?'Opening…':tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button></section>
+   {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
+   <div className="k4k-pricing-links"><Link href="/k4k-app/register">{tr('New creator? Create an account','Novo criador? Criar conta','¿Nuevo creador? Crear cuenta')}</Link><Link href="/login?next=%2Fk4k-app%2Fcredits">{tr('Already registered? Sign in','Já tem conta? Entrar','¿Tienes cuenta? Entrar')}</Link><Link href="/academy">{tr('Existing student? My Academy','Aluno atual? Minha Academy','¿Alumno actual? Mi Academy')}</Link></div>
+   <section className="k4k-pricing-note"><h2>{tr('Before you choose a plan','Antes de escolher um plano','Antes de elegir un plan')}</h2><p>{tr('AI generation is currently disabled. Credits per video will depend on validated provider rates, model, duration and resolution. Test checkout does not activate a paid service. Existing Academy subscriptions remain unchanged.','A geração de IA está desativada. O custo por vídeo dependerá do provedor, modelo, duração e resolução. O checkout de teste não ativa um serviço pago. Assinaturas atuais da Academy são preservadas.','La generación de IA está desactivada. El costo por vídeo depende del proveedor, modelo, duración y resolución. El checkout de prueba no activa un servicio pagado. Las suscripciones de Academy no cambian.')}</p><Link href="/k4k-app/support">{tr('Questions? Contact K4K support ↗','Dúvidas? Fale com o suporte ↗','¿Dudas? Contacta con soporte ↗')}</Link></section>
+  </div>
+ </PreviewShell>;
+}
