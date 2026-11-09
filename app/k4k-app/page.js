@@ -1,10 +1,4 @@
-import LandingExperience from './LandingExperience';
+import MobileTemplateFeed from './MobileTemplateFeed';
 import './landing.css';
-
-export const metadata={
- title:'K4K APP — Recreate Viral Videos | Creator Studio',
- description:'Explore viral reference scenes, upload your character images and prepare video projects in K4K APP, by KreativeStudios4K.',
-};
-export default function StudioHome(){
- return <LandingExperience/>;
-}
+export const metadata={title:'K4K APP — Video Templates',description:'Discover and recreate viral video templates with K4K APP.'};
+export default function StudioHome(){return <MobileTemplateFeed/>;}
