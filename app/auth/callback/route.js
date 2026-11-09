@@ -8,7 +8,8 @@ export async function GET(request){
  // All regular email/Google sign-ins continue to the membership gate.
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
  const next=searchParams.get('next');
- const safeNext=next&&next.startsWith('/')&&!next.startsWith('//')&&!next.includes('\\')?next:null;
+ // Only public onboarding may override the legacy Academy membership redirect.
+ const safeNext=next==='/k4k-app/credits'?next:null;
  const target=new URL(isPasswordRecovery?'/update-password':(safeNext||'/membership-required'),origin);
  if(!code)return NextResponse.redirect(new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin));
  let response=NextResponse.redirect(target);
