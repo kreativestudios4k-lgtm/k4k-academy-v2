@@ -75,6 +75,9 @@ test('checkout form carries the mode, price, user and plan, and never an amount'
   assert.equal(form.get('line_items[0][price]'), 'price_x');
   assert.equal(form.get('client_reference_id'), 'user-1');
   assert.equal(form.get('metadata[plan_key]'), 'starter');
-  assert.equal(form.get('success_url'), 'https://example.test/academy?checkout=success');
+  assert.equal(form.get('success_url'), 'https://example.test/k4k-app/credits?checkout=success');
+  assert.equal(form.get('cancel_url'), 'https://example.test/k4k-app/credits?checkout=cancelled');
+  assert.equal(form.get('line_items[0][quantity]'), '1');
+  assert.equal(form.get('subscription_data[metadata][plan_key]'), 'starter');
   assert.equal(form.has('line_items[0][price_data][unit_amount]'), false);
 });
