@@ -53,3 +53,20 @@ test('public account registration does not promise paid generation',()=>{
  const register=read('app/k4k-app/register/page.js');
  assert.match(register,/AI generation remains disabled/);
 });
+
+test('signup redirect lands on the public K4K account rather than Academy membership gate',()=>{
+ const register=read('app/k4k-app/register/page.js');
+ const callback=read('app/auth/callback/route.js');
+ assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Faccount/);
+ assert.match(callback,/\/k4k-app\/account/);
+ assert.match(callback,/K4K_PUBLIC_DESTINATIONS\.has\(next\)/);
+ assert.match(callback,/safeNext\|\|'\/membership-required'/);
+});
+
+test('Stripe Checkout fails closed when membership status cannot be loaded',()=>{
+ const route=read('app/api/billing/checkout/route.js');
+ assert.match(route,/if \(membershipError\)/);
+ assert.match(route,/MEMBERSHIP_CHECK_UNAVAILABLE/);
+ assert.match(route,/STRIPE_UNREACHABLE/);
+ assert.match(route,/AbortSignal\.timeout/);
+});
