@@ -128,7 +128,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
     <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K APP · CREATOR ACCESS'}</div>
     <h1>{registering?'Create your account':'Your next creation starts here.'}</h1>
-    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to your K4K account to continue creating and learning.'}</p>
+    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to create AI videos, recreate trending scenes and access your creator tools.'}</p>
 
     {registering&&lookup!=='verified'&&<div className="k4k-auth-verify" role="status">
      {lookup==='loading'?<><RefreshCw size={19} className="k4k-auth-spin"/>Checking your Stripe payment…</>:
@@ -166,11 +166,11 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}
     <p className="k4k-auth-footer">
-     {registering?<>Already have an Academy account? <Link href="/login">Log in</Link></>:<>New to K4K Academy? <Link href="/">Buy the course first</Link></>}
+     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K APP? <Link href="/k4k-app/coming-soon">Request creator access</Link></>}
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
-   <p className="k4k-auth-support"><ShieldCheck size={16}/> Already paid but need help? <a href="mailto:hello@kreativestudios4k.com">Contact Academy support</a>. Don't pay twice.</p>
+   <p className="k4k-auth-support"><ShieldCheck size={16}/> Need account help? <a href="mailto:hello@kreativestudios4k.com">Contact Academy support</a>. Don't pay twice.</p>
   </div>
  </main>;
 }
