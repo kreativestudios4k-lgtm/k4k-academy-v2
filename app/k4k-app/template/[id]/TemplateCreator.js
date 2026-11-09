@@ -3,6 +3,7 @@ import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {useK4KLocale} from '../../locale';
 import './template.css';
+import {requiredCharacterCount,validateTemplatePreparation} from '../../../../lib/template-preparation.mjs';
 
 const MAX_PHOTOS=30,MAX_BYTES=10*1024*1024;
 const allowed=new Set(['image/png','image/jpeg','image/webp']);
@@ -16,7 +17,7 @@ export default function TemplateCreator({template}){
  const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.round(template.durationSeconds||10))));
  const [model,setModel]=useState('motion');
  const [quality,setQuality]=useState('pro');
- const minimumPhotos=Math.max(1,Math.min(MAX_PHOTOS,Number(template.requiredImages)||1));
+ const minimumPhotos=requiredCharacterCount(template);
  const [consent,setConsent]=useState(false);
  const [error,setError]=useState('');
  const [showHelp,setShowHelp]=useState(true);
@@ -61,7 +62,7 @@ export default function TemplateCreator({template}){
  }
  const uploaded=characters.filter(item=>item.photo).length;
  const mapped=characters.filter(item=>item.photo&&item.target).length;
- const requiredReady=characters.slice(0,minimumPhotos).every(item=>Boolean(item.photo&&item.target));
+ const requiredReady=validateTemplatePreparation(template,characters,quality).ready;
  return <main className="k4k-recreate k4k-template-workflow">
   <header className="k4k-template-header"><Link href="/k4k-app" className="k4k-template-logo"><span>✦</span> K4K <b>APP</b></Link><nav aria-label="Template navigation"><Link href="/k4k-app">{tr('Explore','Explorar','Explorar')}</Link><Link href="/k4k-app/videos">{tr('My projects','Meus projetos','Mis proyectos')}</Link><Link href="/k4k-app/credits">{tr('Credits','Créditos','Créditos')}</Link></nav></header>
   <div className="k4k-template-breadcrumb"><Link href="/k4k-app">← {tr('Back to all templates','Voltar aos templates','Volver a las plantillas')}</Link><span> / </span><strong>{template.title}</strong></div>
