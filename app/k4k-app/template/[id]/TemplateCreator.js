@@ -10,8 +10,8 @@ export default function TemplateCreator({template}){
  const {locale}=useK4KLocale();
  const pt=locale==='pt',es=locale==='es';
  const tr=(en,br,spa)=>pt?br:es?spa:en;
- const video=useRef(null),nextId=useRef(1),objectUrls=useRef(new Set());
- const [characters,setCharacters]=useState([{id:0,photo:null,target:null}]);
+ const video=useRef(null),nextId=useRef(Math.max(1,Math.min(MAX_PHOTOS,Number(template.requiredImages)||1))),objectUrls=useRef(new Set());
+ const [characters,setCharacters]=useState(()=>Array.from({length:Math.max(1,Math.min(MAX_PHOTOS,Number(template.requiredImages)||1))},(_,id)=>({id,photo:null,target:null})));
  const [mappingId,setMappingId]=useState(null);
  const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.round(template.durationSeconds||10))));
  const [model,setModel]=useState('motion');
@@ -77,7 +77,7 @@ export default function TemplateCreator({template}){
    <section className="k4k-template-editor" aria-label={tr('Prepare a video','Prepare seu vídeo','Prepara tu vídeo')}>
     <div className="k4k-template-editor-top"><span>01 / {tr('PERSONALISE THE SCENE','PERSONALIZE A CENA','PERSONALIZA LA ESCENA')}</span><span className="k4k-template-preview-pill">● PREVIEW ONLY</span></div>
     <h2>{tr('Put yourself in the scene.','Entre no vídeo.','Entra en el vídeo.')}</h2>
-    <p className="k4k-template-editor-lead">{tr('Upload a clear photo of each person you want in the reference video. Each slot represents one replacement.','Envie uma foto nítida de cada pessoa que deseja colocar no vídeo.','Sube una foto clara de cada persona que quieras colocar en el vídeo.')}</p>
+    <p className="k4k-template-editor-lead"><strong>{template.requiredImages||1} {tr('recommended replacement photos','fotos recomendadas para substituição','fotos recomendadas para reemplazo')}.</strong> {' '}{tr('Upload a clear photo of each person you want in the reference video. Each slot represents one replacement.','Envie uma foto nítida de cada pessoa que deseja colocar no vídeo.','Sube una foto clara de cada persona que quieras colocar en el vídeo.')}</p>
     <div className="k4k-template-progress"><strong>{uploaded}/{characters.length} {tr('photos ready','fotos prontas','fotos listas')}</strong><span>{mapped} {tr('positions marked','posições marcadas','posiciones marcadas')}</span></div>
     <div className="k4k-template-progress-track"><div style={{width:(uploaded/Math.max(characters.length,1)*100)+'%'}}/></div>
     <div className="k4k-template-character-grid">
