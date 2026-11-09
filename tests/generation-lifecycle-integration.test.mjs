@@ -31,8 +31,9 @@ function harness({balance=20,failProvider=false}={}){
   return {data:null,error:{message:'UNKNOWN_RPC'}};
  };
  const ledger=createGuardedGenerationLedger({rpc},{enabled:true});
+ const submissionRecorder={record:async()=>({status:'processing'})};
  const provider={submit:async()=>{state.submissions++;if(failProvider)throw Error('mock provider rejected');return {request_id:'mock-request',status:'queued'};}};
- const lifecycle=createGenerationLifecycle({ledger,provider,priceCredits:()=>7,enabled:true,providerEnabled:true});
+ const lifecycle=createGenerationLifecycle({ledger,provider,submissionRecorder,priceCredits:()=>7,enabled:true,providerEnabled:true});
  return {state,ledger,lifecycle};
 }
 test('new reservation deducts exactly once; retries never submit twice',async()=>{
@@ -42,10 +43,12 @@ test('new reservation deducts exactly once; retries never submit twice',async()=
  await assert.rejects(lifecycle.run(identity),/RESERVATION_NOT_NEW/);
  assert.equal(state.balance,13);assert.equal(state.submissions,1);
 });
-test('mocked provider failure refunds once even if finish retried',async()=>{
+test('ambiguous provider failure preserves reservation for reconciliation',async()=>{
  const {state,ledger,lifecycle}=harness({failProvider:true});
- await assert.rejects(lifecycle.run(identity),/GENERATION_SUBMISSION_FAILED/);
- assert.equal(state.balance,20);assert.equal(state.refunds,1);
+ await assert.rejects(lifecycle.run(identity),/PROVIDER_SUBMISSION_UNCERTAIN/);
+ assert.equal(state.balance,13);assert.equal(state.refunds,0);
+ // A trusted reconciler may later confirm failure and refund exactly once.
+ await ledger.finish(identity.userId,identity.jobId,'failed');
  await ledger.finish(identity.userId,identity.jobId,'failed');
  assert.equal(state.balance,20);assert.equal(state.refunds,1);
 });
