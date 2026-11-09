@@ -40,3 +40,54 @@
 
 
 .k4k-global-header .k4k-account-status{display:inline-flex;align-items:center;justify-content:center;border-radius:40px;background:#d9ff3d;color:#14200a;padding:9px 14px;font-size:12px;font-weight:900;text-decoration:none;min-width:68px}
+
+
+/* K4K neon-black theme: customer workspace, plans, projects, account and support. */
+.k4k-light{
+ --k4k-ink:#070c09;--k4k-surface:#101c13;--k4k-surface-raised:#18281b;
+ --k4k-border:#304c2e;--k4k-neon:#c7ff36;--k4k-text:#f2faee;--k4k-muted:#b0c4aa;
+ background:radial-gradient(ellipse at 50% 0%,#163019 0%,#0a130d 38%,#070c09 75%);
+ color:var(--k4k-text);
+}
+.k4k-light h1,.k4k-light h2,.k4k-light h3,.k4k-light label,.k4k-light strong{color:var(--k4k-text)}
+.k4k-light p,.k4k-light small{color:var(--k4k-muted)}
+.k4k-global-brand{color:#f5fff1!important}
+.k4k-global-brand b,.k4k-workspace-eyebrow{color:var(--k4k-neon)}
+.k4k-global-header{border-bottom:1px solid #2a482c;padding-bottom:17px;max-width:1080px}
+.k4k-global-header nav a{color:#c6d6c1}
+.k4k-global-header nav a:hover{color:var(--k4k-neon)}
+.k4k-global-header .k4k-account-status{background:var(--k4k-neon);color:#0a1305!important;box-shadow:0 0 20px #baff342f}
+.k4k-light .k4k-card{background:linear-gradient(145deg,#132116,#0d180f);border:1px solid #355134;color:var(--k4k-text);box-shadow:0 12px 45px #0008}
+.k4k-light .k4k-card>h2,.k4k-light .k4k-card h2{color:#f6fff1}
+.k4k-light .k4k-card p{color:#b6c7af}
+.k4k-light .k4k-card a:not(.k4k-black){color:#d2ff85}
+.k4k-light .k4k-plan{color:#f5fff0;border-color:#355134}
+.k4k-light .k4k-plan.active{border:2px solid var(--k4k-neon);background:linear-gradient(120deg,#244b20,#132716);box-shadow:0 0 0 1px #c7ff3620,0 0 30px #96ff201a}
+.k4k-light .k4k-plan h2,.k4k-light .k4k-plan strong{color:#f8fff5}
+.k4k-light .k4k-tag{background:var(--k4k-neon);color:#101708}
+.k4k-light .k4k-visual{background:radial-gradient(circle at 55% 40%,#376b22,#142e18 45%,#071208 95%);border:1px solid #5d8a39;color:var(--k4k-neon);text-shadow:0 0 55px #aaff30;box-shadow:inset 0 0 45px #73ff0b10}
+.k4k-light .k4k-light-nav{background:#08110a;border-top:1px solid #355b2c;box-shadow:0 -12px 35px #0008}
+.k4k-light .k4k-light-nav a{color:#a5baa0}
+.k4k-light .k4k-light-nav a.active{color:#e9ffe3}
+.k4k-light .k4k-light-nav a.active>span,.k4k-light .k4k-light-nav a:nth-child(3)>span{background:var(--k4k-neon);color:#101708;box-shadow:0 0 22px #b9ff344d}
+.k4k-light .k4k-black{background:#162b17;color:var(--k4k-neon)!important;border:1px solid #527a39}
+.k4k-light .k4k-lime{background:var(--k4k-neon);color:#101708;box-shadow:0 0 26px #bcff3435}
+.k4k-light input:not([type="range"]):not([type="checkbox"]):not([type="file"]),.k4k-light select,.k4k-light textarea{
+ background:#0b150e;color:#f4fff0;border:1px solid #45653d;border-radius:12px;
+}
+.k4k-light input::placeholder,.k4k-light textarea::placeholder{color:#9aac93}
+.k4k-light input[type="range"]{accent-color:var(--k4k-neon)}
+.k4k-light .k4k-workspace-refresh{background:#172b19;color:#dcffac;border:1px solid #4d7a37}
+.k4k-light .k4k-project-state>span{background:#213b1d;border:1px solid #638844;color:#dbffbd}
+.k4k-light .k4k-project-state small{color:#a1b898}
+.k4k-light .k4k-workspace-actions a{background:#192b1a;border:1px solid #42663a;color:#d6ffc0!important}
+.k4k-light .k4k-workspace-actions a:first-child{background:var(--k4k-neon);border-color:var(--k4k-neon);color:#0b1406!important}
+.k4k-light .k4k-support-tile{background:#132519;border:1px solid #345e34;color:#f2fff1}
+.k4k-light .k4k-support-tile strong{color:var(--k4k-neon)}
+.k4k-light .k4k-support-tile span{color:#b0c7ad}
+.k4k-light .k4k-support-faq details{border-color:#314b31}
+.k4k-light .k4k-support-faq summary{color:#eefae9}
+.k4k-light .k4k-support-faq details[open] summary{color:var(--k4k-neon)}
+.k4k-light .k4k-workspace-error,.k4k-light [role="alert"]{color:#ffaaa8!important}
+.k4k-light a:focus-visible,.k4k-light button:focus-visible,.k4k-light input:focus-visible,.k4k-light select:focus-visible,.k4k-light textarea:focus-visible{outline:3px solid var(--k4k-neon);outline-offset:3px}
+.k4k-light button:disabled{cursor:not-allowed;opacity:.65}
