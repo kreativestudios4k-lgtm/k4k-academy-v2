@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:billing": "node --test tests/stripe-invoice-safety.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.103",
