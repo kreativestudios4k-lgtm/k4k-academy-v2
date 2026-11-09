@@ -58,7 +58,15 @@ export async function POST(request) {
     headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
     body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: body.currency}).toString(),
   });
-  if (!res.ok) return json({error: 'CHECKOUT_FAILED'}, 502);
+  if (!res.ok) {
+    // Return only Stripe's machine-readable error category; never expose API keys or raw responses.
+    const payload = await res.json().catch(() => ({}));
+    const stripeError = payload?.error || {};
+    const safeCode = typeof stripeError.code === 'string' && /^[a-z0-9_]{1,64}$/.test(stripeError.code) ? stripeError.code : null;
+    const safeType = typeof stripeError.type === 'string' && /^[a-z0-9_]{1,64}$/.test(stripeError.type) ? stripeError.type : 'stripe_error';
+    console.error('Stripe test checkout failed', {status: res.status, type: safeType, code: safeCode, param: typeof stripeError.param === 'string' ? stripeError.param.slice(0,80) : null});
+    return json({error: 'CHECKOUT_FAILED', stripeCode: safeCode, stripeType: safeType}, 502);
+  }
 
   const session = await res.json();
   return json({url: session.url}, 200);
