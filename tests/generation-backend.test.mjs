@@ -14,7 +14,7 @@ test('reservation and settlement are disabled by default',async()=>{
  assert.equal(calls,0);
 });
 test('enabled adapter calls atomic reserve and refund RPC with correct arguments',async()=>{
- const calls=[];const client={rpc:async(name,args)=>{calls.push({name,args});return {data:{status:'ok'}}}};
+ const calls=[];const client={rpc:async(name,args)=>{calls.push({name,args});return {data:{status:'reserved',newly_reserved:true}}}};
  const store=createGuardedGenerationLedger(client,{enabled:true});
  await store.reserve('user','job','key',7);
  await store.finish('user','job','failed');
