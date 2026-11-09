@@ -187,3 +187,24 @@
 .k4k-light .k4k-own-modal label{padding:10px 0;font-size:13px}
 .k4k-light .k4k-own-modal select,.k4k-light .k4k-own-modal textarea{font-size:13px}
 }
+
+
+/* Modal layer must completely replace the app navigation while editing. */
+.k4k-light:has(.k4k-own-creator-backdrop) .k4k-light-nav,
+.k4k-light:has(.k4k-own-modal-backdrop) .k4k-light-nav{display:none!important}
+.k4k-light:has(.k4k-own-creator-backdrop) .k4k-own-start,
+.k4k-light:has(.k4k-own-modal-backdrop) .k4k-own-start{display:none!important}
+.k4k-light .k4k-own-creator-backdrop{z-index:10000}
+.k4k-light .k4k-own-modal-backdrop{z-index:10020;isolation:isolate}
+.k4k-light .k4k-own-creator-backdrop .k4k-own-sheet{max-height:calc(100dvh - 20px);overscroll-behavior:contain}
+.k4k-light .k4k-own-asset-launch{background:#222326!important;color:#f4f4f4!important;border:2px dashed #47494b!important;box-shadow:none!important}
+.k4k-light .k4k-own-asset-launch small{color:#a4a5a8!important}
+.k4k-light .k4k-own-modal-backdrop .k4k-own-modal{background:#202023;color:#fff}
+@media(min-width:701px){
+.k4k-light .k4k-own-modal-backdrop{padding:12px;align-items:center}
+.k4k-light .k4k-own-modal{max-height:calc(100dvh - 24px)}
+}
+@media(max-width:700px){
+.k4k-light .k4k-own-modal-backdrop{padding:0;align-items:flex-end}
+.k4k-light .k4k-own-modal{max-height:calc(100dvh - 12px)}
+}
