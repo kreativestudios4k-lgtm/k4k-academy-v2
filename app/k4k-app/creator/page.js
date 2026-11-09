@@ -27,6 +27,8 @@ export default function Creator(){
  const [model,setModel]=useState('standard');
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
+ const [history,setHistory]=useState([]),[historyState,setHistoryState]=useState('');
+ async function loadHistory(){setHistoryState('Loading your generation history…');try{const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Sign in to view your generation history.');const {data,error}=await client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);if(error)throw error;setHistory(data||[]);setHistoryState(data?.length?'':'No generation drafts or jobs yet.');}catch(e){setHistoryState(e?.message||'Could not load history.')}}
  async function saveDraft(){
   if(!savedReference||savingDraft)return;
   setSavingDraft(true);setDraftMessage('');
@@ -35,7 +37,7 @@ export default function Creator(){
    if(authError||!user||user.id!==savedReference.userId)throw new Error('Please sign in again to save your draft.');
    const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:[savedReference.path],main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
    if(error)throw error;
-   setDraftMessage('Draft saved: '+data.id+'. No generation started and no credits charged.');
+   setDraftMessage('Draft saved: '+data.id+'. Only the primary uploaded image and prompt are saved. Video and additional images remain local. No generation started and no credits charged.');await loadHistory();
   }catch(e){setDraftMessage(e?.message||'Unable to save draft.')}finally{setSavingDraft(false)}
  }
  async function saveReference(){
@@ -58,7 +60,7 @@ export default function Creator(){
  function choose(event,target,kind,max){const file=event.target.files?.[0];setError('');if(!file)return;if(!(kind==='image'?IMAGE_TYPES:VIDEO_TYPES).includes(file.type)||file.size>max){setError(copy.limit);event.target.value='';return;}target.setFile(file);if(kind==='image'){setSavedReference(null);setDraftMessage('')}}
  return <PreviewShell active="Creator">
  <div className="k4k-visual" aria-hidden="true">✦</div><div className="k4k-creator-switch" role="group" aria-label="Creation mode" style={{display:"flex",gap:9,overflowX:"auto",padding:"10px 0 20px"}}>{['Motion Transfer','Character Swap','Image to Video','Text to Video'].map(tab=><button type="button" key={tab} aria-pressed={activeTab===tab} onClick={()=>setActiveTab(tab)} style={{borderRadius:24,padding:"12px 16px",border:"1px solid #3e4a32",background:activeTab===tab?"#d9ff3d":"#181d16",color:activeTab===tab?"#101510":"#f2f6e8",fontWeight:800}}>{tab}</button>)}</div>
- <h1>{copy.title}</h1><p>{copy.intro}</p><p style={{fontSize:13,color:"#7b8c68"}}>{activeTab} · Preview workflow only — AI generation is not enabled.</p>
+ <h1>{copy.title}</h1><section style={{margin:'12px 0 24px',padding:16,border:'1px solid #35422c',borderRadius:14,background:'#141a12'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}><strong>My Generations</strong><button type='button' onClick={loadHistory} style={{background:'#d9ff3d',color:'#111',border:0,borderRadius:24,padding:'9px 15px',fontWeight:800}}>Refresh history</button></div>{historyState&&<p role='status' style={{fontSize:12}}>{historyState}</p>}{history.map(job=><div key={job.id} style={{padding:'10px 0',borderBottom:'1px solid #33402c',display:'flex',justifyContent:'space-between',gap:8,fontSize:12}}><span>{job.model||'Preview'} · {new Date(job.created_at).toLocaleDateString()}</span><strong>{job.status}</strong></div>)}</section><p>{copy.intro}</p><p style={{fontSize:13,color:"#7b8c68"}}>{activeTab} · Preview workflow only — AI generation is not enabled.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:16,margin:'26px 0'}}>
  <section className="k4k-card"><h2>01 · {copy.reference}</h2>
  <div style={{aspectRatio:'9 / 16',maxHeight:370,background:'#151816',borderRadius:16,overflow:'hidden',display:'grid',placeItems:'center',color:'#dfff38'}}>
