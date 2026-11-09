@@ -59,3 +59,17 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
+
+test('reference-video sound is activated only by a tap and stops overlapping audio',()=>{
+ const homepage=source('app/k4k-app/LandingExperience.js');
+ assert.match(homepage,/if\(current\.muted\)/);
+ assert.match(homepage,/activateAudio/);
+ assert.match(homepage,/player\.muted=true;player\.pause\(\)/);
+ assert.doesNotMatch(homepage,/Fluxfield/i);
+});
+
+test('rebuild serves one responsive homepage on mobile and desktop',()=>{
+ const page=source('app/k4k-app/page.js');
+ assert.match(page,/return <LandingExperience\/>/);
+ assert.doesNotMatch(page,/MobileTemplateFeed/);
+});
