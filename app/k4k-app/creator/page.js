@@ -66,7 +66,7 @@ export default function Creator(){
  const needsImage=activeTab!=='Text to Video';
  const ready=(!needsVideo||Boolean(video.file))&&(!needsImage||Boolean(character.file));
  return <PreviewShell active="Creator">
- <main className="k4k-own-generator">
+ <main className="k4k-own-generator k4k-creator-layout">
   <div className="k4k-own-back"><Link href="/k4k-app">← Explore</Link><Link href="/k4k-app/videos">My videos ↗</Link></div>
   <section className="k4k-own-sheet" aria-label="Create your own video">
    <div className="k4k-own-handle" aria-hidden="true"/>
