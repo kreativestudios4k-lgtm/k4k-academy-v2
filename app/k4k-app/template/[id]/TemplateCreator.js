@@ -6,7 +6,7 @@ export default function TemplateCreator({template}){
  const nextId=useRef(1);
  const [characters,setCharacters]=useState([{id:0,photo:null}]);
  const [recreateOpen,setRecreateOpen]=useState(false);
- const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.floor(template.durationSeconds||10))));const [model,setModel]=useState('wan');const [sound,setSound]=useState(false);const [mapping,setMapping]=useState(false);const [selectedId,setSelectedId]=useState(0);
+ const [duration,setDuration]=useState(Math.min(30,Math.max(3,Math.floor(template.durationSeconds||10))));const [model,setModel]=useState('wan');const [mapping,setMapping]=useState(false);const [selectedId,setSelectedId]=useState(0);
  const video=useRef(null);
  useEffect(()=>{if(!recreateOpen){if(!mapping)video.current?.play().catch(()=>{});}else{video.current?.pause();}},[recreateOpen,mapping]);
  useEffect(()=>{
@@ -17,7 +17,17 @@ export default function TemplateCreator({template}){
  },[recreateOpen]);
  const objectUrls=useRef(new Set());
  useEffect(()=>()=>{objectUrls.current.forEach(url=>URL.revokeObjectURL(url));objectUrls.current.clear()},[]);
- useEffect(()=>{if(video.current)video.current.muted=!sound},[sound]);
+ function handleVideoTap(event){
+  const player=event.currentTarget;
+  if(player.muted){
+   player.muted=false;
+   player.volume=1;
+   if(player.paused)player.play().catch(()=>{});
+   return;
+  }
+  if(player.paused)player.play().catch(()=>{});
+  else player.pause();
+ }
  function choose(e,id){
   const file=e.target.files?.[0];if(!file)return;
   if(!['image/png','image/jpeg','image/webp'].includes(file.type)){alert('Select an image.');return}
@@ -36,10 +46,10 @@ export default function TemplateCreator({template}){
  const supported=model==='wan'||(model==='light'&&duration<=15)||(model==='genjutsu'&&duration>=5);
  const allMapped=characters.filter(c=>c.photo).every(c=>c.target);
  return <main className="k4k-recreate">
- <div className="k4k-recreate-video">{template.videoUrl&&<video ref={video} src={template.videoUrl} playsInline autoPlay loop muted controls={false}/>}<div className={mapping?'k4k-recreate-mark-area is-mapping':'k4k-recreate-mark-area'} onClick={markPerson}>{characters.filter(c=>c.target).map((c,i)=><span key={c.id} className="k4k-recreate-marker" style={{left:c.target.x+'%',top:c.target.y+'%'}}>{characters.findIndex(item=>item.id===c.id)+1}</span>)}{mapping&&<span className="k4k-recreate-mark-help">Tap the person you want to replace</span>}</div>
+ <div className="k4k-recreate-video">{template.videoUrl&&<video ref={video} src={template.videoUrl} playsInline autoPlay loop muted controls={false} onClick={handleVideoTap} aria-label={`${template.title} — tap the video for sound`}/>}<div className={mapping?'k4k-recreate-mark-area is-mapping':'k4k-recreate-mark-area'} onClick={markPerson}>{characters.filter(c=>c.target).map((c,i)=><span key={c.id} className="k4k-recreate-marker" style={{left:c.target.x+'%',top:c.target.y+'%'}}>{characters.findIndex(item=>item.id===c.id)+1}</span>)}{mapping&&<span className="k4k-recreate-mark-help">Tap the person you want to replace</span>}</div>
  <Link className="k4k-recreate-back" href="/k4k-app" aria-label="Back">‹</Link>
  <Link className="k4k-recreate-upgrade" href="/k4k-app/credits">✦ Credits</Link>
- <button type="button" className="k4k-recreate-sound" onClick={()=>setSound(v=>!v)} aria-label={sound?'Mute':'Unmute'}>{sound?'🔊':'🔇'}</button></div>
+</div>
  <div className="k4k-template-viewer-meta"><span>✦ K4K COMMUNITY</span><h1>{template.title}</h1><p>Watch the reference, then recreate it with your own characters.</p><button type="button" onClick={()=>setRecreateOpen(true)}>✦ Recreate this video</button></div>
  {recreateOpen&&<><button className="k4k-recreate-backdrop" type="button" aria-label="Close recreate panel" onClick={()=>setRecreateOpen(false)}/><section className="k4k-recreate-panel" role="dialog" aria-modal="true" aria-label="Recreate this video"><div className="k4k-recreate-handle"/>
  <header><span>ⓘ</span><div><h1>Recreate this video</h1><p>{template.title} · K4K APP</p></div><button type="button" className="k4k-sheet-close" onClick={()=>setRecreateOpen(false)} aria-label="Close">✕</button></header>
