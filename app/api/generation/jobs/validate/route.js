@@ -5,7 +5,7 @@ export const runtime='nodejs';
 const headers={'Cache-Control':'no-store'};
 const reply=(body,status)=>NextResponse.json(body,{status,headers});
 export async function POST(request){
- const token=request.headers.get('authorization')?.match(/^Bearer (\\S+)$/i)?.[1];
+ const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
  if(!token)return reply({error:'UNAUTHENTICATED'},401);
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
  const key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
