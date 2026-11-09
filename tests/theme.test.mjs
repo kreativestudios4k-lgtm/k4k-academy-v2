@@ -50,7 +50,8 @@ test('K4K homepage provides original template discovery and customer routes',()=
 test('template workflow does not trigger AI generation or credits',()=>{
  const template=source('app/k4k-app/template/[id]/TemplateCreator.js');
  assert.match(template,/k4k-template-disabled-generate/);
- assert.match(template,/disabled>\{uploaded===0/);
+ assert.match(template,/disabled>\{!requiredReady/);
+ assert.match(template,/validateTemplatePreparation/);
  assert.match(template,/MAX_PHOTOS=30/);
 });
 
