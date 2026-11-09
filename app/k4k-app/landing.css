@@ -340,3 +340,40 @@ body:has(.k4k-reels) nav.k4k-reels-nav a{display:flex;flex-direction:column;alig
  .k4k-reels-slide video{object-fit:cover;object-position:center center}
 }
 @media(min-width:900px) and (max-width:1100px){.k4k-reels-desktop-controls{left:calc(50% + var(--desktop-video-width)/2 + 7px);width:58px}}
+
+/* Reels v4: consistent mobile immersive feed / desktop centred player and exterior tools.
+   Keep the portrait video free of mid-screen text and prevent clipping on short displays. */
+.k4k-reels-slide video{object-position:center 35%}
+.k4k-reels-header{z-index:8;padding-top:calc(12px + env(safe-area-inset-top));gap:9px}
+.k4k-reels-header .k4k-reels-logo{font-size:19px;gap:7px}
+.k4k-reels-header .k4k-reels-logo>span{font-size:19px}
+.k4k-reels-header .k4k-reels-logo img{width:27px;height:27px}
+.k4k-reels-header .k4k-reels-logo small{font-size:6px;letter-spacing:.85px}
+.k4k-reels-header .k4k-reels-tabs{gap:29px}
+.k4k-reels-header .k4k-reels-tabs button{font-size:15px;padding-bottom:7px}
+.k4k-reels-overlay{background:linear-gradient(to bottom,#0008 0%,transparent 23%,transparent 66%,#0005 76%,#000e 100%)}
+.k4k-reels-caption{bottom:10px;left:14px;right:14px}
+.k4k-reels-caption h1{max-width:calc(100% - 65px);font-size:clamp(20px,5.3vw,26px);margin:6px 0 4px}
+.k4k-reels-caption p{font-size:11px;margin-bottom:9px}
+.k4k-reels-badge{font-size:10px;padding:5px 8px}
+.k4k-reels-cta{min-height:49px;font-size:15px}
+.k4k-reels-actions{bottom:clamp(154px,22dvh,208px);right:12px;gap:10px}
+.k4k-reels-actions span{font-size:27px}
+.k4k-reels-actions>div,.k4k-reels-actions button{font-size:10px}
+.k4k-reels-sound{display:none}
+@media(min-width:900px){
+ .k4k-reels{--desktop-video-width:min(510px,calc((100dvh - 78px)*.5625))}
+ .k4k-reels-scroll{width:var(--desktop-video-width);max-width:var(--desktop-video-width)}
+ .k4k-reels-header{width:var(--desktop-video-width)}
+ body:has(.k4k-reels) nav.k4k-reels-nav{width:var(--desktop-video-width)}
+ .k4k-reels-slide video{object-position:center center}
+ .k4k-reels-caption{bottom:9px;left:12px;right:12px}
+ .k4k-reels-caption h1{font-size:clamp(18px,2.8dvh,24px);max-width:100%}
+ .k4k-reels-cta{min-height:44px;font-size:13px}
+ .k4k-reels-desktop-controls{left:calc(50% + var(--desktop-video-width)/2 + 16px);top:calc(50% - 195px)}
+}
+@media(max-height:620px){
+ .k4k-reels-caption h1{font-size:18px}
+ .k4k-reels-cta{min-height:40px}
+ .k4k-reels-actions{bottom:135px}
+}
