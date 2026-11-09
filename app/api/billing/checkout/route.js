@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
+import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 
 export const runtime = 'nodejs';
 
@@ -31,7 +32,11 @@ export async function POST(request) {
     return json({error: 'INVALID_REQUEST'}, 400);
   }
 
-  const priceId = resolvePrice(body?.plan, body?.currency);
+  // Region must be derived from the trusted Vercel edge header, not browser input.
+  // Reject mismatches before any Stripe API request to avoid currency/price surprises.
+  const expectedCurrency = currencyForCountry(request.headers.get('x-vercel-ip-country'));
+  if (body?.currency !== expectedCurrency) return json({error: 'CURRENCY_REGION_MISMATCH', currency: expectedCurrency}, 409);
+  const priceId = resolvePrice(body?.plan, expectedCurrency);
   if (!priceId) return json({error: 'INVALID_PLAN'}, 400);
 
   const secret = process.env.STRIPE_SECRET_KEY;
@@ -66,7 +71,7 @@ export async function POST(request) {
     res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
-      body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: body.currency}).toString(),
+      body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: expectedCurrency}).toString(),
       signal: AbortSignal.timeout(12000),
     });
   } catch (error) {
