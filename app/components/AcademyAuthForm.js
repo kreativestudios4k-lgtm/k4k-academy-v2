@@ -137,9 +137,9 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    </aside>
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
-    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K APP · CREATOR ACCESS'}</div>
-    <h1>{registering?'Create your account':'Your next creation starts here.'}</h1>
-    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to create AI videos, recreate trending scenes and access your creator tools.'}</p>
+    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'YOUR ACCOUNT'}</div>
+    <h1>{registering?'Create your account':'Welcome back to K4K'}</h1>
+    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to your account to create videos and manage your projects.'}</p>
 
     {registering&&lookup!=='verified'&&<div className="k4k-auth-verify" role="status">
      {lookup==='loading'?<><RefreshCw size={19} className="k4k-auth-spin"/>Checking your Stripe payment…</>:
@@ -169,7 +169,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
       <label htmlFor="academy-password-confirm">Confirm password</label>
       <input id="academy-password-confirm" type={showPassword?'text':'password'} autoComplete="new-password" required minLength={8} value={confirmation} onChange={e=>setConfirmation(e.target.value)} placeholder="Repeat your password" disabled={busy}/>
      </>}
-     <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Log in'}<ArrowRight size={18}/></button>
+     <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Sign in'}<ArrowRight size={18}/></button>
     </form>}
 
     {!registering&&<div className="k4k-auth-google-wrap">
@@ -177,7 +177,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}
     <p className="k4k-auth-footer">
-     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K APP? <Link href="/k4k-app/register">Create an account</Link></>}
+     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K? <Link href="/k4k-app/register">Create an account</Link></>}
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
