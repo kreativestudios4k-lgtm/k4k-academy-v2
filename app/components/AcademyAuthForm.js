@@ -4,6 +4,7 @@ import {useCallback,useEffect,useState} from 'react';
 import Link from 'next/link';
 import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
+import '../kx-redesign.css';
 
 const isEmail=(value)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 function GoogleIcon(){
@@ -118,12 +119,22 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   }catch{setError('Google login could not be started. Please use your email and password.');setBusy(false)}
  }
 
- return <main className="k4k-auth-page">
+ return <main className="k4k-auth-page kx-auth">
   <header className="k4k-auth-header">
    <Link className="k4k-auth-brand" href="/" aria-label="K4K APP home">K4K<span>✳</span> <small>APP</small></Link>
    <Link href="/" className="k4k-auth-back">Home <ArrowRight size={15}/></Link>
   </header>
-  <div className="k4k-auth-centre">
+  <div className="k4k-auth-centre kx-auth-grid">
+   <aside className="kx-stage" aria-hidden="true">
+    <p className="kx-stage-kicker">Scene 01 · 00:03 · Storyboard</p>
+    <div className="kx-frames">
+     <div className="kx-frame kx-frame-a"><span>Wide</span></div>
+     <div className="kx-frame kx-frame-b"><span>Close</span></div>
+     <div className="kx-frame kx-frame-c"><span>Cut</span></div>
+    </div>
+    <h2 className="kx-stage-title">Plan the shot. <em>Then make it move.</em></h2>
+    <p className="kx-stage-copy">Build your scenes frame by frame and keep your characters consistent from one clip to the next.</p>
+   </aside>
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
     <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K APP · CREATOR ACCESS'}</div>
