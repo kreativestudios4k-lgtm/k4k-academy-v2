@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import './preview.css';
+import AccountStatus from './AccountStatus';
 import {useK4KLocale} from './locale';
 
 const navigation=[
@@ -20,7 +21,7 @@ export default function PreviewShell({active,children}){
  return <div className="k4k-light">
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/k4k-app">✦ K4K <b>APP</b></Link>
-   <nav aria-label="Customer links"><Link href="/k4k-app/support">Help & support</Link><Link href="/academy">My Academy</Link></nav>
+   <nav aria-label="Customer links"><Link href="/k4k-app/support">Help & support</Link><Link href="/academy">My Academy</Link><AccountStatus/></nav>
   </header>
   <main className="k4k-light-main">{children}</main>
   <nav className="k4k-light-nav" aria-label="K4K APP primary navigation">
