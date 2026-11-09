@@ -259,3 +259,18 @@
 .kx-auth .kx-brand-name{display:inline-flex;align-items:center;gap:10px;font-family:Arial,Helvetica,sans-serif;font-size:23px;font-weight:900;letter-spacing:-.055em;color:#f7fff2}
 .kx-auth .kx-brand-name small{font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.24em;border-left:1px solid #baff3070;padding-left:11px;color:#c7ff36}
 @media(max-width:520px){.kx-auth .kx-brand-mark{width:39px;height:39px;flex-basis:39px;font-size:22px}.kx-auth .kx-brand-name{font-size:20px}}
+
+
+/* Consistent floating support on the sign-in page */
+.kx-auth .k4k-auth-support-dock{position:fixed;right:22px;bottom:22px;z-index:120;font-family:Arial,Helvetica,sans-serif}
+.kx-auth .k4k-auth-support-fab{display:flex;align-items:center;gap:9px;border:1px solid #caff39;border-radius:100px;background:#caff39;color:#11200b;padding:13px 19px;font-size:14px;font-weight:850;cursor:pointer;box-shadow:0 12px 40px #0008}
+.kx-auth .k4k-auth-support-panel{position:absolute;right:0;bottom:calc(100% + 12px);width:min(350px,calc(100vw - 32px));border:1px solid #527543;border-radius:18px;background:#101c12;color:#f5fff0;padding:20px;box-shadow:0 20px 60px #000a}
+.kx-auth .k4k-auth-support-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.kx-auth .k4k-auth-support-panel-head strong{font-size:18px}
+.kx-auth .k4k-auth-support-panel-head button{background:transparent;color:#fff;border:0;padding:7px;cursor:pointer}
+.kx-auth .k4k-auth-support-panel p{font-size:13px;line-height:1.6;color:#b7c6b0;margin:12px 0 17px}
+.kx-auth .k4k-auth-support-panel a{display:flex;align-items:center;gap:10px;padding:13px;margin-top:9px;background:#1e2c1e;border:1px solid #ffffff24;border-radius:11px;color:#f5fff0;text-decoration:none;font-size:14px;font-weight:750}
+.kx-auth .k4k-auth-support-panel a:hover{border-color:#caff39}
+.kx-auth .k4k-auth-support-panel small{display:block;margin-top:14px;color:#acbba5;font-size:11px;line-height:1.5}
+.kx-auth .k4k-auth-support-fab:focus-visible,.kx-auth .k4k-auth-support-panel a:focus-visible,.kx-auth .k4k-auth-support-panel button:focus-visible{outline:3px solid #8abaff;outline-offset:3px}
+@media(max-width:520px){.kx-auth .k4k-auth-support-dock{right:14px;bottom:14px}.kx-auth .k4k-auth-support-fab{padding:13px}.kx-auth .k4k-auth-support-fab span{display:none}}
