@@ -82,3 +82,20 @@
 @media(max-width:700px){.k4k-template-header{height:65px;padding:0 18px}.k4k-template-logo{font-size:20px}.k4k-template-header nav{gap:13px;font-size:10px}.k4k-template-header nav a:nth-child(2){display:none}.k4k-template-breadcrumb{padding:17px 18px;font-size:11px}.k4k-template-layout{display:flex;flex-direction:column;gap:22px;padding:7px 15px 45px}.k4k-template-watch{width:100%;position:static}.k4k-template-video-frame{width:min(100%,410px);max-height:58dvh;aspect-ratio:9/12}.k4k-template-reference-text{padding:20px 4px 5px}.k4k-template-reference-text h1{font-size:33px}.k4k-template-editor{width:100%;padding:22px 17px;border-radius:18px}.k4k-template-editor h2{font-size:33px}.k4k-template-character-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.k4k-template-character,.k4k-template-new-character{padding:9px;border-radius:12px}.k4k-template-upload,.k4k-template-photo{min-height:132px;height:132px}.k4k-template-map-button{font-size:9px;padding:10px 4px}.k4k-template-character-name strong{font-size:11px}.k4k-template-new-character{min-height:220px}.k4k-template-settings{grid-template-columns:1fr;gap:16px}.k4k-template-footer{padding:24px 17px}}
 @media(max-width:400px){.k4k-template-character-grid{grid-template-columns:1fr 1fr}.k4k-template-character-name strong{font-size:10px}.k4k-template-editor-top{font-size:9px}.k4k-template-preview-pill{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.k4k-template-workflow *{transition:none!important;animation:none!important}}
+
+/* Template-first workspace refinement: focused preview + compact creation panel. */
+@media(min-width:981px){
+ .k4k-template-layout{max-width:1500px;grid-template-columns:minmax(360px,.95fr) minmax(470px,1.05fr);gap:clamp(24px,3vw,54px)}
+ .k4k-template-editor{position:relative;align-self:start}
+ .k4k-template-video-frame{aspect-ratio:9/16;max-height:min(74dvh,780px);max-width:440px}
+ .k4k-template-reference-text{max-width:440px}
+}
+.k4k-template-editor{background:#101812;border-color:#314d36}
+.k4k-template-character{background:#0b150e}
+.k4k-template-upload{background:#132118}
+.k4k-template-upload:focus-within{outline:3px solid #c7ff36;outline-offset:3px}
+.k4k-template-photo button:focus-visible,.k4k-template-map-button:focus-visible,.k4k-template-new-character:focus-visible{outline:3px solid #c7ff36;outline-offset:3px}
+@media(max-width:700px){
+ .k4k-template-video-frame{aspect-ratio:9/16;max-height:66dvh}
+ .k4k-template-editor{box-shadow:none}
+}
