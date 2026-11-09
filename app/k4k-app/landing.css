@@ -236,3 +236,34 @@
 .k4k-reels-logo>span{display:flex;flex-direction:column;gap:4px}
 .k4k-reels-logo small{font-size:8px;font-weight:800;letter-spacing:1.25px;color:#dce7d6}
 @media(max-width:390px){.k4k-reels-logo{font-size:22px}.k4k-reels-logo img{width:31px;height:31px}.k4k-reels-logo small{font-size:7px;letter-spacing:.8px}}
+
+/* Mobile visual QA fix: global app/globals.css nav sets top:0 on every nav.
+   Reset the inherited top and layout properties so the Reels tab bar stays below. */
+html:has(.k4k-reels),body:has(.k4k-reels){overflow:hidden;overscroll-behavior:none}
+body:has(.k4k-reels) nav.k4k-reels-nav{
+ position:absolute;top:auto;bottom:0;left:0;right:0;z-index:30;
+ display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:stretch;
+ justify-content:initial;gap:0;width:100%;height:calc(78px + env(safe-area-inset-bottom));
+ padding:8px 4px env(safe-area-inset-bottom);border:0;border-top:1px solid #29292d;
+ background:#101014;transform:none;
+}
+body:has(.k4k-reels) nav.k4k-reels-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0}
+.k4k-reels-header{height:auto;min-height:105px;justify-content:flex-start;gap:12px;padding-top:calc(13px + env(safe-area-inset-top));background:linear-gradient(#000b,#0003 72%,transparent)}
+.k4k-reels-header .k4k-reels-logo{font-size:22px;line-height:1;letter-spacing:-.7px;display:flex;flex-direction:row;align-items:center;gap:8px;white-space:nowrap}
+.k4k-reels-header .k4k-reels-logo>span{display:block;font-size:22px;line-height:1}
+.k4k-reels-header .k4k-reels-logo b{display:inline;color:#d9fb64}
+.k4k-reels-header .k4k-reels-logo small{display:block;font-size:7px;line-height:1.4;letter-spacing:1px;margin-top:4px;color:#e6e6e6}
+.k4k-reels-header .k4k-reels-logo img{width:34px;height:34px;flex:none}
+.k4k-reels-header .k4k-reels-tabs{display:flex;align-items:center;gap:34px}
+.k4k-reels-header .k4k-reels-tabs button{font-size:16px;line-height:1.2}
+.k4k-reels-scroll{position:relative;z-index:1;height:calc(100dvh - 78px - env(safe-area-inset-bottom))}
+.k4k-reels-slide{height:100%;min-height:100%;position:relative}
+.k4k-reels-slide video{z-index:0;background:#111b14;object-fit:cover}
+.k4k-reels-overlay{z-index:1}
+.k4k-reels-caption{z-index:4;bottom:18px}
+.k4k-reels-actions{z-index:4;bottom:210px}
+.k4k-reels-sound{z-index:3;opacity:0;transition:opacity .2s}
+.k4k-reels-slide:active .k4k-reels-sound{opacity:.6}
+.k4k-reels-modal-backdrop{z-index:60}
+.k4k-reels-video-status{position:absolute;z-index:2;inset:25% 10% auto;display:flex;justify-content:center;text-align:center;color:#f4f4f4;font-size:13px;text-shadow:0 2px 6px #000}
+@media(min-width:900px){body:has(.k4k-reels) nav.k4k-reels-nav{left:50%;right:auto;transform:translateX(-50%);width:510px}}
