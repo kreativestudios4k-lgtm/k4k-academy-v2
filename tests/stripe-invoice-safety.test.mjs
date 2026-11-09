@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {handleStripeEvent} from '../lib/server/stripe-webhook-handler.mjs';
 
 const price='price_1UZ9OgL7fmdMaK0kcN2JJFOa';
-function invoice(id='in_test_1') {return {id,type:'invoice.paid',created:1700000000,data:{object:{id,customer:'cus_test',subscription:'sub_test',billing_reason:'subscription_cycle',lines:{data:[{price:{id:price},period:{end:1703000000}}]}}}};}
+function invoice(id='in_test_1') {return {id:'evt_'+id,type:'invoice.paid',created:1700000000,data:{object:{id,customer:'cus_test',subscription:'sub_test',billing_reason:'subscription_cycle',lines:{data:[{price:{id:price},period:{end:1703000000}}]}}}};}
 function store({applied=true}={}) {const seen=new Set();let grants=0;return {get grants(){return grants},async hasProcessedEvent(id){return seen.has(id)},async markProcessed({eventId}){seen.add(eventId)},async userIdForCustomer(){return 'user_test'},async applyInvoiceStatus(){return {handled:applied}},async grantCredits(){grants++;return {granted:true}}};}
 
 test('paid subscription invoice grants once when membership update succeeds',async()=>{const s=store();const e=invoice();await handleStripeEvent(e,s);await handleStripeEvent(e,s);assert.equal(s.grants,1)});
