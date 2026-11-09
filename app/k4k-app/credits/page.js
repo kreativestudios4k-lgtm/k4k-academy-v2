@@ -4,29 +4,31 @@ import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import {createClient} from '../../../lib/supabase/client';
 import {useK4KLocale} from '../locale';
+import {PLAN_PRICES} from '../../../lib/k4k-plan-prices.mjs';
 import './credits.css';
 
 const plans=[
- {key:'starter',name:'Starter',gbp:'15.99',brl:'109,99',credits:80,description:'For first-time creators'},
- {key:'creator',name:'Creator',gbp:'30.99',brl:'209,99',credits:160,description:'For consistent creators'},
- {key:'pro',name:'Pro',gbp:'65.99',brl:'449,99',credits:340,description:'For serious storytelling'},
- {key:'studio',name:'Studio',gbp:'134.99',brl:'899,99',credits:700,description:'For creative teams'},
+ {key:'starter',name:'Starter',credits:80,description:'For first-time creators'},
+ {key:'creator',name:'Creator',credits:160,description:'For consistent creators'},
+ {key:'pro',name:'Pro',credits:340,description:'For serious storytelling'},
+ {key:'studio',name:'Studio',credits:700,description:'For creative teams'},
 ];
+const supportedCurrencies=new Set(['GBP','EUR','USD','BRL']);
+const formatPrice=(plan,currency)=>new Intl.NumberFormat(currency==='BRL'?'pt-BR':currency==='EUR'?'de-DE':currency==='USD'?'en-US':'en-GB',{style:'currency',currency}).format(PLAN_PRICES[plan.key][currency]/100);
 export default function Credits(){
  const {locale}=useK4KLocale();
  const pt=locale==='pt',es=locale==='es';
  const tr=(en,br,spa)=>pt?br:es?spa:en;
- const [selected,setSelected]=useState('creator'),[market,setMarket]=useState(null);
+ const [selected,setSelected]=useState('creator'),[currency,setCurrency]=useState(null);
  const [checkoutBusy,setCheckoutBusy]=useState(false),[checkoutError,setCheckoutError]=useState('');
  useEffect(()=>{let active=true;fetch('/api/k4k-region',{cache:'no-store'})
   .then(response=>response.ok?response.json():null)
-  .then(data=>{if(active)setMarket(data?.country==='BR'?'BR':'INT')})
-  .catch(()=>{if(active)setMarket('INT')});
+  .then(data=>{if(active)setCurrency(supportedCurrencies.has(data?.currency)?data.currency:'GBP')})
+  .catch(()=>{if(active)setCurrency('GBP')});
   return()=>{active=false};
  },[]);
- const brazil=market==='BR',current=plans.find(plan=>plan.key===selected)||plans[1];
- const symbol=brazil?'R$ ':'£';
- const amount=plan=>!market?'—':symbol+(brazil?plan.brl:plan.gbp);
+ const current=plans.find(plan=>plan.key===selected)||plans[1];
+ const amount=plan=>!currency?'—':formatPrice(plan,currency);
  async function startTestCheckout(){
   if(checkoutBusy)return;
   setCheckoutBusy(true);setCheckoutError('');
@@ -35,7 +37,7 @@ export default function Credits(){
    if(authError||!session?.access_token){window.location.assign('/login?next=%2Fk4k-app%2Fcredits');return;}
    const response=await fetch('/api/billing/checkout',{
     method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+session.access_token},
-    body:JSON.stringify({plan:selected,currency:brazil?'BRL':'GBP'}),
+    body:JSON.stringify({plan:selected,currency}),
    });
    const result=await response.json().catch(()=>({}));
    if(!response.ok||!result.url){
@@ -69,7 +71,7 @@ export default function Credits(){
     <ul><li>{tr('Template browsing and saved drafts','Templates e rascunhos','Plantillas y borradores')}</li><li>{tr('Creator workspace access','Acesso ao estúdio','Acceso al estudio')}</li><li>{tr('Academy included in planned plan','Academy incluída no plano previsto','Academy incluida en el plan previsto')}</li></ul>
     <span className="k4k-pricing-select">{plan.key===selected?tr('Selected ✓','Selecionado ✓','Seleccionado ✓'):tr('Select plan','Escolher plano','Elegir plan')} <span aria-hidden="true">↗</span></span>
    </button>)}</div>
-   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Stripe test checkout only. Do not expect generation credits until the verified webhook and ledger are activated.','Checkout Stripe somente em modo de teste. Os créditos só serão liberados após a validação do webhook e do extrato.','Checkout de Stripe solo en modo de prueba. Los créditos dependen de validar el webhook y el registro.')}</p></div><button type="button" disabled={!market||checkoutBusy} onClick={startTestCheckout}>{checkoutBusy?'Opening…':tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button></section>
+   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Stripe test checkout only. Do not expect generation credits until the verified webhook and ledger are activated.','Checkout Stripe somente em modo de teste. Os créditos só serão liberados após a validação do webhook e do extrato.','Checkout de Stripe solo en modo de prueba. Los créditos dependen de validar el webhook y el registro.')}</p></div><button type="button" disabled={!currency||checkoutBusy} onClick={startTestCheckout}>{checkoutBusy?'Opening…':tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button></section>
    {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
    <div className="k4k-pricing-links"><Link href="/k4k-app/register">{tr('New creator? Create an account','Novo criador? Criar conta','¿Nuevo creador? Crear cuenta')}</Link><Link href="/login?next=%2Fk4k-app%2Fcredits">{tr('Already registered? Sign in','Já tem conta? Entrar','¿Tienes cuenta? Entrar')}</Link><Link href="/academy">{tr('Existing student? My Academy','Aluno atual? Minha Academy','¿Alumno actual? Mi Academy')}</Link></div>
    <section className="k4k-pricing-note"><h2>{tr('Before you choose a plan','Antes de escolher um plano','Antes de elegir un plan')}</h2><p>{tr('AI generation is currently disabled. Credits per video will depend on validated provider rates, model, duration and resolution. Test checkout does not activate a paid service. Existing Academy subscriptions remain unchanged.','A geração de IA está desativada. O custo por vídeo dependerá do provedor, modelo, duração e resolução. O checkout de teste não ativa um serviço pago. Assinaturas atuais da Academy são preservadas.','La generación de IA está desactivada. El costo por vídeo depende del proveedor, modelo, duración y resolución. El checkout de prueba no activa un servicio pagado. Las suscripciones de Academy no cambian.')}</p><Link href="/k4k-app/support">{tr('Questions? Contact K4K support ↗','Dúvidas? Fale com o suporte ↗','¿Dudas? Contacta con soporte ↗')}</Link></section>
