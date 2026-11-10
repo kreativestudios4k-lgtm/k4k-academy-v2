@@ -4,6 +4,7 @@ import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import {createClient} from '../../../lib/supabase/client';
 import {useK4KLocale} from '../locale';
+import {stripeCheckoutDestination} from '../../../lib/stripe-checkout-destination.mjs';
 import {PLAN_PRICES} from '../../../lib/k4k-plan-prices.mjs';
 import './credits.css';
 
@@ -30,7 +31,7 @@ export default function Credits(){
  const current=plans.find(plan=>plan.key===selected)||plans[1];
  const amount=plan=>!currency?'—':formatPrice(plan,currency);
  async function startTestCheckout(){
-  if(checkoutBusy)return;
+  if(checkoutBusy||!currency)return;
   setCheckoutBusy(true);setCheckoutError('');
   try{
    const {data:{session},error:authError}=await createClient().auth.getSession();
@@ -42,6 +43,11 @@ export default function Credits(){
    const result=await response.json().catch(()=>({}));
    if(!response.ok||!result.url){
     const reason=result.error||'HTTP_'+response.status;
+    if(reason==='CURRENCY_REGION_MISMATCH'&&supportedCurrencies.has(result.currency)){
+     setCurrency(result.currency);
+     setCheckoutError(tr('Your region changed. Review the updated prices before continuing.','Sua região mudou. Confira os preços atualizados antes de continuar.','Tu región ha cambiado. Revisa los precios actualizados antes de continuar.'));
+     return;
+    }
     const message={
      ALREADY_SUBSCRIBED:'Your account already has an active subscription.',
      UNAVAILABLE:'Test checkout is not configured. No payment was taken.',
@@ -54,9 +60,7 @@ export default function Credits(){
     setCheckoutError(message||(reason==='CHECKOUT_FAILED'?'Stripe rejected test checkout ('+(result.stripeCode||result.stripeType||'unknown')+'). No payment was taken.':'Checkout could not be started ('+String(reason).replace(/[^A-Z0-9_]/gi,'').slice(0,48)+'). No payment was taken.'));
     return;
    }
-   const target=new URL(result.url);
-   if(target.protocol!=='https:'||target.hostname!=='checkout.stripe.com'){setCheckoutError('Unexpected checkout destination. No payment was taken.');return;}
-   window.location.assign(target.href);
+   window.location.assign(stripeCheckoutDestination(result.url));
   }catch{setCheckoutError('Unable to start Stripe test checkout. No payment was taken.');}
   finally{setCheckoutBusy(false);}
  }

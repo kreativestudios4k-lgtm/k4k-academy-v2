@@ -1,3 +1,5 @@
+import {headers} from 'next/headers';
+import {currencyForCountry} from '../../lib/k4k-market.mjs';
 import Link from 'next/link';
 import SubscribeButton from './SubscribeButton';
 import {PLAN_PRICES} from '../../lib/k4k-plan-prices.mjs';
@@ -24,7 +26,9 @@ const WHY=[
 
 const money=(minor,currency)=>(minor/100).toLocaleString('en-GB',{style:'currency',currency});
 
-export default function PricingPage(){
+export const dynamic='force-dynamic';
+export default async function PricingPage(){
+ const currency=currencyForCountry((await headers()).get('x-vercel-ip-country'));
  return <main className="kx-pricing">
   <header className="kx-pricing-top">
    <Link href="/" className="kx-pricing-brand">K4K<span> APP</span></Link>
@@ -32,14 +36,15 @@ export default function PricingPage(){
   </header>
 
   <section className="kx-pricing-hero">
-   <p className="kx-pricing-kicker">Plans · Billed monthly · GBP</p>
+   <p className="kx-pricing-kicker">Plans · Billed monthly · {currency}</p>
    <h1 className="kx-hook">Pick the plan that <em>powers your next scene.</em></h1>
    <p>Every plan includes K4K Academy.</p>
+   <p role="note">Preview · Stripe TEST checkout only. No live payments. AI generation is currently disabled.</p>
   </section>
 
   <section className="kx-plans" aria-label="Subscription plans">
    {PLANS.map(plan=>{
-    const price=PLAN_PRICES[plan.key].GBP;
+    const price=PLAN_PRICES[plan.key][currency];
     const meter=Math.round((CREDITS[plan.key]/MAX_CREDITS)*100);
     return <article key={plan.key} className="kx-plan">
      <div className="kx-plan-name">
@@ -47,14 +52,14 @@ export default function PricingPage(){
       <h2>{plan.name}</h2>
       <p>{plan.audience}</p>
      </div>
-     <p className="kx-price">{money(price,'GBP')}<small>/ month</small></p>
+     <p className="kx-price">{money(price,currency)}<small>/ month</small></p>
      <div className="kx-credits">
       <strong>{CREDITS[plan.key]} credits / month</strong>
       <div className="kx-meter" style={{'--w':`${meter}%`}} aria-hidden="true"/>
       <p className="kx-credit-note">Credit charges depend on video duration (3–30 seconds), model and resolution. Actual generation is disabled until provider prices and safeguards are validated.</p>
      </div>
      <div className="kx-plan-cta">
-      <SubscribeButton plan={plan.key} currency="GBP" style={{width:'100%'}} />
+      <SubscribeButton plan={plan.key} currency={currency} style={{width:'100%'}} />
      </div>
     </article>;
    })}
