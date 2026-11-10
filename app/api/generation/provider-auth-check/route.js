@@ -13,7 +13,7 @@ export async function POST(request){
  const {data:{user}={},error}=await supabase.auth.getUser(token);
  if(error||!user||user.is_anonymous||user.email?.toLowerCase()!=='hello@kreativestudios4k.com')return respond({error:'FORBIDDEN'},403);
  const credentials=process.env.HF_CREDENTIALS;
- if(typeof credentials!=='string'||!credentials.trim().length>0)return respond({authenticated:false,error:'CREDENTIAL_MISSING'},503);
+ if(typeof credentials!=='string'||credentials.trim().length===0)return respond({authenticated:false,error:'CREDENTIAL_MISSING'},503);
  // The documented status GET is non-billable. A deliberately nonexistent UUID
  // probes authorization without submitting or charging for generation.
  const requestId='00000000-0000-4000-8000-000000000000';
