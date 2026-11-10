@@ -28,6 +28,7 @@ test('valid MP4 is uploaded once to exact owner/job path without upsert',async()
  assert.equal(calls[0].path,result.outputPath);
  assert.equal(calls[0].options.contentType,'video/mp4');
  assert.equal(calls[0].options.upsert,false);
+ assert.equal(calls[0].options.cacheControl,'0');
 });
 test('rejects invalid identities before upload',async()=>{
  const {ingest,calls}=harness();
