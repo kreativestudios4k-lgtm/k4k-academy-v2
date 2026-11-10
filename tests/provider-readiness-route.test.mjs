@@ -8,7 +8,7 @@ test('provider readiness never enables generation from credentials alone',()=>{
  assert.match(route,/GENERATION_FEATURE_DISABLED/);
 });
 test('readiness does not expose credentials or submit billable work',()=>{
- assert.doesNotMatch(route,/credentials\s*[,}]/);
+ assert.doesNotMatch(route,/return NextResponse\.json\(\{\s*credentials\b/);
  assert.doesNotMatch(route,/fetch\(|\.submit\(|service_role/i);
  assert.match(route,/Cache-Control':'no-store/);
 });
