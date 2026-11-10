@@ -31,25 +31,25 @@ test('mock provider completion -> verified media -> private upload -> settlement
 test('pending provider response never downloads or settles',async()=>{
  const {reconcile,events}=build({status:'in_progress'});
  assert.deepEqual(await reconcile(ids),{status:'pending'});
- assert.deepEqual(events,['provider-status']);
+ assert.deepEqual(events,['owner','provider-status']);
 });
 test('failed provider response never settles automatically',async()=>{
  const {reconcile,events}=build({status:'failed'});
  assert.deepEqual(await reconcile(ids),{status:'provider_failed_review_required'});
- assert.deepEqual(events,['provider-status']);
+ assert.deepEqual(events,['owner','provider-status']);
 });
 test('provider request mismatch blocks all downstream effects',async()=>{
  const {reconcile,events}=build({providerResponseId:'other'});
  await assert.rejects(reconcile(ids),/HIGGSFIELD_STATUS_MISMATCH/);
- assert.deepEqual(events,['provider-status']);
+ assert.deepEqual(events,['owner','provider-status']);
 });
 test('cross-user job mismatch blocks provider calls and settlement',async()=>{
  const {reconcile,events}=build({owner:'99999999-9999-4999-8999-999999999999'});
  await assert.rejects(reconcile(ids),/JOB_OWNERSHIP_OR_PROVIDER_MISMATCH/);
- assert.deepEqual(events,['provider-status','provider-media']);
+ assert.deepEqual(events,['owner']);
 });
 test('private upload error blocks settlement',async()=>{
  const {reconcile,events}=build({uploadError:{message:'already exists'}});
  await assert.rejects(reconcile(ids),/OUTPUT_UPLOAD_FAILED/);
- assert.deepEqual(events,['provider-status','provider-media','private-upload']);
+ assert.deepEqual(events,['owner','provider-status','provider-media','private-upload']);
 });
