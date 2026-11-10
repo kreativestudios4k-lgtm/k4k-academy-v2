@@ -19,7 +19,7 @@ test('provider fails closed without explicit enablement',async()=>{
 });
 test('enabled provider posts the documented request with server authorization',async()=>{
  let call;
- const provider=createGenjutsuLightProvider({enabled:true,maxUsd:5,verifiedOutputSeconds:5,verifiedReferenceSeconds:5,credentials:'key:secret',fetchImpl:async(url,options)=>{call={url,options};return {ok:true,json:async()=>({status:'queued',request_id:'request-1'})}}});
+ const provider=createGenjutsuLightProvider({enabled:true,maxUsd:5,providerQuoteUsd:1,verifiedOutputSeconds:5,verifiedReferenceSeconds:5,credentials:'key:secret',fetchImpl:async(url,options)=>{call={url,options};return {ok:true,json:async()=>({status:'queued',request_id:'request-1'})}}});
  const result=await provider.submit(input);
  assert.equal(result.status,'queued');
  assert.equal(call.url,GENJUTSU_LIGHT_ENDPOINT);
@@ -35,5 +35,13 @@ test('enabled provider rejects requests without verified budget and duration bef
  await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:5}).submit(input),/media duration/);
  await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:5,verifiedOutputSeconds:15,verifiedReferenceSeconds:50}).submit(input),/exceeds authorized/);
  await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:6,verifiedOutputSeconds:5,verifiedReferenceSeconds:5}).submit(input),/spending cap/);
+ assert.equal(calls,0);
+});
+
+test('local USD estimate alone cannot authorize a billable provider call',async()=>{
+ let calls=0;
+ const base={enabled:true,credentials:'key:secret',maxUsd:5,verifiedOutputSeconds:5,verifiedReferenceSeconds:5,fetchImpl:async()=>{calls++;throw Error('unexpected request')}};
+ await assert.rejects(createGenjutsuLightProvider(base).submit(input),/Verified provider USD quote required/);
+ await assert.rejects(createGenjutsuLightProvider({...base,providerQuoteUsd:5.01}).submit(input),/quote exceeds/);
  assert.equal(calls,0);
 });
