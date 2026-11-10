@@ -38,3 +38,8 @@ test('missing reservation idempotency contract fails closed',async()=>{
  const ledger=createGuardedGenerationLedger({rpc:async()=>({data:{status:'reserved'},error:null})},{enabled:true});
  await assert.rejects(ledger.reserve(user,job,key,2),/RESERVATION_CONTRACT_INVALID/);
 });
+
+test('only allowlisted credit errors are returned without raw database messages',async()=>{
+ const ledger=createGuardedGenerationLedger({rpc:async()=>({data:null,error:{message:'INSUFFICIENT_CREDITS'}})},{enabled:true});
+ await assert.rejects(ledger.reserve(user,job,key,10),/INSUFFICIENT_CREDITS/);
+});

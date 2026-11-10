@@ -11,7 +11,7 @@ test('draft quote requires authenticated user and owned job',()=>{
 });
 test('quote uses non-generating provider estimate without reserving customer credits',()=>{
  assert.doesNotMatch(route,/provider\.submit\(|\.reserve\(|k4k_generation_reserve_draft|\.rpc\(/);
- assert.match(route,/\.estimate\(job\.model,input\)/);
+ assert.match(route,/\.estimate\(job\.model,input,/ );
  assert.match(route,/generationCredits\(usd\)/);
  assert.match(route,/quoteSigner/);
  assert.match(route,/creditsReserved:0/);

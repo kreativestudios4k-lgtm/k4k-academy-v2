@@ -23,7 +23,7 @@ export default function HiggsfieldConnection(){
    if(error||!session){setMessage(messages.UNAUTHENTICATED);return;}
    const response=await fetch('/api/generation/provider-auth-check',{cache:'no-store'});
    const result=await response.json();
-   setMessage(result.authenticated?'Higgsfield authentication and a non-generating estimate are verified.':messages[result.error||result.interpretation]||'The connection could not be verified. Try again later.');
+   setMessage(result.authenticated?(result.providerQuoteVerified?'Higgsfield authentication and a non-generating estimate are verified.':'Higgsfield authentication is verified. This model returns pricing rules rather than a fixed quote; generation remains blocked until pricing is approved.'):messages[result.error||result.interpretation]||'The connection could not be verified. Try again later.');
   }catch{setMessage('The connection could not be checked. Try again later.');}
   finally{setBusy(false);}
  }

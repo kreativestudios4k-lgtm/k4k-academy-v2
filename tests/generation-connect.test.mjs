@@ -17,7 +17,7 @@ function setup({newlyReserved=true,providerError=false,usd=1.2}={}){
 }
 test('estimate calls only the documented non-generating endpoint with copied-key auth',async()=>{
  const calls=[];const rest=createHiggsfieldRest({credentials:'copied_key',fetchImpl:async(url,options)=>{calls.push({url,options});return {ok:true,json:async()=>({usd:'1.25'})}}});
- assert.deepEqual(await rest.estimate('pro',input),{usd:1.25});
+ assert.equal((await rest.estimate('pro',input)).usd,1.25);
  assert.equal(calls[0].url,'https://api.higgsfield.ai/estimate/higgsfield/genjutsu/motion-transfer/v1.0');
  assert.equal(calls[0].options.headers.Authorization,'Key copied_key');
  assert.equal(calls[0].options.redirect,'error');
@@ -79,4 +79,13 @@ test('definitive synchronous rejection refunds through the atomic ledger',async(
  const {run,args,calls}=setup({providerError:401});const result=await run(args);
  assert.equal(result.creditsRefunded,true);assert.equal(result.status,'failed');
  assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_draft','submit','k4k_generation_finish']);
+});
+
+test('verified Pro rate card uses trusted duration rounded up and rejects changed pricing',async()=>{
+ const description='Per-second pricing. Each second of input video costs $0.318 at 480p, $0.681 at 720p, $1.632 at 1080p. Input duration is rounded up to the nearest whole second. Rates shown are before any applicable customer discount.';
+ const client=text=>createHiggsfieldRest({credentials:'key',fetchImpl:async()=>({ok:true,json:async()=>({type:'description',pricing_description:text})})});
+ const estimate=await client(description).estimate('pro',input,{sourceSeconds:4.1});
+ assert.equal(estimate.usd,3.405);assert.equal(estimate.providerQuoteVerified,false);assert.equal(estimate.providerRateCardVerified,true);
+ await assert.rejects(client(description).estimate('pro',input),/PROVIDER_QUOTE_INVALID/);
+ await assert.rejects(client(description.replace('0.681','0.900')).estimate('pro',input,{sourceSeconds:4.1}),/PROVIDER_QUOTE_INVALID/);
 });

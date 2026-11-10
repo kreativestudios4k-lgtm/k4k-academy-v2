@@ -24,10 +24,12 @@ separate launch requirement. This change is not a full production launch.
 Preview-only `GET /api/generation/provider-auth-check` estimates a fixed public
 sample with the saved server credential. It does not submit a generation or
 use private customer media. Results are cached for one minute per worker.
-An accepted, validated USD estimate verifies authentication. Errors expose only
-sanitized categories and HTTP status. The owner Admin panel uses this check.
+An accepted numeric estimate or recognized pricing-description response verifies authentication. The live Pro check confirmed the saved credential and all three existing per-second rates. Errors expose only
+sanitized categories and HTTP status. The owner Admin panel uses this check. `?tier=lite` checks the other fixed model endpoint.
 
 ## Configuration required before any paid preview test
+
+The Pro endpoint returns a pricing description rather than a numeric USD quote. The backend accepts only the exact verified rate card, calculates a conservative pre-discount estimate from inspected duration rounded up, and fails closed if the rate description changes. It does not claim that estimate is an exact provider quote.
 
 All switches remain disabled unless separately configured after owner approval:
 

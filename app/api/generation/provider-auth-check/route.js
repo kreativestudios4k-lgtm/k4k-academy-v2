@@ -1,3 +1,4 @@
+import {higgsfieldDiagnostic} from '../../../../lib/server/higgsfield-diagnostic.mjs';
 import {higgsfieldAuthorization} from '../../../../lib/server/higgsfield-auth.mjs';
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
@@ -33,25 +34,8 @@ export async function POST(request){
  }catch{return respond({authenticated:false,probeCompleted:false,error:'PROVIDER_UNREACHABLE'},502)}
 }
 
-// Preview-only diagnostic: fixed public sample, cached per worker. This calls
-// /estimate only, never a generation endpoint or a customer's private media.
-let diagnostic;
-export async function GET(){
+export async function GET(request){
  if(process.env.VERCEL_ENV!=='preview')return respond({error:'PREVIEW_ONLY'},403);
- if(diagnostic&&diagnostic.until>Date.now())return respond(await diagnostic.promise);
- const promise=(async()=>{
-  try{
-   const {createHiggsfieldRest}=await import('../../../../lib/server/higgsfield-rest.mjs');
-   const quote=await createHiggsfieldRest({credentials:process.env.HF_CREDENTIALS}).estimate('pro',{
-    video_url:'https://kreativestudios4k.com/videos/template-1.mp4',
-    image_urls:['https://kreativestudios4k.com/videos/template-1.webp'],resolution:'720p',prompt:''
-   });
-   return {authenticated:true,probeCompleted:true,providerQuoteVerified:true,quoteUsd:quote.usd,billableGenerationSubmitted:false};
-  }catch(error){
-   const known=['PROVIDER_CREDENTIALS_REJECTED','PROVIDER_ACCESS_OR_BALANCE_BLOCKED','PROVIDER_UNREACHABLE','PROVIDER_QUOTE_INVALID','PROVIDER_REQUEST_REJECTED'];
-   return {authenticated:error.authenticated===true,providerQuoteVerified:false,pricingType:error.pricingType??null,pricingDescription:error.pricingDescription??null,probeCompleted:true,error:known.includes(error.message)?error.message:'CREDENTIAL_INVALID',httpStatus:error.httpStatus??null,quoteShape:error.quoteShape??null,reportedUsd:error.reportedUsd??null,billableGenerationSubmitted:false};
-  }
- })();
- diagnostic={until:Date.now()+60000,promise};
- return respond(await promise);
+ const tier=request&&new URL(request.url).searchParams.get('tier')==='lite'?'lite':'pro';
+ return respond(await higgsfieldDiagnostic(tier));
 }
