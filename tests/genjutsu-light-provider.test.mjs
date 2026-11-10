@@ -46,14 +46,14 @@ test('local USD estimate alone cannot authorize a billable provider call',async(
  assert.equal(calls,0);
 });
 
-test('opaque API keys are accepted and empty keys are rejected',async()=>{
+test('key-secret credentials are required and empty keys are rejected',async()=>{
  const base={enabled:true,maxUsd:5,providerQuoteUsd:1,verifiedOutputSeconds:5,verifiedReferenceSeconds:5};
  await assert.rejects(createGenjutsuLightProvider({...base,credentials:'  '}).submit(input),/credentials not configured/);
  let authorization;
- const provider=createGenjutsuLightProvider({...base,credentials:'opaque-api-key',fetchImpl:async(_url,options)=>{
+ const provider=createGenjutsuLightProvider({...base,credentials:'key:secret',fetchImpl:async(_url,options)=>{
   authorization=options.headers.Authorization;
   return {ok:true,json:async()=>({status:'queued',request_id:'test-id'})};
  }});
  await provider.submit(input);
- assert.equal(authorization,'Key opaque-api-key');
+ assert.equal(authorization,'Key key:secret');
 });
