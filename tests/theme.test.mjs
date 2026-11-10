@@ -36,11 +36,11 @@ test('dark background and input themes are present in the account workspace',()=
 test('K4K homepage provides original template discovery and customer routes',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/LandingExperience/);
+ assert.match(homepage,/MobileTemplateFeed/);
  assert.match(source('app/k4k-app/explore/page.js'),/MobileTemplateFeed/);
  assert.match(feed,/template-catalogue\.json/);
- assert.match(feed,/k4k-reels-scroll/);
- assert.match(feed,/k4k-reels-cta/);
+ assert.match(feed,/kf-scroll/);
+ assert.match(feed,/kf-cta/);
  assert.match(feed,/k4k-mark\.svg/);
  assert.match(feed,/CREATE · SWAP · GENERATE/);
  assert.match(source('app/k4k-app/landing.css'),/@media\(max-width:680px\)/);
