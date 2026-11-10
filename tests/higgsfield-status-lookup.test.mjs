@@ -10,7 +10,7 @@ test('polls documented API origin and normalizes in_progress',async()=>{
  let request;
  const lookup=createHiggsfieldStatusLookup({enabled:true,apiKey:'mock',fetchImpl:async(url,options)=>{request={url,options};return {ok:true,json:async()=>({request_id:providerJobId,status:'in_progress',video:{url:'https://untrusted.example/video.mp4'}})}}});
  assert.deepEqual(await lookup({providerJobId}),{providerJobId,status:'processing'});
- assert.equal(request.url,'https://platform.higgsfield.ai/requests/request_123/status');
+ assert.equal(request.url,'https://api.higgsfield.ai/requests/request_123/status');
  assert.equal(request.options.headers.Authorization,'Key mock');
  assert.equal(request.options.redirect,'error');
  assert.equal(request.options.cache,'no-store');
