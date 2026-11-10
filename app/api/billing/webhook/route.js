@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
 import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
+import {billingMode} from '../../../../lib/server/billing-policy.mjs';
 import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 
@@ -12,6 +13,9 @@ const NO_STORE = {'Cache-Control': 'no-store'};
 // subscription events are refused with 503 so Stripe keeps retrying them.
 const SUBSCRIPTION_EVENTS = new Set([
   'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+  'charge.refunded',
+  'charge.dispute.created',
   'customer.subscription.created',
   'customer.subscription.updated',
   'customer.subscription.deleted',
@@ -27,7 +31,7 @@ function isNonSubscriptionEvent(event) {
     return !invoiceSubscriptionId(object);
   }
   if (event.type === 'checkout.session.completed') {
-    return object?.mode !== 'subscription';
+    return object?.mode !== 'subscription'&&object?.metadata?.kind!=='k4k_credit_pack';
   }
   return false;
 }
@@ -48,6 +52,8 @@ export async function POST(request) {
   } catch {
     return NextResponse.json({error: 'INVALID_PAYLOAD'}, {status: 400, headers: NO_STORE});
   }
+
+  if(event.livemode!==(billingMode()==='live'))return NextResponse.json({error:'BILLING_MODE_MISMATCH'},{status:400,headers:NO_STORE});
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});

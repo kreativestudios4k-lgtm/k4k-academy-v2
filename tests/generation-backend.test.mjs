@@ -18,7 +18,7 @@ test('enabled adapter calls atomic reserve and refund RPC with correct arguments
  const store=createGuardedGenerationLedger(client,{enabled:true});
  await store.reserve('user','job','key',7);
  await store.finish('user','job','failed');
- assert.equal(calls[0].name,'k4k_generation_reserve_draft');
+ assert.equal(calls[0].name,'k4k_generation_reserve_checked');
  assert.deepEqual(calls[0].args,{p_user:'user',p_job:'job',p_key:'key',p_credits:7,p_enabled:true});
  assert.equal(calls[1].name,'k4k_generation_finish');
  assert.equal(calls[1].args.p_outcome,'failed');

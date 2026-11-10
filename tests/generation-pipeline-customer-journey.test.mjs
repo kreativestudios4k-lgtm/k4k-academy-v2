@@ -13,7 +13,7 @@ function harness({balance=20,providerFails=false,invalidOutput=false}={}){
  const state={balance,submissions:0,refunds:0,reservation:null,job:{id:jobId,user_id:userId,status:'draft',provider_job_id:null},files:new Map()};
  const database={
   rpc:async(name,args)=>{
-   if(name==='k4k_generation_reserve_draft'){
+   if(name==='k4k_generation_reserve_checked'){
     if(state.reservation)return {data:{newly_reserved:false,status:state.reservation.status},error:null};
     if(state.balance<args.p_credits)return {data:null,error:{message:'insufficient'}};
     state.balance-=args.p_credits;state.reservation={status:'reserved',credits:args.p_credits};state.job.status='queued';

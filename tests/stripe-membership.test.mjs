@@ -36,11 +36,11 @@ function memoryStore({customers = {}, memberships = {}} = {}) {
       memberships[userId] = {...membership, last_event_created: eventCreated};
       return {handled: true};
     },
-    async applyInvoiceStatus({userId, status, eventCreated}) {
+    async applyInvoiceEvent({userId, status, eventCreated, credits, invoiceId, eventId}) {
       const current = memberships[userId];
       if (!current || isStale(current.last_event_created, eventCreated)) return {handled: false, reason: 'STALE_EVENT'};
       memberships[userId] = {...current, status, last_event_created: eventCreated};
-      return {handled: true};
+      const result={handled:true};if(credits)result.credits=await this.grantCredits({userId,invoiceId,credits});processed.add(eventId);return result;
     },
   };
 }

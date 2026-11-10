@@ -21,11 +21,12 @@ export default function AccountStatus(){
    }catch{if(alive)setState({signedIn:false,balance:null,ready:true})}
   }
   refresh();
+  const timer=setInterval(()=>{if(document.visibilityState==='visible')refresh()},15000);
   const {data:{subscription}}=client.auth.onAuthStateChange(()=>{
    // Read after the auth callback to avoid re-entering Supabase's auth lock.
    setTimeout(refresh,0);
   });
-  return()=>{alive=false;subscription.unsubscribe()};
+  return()=>{alive=false;clearInterval(timer);subscription.unsubscribe()};
  },[]);
  return <Link href={state.signedIn?'/k4k-app/credits':'/k4k-app/account'} className="k4k-account-status" aria-label={state.signedIn?'View your credits':'Sign in to K4K APP'}>
   {state.signedIn?state.balance===null?'My credits':state.balance+' credits':state.ready?'Sign in':'Account'}

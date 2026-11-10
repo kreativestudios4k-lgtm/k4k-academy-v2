@@ -54,12 +54,12 @@ test('credit pricing requires explicit approval and a configured conversion',()=
 test('submission verifies quote then atomically reserves before one provider call and recording',async()=>{
  const {run,args,calls}=setup();const result=await run(args);
  assert.equal(result.status,'processing');assert.equal(result.creditsReserved,12);
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_draft','submit','record']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit','record']);
  assert.equal(calls[2].options.idempotencyKey,jobId);
 });
 test('duplicate reservation cannot trigger another paid submission',async()=>{
  const {run,args,calls}=setup({newlyReserved:false});assert.equal((await run(args)).status,'already_reserved');
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_draft']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked']);
 });
 test('changed price and changed draft fail before reservation or submission',async()=>{
  const first=setup({usd:1.3});await assert.rejects(first.run(first.args),/QUOTE_CHANGED/);
@@ -72,13 +72,13 @@ test('wrong owner and non-draft jobs never reserve credits',async()=>{
 });
 test('ambiguous provider submission preserves reservation without a refund or retry',async()=>{
  const {run,args,calls}=setup({providerError:true});await assert.rejects(run(args),/PROVIDER_SUBMISSION_UNCERTAIN/);
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_draft','submit']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit']);
 });
 
 test('definitive synchronous rejection refunds through the atomic ledger',async()=>{
  const {run,args,calls}=setup({providerError:401});const result=await run(args);
  assert.equal(result.creditsRefunded,true);assert.equal(result.status,'failed');
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_draft','submit','k4k_generation_finish']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit','k4k_generation_finish']);
 });
 
 test('verified Pro rate card uses trusted duration rounded up and rejects changed pricing',async()=>{

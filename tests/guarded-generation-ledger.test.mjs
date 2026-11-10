@@ -14,7 +14,7 @@ test('enabled adapter calls only the guarded transactional RPC with idempotency 
  const calls=[];const ledger=createGuardedGenerationLedger({rpc:async(name,args)=>{calls.push({name,args});return {data:{ok:true,newly_reserved:true},error:null}}},{enabled:true});
  await ledger.reserve(user,job,key,12);
  await ledger.finish(user,job,'failed');
- assert.deepEqual(calls,[{name:'k4k_generation_reserve_draft',args:{p_user:user,p_job:job,p_key:key,p_credits:12,p_enabled:true}},{name:'k4k_generation_finish',args:{p_user:user,p_job:job,p_outcome:'failed',p_output_path:null}}]);
+ assert.deepEqual(calls,[{name:'k4k_generation_reserve_checked',args:{p_user:user,p_job:job,p_key:key,p_credits:12,p_enabled:true}},{name:'k4k_generation_finish',args:{p_user:user,p_job:job,p_outcome:'failed',p_output_path:null}}]);
 });
 test('invalid credits and outcomes fail before RPC',async()=>{
  let calls=0;const ledger=createGuardedGenerationLedger({rpc:async()=>{calls++;return {data:{},error:null}}},{enabled:true});

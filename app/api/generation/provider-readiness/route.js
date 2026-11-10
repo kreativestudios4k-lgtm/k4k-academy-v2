@@ -17,7 +17,7 @@ export async function GET(){
   ...(!pricingApproved?['CUSTOMER_CREDIT_PRICING_NOT_APPROVED']:[]),
   ...(!enabled?['GENERATION_FEATURE_DISABLED']:[]),
   ...(!diagnostic.authenticated?['PROVIDER_AUTH_NOT_VERIFIED']:[]),
-  'PROVIDER_API_AND_END_TO_END_TEST_NOT_VERIFIED'
+  'CUSTOMER_ACCEPTANCE_TEST_REQUIRED'
  ];
  return NextResponse.json({
   generationEnabled:false,
@@ -25,6 +25,7 @@ export async function GET(){
   providerAuthenticated:diagnostic.authenticated===true,
   providerQuoteVerified:false,
   customerPricingApproved:pricingApproved,
+  productionPathPrepared:true,
   previewTestConfigured:testFlag&&testUsersConfigured,
   previewOnly:true,
   testReady:false,

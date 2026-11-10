@@ -38,7 +38,7 @@ export default async function PricingPage(){
   <section className="kx-pricing-hero">
    <p className="kx-pricing-kicker">Plans · Billed monthly · {currency}</p>
    <h1 className="kx-hook">Pick the plan that <em>powers your next scene.</em></h1>
-   <p>Every plan includes K4K Academy.</p>
+   <p>Every plan includes K4K Academy. Prices exclude applicable VAT, added at checkout.</p>
    <p role="note">Preview · Stripe TEST checkout only. No live payments. AI generation is currently disabled.</p>
   </section>
 

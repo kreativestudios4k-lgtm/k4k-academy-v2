@@ -1,3 +1,4 @@
+import {generationEnvironmentAllowed} from '../../../../../lib/server/generation-policy.mjs';
 import {generationContext,generationError} from '../../../../../lib/server/generation-route-context.mjs';
 import {createHiggsfieldRest} from '../../../../../lib/server/higgsfield-rest.mjs';
 import {createGenerationCompletion} from '../../../../../lib/server/generation-completion.mjs';
@@ -9,7 +10,7 @@ export const maxDuration=60;
 export async function POST(request){
  try{
   const {user,job,database}=await generationContext(request);
-  if(process.env.VERCEL_ENV!=='preview')throw Error('GENERATION_DISABLED');
+  if(!generationEnvironmentAllowed())throw Error('GENERATION_DISABLED');
   if(!['queued','processing'].includes(job.status)||!job.provider_job_id)return Response.json({jobId:job.id,status:job.status},{headers:{'Cache-Control':'no-store'}});
   const status=await createHiggsfieldRest({credentials:process.env.HF_CREDENTIALS}).status(job.provider_job_id);
   if(['failed','nsfw','canceled'].includes(status.status)){

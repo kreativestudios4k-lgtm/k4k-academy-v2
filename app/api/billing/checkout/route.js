@@ -1,6 +1,8 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
+import {livePrices} from '../../../../lib/server/live-price-config.mjs';
+import {assertBillingKey,assertTaxReady,billingMode} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 
 export const runtime = 'nodejs';
@@ -36,15 +38,19 @@ export async function POST(request) {
   // Reject mismatches before any Stripe API request to avoid currency/price surprises.
   const expectedCurrency = currencyForCountry(request.headers.get('x-vercel-ip-country'));
   if (body?.currency !== expectedCurrency) return json({error: 'CURRENCY_REGION_MISMATCH', currency: expectedCurrency}, 409);
-  const priceId = resolvePrice(body?.plan, expectedCurrency);
+  let priceId;
+  try { priceId = billingMode()==='test'?resolvePrice(body?.plan, expectedCurrency):livePrices('plans')?.[body?.plan]?.[expectedCurrency]; }
+  catch { return json({error:'BILLING_SETUP_REQUIRED'},503); }
   if (!priceId) return json({error: 'INVALID_PLAN'}, 400);
 
   const secret = process.env.STRIPE_SECRET_KEY;
   if (!secret) return json({error: 'UNAVAILABLE'}, 503);
   try {
-    assertTestModeKey(secret);
+    if(billingMode()==='test')assertTestModeKey(secret);
+    assertBillingKey(secret);assertTaxReady();
+
   } catch {
-    return json({error: 'LIVE_CHECKOUT_DISABLED'}, 503);
+    return json({error:'BILLING_SETUP_REQUIRED'},503);
   }
 
   // Block a second subscription while an active membership exists.
@@ -71,7 +77,7 @@ export async function POST(request) {
     res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
-      body: buildCheckoutForm({priceId, userId: user.id, origin, plan: body.plan, currency: expectedCurrency}).toString(),
+      body: (()=>{const form=buildCheckoutForm({priceId,userId:user.id,origin,plan:body.plan,currency:expectedCurrency});form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');return form.toString()})(),
       signal: AbortSignal.timeout(12000),
     });
   } catch (error) {

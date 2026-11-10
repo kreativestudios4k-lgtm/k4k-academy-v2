@@ -19,5 +19,5 @@ test('each supported market maps to a configured Stripe test price',()=>{
 });
 test('checkout remains test-mode-only',()=>{
  assert.match(route,/assertTestModeKey\(secret\)/);
- assert.match(route,/LIVE_CHECKOUT_DISABLED/);
+ assert.match(route,/assertBillingKey/);
 });

@@ -8,7 +8,7 @@ function harness({balance=20,failProvider=false}={}){
  const state={balance,reservations:new Map(),calls:[],submissions:0,refunds:0};
  const rpc=async(name,args)=>{
   state.calls.push(name);
-  if(name==='k4k_generation_reserve_draft'){
+  if(name==='k4k_generation_reserve_checked'){
    const existing=state.reservations.get(args.p_key);
    if(existing){
     if(existing.job!==args.p_job||existing.credits!==args.p_credits)return {data:null,error:{message:'IDEMPOTENCY_CONFLICT'}};

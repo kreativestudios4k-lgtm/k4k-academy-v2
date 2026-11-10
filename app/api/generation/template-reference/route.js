@@ -1,3 +1,4 @@
+import {generationEnvironmentAllowed} from '../../../../lib/server/generation-policy.mjs';
 import {randomUUID} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
 import catalogue from '../../../k4k-app/template-catalogue.json';
@@ -6,7 +7,7 @@ export const runtime='nodejs';
 export const maxDuration=60;
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request){
- if(process.env.VERCEL_ENV!=='preview')return json({error:'PREVIEW_ONLY'},403);
+ if(!generationEnvironmentAllowed())return json({error:'PREVIEW_ONLY'},403);
  try{
   const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   if(!token)return json({error:'UNAUTHENTICATED'},401);
