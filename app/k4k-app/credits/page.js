@@ -6,6 +6,7 @@ import {createClient} from '../../../lib/supabase/client';
 import {useK4KLocale} from '../locale';
 import {PLAN_PRICES} from '../../../lib/k4k-plan-prices.mjs';
 import './credits.css';
+import CreditProposal from './CreditProposal';
 
 const plans=[
  {key:'starter',name:'Starter',credits:80,description:'For first-time creators'},
@@ -73,6 +74,7 @@ export default function Credits(){
    </button>)}</div>
    <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Stripe test checkout only. Do not expect generation credits until the verified webhook and ledger are activated.','Checkout Stripe somente em modo de teste. Os créditos só serão liberados após a validação do webhook e do extrato.','Checkout de Stripe solo en modo de prueba. Los créditos dependen de validar el webhook y el registro.')}</p></div><button type="button" disabled={!currency||checkoutBusy} onClick={startTestCheckout}>{checkoutBusy?'Opening…':tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button></section>
    {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
+   <CreditProposal currency={currency}/>
    <div className="k4k-pricing-links"><Link href="/k4k-app/register">{tr('New creator? Create an account','Novo criador? Criar conta','¿Nuevo creador? Crear cuenta')}</Link><Link href="/login?next=%2Fk4k-app%2Fcredits">{tr('Already registered? Sign in','Já tem conta? Entrar','¿Tienes cuenta? Entrar')}</Link><Link href="/academy">{tr('Existing student? My Academy','Aluno atual? Minha Academy','¿Alumno actual? Mi Academy')}</Link></div>
    <section className="k4k-pricing-note"><h2>{tr('Before you choose a plan','Antes de escolher um plano','Antes de elegir un plan')}</h2><p>{tr('AI generation is currently disabled. Credits per video will depend on validated provider rates, model, duration and resolution. Test checkout does not activate a paid service. Existing Academy subscriptions remain unchanged.','A geração de IA está desativada. O custo por vídeo dependerá do provedor, modelo, duração e resolução. O checkout de teste não ativa um serviço pago. Assinaturas atuais da Academy são preservadas.','La generación de IA está desactivada. El costo por vídeo depende del proveedor, modelo, duración y resolución. El checkout de prueba no activa un servicio pagado. Las suscripciones de Academy no cambian.')}</p><Link href="/k4k-app/support">{tr('Questions? Contact K4K support ↗','Dúvidas? Fale com o suporte ↗','¿Dudas? Contacta con soporte ↗')}</Link></section>
   </div>
