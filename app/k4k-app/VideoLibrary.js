@@ -12,7 +12,7 @@ export default function VideoLibrary({embedded=false,onReuse}){
  const [jobs,setJobs]=useState([]),[loading,setLoading]=useState(true),[signedIn,setSignedIn]=useState(false),[error,setError]=useState(''),[pageSize,setPageSize]=useState(60);
  const [filter,setFilter]=useState('all'),[search,setSearch]=useState(''),[view,setView]=useState('grid');
  const [urls,setUrls]=useState({}),[busy,setBusy]=useState(null),[selected,setSelected]=useState(null),[actionError,setActionError]=useState('');
- const dialog=useRef(null),refreshLock=useRef(false),alive=useRef(true);
+ const dialog=useRef(null),accountId=useRef(null),refreshLock=useRef(false),alive=useRef(true);
  const refresh=useCallback(async()=>{
   if(refreshLock.current)return;
   refreshLock.current=true;
@@ -30,9 +30,9 @@ export default function VideoLibrary({embedded=false,onReuse}){
  useEffect(()=>{alive.current=true;refresh();return()=>{alive.current=false}},[refresh]);
  useEffect(()=>{
   const client=createClient();let refreshTimer;
-  const {data:{subscription}}=client.auth.onAuthStateChange(event=>{
-   if(event==='SIGNED_OUT'){setSignedIn(false);setJobs([]);setUrls({});setSelected(null);}
-   if(event==='SIGNED_IN'){setUrls({});setSelected(null);refreshTimer=setTimeout(()=>refresh(),0);}
+  const {data:{subscription}}=client.auth.onAuthStateChange((event,session)=>{
+   if(event==='SIGNED_OUT'){accountId.current=null;setSignedIn(false);setJobs([]);setUrls({});setSelected(null);}
+   if(event==='SIGNED_IN'){if(accountId.current&&accountId.current!==session?.user?.id){setUrls({});setSelected(null);setJobs([]);}accountId.current=session?.user?.id;refreshTimer=setTimeout(()=>refresh(),0);}
   });
   return()=>{clearTimeout(refreshTimer);subscription.unsubscribe()};
  },[refresh]);
