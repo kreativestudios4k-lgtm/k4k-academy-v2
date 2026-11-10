@@ -49,7 +49,7 @@ export async function GET(){
    return {authenticated:true,probeCompleted:true,providerQuoteVerified:true,quoteUsd:quote.usd,billableGenerationSubmitted:false};
   }catch(error){
    const known=['PROVIDER_CREDENTIALS_REJECTED','PROVIDER_ACCESS_OR_BALANCE_BLOCKED','PROVIDER_UNREACHABLE','PROVIDER_QUOTE_INVALID','PROVIDER_REQUEST_REJECTED'];
-   return {authenticated:false,probeCompleted:true,error:known.includes(error.message)?error.message:'CREDENTIAL_INVALID',httpStatus:error.httpStatus??null,billableGenerationSubmitted:false};
+   return {authenticated:false,probeCompleted:true,error:known.includes(error.message)?error.message:'CREDENTIAL_INVALID',httpStatus:error.httpStatus??null,quoteShape:error.quoteShape??null,reportedUsd:error.reportedUsd??null,billableGenerationSubmitted:false};
   }
  })();
  diagnostic={until:Date.now()+60000,promise};
