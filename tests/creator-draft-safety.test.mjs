@@ -8,8 +8,10 @@ test('creator saves all selected images and uses private reference storage',()=>
  assert.match(creator,/storage\.from\('studio-references'\)\.upload/);
  assert.match(creator,/reference_paths:savedReference\.paths/);
 });
-test('creator rejects stale attachments and keeps AI generation disabled',()=>{
+test('creator rejects stale attachments and requires an enabled quote before confirmation',()=>{
  assert.match(creator,/extraImages\.some\(\(item,i\)=>item\.file!==savedReference\.extraFiles\[i\]\)/);
- assert.match(creator,/disabled aria-label="Generation not yet enabled"/);
+ assert.match(creator,/generationQuote\.generationEnabled&&generationQuote\.quoteToken/);
+ assert.match(creator,/Confirm generation/);
+ assert.match(creator,/Review generation cost/);
  assert.match(creator,/credits_reserved:0/);
 });

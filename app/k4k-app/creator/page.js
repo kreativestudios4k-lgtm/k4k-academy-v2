@@ -32,6 +32,8 @@ export default function Creator(){
  const [preflightBusy,setPreflightBusy]=useState(false),[preflightResult,setPreflightResult]=useState(null),[preflightError,setPreflightError]=useState('');
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
+ const [generationDraftId,setGenerationDraftId]=useState(null),[generationQuote,setGenerationQuote]=useState(null),[generationBusy,setGenerationBusy]=useState(false),[generationMessage,setGenerationMessage]=useState(''),[submittedJobId,setSubmittedJobId]=useState(null);
+ const generationRequestKey=useRef(null);
  const [history,setHistory]=useState([]),[historyState,setHistoryState]=useState('');
  async function loadHistory(){setHistoryState('Loading your generation history…');try{const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Sign in to view your generation history.');const {data,error}=await client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);if(error)throw error;setHistory(data||[]);setHistoryState(data?.length?'':'No generation drafts or jobs yet.');}catch(e){setHistoryState(e?.message||'Could not load history.')}}
  async function checkGenerationEstimate(){
@@ -68,9 +70,37 @@ export default function Creator(){
    if(authError||!user||user.id!==savedReference.userId)throw new Error('Please sign in again to save your draft.');
    const {data,error}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload-preview',provider:'higgsfield',model,status:'draft',reference_paths:savedReference.paths,reference_video_path:savedReference.videoPath,main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
    if(error)throw error;
+   setGenerationDraftId(data.id);setGenerationQuote(null);generationRequestKey.current=crypto.randomUUID();
    setDraftMessage('Draft saved: '+data.id+'. All '+savedReference.paths.length+' image attachments and your prompt are saved privately. Reference video saved privately when supplied. No generation started and no credits charged.');await loadHistory();
   }catch(e){setDraftMessage(e?.message||'Unable to save draft.')}finally{setSavingDraft(false)}
  }
+ async function generationAction(action){
+  if(generationBusy)return;
+  const jobId=action==='refresh'?submittedJobId:generationDraftId;
+  if(!jobId){setGenerationMessage('Save your reference media and draft before reviewing generation cost.');return;}
+  setGenerationBusy(true);setGenerationMessage('');
+  try{
+   const {data:{session}}=await createClient().auth.getSession();
+   if(!session?.access_token)throw Error('Sign in to continue.');
+   const response=await fetch('/api/generation/jobs/'+action,{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({jobId,resolution:quality,quoteToken:generationQuote?.quoteToken,requestKey:generationRequestKey.current})});
+   const result=await response.json();
+   if(result.error){
+    if(result.reconciliationRequired){setSubmittedJobId(jobId);setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage('Submission outcome is uncertain. Credits remain reserved while the job is reconciled. Do not submit another generation.');return;}
+    const messages={GENERATION_DISABLED:'Generation needs owner activation. No credits were charged.',CREDIT_PRICING_NOT_APPROVED:'Credit pricing needs owner approval. No credits were charged.',QUOTE_CHANGED:'The quote changed. Review a fresh quote before generating.',QUOTE_EXPIRED:'The quote expired. Review a fresh quote.',PROVIDER_CREDENTIALS_REJECTED:'The provider rejected the saved API credential.',GENERATION_UNAVAILABLE:'Generation is unavailable. Please try again or contact support.'};
+    if(action==='submit')setGenerationQuote(null);
+    throw Error(messages[result.error]||'Unable to continue ('+result.error+').');
+   }
+   if(!response.ok)throw Error('Unable to continue.');
+   if(action==='quote'){
+    setGenerationQuote({...result,reviewedAt:Date.now()});
+    setGenerationMessage(result.blocker==='CREDIT_PRICING_NOT_APPROVED'?'Higgsfield authenticated and quoted this draft. Customer credit pricing still needs owner approval.':result.blocker==='GENERATION_DISABLED'?'Quote verified. Generation is awaiting owner activation.':'Review the credit cost below before generating.');
+   }else if(action==='submit'){
+    setSubmittedJobId(jobId);setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage(result.creditsRefunded?'The provider rejected this request. Reserved credits were refunded.':'Generation submitted. Credits reserved: '+result.creditsReserved+'.');await loadHistory();
+   }else{setGenerationMessage(result.creditsRefunded?'Generation failed. Reserved credits were refunded.':'Job status: '+result.status+(result.status==='awaiting_output'?' — private video delivery is pending.':''));await loadHistory();}
+  }catch(error){setGenerationMessage(error.message||'Unable to continue.');}
+  finally{setGenerationBusy(false);}
+ }
+ useEffect(()=>{setGenerationDraftId(null);setGenerationQuote(null);generationRequestKey.current=null;},[model,quality,prompt,video.file,character.file,extraImages]);
  async function saveReference(){
   if(!character.file||uploading)return;
   setUploadMessage('');setUploading(true);
@@ -137,7 +167,7 @@ export default function Creator(){
     {(character.url||extraImages.length>0)&&<div className="k4k-own-thumbnails">{character.url&&<div><img src={character.url} alt="Main character"/><button type="button" onClick={()=>{character.setFile(null);setSavedReference(null);setDraftMessage('')}} aria-label="Remove main character">×</button></div>}{extraImages.map((item,i)=><div key={item.url}><img src={item.url} alt={'Reference '+(i+2)}/><button type="button" onClick={()=>removeExtraImage(i)} aria-label={'Remove reference '+(i+2)}>×</button></div>)}</div>}
    </div>
    {error&&<p role="alert" className="k4k-own-error">{error}</p>}
-   <div className="k4k-own-bottom"><button type="button" className="k4k-own-generate" disabled aria-label="Generation not yet enabled">Generate with {model==='lite'?'K4K Lite':'K4K Pro'} ✦</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
+   <div className="k4k-own-bottom"><button type="button" className="k4k-own-generate" disabled={generationBusy||!generationDraftId} onClick={()=>generationAction('quote')}>{generationBusy?'Checking…':'Review generation cost'} ✦</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
    <p className="k4k-own-safety">Preview only · {model==='lite'?'K4K Lite (up to 15s)':'K4K Pro (4–30s)'} · AI generation disabled · No credits charged</p>
    <button type="button" className="k4k-own-done" onClick={checkGenerationEstimate} disabled={preflightBusy}>{preflightBusy?'Checking…':'Check estimated generation cost'}</button>
    {preflightError&&<p role="alert" className="k4k-own-error">{preflightError}</p>}
@@ -154,6 +184,11 @@ export default function Creator(){
    <p>These are preview settings. Actual model support, credits and output quality require provider verification.</p>
    <button type="button" className="k4k-own-done" onClick={()=>setOptionsOpen(false)}>Done</button>
   </section></div>}
+  <section aria-label="Generation confirmation" className="k4k-card">
+   {generationQuote&&<><p>Provider quote: ${generationQuote.estimatedProviderUsd.toFixed(3)} USD · {generationQuote.customerCredits===null?'Credit pricing awaiting approval':generationQuote.customerCredits+' credits'}</p><p>This quote expires after five minutes. Failed or moderated jobs refund their reservation once verified.</p>{generationQuote.generationEnabled&&generationQuote.quoteToken&&<button type="button" disabled={generationBusy} onClick={()=>generationAction('submit')}>Confirm generation · {generationQuote.customerCredits} credits</button>}</>}
+   {generationMessage&&<p role="status" aria-live="polite">{generationMessage}</p>}
+   {submittedJobId&&<button type="button" disabled={generationBusy} onClick={()=>generationAction('refresh')}>Check generation status</button>}
+  </section>
   <section className="k4k-own-drafts"><h2>Save your project</h2><p>Save your character images and optional MP4 reference video privately to your account. Maximum video size: 50 MB. No generation or charges.</p>{character.file&&<button type="button" onClick={saveReference} disabled={uploading}>{uploading?'Saving…':'Save reference media privately'}</button>}{uploadMessage&&<p role="status">{uploadMessage}</p>}{savedReference&&<button type="button" onClick={saveDraft} disabled={savingDraft}>{savingDraft?'Saving…':'Save draft'}</button>}{draftMessage&&<p role="status">{draftMessage}</p>}<button type="button" onClick={loadHistory}>Refresh draft history</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}>{job.model||'Preview'} · {job.status}</p>)}</section>
  </main>
  </PreviewShell>;
