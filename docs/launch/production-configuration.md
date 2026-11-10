@@ -21,6 +21,6 @@ Owner confirmed UK VAT registration and VAT added at checkout. Pack products use
 
 Higgsfield funding: proposed USD100 manual API balance; auto top-up off. Funding/account balance is not verified and no top-up was purchased. Per-job cap does not imply an account-wide monthly budget. Provider prepaid balance is separate from K4K/Stripe credits.
 
-Webhook destination: /api/billing/webhook. Subscribe to checkout.session.completed, checkout.session.async_payment_succeeded, customer.subscription.created/updated/deleted, invoice.paid, invoice.payment_failed, charge.refunded, charge.dispute.created. Final event schema must be tested; do not silently change existing destinations.
+Webhook destination: /api/billing/webhook. Subscribe to checkout.session.completed, checkout.session.async_payment_succeeded, customer.subscription.created/updated/deleted, invoice.paid, invoice.payment_failed, charge.refunded, charge.dispute.created. The K4K TEST destination was updated on 10 November to candidate c144c920 with these events, following the request to complete customer testing. Other destinations and all live settings remain unchanged. Real signed event delivery still needs verification.
 
 All database additions are additive. Subscription invoice application, credits and processed receipts use one RPC transaction. Top-ups deduplicate by Checkout Session, not merely event ID. Refunds revoke credits once; spent-credit reversals and disputes hold further generation for support review. Existing accounts/subscriptions are not reset.

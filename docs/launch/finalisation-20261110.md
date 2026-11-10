@@ -16,9 +16,17 @@ Hosted database before/after: 32 auth users, one generation job, no credit-accou
 
 ## Remaining external steps
 
-- Activate Stripe Tax in the Stripe dashboard, then create and verify UK VAT registration in TEST mode. Do not set tax readiness merely to bypass this error. Monthly product tax category must also be reviewed against the owner-selected AI personal-use category.
-- Confirm the TEST webhook destination targets this candidate before a real Checkout acceptance run. The existing destination still targets an older integration preview; no destination settings were changed.
+- Activate Stripe Tax in the Stripe dashboard, then create and verify UK VAT registration in TEST mode. Do not set tax readiness merely to bypass this error. All four K4K monthly TEST products now use the owner-selected AI personal-use category (canonical Stripe tax code verified before applying).
+- The K4K TEST webhook now targets candidate c144c920a246435f5f8a0d06009ceee14d9b8994 and includes asynchronous top-up fulfilment, refunds and disputes. Other Supabase/Academy webhook endpoints were preserved. Reachability verified (GET returns expected 405). Actual signed delivery and payment acceptance remain pending.
 - Approve one bounded billable acceptance generation after TEST checkout works. Prior operator authorization has already been consumed.
 - Obtain written Higgsfield permission for this business model, verify/fund the API balance (USD100 was proposed), and separately approve live configuration and production release.
 
 These are release blockers, not completed work. No production launch claim should be made from these tests alone.
+
+## Follow-up account checks
+
+Stripe TEST tax settings remain configured, but active registrations are empty. The dashboard requires sign-in. The owner selected Google in the secure sign-in flow; automatic browser review then blocked observation of accounts.google.com because Google-origin authorization is required separately. No alternate sign-in workaround attempted. No passwords or codes were read.
+
+The connected Higgsfield workspace balance was read, but it does not establish the separate prepaid API balance. A focused connected-mail search found no business-use permission reply. Current official API terms sections 4.1–4.2 still restrict pass-through/similar generation services absent written consent: https://open.higgsfield.ai/terms-of-service . The prepared request remains unsent because sending needs an explicit instruction.
+
+Hosted preview status READY; 11 HTTP checks passed, including credit packs/terms pages, unauthenticated billing and generation rejection, and unsigned webhook rejection. Billing readiness returns TEST / TAX_SETUP_REQUIRED. No live Stripe operation or production release occurred.
