@@ -20,13 +20,13 @@ function build({status='completed',providerResponseId=providerJobId,uploadError=
  const ingest=createGenerationOutputIngestor({enabled:true,storage:{from:()=>({upload:async()=>{events.push('private-upload');return {error:uploadError}}})}});
  const jobStore={getOwnedJob:async()=>({user_id:owner,id:jobId,provider_job_id:providerJobId,status:'processing'})};
  const completeWithBytes=createGenerationOutputCoordinator({enabled:true,jobStore,ingest,pipeline:{complete:async()=>{events.push('settle');return {status:'settled'}}}});
- const reconcile=createGenerationOutputReconciler({enabled:true,getStatus,retrieve,completeWithBytes});
+ const reconcile=createGenerationOutputReconciler({enabled:true,authorizeJob:async({userId:u,jobId:j,providerJobId:p})=>{events.push('owner');const job=await jobStore.getOwnedJob(u,j);return !!job&&job.user_id===u&&job.id===j&&job.provider_job_id===p&&['queued','processing'].includes(job.status)},getStatus,retrieve,completeWithBytes});
  return {reconcile,events};
 }
 test('mock provider completion -> verified media -> private upload -> settlement',async()=>{
  const {reconcile,events}=build();
  assert.deepEqual(await reconcile(ids),{status:'settled'});
- assert.deepEqual(events,['provider-status','provider-media','private-upload','settle']);
+ assert.deepEqual(events,['owner','provider-status','provider-media','private-upload','settle']);
 });
 test('pending provider response never downloads or settles',async()=>{
  const {reconcile,events}=build({status:'in_progress'});
@@ -43,7 +43,7 @@ test('provider request mismatch blocks all downstream effects',async()=>{
  await assert.rejects(reconcile(ids),/HIGGSFIELD_STATUS_MISMATCH/);
  assert.deepEqual(events,['provider-status']);
 });
-test('cross-user job mismatch blocks upload and settlement',async()=>{
+test('cross-user job mismatch blocks provider calls and settlement',async()=>{
  const {reconcile,events}=build({owner:'99999999-9999-4999-8999-999999999999'});
  await assert.rejects(reconcile(ids),/JOB_OWNERSHIP_OR_PROVIDER_MISMATCH/);
  assert.deepEqual(events,['provider-status','provider-media']);
