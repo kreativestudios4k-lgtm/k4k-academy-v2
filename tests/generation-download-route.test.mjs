@@ -9,8 +9,8 @@ test('download route authenticates and scopes jobs to the caller',()=>{
 });
 test('download only completed mp4 from private output bucket with expiring signed link',()=>{
  assert.match(route,/job\.status!=='completed'/);
- assert.match(route,/path\.startsWith\(user\.id\+'\/'\)/);
- assert.match(route,/path\.includes\('\.\.'\)/);
- assert.match(route,/studio-outputs'\)\.createSignedUrl\(path,60/);
+ assert.match(route,/path!==user\.id\+'\/'\+id\+'\.mp4'/);
+ assert.doesNotMatch(route,/studio-outputs/);
+ assert.match(route,/studio-generations'\)\.createSignedUrl\(path,60/);
  assert.match(route,/Cache-Control':'no-store/);
 });
