@@ -21,7 +21,18 @@ test('no paid request without explicit enablement',async()=>{
 });
 test('Pro routes only to documented Genjutsu endpoint',async()=>{
  let url;
- const p=createK4KModelProvider({enabled:true,credentials:'id:secret',fetchImpl:async(u)=>{url=u;return {ok:true,json:async()=>({request_id:'test-id',status:'queued'})}}});
+ const p=createK4KModelProvider({enabled:true,credentials:'id:secret',maxUsd:5,providerQuoteUsd:3,verifiedSourceSeconds:4,verifiedReferenceSeconds:0,fetchImpl:async(u)=>{url=u;return {ok:true,json:async()=>({request_id:'test-id',status:'queued'})}}});
  await p.submit('pro',input);
  assert.equal(url,K4K_MODELS.pro.endpoint);
+});
+
+test('actual K4K provider blocks billable requests without independent quote and verified duration',async()=>{
+ let calls=0;
+ const base={enabled:true,credentials:'id:secret',fetchImpl:async()=>{calls++;throw Error('unexpected network call')}};
+ await assert.rejects(createK4KModelProvider(base).submit('lite',input),/spending cap/);
+ await assert.rejects(createK4KModelProvider({...base,maxUsd:5}).submit('lite',input),/media duration/);
+ await assert.rejects(createK4KModelProvider({...base,maxUsd:5,verifiedSourceSeconds:5,verifiedReferenceSeconds:0}).submit('lite',input),/provider USD quote/);
+ await assert.rejects(createK4KModelProvider({...base,maxUsd:5,verifiedSourceSeconds:5,verifiedReferenceSeconds:0,providerQuoteUsd:5.01}).submit('lite',input),/quote exceeds/);
+ await assert.rejects(createK4KModelProvider({...base,maxUsd:5,verifiedSourceSeconds:15,verifiedReferenceSeconds:0,providerQuoteUsd:4}).submit('pro',input),/Estimated cost exceeds/);
+ assert.equal(calls,0);
 });
