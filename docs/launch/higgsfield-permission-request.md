@@ -1,4 +1,4 @@
-# Draft — not sent
+# Sent — 10 November 2026
 
 To: support@higgsfield.ai
 Subject: Written confirmation for K4K APP commercial API integration
@@ -17,3 +17,5 @@ Kind regards,
 Kelson
 KreativeStudios4K
 hello@kreativestudios4k.com
+
+Sent from hello@kreativestudios4k.com to support@higgsfield.ai after owner approval. Gmail message/thread ID: 1a1c6a22e7817e30. Delivery accepted with SENT label. Written permission is pending; sending this request is not provider approval.
