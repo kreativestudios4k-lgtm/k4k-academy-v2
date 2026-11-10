@@ -1,0 +1,7 @@
+/* Generation lifecycle states in Creator Studio */
+.k4k-light .k4k-own-generate.k4k-own-generate-ready{opacity:1;cursor:pointer}
+.k4k-light .k4k-own-generation-status{margin:14px 0 0;padding:14px 16px;border:1px solid #ffffff24;border-radius:18px;font-size:14px;line-height:1.5;color:#e9e9ec;display:grid;gap:10px}
+.k4k-light .k4k-own-generation-status video{width:100%;border-radius:14px;background:#000}
+.k4k-light .k4k-own-generation-status ul{margin:6px 0 0;padding-left:18px}
+.k4k-light .k4k-own-generation-status a.k4k-own-done{display:block;text-align:center;text-decoration:none}
+.k4k-light .k4k-own-generation-status summary{cursor:pointer}

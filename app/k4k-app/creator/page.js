@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import './creator.css';
+import './generation.css';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import catalogue from '../template-catalogue.json';
@@ -96,11 +97,108 @@ export default function Creator(){
     const {error:videoError}=await client.storage.from('studio-videos').upload(videoPath,video.file,{contentType:'video/mp4',upsert:false});
     if(videoError)throw videoError;
    }
-   setSavedReference({paths,videoPath,videoFile:video.file,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)});
+   const saved={paths,videoPath,videoFile:video.file,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)};
+   setSavedReference(saved);
    setUploadMessage(files.length+' image(s)'+(videoPath?' and reference video':'')+' saved privately. No AI generation or credit charge occurred.');
+   return saved;
   }catch(e){setUploadMessage(e?.message||'Unable to save reference image.')}finally{setUploading(false)}
  }
  useEffect(()=>{setPreflightResult(null);setPreflightError('')},[model,quality,video.file,character.file,extraImages]);
+ // ---- Real generation lifecycle -------------------------------------------
+ // The browser only sends a draft ID, a resolution and a request key. The
+ // server inspects the stored media, sets the credit price, reserves credits
+ // and talks to the video provider. Nothing here can set a price.
+ const [readiness,setReadiness]=useState(null);
+ const [gen,setGen]=useState({phase:'idle'});
+ const pollRef=useRef(0);
+ async function generationApi(path,options={}){
+  const client=createClient();const {data:{session},error:sessionError}=await client.auth.getSession();
+  if(sessionError||!session?.access_token)throw new Error('Sign in to your K4K APP account to generate.');
+  const response=await fetch(path,{method:options.method||'GET',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,...(options.body?{'Content-Type':'application/json'}:{})},...(options.body?{body:JSON.stringify(options.body)}:{})});
+  let data={};try{data=await response.json()}catch{}
+  return {ok:response.ok,status:response.status,data};
+ }
+ async function loadReadiness(){
+  try{const {ok,status,data}=await generationApi('/api/generation/submission-readiness');setReadiness(ok?data:{ready:false,signedOut:status===401,blockers:[]});}
+  catch{setReadiness({ready:false,signedOut:true,blockers:[]})}
+ }
+ useEffect(()=>{if(creatorOpen)loadReadiness()},[creatorOpen]);
+ function generationProblem(result){
+  const {data,status}=result,code=data?.error;
+  if(code==='GENERATION_BLOCKED')return {message:'Generation is not available yet.',details:(data.blockers||[]).map(item=>item.message)};
+  const messages={
+   INSUFFICIENT_CREDITS:'You do not have enough credits for this video'+(data?.credits?' ('+data.credits+' needed)':'')+'. Add credits on the Plans page, then try again.',
+   MODEL_DURATION_OUT_OF_RANGE:'Your reference video is '+(data?.durationSeconds?Math.round(data.durationSeconds*10)/10+' seconds':'the wrong length')+'. This model needs '+data?.minSeconds+'–'+data?.maxSeconds+' seconds.',
+   MEDIA_VERIFICATION_FAILED:'We could not verify your saved files. Use a standard MP4 video and 1–8 JPG, PNG or WebP images, then save again.',
+   GENERATION_OPTION_NOT_PRICED:'This model and resolution are not available yet. Choose another resolution in Options.',
+   ACTIVE_JOB_LIMIT:'You already have '+(data?.limit||2)+' videos in progress. Wait for one to finish.',
+   PROVIDER_ESTIMATE_UNAVAILABLE:'The video service could not confirm the cost of this request. No credits were used. Please try again shortly.',
+   PROVIDER_COST_EXCEEDS_CAP:'This video is larger than the current limit for one generation. No credits were used. Try a shorter clip or a lower resolution.',
+   PROVIDER_REJECTED:data?.refunded?'The video service did not accept this request. Your credits were returned.':'The video service did not accept this request. Your credits are on hold while we check it.',
+   JOB_NOT_DRAFT:'This draft has already been submitted. Check My videos.',
+   UNAUTHENTICATED:'Sign in to your K4K APP account to generate.',
+  };
+  return {message:messages[code]||(status===503?'Generation is temporarily unavailable. No new credits were used.':'Something went wrong. No new credits were used.'),details:[]};
+ }
+ async function prepareGeneration(){
+  if(gen.phase==='preparing'||gen.phase==='submitting')return;
+  const imageCount=extraImages.length+(character.file?1:0);
+  if(!video.file){setGen({phase:'error',message:selectedPreset?'Presets are a preview. Upload your own MP4 reference video to generate.':'Add an MP4 reference video first.',details:[]});return;}
+  if(imageCount<1||imageCount>8){setGen({phase:'error',message:'Choose between 1 and 8 images for one generation.',details:[]});return;}
+  setGen({phase:'preparing',message:'Saving your files privately…'});
+  try{
+   const current=savedReference&&character.file===savedReference.file&&video.file===savedReference.videoFile&&savedReference.videoPath&&extraImages.length===savedReference.extraFiles.length&&extraImages.every((item,i)=>item.file===savedReference.extraFiles[i]);
+   const saved=current?savedReference:await saveReference();
+   if(!saved?.videoPath)throw new Error('Your files could not be saved. Check the message under “Save your project”.');
+   const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();
+   if(authError||!user||user.id!==saved.userId)throw new Error('Please sign in again.');
+   const {data:draft,error:draftError}=await client.from('studio_generation_jobs').insert({user_id:user.id,template_id:'creator-upload',provider:'higgsfield',model,status:'draft',reference_paths:saved.paths,reference_video_path:saved.videoPath,main_reference_index:0,prompt:prompt.trim(),credits_reserved:0}).select('id').single();
+   if(draftError)throw new Error('Your draft could not be saved. Please try again.');
+   setGen({phase:'preparing',message:'Checking your video and working out the price…'});
+   const result=await generationApi('/api/generation/jobs/price',{method:'POST',body:{jobId:draft.id,resolution:quality}});
+   if(!result.ok){setGen({phase:'error',...generationProblem(result)});return;}
+   setGen({phase:'priced',jobId:draft.id,requestKey:crypto.randomUUID(),resolution:quality,price:result.data.price});
+  }catch(e){setGen({phase:'error',message:e?.message||'Could not prepare your video.',details:[]})}
+ }
+ async function confirmGeneration(){
+  if(gen.phase!=='priced')return;
+  const {jobId,requestKey,resolution,price}=gen;
+  setGen({...gen,phase:'submitting'});
+  try{
+   const result=await generationApi('/api/generation/jobs/submit',{method:'POST',body:{jobId,requestKey,resolution}});
+   if(!result.ok){setGen({phase:'error',...generationProblem(result)});loadReadiness();return;}
+   const job=result.data.job;
+   if(job.needsReview){setGen({phase:'review',jobId,message:'We could not confirm that the video service received your request. Your '+job.creditsReserved+' credits are on hold, not spent. We will check it and either deliver the video or return the credits.'});return;}
+   setGen({phase:'running',jobId,credits:job.creditsReserved??price.credits,note:''});
+  }catch(e){
+   // The request may have reached the server. Keep the same key so a retry cannot charge twice.
+   setGen({phase:'priced',jobId,requestKey,resolution,price,retryNote:'We lost the connection. Press confirm again. You will not be charged twice.'});
+  }
+ }
+ useEffect(()=>{
+  if(gen.phase!=='running')return;
+  const run=++pollRef.current;let delay=3000,timer;
+  const notes={OUTPUT_HOST_NOT_APPROVED:'Your video is finished. Delivery is waiting for a server setting to be approved.',OUTPUT_STORAGE_FAILED:'Your video is finished. We are still saving it to your account.',SETTLEMENT_FAILED:'Your video is finished. We are still completing it.'};
+  const tick=async()=>{
+   if(pollRef.current!==run)return;
+   try{
+    const {ok,data}=await generationApi('/api/generation/jobs/'+gen.jobId);
+    if(pollRef.current!==run)return;
+    if(ok&&data.job?.status==='completed'){
+     const link=await generationApi('/api/generation/jobs/'+gen.jobId+'/download');
+     setGen({phase:'done',jobId:gen.jobId,url:link.ok&&typeof link.data.url==='string'&&link.data.url.startsWith('https://')?link.data.url:''});loadReadiness();return;
+    }
+    if(ok&&(data.job?.status==='failed'||data.job?.status==='cancelled')){setGen({phase:'error',message:data.job.error||'The video could not be generated. Your credits were returned.',details:[]});loadReadiness();return;}
+    const note=data?.progress?.state==='awaiting_review'?'This request is being checked by our team. Your credits are on hold, not spent.':notes[data?.progress?.blocked]||'';
+    setGen(old=>old.phase==='running'&&old.jobId===gen.jobId?{...old,note}:old);
+   }catch{}
+   delay=Math.min(10000,Math.round(delay*1.5));timer=setTimeout(tick,delay+Math.random()*500);
+  };
+  timer=setTimeout(tick,delay);
+  return()=>{pollRef.current++;clearTimeout(timer)};
+ },[gen.phase,gen.jobId]);
+ const generationBusy=gen.phase==='preparing'||gen.phase==='submitting'||gen.phase==='running';
+ const generationBlocked=!!readiness&&!readiness.ready;
  const pt=locale==='pt',es=locale==='es';
  const copy=pt?{title:'Estúdio de criação',intro:'Prepare seu vídeo e sua foto. O vídeo fica no navegador; você pode salvar a foto na sua conta.',reference:'Vídeo de referência',image:'Foto do personagem',prompt:'Instruções criativas (opcional)',placeholder:'Descreva o personagem, o cenário ou o resultado desejado...',model:'Modelo de geração',ready:'Prévia pronta para geração',waiting:'Adicione um vídeo e uma imagem para preparar seu projeto',disabled:'Geração de IA ainda desativada — nenhum crédito será cobrado.',back:'Explorar templates',video:'Escolher vídeo',photo:'Escolher foto',remove:'Remover',privacy:'O vídeo fica neste navegador. A foto só é enviada ao armazenamento privado se você clicar em Salvar.',limit:'Arquivo inválido ou acima do limite permitido.'}:es?{title:'Estudio de creación',intro:'Prepara tu vídeo y foto. El vídeo permanece en tu navegador; puedes guardar la foto en tu cuenta.',reference:'Vídeo de referencia',image:'Foto del personaje',prompt:'Instrucciones creativas (opcional)',placeholder:'Describe el resultado deseado...',model:'Modelo de generación',ready:'Vista previa lista',waiting:'Añade un vídeo y una imagen',disabled:'Generación desactivada — no se cobran créditos.',back:'Explorar plantillas',video:'Elegir vídeo',photo:'Elegir foto',remove:'Quitar',privacy:'El vídeo permanece en tu navegador. La foto solo se sube si eliges guardarla.',limit:'Archivo no válido o demasiado grande.'}:{title:'Creator Studio',intro:'Prepare a reference video and character image. Your images and optional MP4 reference video can be saved privately.',reference:'Reference video',image:'Character photo',prompt:'Creative instructions (optional)',placeholder:'Describe the character, scene, or result you want...',model:'Generation model',ready:'Project ready for generation',waiting:'Add a video and an image to prepare your project',disabled:'AI generation is disabled — no credits will be charged.',back:'Explore templates',video:'Choose video',photo:'Choose photo',remove:'Remove',privacy:'Video stays in this browser. Images and an optional MP4 video are uploaded to private storage only when you choose Save reference media.',limit:'Invalid file or file exceeds the size limit.'};
  function choose(event,target,kind,max){const file=event.target.files?.[0];setError('');if(!file)return;if(!(kind==='image'?IMAGE_TYPES:VIDEO_TYPES).includes(file.type)||file.size>max){setError(copy.limit);event.target.value='';return;}target.setFile(file);setSavedReference(null);setDraftMessage('')}
@@ -137,8 +235,17 @@ export default function Creator(){
     {(character.url||extraImages.length>0)&&<div className="k4k-own-thumbnails">{character.url&&<div><img src={character.url} alt="Main character"/><button type="button" onClick={()=>{character.setFile(null);setSavedReference(null);setDraftMessage('')}} aria-label="Remove main character">×</button></div>}{extraImages.map((item,i)=><div key={item.url}><img src={item.url} alt={'Reference '+(i+2)}/><button type="button" onClick={()=>removeExtraImage(i)} aria-label={'Remove reference '+(i+2)}>×</button></div>)}</div>}
    </div>
    {error&&<p role="alert" className="k4k-own-error">{error}</p>}
-   <div className="k4k-own-bottom"><button type="button" className="k4k-own-generate" disabled aria-label="Generation not yet enabled">Generate with {model==='lite'?'K4K Lite':'K4K Pro'} ✦</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
-   <p className="k4k-own-safety">Preview only · {model==='lite'?'K4K Lite (up to 15s)':'K4K Pro (4–30s)'} · AI generation disabled · No credits charged</p>
+   <div className="k4k-own-bottom"><button type="button" className={'k4k-own-generate'+(generationBusy||generationBlocked||!readiness?'':' k4k-own-generate-ready')} disabled={generationBusy||generationBlocked||!readiness} aria-disabled={generationBusy||generationBlocked||!readiness} onClick={prepareGeneration}>{gen.phase==='preparing'?'Preparing…':gen.phase==='running'?'Generating…':'Generate with '+(model==='lite'?'K4K Lite':'K4K Pro')+' ✦'}</button><button type="button" className="k4k-own-options-button" aria-label="Generation options" aria-expanded={optionsOpen} onClick={()=>setOptionsOpen(true)}>☷</button></div>
+   <p className="k4k-own-safety">{model==='lite'?'K4K Lite (up to 15s)':'K4K Pro (4–30s)'} · {quality} · {readiness?.ready?'Credits are only reserved after you confirm the price':'No credits charged'}{typeof readiness?.creditBalance==='number'?' · Balance: '+readiness.creditBalance+' credits':''}</p>
+   {readiness?.signedOut&&<p role="status" className="k4k-own-generation-status">Sign in to generate. <Link href="/login?next=%2Fk4k-app%2Fcreator">Sign in</Link></p>}
+   {generationBlocked&&!readiness.signedOut&&<div role="status" className="k4k-own-generation-status"><strong>Generation is not available yet.</strong><details><summary>What is still needed</summary><ul>{readiness.blockers.map(item=><li key={item.code}>{item.message}</li>)}</ul></details></div>}
+   {gen.phase==='preparing'&&<p role="status" className="k4k-own-generation-status">{gen.message}</p>}
+   {gen.phase==='priced'&&<div role="status" className="k4k-own-generation-status"><strong>{gen.price.credits} credits</strong> for {Math.ceil(gen.price.durationSeconds)} seconds at {gen.resolution} with {model==='lite'?'K4K Lite':'K4K Pro'}. Your balance is {gen.price.balance} credits.{gen.retryNote?<p role="alert">{gen.retryNote}</p>:null}{gen.price.sufficient?<button type="button" className="k4k-own-done" onClick={confirmGeneration}>Confirm and use {gen.price.credits} credits</button>:<p>You need {gen.price.credits-gen.price.balance} more credits. <Link href="/k4k-app/credits">See plans</Link></p>}<button type="button" className="k4k-own-clear-preset" onClick={()=>setGen({phase:'idle'})}>Cancel</button></div>}
+   {gen.phase==='submitting'&&<p role="status" className="k4k-own-generation-status">Reserving credits and sending your video…</p>}
+   {gen.phase==='running'&&<p role="status" className="k4k-own-generation-status">Your video is being generated. {gen.credits} credits are reserved. You can leave this page and find it in <Link href="/k4k-app/videos">My videos</Link>.{gen.note?' '+gen.note:''}</p>}
+   {gen.phase==='review'&&<p role="alert" className="k4k-own-generation-status">{gen.message}</p>}
+   {gen.phase==='done'&&<div role="status" className="k4k-own-generation-status"><strong>Your video is ready.</strong>{gen.url?<><video src={gen.url} controls playsInline preload="metadata" aria-label="Generated video"/><a className="k4k-own-done" href={gen.url} download>Download video</a></>:<p>Open <Link href="/k4k-app/videos">My videos</Link> to download it.</p>}<button type="button" className="k4k-own-clear-preset" onClick={()=>setGen({phase:'idle'})}>Create another</button></div>}
+   {gen.phase==='error'&&<div role="alert" className="k4k-own-error k4k-own-generation-status">{gen.message}{gen.details?.length?<ul>{gen.details.map(item=><li key={item}>{item}</li>)}</ul>:null}</div>}
    <button type="button" className="k4k-own-done" onClick={checkGenerationEstimate} disabled={preflightBusy}>{preflightBusy?'Checking…':'Check estimated generation cost'}</button>
    {preflightError&&<p role="alert" className="k4k-own-error">{preflightError}</p>}
    {preflightResult&&<p role="status">{preflightResult.model} · {preflightResult.resolution} · Estimated provider cost: ${preflightResult.estimatedProviderUsd.toFixed(2)} USD. This is not a customer price or credit quote. No generation or charge occurred.</p>}
