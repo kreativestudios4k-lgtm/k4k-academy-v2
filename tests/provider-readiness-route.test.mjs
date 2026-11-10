@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const route=readFileSync(new URL('../app/api/generation/provider-readiness/route.js',import.meta.url),'utf8');
 test('provider readiness never enables generation from credentials alone',()=>{
- assert.match(route,/enabled&&pricingApproved&&credentialFormatValid/);
+ assert.match(route,/generationEnabled:false/);
  assert.match(route,/testReady:false/);
  assert.match(route,/GENERATION_FEATURE_DISABLED/);
 });
