@@ -3,7 +3,7 @@ import {createClient} from '@supabase/supabase-js';
 
 export const runtime='nodejs';
 const NO_STORE={'Cache-Control':'no-store'};
-const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const respond=(body,status)=>NextResponse.json(body,{status,headers:NO_STORE});
 
 // Return a short-lived signed URL only after authenticating the job owner.
