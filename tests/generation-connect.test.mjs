@@ -89,3 +89,10 @@ test('verified Pro rate card uses trusted duration rounded up and rejects change
  await assert.rejects(client(description).estimate('pro',input),/PROVIDER_QUOTE_INVALID/);
  await assert.rejects(client(description.replace('0.681','0.900')).estimate('pro',input,{sourceSeconds:4.1}),/PROVIDER_QUOTE_INVALID/);
 });
+
+test('verified Lite rate card includes the input reference video duration',async()=>{
+ const pricing_description='Priced per total second by resolution: 480p $0.05, 720p $0.10, or 1080p $0.20. Rates shown are before any applicable customer discount. Billable seconds = output duration + the sum of input reference video durations. Input video durations are measured during preprocessing; without video references, only output duration is billed. Genjutsu Light trims the source to 15 seconds; output duration is rounded up to whole seconds before billing.';
+ const rest=createHiggsfieldRest({credentials:'key',fetchImpl:async()=>({ok:true,json:async()=>({type:'description',pricing_description})})});
+ const estimate=await rest.estimate('lite',input,{sourceSeconds:4.1,referenceSeconds:4.1});
+ assert.equal(estimate.usd,0.91);assert.equal(estimate.providerRateCardVerified,true);
+});

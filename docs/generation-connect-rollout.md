@@ -24,7 +24,7 @@ separate launch requirement. This change is not a full production launch.
 Preview-only `GET /api/generation/provider-auth-check` estimates a fixed public
 sample with the saved server credential. It does not submit a generation or
 use private customer media. Results are cached for one minute per worker.
-An accepted numeric estimate or recognized pricing-description response verifies authentication. The live Pro check confirmed the saved credential and all three existing per-second rates. Errors expose only
+An accepted numeric estimate or recognized pricing-description response verifies authentication. Live Pro and Lite checks confirmed the saved credential and existing per-second rates. A deliberately invalid credential returned HTTP 401 as a negative control. Errors expose only
 sanitized categories and HTTP status. The owner Admin panel uses this check. `?tier=lite` checks the other fixed model endpoint.
 
 ## Configuration required before any paid preview test
@@ -60,7 +60,4 @@ part of this implementation.
 - https://docs.higgsfield.ai/docs/models/genjutsu/motion-transfer.md
 - https://supabase.com/docs/reference/javascript/file-buckets-createsignedurl
 
-The Pro schema was verified against the model documentation. Lite uses the
-pre-existing endpoint contract; its model-specific documentation was not
-accessible during this change. A successful authenticated estimate is still
-required, and Lite should remain disabled until its contract is reviewed.
+The Pro schema was verified against model documentation. Both Pro and Lite pricing descriptions were verified against live non-generating estimate responses. Lite includes both rounded output duration and the measured input reference video duration. Its standalone model documentation remained inaccessible; no claim of end-to-end Lite generation verification is made. Both models remain disabled pending owner approval and a paid preview test.

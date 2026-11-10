@@ -16,10 +16,10 @@ export async function POST(request){
  let body;
  try{body=await request.json()}catch{return reply({error:'INVALID_JSON'},400)}
  if(!body||typeof body!=='object'||Array.isArray(body))return reply({error:'INVALID_INPUT'},400);
- const {tier,resolution='720p',sourceSeconds,referenceSeconds=0,imageCount}=body;
+ const {tier,resolution='720p',sourceSeconds,imageCount}=body;
  if(!Number.isInteger(imageCount)||imageCount<1||imageCount>8)return reply({error:'IMAGE_COUNT_OUT_OF_RANGE'},400);
  try{
-  const estimatedProviderUsd=estimateK4KProviderCost(tier,{resolution,sourceSeconds,referenceSeconds});
+  const estimatedProviderUsd=estimateK4KProviderCost(tier,{resolution,sourceSeconds,referenceSeconds:tier==='lite'?sourceSeconds:0});
   return reply({tier,model:K4K_MODELS[tier].label,resolution,estimatedProviderUsd,estimatedOnly:true,
    note:'Estimate only. Source duration and reference media have not been independently verified. No credits reserved or provider request submitted.',
    generationEnabled:false});

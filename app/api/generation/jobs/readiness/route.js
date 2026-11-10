@@ -27,7 +27,7 @@ export async function POST(request){
  if(balanceError)return reply({error:'CREDIT_ACCOUNT_UNAVAILABLE'},503);
  try{
   const verified=await verifyStudioMedia({client:admin,userId:user.id,referencePaths:job.reference_paths,videoPath:job.reference_video_path});
-  const estimatedProviderUsd=estimateK4KProviderCost(job.model,{resolution,sourceSeconds:verified.durationSeconds});
+  const estimatedProviderUsd=estimateK4KProviderCost(job.model,{resolution,sourceSeconds:verified.durationSeconds,referenceSeconds:job.model==='lite'?verified.durationSeconds:0});
   return reply({jobId:job.id,model:job.model,resolution,durationSeconds:verified.durationSeconds,images:verified.images,creditBalance:account?.balance??0,estimatedProviderUsd,customerCreditPrice:null,reservationReady:false,generationEnabled:false,reason:'CUSTOMER_CREDIT_PRICE_NOT_APPROVED',note:'Read-only readiness check. No credits reserved or provider requests made.'});
  }catch{return reply({error:'MEDIA_OR_DURATION_INVALID'},422)}
 }
