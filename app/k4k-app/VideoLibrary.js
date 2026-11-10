@@ -19,7 +19,7 @@ export default function VideoLibrary({embedded=false,onReuse}){
   try{
    const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();
    if(!alive.current)return;
-   if(authError||!user){setSignedIn(false);setJobs([]);return;}
+   if(authError||!user){setSignedIn(false);setJobs([]);setUrls({});setSelected(null);return;}
    setSignedIn(true);
    const {data,error}=await client.from('studio_generation_jobs').select('id,status,model,template_id,prompt,created_at,credits_reserved').eq('user_id',user.id).order('created_at',{ascending:false}).limit(pageSize);
    if(error)throw Error('Unable to load your library.');
@@ -28,6 +28,14 @@ export default function VideoLibrary({embedded=false,onReuse}){
   finally{refreshLock.current=false;if(alive.current)setLoading(false)}
  },[pageSize]);
  useEffect(()=>{alive.current=true;refresh();return()=>{alive.current=false}},[refresh]);
+ useEffect(()=>{
+  const client=createClient();let refreshTimer;
+  const {data:{subscription}}=client.auth.onAuthStateChange(event=>{
+   if(event==='SIGNED_OUT'){setSignedIn(false);setJobs([]);setUrls({});setSelected(null);}
+   if(event==='SIGNED_IN'){setUrls({});setSelected(null);refreshTimer=setTimeout(()=>refresh(),0);}
+  });
+  return()=>{clearTimeout(refreshTimer);subscription.unsubscribe()};
+ },[refresh]);
  useEffect(()=>{
   let stopped=false;
   const ready=jobs.filter(job=>job.status==='completed'&&(!urls[job.id]||urls[job.id].until<Date.now()+10000)).slice(0,12);
