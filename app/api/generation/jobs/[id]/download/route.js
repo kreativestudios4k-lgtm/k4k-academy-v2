@@ -27,9 +27,9 @@ export async function GET(request,{params}){
   if(!job)return respond({error:'JOB_NOT_FOUND'},404);
   if(job.status!=='completed'||!job.output_path)return respond({error:'OUTPUT_NOT_READY'},409);
   const path=job.output_path;
-  if(typeof path!=='string'||!path.startsWith(user.id+'/')||path.includes('..')||!path.toLowerCase().endsWith('.mp4'))
+  if(typeof path!=='string'||path!==user.id+'/'+id+'.mp4')
    return respond({error:'INVALID_OUTPUT_PATH'},409);
-  const {data:signed,error:signError}=await admin.storage.from('studio-outputs').createSignedUrl(path,60,{download:true});
+  const {data:signed,error:signError}=await admin.storage.from('studio-generations').createSignedUrl(path,60,{download:true});
   if(signError||!signed?.signedUrl)return respond({error:'OUTPUT_UNAVAILABLE'},503);
   return respond({url:signed.signedUrl,expiresIn:60},200);
  }catch{return respond({error:'UNAVAILABLE'},503)}
