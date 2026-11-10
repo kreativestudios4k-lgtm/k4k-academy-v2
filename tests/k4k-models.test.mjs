@@ -37,14 +37,14 @@ test('actual K4K provider blocks billable requests without independent quote and
  assert.equal(calls,0);
 });
 
-test('active K4K provider accepts opaque keys and rejects empty credentials',async()=>{
+test('active K4K provider requires key-secret credentials and rejects malformed credentials',async()=>{
  const base={enabled:true,maxUsd:5,providerQuoteUsd:1,verifiedSourceSeconds:4,verifiedReferenceSeconds:0};
  await assert.rejects(createK4KModelProvider({...base,credentials:'  '}).submit('lite',input),/Missing server credentials/);
  let auth;
- const provider=createK4KModelProvider({...base,credentials:'opaque-key',fetchImpl:async(_url,options)=>{
+ const provider=createK4KModelProvider({...base,credentials:'key:secret',fetchImpl:async(_url,options)=>{
   auth=options.headers.Authorization;
   return {ok:true,json:async()=>({request_id:'test-id',status:'queued'})};
  }});
  await provider.submit('lite',input);
- assert.equal(auth,'Key opaque-key');
+ assert.equal(auth,'Key key:secret');
 });
