@@ -6,6 +6,7 @@ const bytes=new Uint8Array(2048);
 function harness(status='completed',enabled=true){
  const calls=[];
  const reconcile=createGenerationOutputReconciler({enabled,
+  authorizeJob:async()=>{calls.push('owner');return true},
   getStatus:async({providerJobId})=>{calls.push('status');return {providerJobId,status}},
   retrieve:async()=>{calls.push('media');return {bytes,contentType:'video/mp4'}},
   completeWithBytes:async args=>{calls.push('complete');assert.equal(args.bytes,bytes);return {status:'settled'}}
@@ -13,12 +14,12 @@ function harness(status='completed',enabled=true){
  return {reconcile,calls};
 }
 test('disabled reconciliation performs no calls',async()=>{const {reconcile,calls}=harness('completed',false);await assert.rejects(reconcile(ids),/OUTPUT_RECONCILIATION_DISABLED/);assert.deepEqual(calls,[])});
-test('completed job runs status then media then completion',async()=>{const {reconcile,calls}=harness();assert.deepEqual(await reconcile(ids),{status:'settled'});assert.deepEqual(calls,['status','media','complete'])});
-test('pending job never downloads or settles',async()=>{for(const state of ['queued','processing']){const {reconcile,calls}=harness(state);assert.deepEqual(await reconcile(ids),{status:'pending'});assert.deepEqual(calls,['status'])}});
+test('completed job runs status then media then completion',async()=>{const {reconcile,calls}=harness();assert.deepEqual(await reconcile(ids),{status:'settled'});assert.deepEqual(calls,['owner','status','media','complete'])});
+test('pending job never downloads or settles',async()=>{for(const state of ['queued','processing']){const {reconcile,calls}=harness(state);assert.deepEqual(await reconcile(ids),{status:'pending'});assert.deepEqual(calls,['owner','status'])}});
 test('failed provider job requires review, no automatic refund',async()=>{const {reconcile,calls}=harness('failed');assert.deepEqual(await reconcile(ids),{status:'provider_failed_review_required'});assert.deepEqual(calls,['status'])});
 test('mismatched provider response never downloads',async()=>{
  let mediaCalled=false;
- const reconcile=createGenerationOutputReconciler({enabled:true,getStatus:async()=>({providerJobId:'other',status:'completed'}),retrieve:async()=>{mediaCalled=true},completeWithBytes:async()=>{}});
+ const reconcile=createGenerationOutputReconciler({enabled:true,authorizeJob:async()=>true,getStatus:async()=>({providerJobId:'other',status:'completed'}),retrieve:async()=>{mediaCalled=true},completeWithBytes:async()=>{}});
  await assert.rejects(reconcile(ids),/PROVIDER_JOB_MISMATCH/);
  assert.equal(mediaCalled,false);
 });
