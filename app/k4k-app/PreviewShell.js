@@ -8,14 +8,14 @@ import {useK4KLocale} from './locale';
 
 const navigation=[
  {href:'/k4k-app',symbol:'⌂',title:'Explore',active:'Home'},
- {href:'/k4k-app/videos',symbol:'▦',title:'Projects',active:'Videos'},
+ {href:'/k4k-app/videos',symbol:'▦',title:'Library',active:'Videos'},
  {href:'/k4k-app/creator',symbol:'✦',title:'Create',active:'Creator'},
  {href:'/k4k-app/credits',symbol:'◎',title:'Plans',active:'Credits'},
  {href:'/k4k-app/account',symbol:'♙',title:'Account',active:'Account'}
 ];
 const translations={
- pt:{Explore:'Explorar',Projects:'Projetos',Create:'Criar',Plans:'Planos',Account:'Conta'},
- es:{Explore:'Explorar',Projects:'Proyectos',Create:'Crear',Plans:'Planes',Account:'Cuenta'}
+ pt:{Explore:'Explorar',Projects:'Projetos',Library:'Biblioteca',Create:'Criar',Plans:'Planos',Account:'Conta'},
+ es:{Explore:'Explorar',Projects:'Proyectos',Library:'Biblioteca',Create:'Crear',Plans:'Planes',Account:'Cuenta'}
 };
 export default function PreviewShell({active,children,studio=false}){
  const {locale}=useK4KLocale();
@@ -24,7 +24,7 @@ export default function PreviewShell({active,children,studio=false}){
  return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')}>
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/k4k-app"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
-   {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app">Explore</Link><Link href="/k4k-app/creator" aria-current="page">Create video</Link><Link href="/k4k-app/videos">My projects</Link><Link href="/k4k-app/credits">Plans</Link></nav>}
+   {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app">Explore</Link><Link href="/k4k-app/creator" aria-current={active==='Creator'?'page':undefined}>Create video</Link><Link href="/k4k-app/videos" aria-current={active==='Videos'?'page':undefined}>My library</Link><Link href="/k4k-app/credits">Plans</Link></nav>}
    <nav aria-label="Customer links"><AccountStatus/></nav>
   </header>
   <main className="k4k-light-main">{children}</main>

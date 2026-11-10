@@ -26,7 +26,7 @@ test('main navigation links to account, creator, projects, plans and support',()
 });
 
 test('project and credit history require the authenticated owner',()=>{
- const projects=read('app/k4k-app/videos/page.js');
+ const projects=read('app/k4k-app/VideoLibrary.js');
  const status=read('app/k4k-app/AccountStatus.js');
  assert.match(projects,/auth\.getUser\(\)/);
  assert.match(projects,/\.eq\('user_id',user\.id\)/);
