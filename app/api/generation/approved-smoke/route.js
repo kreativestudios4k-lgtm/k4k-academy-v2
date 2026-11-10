@@ -2,6 +2,9 @@
 import {timingSafeEqual} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
 import {createHiggsfieldRest} from '../../../../lib/server/higgsfield-rest.mjs';
+import {createTrustedProviderMp4Downloader} from '../../../../lib/server/trusted-provider-mp4-downloader.mjs';
+import {createGenerationOutputIngestor} from '../../../../lib/server/generation-output-ingestion.mjs';
+import {createGenerationOutputVerifier} from '../../../../lib/server/generation-output-verifier.mjs';
 import {mp4DurationSeconds} from '../../../../lib/server/mp4-duration.mjs';
 export const runtime='nodejs';
 export const maxDuration=60;
@@ -44,5 +47,33 @@ export async function GET(request){
   if(error)throw Error('JOB_UNAVAILABLE');
   if(!job.provider_job_id)return json(job);
   return json({job,...await provider.status(job.provider_job_id)});
+ }catch(error){return json({error:error.message},error.message==='FORBIDDEN'?403:503)}
+}
+
+// Collect the same approved request without ever submitting a second generation.
+export async function PUT(request){
+ try{
+  const {db,provider}=context(request);
+  const {data:job,error}=await db.from('studio_generation_jobs').select('status,provider_job_id,output_path').eq('id',jobId).eq('user_id',userId).single();
+  if(error||!job.provider_job_id)throw Error('JOB_UNAVAILABLE');
+  const outputPath=userId+'/'+jobId+'.mp4';
+  const verify=createGenerationOutputVerifier({storage:db.storage,enabled:true});
+  if(job.status!=='completed'){
+   const status=await provider.status(job.provider_job_id);
+   if(status.status!=='completed')return json({status:status.status});
+   const download=createTrustedProviderMp4Downloader({enabled:true,fetchImpl:fetch,resolveTrustedUrl:async()=>status.video?.url,allowedHosts:['d2ol7oe51mr4n9.cloudfront.net']});
+   let exists=false;try{exists=await verify({userId,jobId,outputPath})}catch{}
+   if(!exists){
+    const media=await download({providerJobId:job.provider_job_id});
+    await createGenerationOutputIngestor({storage:db.storage,enabled:true})({userId,jobId,providerJobId:job.provider_job_id,...media});
+   }
+   await verify({userId,jobId,outputPath});
+   const saved=await db.from('studio_generation_jobs').update({status:'completed',output_path:outputPath}).eq('id',jobId).eq('user_id',userId).eq('provider_job_id',job.provider_job_id).eq('status','processing');
+   if(saved.error)throw Error('OUTPUT_RECORD_FAILED');
+  }
+  await verify({userId,jobId,outputPath});
+  const signed=await db.storage.from('studio-generations').createSignedUrl(outputPath,900);
+  if(signed.error)throw Error('DELIVERY_FAILED');
+  return json({status:'completed',jobId,url:signed.data.signedUrl,expiresIn:900});
  }catch(error){return json({error:error.message},error.message==='FORBIDDEN'?403:503)}
 }
