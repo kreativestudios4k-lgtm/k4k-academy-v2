@@ -54,7 +54,8 @@ test('ambiguous provider failure preserves reservation for reconciliation',async
 });
 test('insufficient credits rejects before provider submission',async()=>{
  const {state,lifecycle}=harness({balance:2});
- await assert.rejects(lifecycle.run(identity),/GENERATION_LEDGER_UNAVAILABLE/);
+ // The ledger now surfaces the database's own code so the customer can be told why.
+ await assert.rejects(lifecycle.run(identity),/INSUFFICIENT_CREDITS/);
  assert.equal(state.balance,2);assert.equal(state.submissions,0);
 });
 test('settlement does not refund, and subsequent failure cannot refund',async()=>{
