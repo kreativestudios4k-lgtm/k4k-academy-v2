@@ -17,13 +17,14 @@ const translations={
  pt:{Explore:'Explorar',Projects:'Projetos',Create:'Criar',Plans:'Planos',Account:'Conta'},
  es:{Explore:'Explorar',Projects:'Proyectos',Create:'Crear',Plans:'Planes',Account:'Cuenta'}
 };
-export default function PreviewShell({active,children}){
+export default function PreviewShell({active,children,studio=false}){
  const {locale}=useK4KLocale();
  const [supportOpen,setSupportOpen]=useState(false);
  const labels=translations[locale]||{};
- return <div className="k4k-light">
+ return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')}>
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/k4k-app"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
+   {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app">Explore</Link><Link href="/k4k-app/creator" aria-current="page">Create video</Link><Link href="/k4k-app/videos">My projects</Link><Link href="/k4k-app/credits">Plans</Link></nav>}
    <nav aria-label="Customer links"><AccountStatus/></nav>
   </header>
   <main className="k4k-light-main">{children}</main>
