@@ -1,6 +1,7 @@
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
 import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
+import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 
 export const runtime = 'nodejs';
@@ -23,7 +24,7 @@ const SUBSCRIPTION_EVENTS = new Set([
 function isNonSubscriptionEvent(event) {
   const object = event?.data?.object;
   if (event.type === 'invoice.paid' || event.type === 'invoice.payment_failed') {
-    return !object?.subscription;
+    return !invoiceSubscriptionId(object);
   }
   if (event.type === 'checkout.session.completed') {
     return object?.mode !== 'subscription';
@@ -52,7 +53,9 @@ export async function POST(request) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
   }
 
-  if (isNonSubscriptionEvent(event)) {
+  let nonSubscription;
+  try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
+  if (nonSubscription) {
     return NextResponse.json(
       {received: true, type: event.type, handled: false, reason: 'NOT_SUBSCRIPTION'},
       {status: 200, headers: NO_STORE},
