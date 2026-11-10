@@ -119,7 +119,7 @@ export default function Creator(){
    <header className="k4k-own-title"><span className="k4k-own-info" title="Custom reference-video generator">ⓘ</span><div><h1>Create a video</h1><p>K4K APP · Own Video Generator</p></div><button type="button" className="k4k-own-close" aria-label="Close creator" onClick={()=>setCreatorOpen(false)}>✕</button></header>
    <div className="k4k-own-upload">
     <div className="k4k-own-drop">
-     {(video.url||selectedPreset)?<video src={video.url||selectedPreset.videoUrl} controls playsInline preload="metadata" aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4, WebM or MOV · up to 150 MB</small></>}
+     {(video.url||selectedPreset)?<video src={video.url||selectedPreset.videoUrl} controls playsInline preload="metadata" aria-label="Reference video preview"/>:<><span className="k4k-own-drop-icon">▣</span><strong>Add reference video to extract motion</strong><small>MP4 only · up to 50 MB</small></>}
      <label className="k4k-own-select k4k-own-video-picker">＋ Choose video<input type="file" accept="video/mp4" aria-label="Upload reference video" onChange={e=>{if(e.target.files?.length){setSelectedPreset(null);choose(e,video,'video',MAX_VIDEO)}}}/></label>
     </div>
     {selectedPreset&&<button type="button" className="k4k-own-clear-preset" onClick={()=>setSelectedPreset(null)}>Clear selected preset</button>}
