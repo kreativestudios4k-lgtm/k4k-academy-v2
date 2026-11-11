@@ -22,16 +22,16 @@ export default function CreditProposal({currency='GBP'}){
    window.location.assign(stripeCheckoutDestination(result.url));
   }catch(error){setPurchaseError(error.message)}finally{setBuying(null)}
  }
- const quote=proposedGenerationCredits({model,resolution,seconds});
+ const quote=proposedGenerationCredits({provider:'fal',model,resolution,seconds});
  const money=minor=>new Intl.NumberFormat(locale==='pt'?'pt-BR':locale==='es'?'es-ES':'en-GB',{style:'currency',currency:currency||'GBP'}).format(minor/100);
  return <section className="k4k-credit-proposal" aria-label="Generation pricing and extra credits">
   <span className="k4k-workspace-eyebrow">{tr('CREDIT PRICING · TEST MODE','PREÇOS DOS CRÉDITOS · MODO TESTE','PRECIOS DE CRÉDITOS · MODO PRUEBA')}</span>
   <h2>{tr('Know your credits before you create.','Confira os créditos antes de criar.','Conoce los créditos antes de crear.')}</h2>
   <p>{tr('Compare models, duration and quality. This calculator is illustrative; the server verifies your uploaded video and confirms the final cost before generation.','Compare modelos, duração e qualidade. Esta simulação é ilustrativa; o servidor verifica seu vídeo e confirma o custo antes da geração.','Compara modelos, duración y calidad. Esta simulación es orientativa; el servidor verifica tu vídeo y confirma el coste antes de generar.')}</p>
   <div className="k4k-credit-calculator">
-   <label>{tr('Model','Modelo','Modelo')}<select value={model} onChange={e=>{setModel(e.target.value);if(e.target.value==='lite'&&seconds>15)setSeconds(15)}}><option value="lite">Motion Lite</option><option value="pro">Motion Pro</option></select></label>
-   <label>{tr('Duration','Duração','Duración')}<select value={seconds} onChange={e=>setSeconds(Number(e.target.value))}>{[5,10,15,...(model==='pro'?[20,30]:[])].map(n=><option key={n} value={n}>{n}s</option>)}</select></label>
-   <label>{tr('Quality','Qualidade','Calidad')}<select value={resolution} onChange={e=>setResolution(e.target.value)}>{['480p','720p','1080p'].map(r=><option key={r}>{r}</option>)}</select></label>
+   <label>{tr('Model','Modelo','Modelo')}<select value={model} onChange={e=>{setModel(e.target.value);setResolution(e.target.value==='lite'?'720p':'1080p')}}><option value="lite">Motion Lite · 720p</option><option value="pro">Motion Pro · 1080p</option></select></label>
+   <label>{tr('Duration','Duração','Duración')}<select value={seconds} onChange={e=>setSeconds(Number(e.target.value))}>{[5,10,15].map(n=><option key={n} value={n}>{n}s</option>)}</select></label>
+   <label>{tr('Quality','Qualidade','Calidad')}<select value={resolution} disabled><option>{resolution}</option></select></label>
    <output aria-live="polite"><strong>{quote.credits}</strong> {tr('credits / video','créditos / vídeo','créditos / vídeo')}</output>
   </div>
   <h2>{tr('Need more? Top up once.','Precisa de mais? Adicione créditos.','¿Necesitas más? Recarga una vez.')}</h2>
