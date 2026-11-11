@@ -38,9 +38,9 @@ test('K4K waitlist homepage preserves the separate template discovery routes',()
  const homepage=source('app/k4k-app/page.js');
  assert.match(homepage,/WaitlistLanding/);
  assert.match(homepage,/4 December 2026/);
- const waitlist=source('app/k4k-app/WaitlistLanding.js');
+ const waitlist=source('app/k4k-app/WaitlistSignup.js');
  assert.match(waitlist,/Get priority access/);
- assert.match(waitlist,/href="\/academy"/);
+ assert.match(feed,/href:'\/academy'/);
  assert.match(waitlist,/consent/);
  assert.match(source('app/k4k-app/explore/page.js'),/MobileTemplateFeed/);
  assert.match(feed,/template-catalogue\.json/);
