@@ -33,11 +33,11 @@ test('dark background and input themes are present in the account workspace',()=
  assert.match(css,/\.k4k-light \.k4k-card/);
 });
 
-test('K4K waitlist homepage preserves the separate template discovery routes',()=>{
+test('K4K homepage is the live template feed, with no waitlist or release-date banner',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/WaitlistLanding/);
- assert.match(homepage,/4 December 2026/);
+ assert.match(homepage,/return <MobileTemplateFeed\/>/);
+ assert.doesNotMatch(homepage,/import WaitlistLanding|<WaitlistLanding|4 December 2026|04\.12\.2026|coming soon/i);
  const waitlist=source('app/k4k-app/WaitlistSignup.js');
  assert.match(waitlist,/Get priority access/);
  assert.match(feed,/href:'\/login'/);
