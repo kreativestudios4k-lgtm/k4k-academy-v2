@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import './creator.css';
 import Link from 'next/link';
 import {Upload,Film,Images,ArrowUpRight,ArrowRight,Sparkles,FolderOpen,Check,Plus,X,Play} from 'lucide-react';
@@ -7,6 +7,7 @@ import PreviewShell from '../PreviewShell';
 import VideoLibrary from '../VideoLibrary';
 import catalogue from '../template-catalogue.json';
 import {canConfirmGeneration,generationQuoteFeedback} from '../../../lib/generation-feedback.mjs';
+import {motionCreditPreview,maySubmitDisplayedQuote} from '../../../lib/generation-experience.mjs';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 
@@ -38,11 +39,28 @@ export default function Creator(){
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
  const [generationDraftId,setGenerationDraftId]=useState(null),[generationQuote,setGenerationQuote]=useState(null),[generationBusy,setGenerationBusy]=useState(false),[generationMessage,setGenerationMessage]=useState(''),[submittedJobId,setSubmittedJobId]=useState(null);
- const generationRequestKey=useRef(null);
+ const generationRequestKey=useRef(null),generationActionLock=useRef(false);
+ const [libraryFocusId,setLibraryFocusId]=useState(null),[optimisticGeneration,setOptimisticGeneration]=useState(null);
+ const [localEstimate,setLocalEstimate]=useState(null),[estimateReading,setEstimateReading]=useState(false),[estimateError,setEstimateError]=useState('');
+ const onActiveJobStatus=useCallback(job=>{if(['completed','failed','cancelled'].includes(job.status)){setSubmittedJobId(current=>current===job.id?null:current);setGenerationMessage(job.status==='completed'?'Your video is ready to play and download.':'Generation has stopped. Check the video details.')}},[]);
+ useEffect(()=>{if(workspaceView==='history')window.scrollTo({top:0,behavior:'smooth'})},[workspaceView]);
+ useEffect(()=>{
+  let stopped=false,media,timer;
+  setLocalEstimate(null);setEstimateError('');
+  function apply(seconds){if(stopped)return;try{setLocalEstimate(motionCreditPreview(model,seconds));setEstimateError('')}catch{setEstimateError('Use a reference video between 2 and 15 seconds.')}setEstimateReading(false)}
+  if(video.file&&video.url){
+   setEstimateReading(true);media=document.createElement('video');media.preload='metadata';
+   timer=setTimeout(()=>{if(!stopped){setEstimateError('Unable to read this video. Try another MP4.');setEstimateReading(false)}},10000);
+   media.onloadedmetadata=()=>{clearTimeout(timer);apply(media.duration)};
+   media.onerror=()=>{clearTimeout(timer);if(!stopped){setEstimateError('Unable to read this video. Try another MP4.');setEstimateReading(false)}};
+   media.src=video.url;
+  }else if(selectedPreset){setEstimateReading(true);apply(selectedPreset.durationSeconds)}else setEstimateReading(false);
+  return()=>{stopped=true;clearTimeout(timer);if(media){media.onloadedmetadata=null;media.onerror=null;media.removeAttribute('src');media.load()}};
+ },[video.file,video.url,selectedPreset,model]);
  const [quoteClock,setQuoteClock]=useState(Date.now);
  useEffect(()=>{if(!generationQuote)return;const timer=setInterval(()=>setQuoteClock(Date.now()),1000);return()=>clearInterval(timer)},[generationQuote]);
  const generationActionRef=useRef(null);
- useEffect(()=>{if(!submittedJobId)return;const timer=setInterval(()=>{if(document.visibilityState==='visible')generationActionRef.current?.('refresh')},15000);return()=>clearInterval(timer)},[submittedJobId]);
+ useEffect(()=>{if(!submittedJobId||workspaceView==='history')return;const timer=setInterval(()=>{if(document.visibilityState==='visible')generationActionRef.current?.('refresh')},15000);return()=>clearInterval(timer)},[submittedJobId,workspaceView]);
  const [history,setHistory]=useState([]),[historyState,setHistoryState]=useState('');
  async function loadHistory(){setHistoryState('Loading your generation history…');try{const client=createClient();const {data:{user},error:authError}=await client.auth.getUser();if(authError||!user)throw new Error('Sign in to view your generation history.');const {data,error}=await client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(15);if(error)throw error;setHistory(data||[]);setHistoryState(data?.length?'':'No generation drafts or jobs yet.');}catch(e){setHistoryState(e?.message||'Could not load history.')}}
  async function checkGenerationEstimate(){
@@ -84,31 +102,49 @@ export default function Creator(){
    setDraftMessage('Draft saved: '+data.id+'. All '+reference.paths.length+' image attachments and your prompt are saved privately. Reference video saved privately when supplied. No generation started and no credits charged.');await loadHistory();return data.id;
   }catch(e){const message=e?.message||'Unable to save draft.';setDraftMessage(message);setGenerationMessage(message);}finally{setSavingDraft(false)}
  }
- async function generationAction(action,jobOverride=null){
-  if(generationBusy)return;
+ async function generationAction(action,jobOverride=null,displayedCredits=null){
+  if(generationActionLock.current)return;
   const jobId=jobOverride||(action==='refresh'?submittedJobId:generationDraftId);
-  if(!jobId){setGenerationMessage('Save your reference media and draft before reviewing generation cost.');return;}
-  setGenerationBusy(true);setGenerationMessage('');if(action==='quote')setGenerationQuote(null);
+  if(!jobId){setGenerationMessage('Save your reference media and draft before generating.');return;}
+  generationActionLock.current=true;setGenerationBusy(true);setGenerationMessage('');if(action==='quote')setGenerationQuote(null);
+  function showInLibrary(status='processing',userId=null){
+   setLibraryFocusId(jobId);setSubmittedJobId(status==='failed'?null:jobId);
+   setOptimisticGeneration({id:jobId,user_id:userId,model,status,template_id:selectedPreset?.id||'creator-upload-preview',prompt,created_at:new Date().toISOString()});
+   setGenerationDraftId(null);setGenerationQuote(null);setWorkspaceView('history');
+  }
   try{
    const {data:{session}}=await createClient().auth.getSession();
    if(!session?.access_token)throw Error('Sign in to continue.');
-   const response=await fetch('/api/generation/jobs/'+action,{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({jobId,resolution:quality,quoteToken:generationQuote?.quoteToken,requestKey:generationRequestKey.current})});
-   const result=await response.json();
-   if(result.error){
-    if(result.reconciliationRequired){setSubmittedJobId(jobId);setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage('Submission outcome is uncertain. Credits remain reserved while the job is reconciled. Do not submit another generation.');return;}
-    const messages={REFERENCE_DURATION_OUT_OF_RANGE:'Use a reference video between 2 and 15 seconds.',INVALID_RESOLUTION:'Lite uses 720p and Pro uses 1080p. Review a new quote.',PROVIDER_CREDENTIALS_MISSING:'The website fal connection needs owner setup. No credits were charged.',PROVIDER_RATE_CARD_NOT_APPROVED:'The fal pricing policy needs owner setup. No credits were charged.',INSUFFICIENT_CREDITS:'You do not have enough credits for this generation.',IDEMPOTENCY_CONFLICT:'This request was already used. Check your job history before generating again.',TEST_GENERATION_NOT_AUTHORIZED:'This account is not authorized for paid preview testing.',PROVIDER_BUDGET_BLOCKED:'This generation exceeds the approved preview spending cap.',PROVIDER_QUOTE_REQUIRES_PRICE_POLICY:'Higgsfield authentication works. This model returns pricing rules instead of a fixed quote. Generation is blocked until the owner approves the pricing policy.',GENERATION_DISABLED:'Generation needs owner activation. No credits were charged.',CREDIT_PRICING_NOT_APPROVED:'Credit pricing needs owner approval. No credits were charged.',QUOTE_CHANGED:'The quote changed. Review a fresh quote before generating.',QUOTE_EXPIRED:'The quote expired. Review a fresh quote.',PROVIDER_CREDENTIALS_REJECTED:'The provider rejected the saved API credential.',GENERATION_UNAVAILABLE:'Generation is unavailable. Please try again or contact support.'};
-    if(action==='submit')setGenerationQuote(null);
-    throw Error(messages[result.error]||'Unable to continue ('+result.error+').');
+   async function post(kind,quoteToken){
+    const response=await fetch('/api/generation/jobs/'+kind,{method:'POST',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({jobId,resolution:quality,quoteToken,requestKey:generationRequestKey.current})});
+    const result=await response.json();
+    if(result.error){
+     if(result.reconciliationRequired){showInLibrary('queued',session.user.id);throw Error('Checking your submission. Credits remain reserved; do not submit again.');}
+     const messages={REFERENCE_DURATION_OUT_OF_RANGE:'Use a reference video between 2 and 15 seconds.',INVALID_RESOLUTION:'Lite uses 720p and Pro uses 1080p.',PROVIDER_CREDENTIALS_MISSING:'The website connection is unavailable. No credits were charged.',PROVIDER_RATE_CARD_NOT_APPROVED:'Pricing needs owner setup. No credits were charged.',INSUFFICIENT_CREDITS:'You do not have enough credits for this video.',BILLING_REVIEW_REQUIRED:'Your account needs a billing review.',TEST_GENERATION_NOT_AUTHORIZED:'This account is not authorized for the private test.',PROVIDER_BUDGET_BLOCKED:'This video exceeds the preview test limit. Use Lite and the five-second reference.',GENERATION_DISABLED:'Generation is unavailable on this preview.',CREDIT_PRICING_NOT_APPROVED:'Credit pricing needs owner setup.',QUOTE_CHANGED:'The cost changed. Please review a fresh price.',QUOTE_EXPIRED:'The price expired. Please review it again.',PROVIDER_CREDENTIALS_REJECTED:'The video service is temporarily unavailable.'};
+     if(kind==='submit')setGenerationQuote(null);
+     throw Error(messages[result.error]||'Unable to continue. Please try again or contact support.');
+    }
+    if(!response.ok)throw Error('Unable to continue. Please try again.');
+    return result;
    }
-   if(!response.ok)throw Error('Unable to continue.');
+   let kind=action,result=await post(action,generationQuote?.quoteToken);
    if(action==='quote'){
-    setGenerationQuote({...result,reviewedAt:Date.now()});
-    setGenerationMessage(generationQuoteFeedback(result,locale));
-   }else if(action==='submit'){
-    setSubmittedJobId(jobId);setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage(result.creditsRefunded?'The provider rejected this request. Reserved credits were refunded.':'Generation submitted. Credits reserved: '+result.creditsReserved+'.');await loadHistory();
-   }else{if(['completed','failed','cancelled'].includes(result.status)){setSubmittedJobId(null);if(result.status==='completed')setWorkspaceView('history')}setGenerationMessage(result.creditsRefunded?'Generation failed. Reserved credits were refunded.':'Job status: '+result.status+(result.status==='awaiting_output'?' — private video delivery is pending.':''));await loadHistory();}
+    const reviewed={...result,reviewedAt:Date.now()};setGenerationQuote(reviewed);
+    if(maySubmitDisplayedQuote(reviewed,displayedCredits)){
+     setGenerationMessage('Starting your video…');kind='submit';result=await post('submit',reviewed.quoteToken);
+    }else{
+     setGenerationMessage(generationQuoteFeedback(result,locale));return;
+    }
+   }
+   if(kind==='submit'){
+    showInLibrary(result.creditsRefunded?'failed':'processing',session.user.id);
+    setGenerationMessage(result.creditsRefunded?'Generation could not start. Reserved credits were refunded.':'Your video is generating. It appears at the top of your library.');await loadHistory();
+   }else{
+    if(['completed','failed','cancelled'].includes(result.status))setSubmittedJobId(null);
+    setGenerationMessage(result.creditsRefunded?'Generation failed. Reserved credits were refunded.':'Video status: '+result.status);await loadHistory();
+   }
   }catch(error){setGenerationMessage(error.message||'Unable to continue.');}
-  finally{setGenerationBusy(false);}
+  finally{generationActionLock.current=false;setGenerationBusy(false);}
  }
  useEffect(()=>{generationActionRef.current=generationAction});
  useEffect(()=>{setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage('');generationRequestKey.current=null;},[model,quality,prompt,video.file,character.file,extraImages,selectedPreset]);
@@ -165,14 +201,14 @@ export default function Creator(){
    setExtraImages(old=>[...old,...next]);
   }
   async function prepareProject(){
-   if(preparing||generationBusy)return;
+   if(preparing||generationBusy||!localEstimate||estimateError)return;
    setPreparing(true);
    try{
     const unchanged=savedReference&&savedReference.file===character.file&&savedReference.videoFile===video.file&&savedReference.presetId===(selectedPreset?.id||null)&&savedReference.extraFiles.length===extraImages.length&&extraImages.every((item,i)=>item.file===savedReference.extraFiles[i]);
     const reference=unchanged?savedReference:await saveReference();
     if(!reference)return;
     const jobId=generationDraftId||await saveDraft(reference);
-    if(jobId)await generationAction('quote',jobId);
+    if(jobId)await generationAction('quote',jobId,localEstimate.credits);
    }finally{setPreparing(false)}
   }
   const tr=(en,br,esText)=>pt?br:es?esText:en;
@@ -192,6 +228,7 @@ export default function Creator(){
       {video.file&&<div className="ks-file"><span>{video.file.name}</span><button type="button" aria-label="Remove reference video" onClick={()=>video.setFile(null)}><X size={13}/></button></div>}
       {selectedPreset&&<p className="ks-inline-note">{tr('Ready to recreate. Add your character photos and save the media.','Pronto para recriar. Adicione suas fotos e salve os arquivos.','Listo para recrear. Añade tus fotos y guarda los archivos.')}</p>}
      </section>
+     {(estimateReading||localEstimate||estimateError)&&<div className="ks-live-estimate" aria-live="polite"><span>{tr('VIDEO COST','CUSTO DO VÍDEO','COSTE DEL VÍDEO')}</span>{estimateReading?<strong>{tr('Reading your video…','Lendo seu vídeo…','Leyendo tu vídeo…')}</strong>:estimateError?<p role="alert">{tr('Use a readable MP4 between 2 and 15 seconds.','Use um MP4 válido entre 2 e 15 segundos.','Usa un MP4 válido entre 2 y 15 segundos.')}</p>:<><strong>{localEstimate.credits} {tr('credits','créditos','créditos')}</strong><small>{localEstimate.sourceSeconds.toFixed(1)}s · {localEstimate.resolution} · {model==='lite'?'Motion Lite':'Motion Pro'}</small><p>{tr('Estimated total. Includes motion-reference processing. The exact cost is checked before charging.','Total estimado, incluindo o processamento da referência. O custo é verificado antes da cobrança.','Total estimado, incluido el procesamiento de referencia. El coste se verifica antes de cobrar.')}</p></>}</div>}
      <section className="ks-input-section"><div className="ks-label"><label htmlFor="ks-images">{tr('Characters & references','Personagens e referências','Personajes y referencias')}</label><small>{referenceCount}/8</small></div>
       <div className="ks-references" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();addReferences({target:{files:e.dataTransfer.files,value:''}})}}>
        {character.url&&<div className="ks-reference"><img src={character.url} alt="Main character"/><button type="button" aria-label="Remove main character" onClick={()=>{character.setFile(null);setSavedReference(null)}}><X size={11}/></button><small>01</small></div>}
@@ -206,16 +243,17 @@ export default function Creator(){
      {(uploadMessage||draftMessage)&&<details className="ks-save-details"><summary>{tr('Save details','Detalhes','Detalles')}</summary><p role="status">{uploadMessage}</p><p role="status">{draftMessage}</p></details>}
      <div className="ks-submit-area" aria-label="Generate video and credit confirmation">
       {generationQuote&&<div className="ks-cost-review"><strong>{generationQuote.customerCredits===null?tr('Pricing unavailable','Preço indisponível','Precio no disponible'):generationQuote.customerCredits+' '+tr('credits','créditos','créditos')}</strong>{Number.isFinite(generationQuote.creditBalance)&&<span>{tr('Your balance: ','Seu saldo: ','Tu saldo: ')+generationQuote.creditBalance}</span>}<small>{canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote.reviewedAt))?tr('Quote valid for five minutes.','Custo válido por cinco minutos.','Coste válido durante cinco minutos.'):generationQuote.generationEnabled?tr('Quote expired. Review the cost again.','Custo expirado. Confira novamente.','El coste ha caducado. Revísalo de nuevo.'):tr('Generation blocked — see the message below.','Geração bloqueada — veja a mensagem abaixo.','Generación bloqueada — consulta el mensaje.')}</small></div>}
-      <button type="button" className="ks-generate" disabled={generationBusy||preparing||uploading||savingDraft||!!submittedJobId||!character.file||!previewUrl} onClick={canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?()=>generationAction('submit'):prepareProject}><Sparkles size={17}/>{(generationBusy||preparing)?tr('Checking…','Verificando…','Verificando…'):submittedJobId?tr('Generating…','Gerando…','Generando…'):canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?tr('Confirm & generate','Confirmar e gerar','Confirmar y generar')+' · '+generationQuote.customerCredits+' '+tr('credits','créditos','créditos'):generationQuote?tr('Review cost again','Conferir custo novamente','Revisar coste de nuevo'):tr('Generate video','Gerar vídeo','Generar vídeo')}<ArrowRight size={17}/></button>
-      <p>{tr('Review the credit cost first. You are charged only after confirmation.','Confira o custo primeiro. A cobrança ocorre somente após confirmar.','Revisa primero el coste. Solo se cobra después de confirmar.')}</p>
+      <button type="button" className="ks-generate" disabled={generationBusy||preparing||uploading||savingDraft||!!submittedJobId||!character.file||!previewUrl||!localEstimate||!!estimateError||estimateReading} onClick={canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?()=>generationAction('submit'):prepareProject}><Sparkles size={17}/>{(generationBusy||preparing)?tr('Checking…','Verificando…','Verificando…'):submittedJobId?tr('Generating…','Gerando…','Generando…'):canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?tr('Confirm & generate','Confirmar e gerar','Confirmar y generar')+' · '+generationQuote.customerCredits+' '+tr('credits','créditos','créditos'):generationQuote?tr('Review cost again','Conferir custo novamente','Revisar coste de nuevo'):tr('Generate video','Gerar vídeo','Generar vídeo')+(localEstimate?' · '+localEstimate.credits+' '+tr('credits','créditos','créditos'):'')}<ArrowRight size={17}/></button>
+      <p>{tr('Generate uses the displayed credits. If the verified cost increases, we ask you to confirm first.','Gerar usa os créditos exibidos. Se o custo verificado aumentar, pediremos sua confirmação.','Generar usa los créditos mostrados. Si el coste aumenta, pediremos confirmación.')}</p>
       {generationMessage&&<p className="ks-generation-feedback" role={generationQuote?.blocker?'alert':'status'} aria-live="polite">{generationMessage}</p>}
       {submittedJobId&&<button type="button" className="ks-check-status" disabled={generationBusy} onClick={()=>generationAction('refresh')}>{tr('Check generation status','Verificar geração','Comprobar generación')}</button>}
      </div>
     </aside>
     <section className="ks-workspace" aria-label="Preview and inspiration">
+     {workspaceView==='history'&&generationMessage&&<p className="ks-generation-feedback" role="status">{generationMessage}</p>}
      <div className="ks-library-tabs" role="group" aria-label="Workspace view"><button type="button" aria-pressed={workspaceView==='history'} onClick={()=>{setWorkspaceView('history');loadHistory()}}><FolderOpen size={14}/>{tr('History','Histórico','Historial')}</button><button type="button" aria-pressed={workspaceView==='library'} onClick={()=>setWorkspaceView('library')}><Film size={14}/>{tr('Motion library','Biblioteca de movimentos','Biblioteca de movimiento')}</button><button type="button" aria-pressed={workspaceView==='guide'} onClick={()=>setWorkspaceView('guide')}>{tr('How it works','Como funciona','Cómo funciona')}</button></div>
      {workspaceView==='guide'&&<section className="ks-guide"><h2>{tr('Your next scene, in three steps.','Sua próxima cena, em três passos.','Tu próxima escena, en tres pasos.')}</h2><ol><li>{tr('Upload your motion reference video.','Envie seu vídeo de referência.','Sube tu vídeo de referencia.')}</li><li>{tr('Add clear photos of your characters.','Adicione fotos nítidas dos personagens.','Añade fotos claras de tus personajes.')}</li><li>{tr('Save your draft and review the generation cost.','Salve o projeto e confira o custo de geração.','Guarda tu proyecto y revisa el coste.')}</li></ol></section>}
-     {workspaceView==='history'&&<VideoLibrary embedded onReuse={job=>{setModel(job.model==='lite'?'lite':'pro');setQuality(job.model==='lite'?'720p':'1080p');setPrompt(job.prompt||'');setPromptOpen(true);setWorkspaceView('library');setGenerationMessage(tr('Creative settings copied. Choose a reference video and character photos to create a new draft.','Configurações copiadas. Escolha um vídeo e fotos para criar um novo projeto.','Ajustes copiados. Elige un vídeo y fotos para crear un nuevo proyecto.'))}}/>}
+     {workspaceView==='history'&&<VideoLibrary embedded activeJobId={libraryFocusId} optimisticJob={optimisticGeneration} onActiveJobStatus={onActiveJobStatus} onReuse={job=>{setModel(job.model==='lite'?'lite':'pro');setQuality(job.model==='lite'?'720p':'1080p');setPrompt(job.prompt||'');setPromptOpen(true);setWorkspaceView('library');setGenerationMessage(tr('Creative settings copied. Choose a reference video and character photos to create a new draft.','Configurações copiadas. Escolha um vídeo e fotos para criar um novo projeto.','Ajustes copiados. Elige un vídeo y fotos para crear un nuevo proyecto.'))}}/>}
      {workspaceView==='library'&&<>
      <header className="ks-library-hero"><div><span className="ks-eyebrow">K4K ORIGINALS / MOTION LIBRARY</span><h1>{tr('ONE VIDEO. ENDLESS POSSIBILITIES.','UM VÍDEO. INFINITAS POSSIBILIDADES.','UN VÍDEO. INFINITAS POSIBILIDADES.')}</h1><p>{tr('Keep the motion. Recast the characters. Turn the scene everyone is watching into the one they remember you for.','Mantenha o movimento. Troque os personagens. Transforme a cena que todos assistem na cena pela qual vão lembrar de você.','Conserva el movimiento. Cambia los personajes. Convierte la escena que todos ven en la que recordarán por ti.')}</p></div><video src={catalogue.trending[0].videoUrl} poster={catalogue.trending[0].posterUrl} muted autoPlay loop playsInline onClick={e=>{e.currentTarget.muted=!e.currentTarget.muted}} aria-label="K4K original video — tap for sound"/></header>
      <div hidden={!previewUrl} className={'ks-canvas'+(previewUrl?' ks-canvas-filled':'')}>
