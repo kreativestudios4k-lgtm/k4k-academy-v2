@@ -15,14 +15,15 @@ export async function GET(request){
  const auth=createClient(url,anon,{auth:{persistSession:false,autoRefreshToken:false}});
  const {data:{user}={},error}=await auth.auth.getUser(token);
  if(error||!user||user.is_anonymous)return respond({error:'UNAUTHENTICATED'},401);
- const jobId=new URL(request.url).searchParams.get('jobId');
+ const params=new URL(request.url).searchParams;
+ const jobId=params.get('jobId');
  if(!/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i.test(jobId??''))return respond({error:'INVALID_JOB'},400);
  const admin=createClient(url,secret,{auth:{persistSession:false,autoRefreshToken:false}});
  const jobStore=createGenerationJobStore({client:admin,enabled:true});
  const verifyOutput=createGenerationOutputVerifier({storage:admin.storage,enabled:true});
  const delivery=createGenerationOutputDelivery({jobStore,storage:admin.storage,verifyOutput,enabled:true});
  try{
-  const result=await delivery.getSignedUrl({userId:user.id,jobId});
+  const result=await delivery.getSignedUrl({userId:user.id,jobId,download:params.get('download')==='1'});
   return respond(result);
  }catch(error){
   if(['JOB_NOT_FOUND','JOB_NOT_COMPLETED','INVALID_OUTPUT_PATH','OUTPUT_NOT_VERIFIED','OUTPUT_NOT_FOUND','INVALID_OUTPUT_SIZE','INVALID_OUTPUT_TYPE'].includes(error.message))return respond({error:'OUTPUT_NOT_AVAILABLE'},404);
