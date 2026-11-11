@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {Upload,Film,Images,ArrowUpRight,ArrowRight,Sparkles,FolderOpen,Check,Plus,X,Play} from 'lucide-react';
 import PreviewShell from '../PreviewShell';
 import VideoLibrary from '../VideoLibrary';
+import CheckoutReturn from '../CheckoutReturn';
 import catalogue from '../template-catalogue.json';
 import {canConfirmGeneration,generationQuoteFeedback} from '../../../lib/generation-feedback.mjs';
 import {motionCreditPreview,maySubmitDisplayedQuote} from '../../../lib/generation-experience.mjs';
@@ -216,6 +217,7 @@ export default function Creator(){
   const previewUrl=video.url||selectedPreset?.videoUrl;
   const previewTitle=video.file?.name||selectedPreset?.title||tr('Your next scene starts here.','Sua próxima cena começa aqui.','Tu próxima escena empieza aquí.');
   return <PreviewShell active="Creator" studio>
+   <CheckoutReturn/>
    <div className={'ks k4k-creator-layout ks-view-'+workspaceView}>
     <aside className="ks-panel" aria-label="Video creation settings">
      <div className="ks-panel-title"><span><Sparkles size={17}/> {tr('Create video','Criar vídeo','Crear vídeo')}</span><span className="ks-preview-badge">PREVIEW</span></div>
@@ -251,7 +253,7 @@ export default function Creator(){
     </aside>
     <section className="ks-workspace" aria-label="Preview and inspiration">
      {workspaceView==='history'&&generationMessage&&<p className="ks-generation-feedback" role="status">{generationMessage}</p>}
-     <div className="ks-library-tabs" role="group" aria-label="Workspace view"><button type="button" aria-pressed={workspaceView==='history'} onClick={()=>{setWorkspaceView('history');loadHistory()}}><FolderOpen size={14}/>{tr('History','Histórico','Historial')}</button><button type="button" aria-pressed={workspaceView==='library'} onClick={()=>setWorkspaceView('library')}><Film size={14}/>{tr('Motion library','Biblioteca de movimentos','Biblioteca de movimiento')}</button><button type="button" aria-pressed={workspaceView==='guide'} onClick={()=>setWorkspaceView('guide')}>{tr('How it works','Como funciona','Cómo funciona')}</button></div>
+     <div className="ks-library-tabs" role="group" aria-label="Workspace view"><button type="button" aria-pressed={workspaceView==='history'} onClick={()=>{setWorkspaceView('history');loadHistory()}}><FolderOpen size={14}/>{tr('My library','Minha biblioteca','Mi biblioteca')}</button><button type="button" aria-pressed={workspaceView==='library'} onClick={()=>setWorkspaceView('library')}><Film size={14}/>{tr('Motion library','Biblioteca de movimentos','Biblioteca de movimiento')}</button><button type="button" aria-pressed={workspaceView==='guide'} onClick={()=>setWorkspaceView('guide')}>{tr('How it works','Como funciona','Cómo funciona')}</button></div>
      {workspaceView==='guide'&&<section className="ks-guide"><h2>{tr('Your next scene, in three steps.','Sua próxima cena, em três passos.','Tu próxima escena, en tres pasos.')}</h2><ol><li>{tr('Upload your motion reference video.','Envie seu vídeo de referência.','Sube tu vídeo de referencia.')}</li><li>{tr('Add clear photos of your characters.','Adicione fotos nítidas dos personagens.','Añade fotos claras de tus personajes.')}</li><li>{tr('Save your draft and review the generation cost.','Salve o projeto e confira o custo de geração.','Guarda tu proyecto y revisa el coste.')}</li></ol></section>}
      {workspaceView==='history'&&<VideoLibrary embedded activeJobId={libraryFocusId} optimisticJob={optimisticGeneration} onActiveJobStatus={onActiveJobStatus} onReuse={job=>{setModel(job.model==='lite'?'lite':'pro');setQuality(job.model==='lite'?'720p':'1080p');setPrompt(job.prompt||'');setPromptOpen(true);setWorkspaceView('library');setGenerationMessage(tr('Creative settings copied. Choose a reference video and character photos to create a new draft.','Configurações copiadas. Escolha um vídeo e fotos para criar um novo projeto.','Ajustes copiados. Elige un vídeo y fotos para crear un nuevo proyecto.'))}}/>}
      {workspaceView==='library'&&<>

@@ -6,6 +6,7 @@ import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,MessageCircle,X,H
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
 import catalogue from '../k4k-app/template-catalogue.json';
+import {studioDestination} from '../../lib/customer-routes.mjs';
 const featuredClips=[...catalogue.trending,...catalogue.topPerforming].filter(item=>item.videoUrl).slice(0,3);
 const videoHooks=['TURN ONE PHOTO INTO A SCENE','YOUR IDEAS. NOW IN MOTION.','CREATE THE NEXT VIRAL MOMENT'];
 
@@ -92,8 +93,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
   const requested=new URLSearchParams(window.location.search).get('next');
-  const safeNext=requested==='/k4k-app/credits'?requested:null;
-  const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':(safeNext||'/membership-required');
+  const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':studioDestination(requested);
    window.location.assign(next);
   }catch(err){
    const reason=String(err?.message||'');
@@ -117,7 +117,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   try{
    const supabase=createClient();
    const {error:oauthError}=await supabase.auth.signInWithOAuth({
-    provider:'google',options:{redirectTo:window.location.origin+'/auth/callback',queryParams:{prompt:'select_account'}}
+    provider:'google',options:{redirectTo:window.location.origin+'/auth/callback?next='+encodeURIComponent(studioDestination(new URLSearchParams(window.location.search).get('next'))),queryParams:{prompt:'select_account'}}
    });
    if(oauthError)throw oauthError;
   }catch{setError('Google login could not be started. Please use your email and password.');setBusy(false)}
@@ -143,7 +143,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
     </div>
     <p className="kx-showreel-footnote">Real template previews · Videos play muted on loop</p>
    </aside>
-   <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
+   <section className="k4k-auth-card" aria-label={registering?'Create K4K APP account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
     <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'YOUR ACCOUNT'}</div>
     <h1>{registering?'Create your account':'Welcome back to K4K'}</h1>
@@ -153,7 +153,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      {lookup==='loading'?<><RefreshCw size={19} className="k4k-auth-spin"/>Checking your Stripe payment…</>:
       <><span>{lookup==='pending'?'Your payment is still being confirmed.':'We could not retrieve your checkout email automatically.'} No second payment is needed.</span>
        <button type="button" onClick={verifyCheckout}>Check again <RefreshCw size={15}/></button>
-       <a href="mailto:hello@kreativestudios4k.com?subject=Paid%20Academy%20registration%20help">Already paid? Get help</a>
+       <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20registration%20help">Already paid? Get help</a>
       </>}
     </div>}
     {registering&&lookup==='verified'&&<p className="k4k-auth-success"><CheckCircle2 size={17}/> Payment confirmed. Your email is filled in.</p>}

@@ -16,13 +16,13 @@ export default function MobileTemplateFeed({waitlist=false,paused=false,onJoinWa
  const selected=list[Math.min(active,list.length-1)];
  const requiredPhotos=item=>Math.max(1,Math.min(30,Number(item?.requiredImages||item?.peopleCount||1)));
  const photoLabel=item=>requiredPhotos(item)===1?tr('photo','foto','foto'):tr('photos','fotos','fotos');
- const standardNavigation=[{href:'/k4k-app',icon:Home,label:tr('Discover','Início','Inicio'),current:true},{href:'/k4k-app/videos',icon:Film,label:tr('My videos','Vídeos','Vídeos')},{href:'/k4k-app/creator',icon:Sparkles,label:tr('Create','Criar','Crear'),special:true},{href:'/k4k-app/credits',icon:Coins,label:tr('Credits','Créditos','Créditos')},{href:'/k4k-app/account',icon:UserRound,label:tr('Account','Conta','Cuenta')}];
+ const standardNavigation=[{href:'/k4k-app/explore',icon:Home,label:tr('Discover','Início','Inicio'),current:true},{href:'/k4k-app/videos',icon:Film,label:tr('My videos','Vídeos','Vídeos')},{href:'/k4k-app/creator',icon:Sparkles,label:tr('Create','Criar','Crear'),special:true},{href:'/k4k-app/credits',icon:Coins,label:tr('Credits','Créditos','Créditos')},{href:'/k4k-app/account',icon:UserRound,label:tr('Account','Conta','Cuenta')}];
  const navigation=waitlist?[
  {href:'/k4k-app',icon:Home,label:tr('Home','Início','Inicio'),current:true},
  {href:'#all-videos',icon:Film,label:tr('Videos','Vídeos','Vídeos')},
  {href:'#priority-access',icon:Sparkles,label:tr('Join','Entrar','Unirme'),special:true},
  {href:'#release-date',icon:Coins,label:tr('Release','Lançamento','Lanzamiento')},
- {href:'/academy',icon:UserRound,label:'Academy'}
+ {href:'/login',icon:UserRound,label:tr('Sign in','Entrar','Entrar')}
  ]:standardNavigation;
  function navClick(event,item){if(waitlist&&item.href.startsWith('#')){event.preventDefault();if(item.href==='#all-videos')setTab('all');else onJoinWaitlist?.()}}
  function navigate(delta){const next=Math.max(0,Math.min(list.length-1,active+delta));scroll.current?.querySelector('[data-slide="'+next+'"]')?.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});setActive(next);setHasMoved(true);}

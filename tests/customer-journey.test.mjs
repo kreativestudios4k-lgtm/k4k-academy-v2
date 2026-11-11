@@ -21,7 +21,7 @@ test('all core customer routes exist',()=>{
 
 test('main navigation links to account, creator, projects, plans and support',()=>{
  const shell=read('app/k4k-app/PreviewShell.js');
- for(const href of ['/k4k-app','/k4k-app/videos','/k4k-app/creator','/k4k-app/credits','/k4k-app/account','/k4k-app/support'])
+ for(const href of ['/k4k-app/explore','/k4k-app/videos','/k4k-app/creator','/k4k-app/credits','/k4k-app/account','/k4k-app/support'])
   assert.ok(shell.includes(href),'Missing navigation '+href);
 });
 
@@ -51,16 +51,15 @@ test('checkout remains restricted to Stripe test keys and AI generation remains 
 
 test('public account registration does not promise paid generation',()=>{
  const register=read('app/k4k-app/register/page.js');
- assert.match(register,/AI generation remains disabled/);
+ assert.match(register,/Video generation uses credits/);
 });
 
-test('signup redirect lands on the public K4K account rather than Academy membership gate',()=>{
+test('signup and callback lead to the studio rather than the retired membership gate',()=>{
  const register=read('app/k4k-app/register/page.js');
  const callback=read('app/auth/callback/route.js');
- assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Faccount/);
- assert.match(callback,/\/k4k-app\/account/);
- assert.match(callback,/K4K_PUBLIC_DESTINATIONS\.has\(next\)/);
- assert.match(callback,/safeNext\|\|'\/membership-required'/);
+ assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Fcreator/);
+ assert.match(callback,/studioDestination\(searchParams.get\('next'\)\)/);
+ assert.doesNotMatch(callback,/membership-required/);
 });
 
 test('Stripe Checkout fails closed when membership status cannot be loaded',()=>{

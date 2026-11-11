@@ -28,7 +28,7 @@ export default function AccountStatus(){
   });
   return()=>{alive=false;clearInterval(timer);subscription.unsubscribe()};
  },[]);
- return <Link href={state.signedIn?'/k4k-app/credits':'/k4k-app/account'} className="k4k-account-status" aria-label={state.signedIn?'View your credits':'Sign in to K4K APP'}>
+ return <Link href={state.signedIn?'/k4k-app/credits':'/login?next=%2Fk4k-app%2Fcreator'} className="k4k-account-status" aria-label={state.signedIn?'View your credits':'Sign in to K4K APP'}>
   {state.signedIn?state.balance===null?'My credits':state.balance+' credits':state.ready?'Sign in':'Account'}
  </Link>;
 }
