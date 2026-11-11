@@ -10,8 +10,8 @@ test('creator saves all selected images and uses private reference storage',()=>
 });
 test('creator rejects stale attachments and requires an enabled quote before confirmation',()=>{
  assert.match(creator,/extraImages\.some\(\(item,i\)=>item\.file!==reference\.extraFiles\[i\]\)/);
- assert.match(creator,/generationQuote\.generationEnabled&&generationQuote\.quoteToken/);
- assert.match(creator,/Confirm generation/);
- assert.match(creator,/Review generation cost/);
+ assert.match(creator,/canConfirmGeneration\(generationQuote,/);
+ assert.match(creator,/Confirm & generate/);
+ assert.match(creator,/Generate video/);
  assert.match(creator,/credits_reserved:0/);
 });

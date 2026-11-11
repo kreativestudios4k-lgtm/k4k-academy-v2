@@ -6,6 +6,7 @@ import {Upload,Film,Images,ArrowUpRight,ArrowRight,Sparkles,FolderOpen,Check,Plu
 import PreviewShell from '../PreviewShell';
 import VideoLibrary from '../VideoLibrary';
 import catalogue from '../template-catalogue.json';
+import {canConfirmGeneration,generationQuoteFeedback} from '../../../lib/generation-feedback.mjs';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 
@@ -22,7 +23,7 @@ function useLocalPreview(){
 export default function Creator(){
  const {locale}=useK4KLocale();
  const video=useLocalPreview(),character=useLocalPreview();
- const [extraImages,setExtraImages]=useState([]),[activeTab,setActiveTab]=useState('Motion Transfer'),[quality,setQuality]=useState('1080p');
+ const [extraImages,setExtraImages]=useState([]),[activeTab,setActiveTab]=useState('Motion Transfer'),[quality,setQuality]=useState('720p');
  const extraUrlRegistry=useRef(new Set());
  useEffect(()=>()=>{extraUrlRegistry.current.forEach(url=>URL.revokeObjectURL(url));extraUrlRegistry.current.clear()},[]);
  function removeExtraImage(index){setExtraImages(old=>old.filter((item,i)=>{if(i===index){URL.revokeObjectURL(item.url);extraUrlRegistry.current.delete(item.url);}return i!==index;}));}
@@ -32,12 +33,14 @@ export default function Creator(){
  const [prompt,setPrompt]=useState('');
  const [workspaceView,setWorkspaceView]=useState('library'),[promptOpen,setPromptOpen]=useState(false),[templateSearch,setTemplateSearch]=useState(''),[preparing,setPreparing]=useState(false);
  useEffect(()=>{if(new URL(window.location.href).searchParams.get('view')==='history')setWorkspaceView('history')},[]);
- const [model,setModel]=useState('pro');
+ const [model,setModel]=useState('lite');
  const [preflightBusy,setPreflightBusy]=useState(false),[preflightResult,setPreflightResult]=useState(null),[preflightError,setPreflightError]=useState('');
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
  const [generationDraftId,setGenerationDraftId]=useState(null),[generationQuote,setGenerationQuote]=useState(null),[generationBusy,setGenerationBusy]=useState(false),[generationMessage,setGenerationMessage]=useState(''),[submittedJobId,setSubmittedJobId]=useState(null);
  const generationRequestKey=useRef(null);
+ const [quoteClock,setQuoteClock]=useState(Date.now);
+ useEffect(()=>{if(!generationQuote)return;const timer=setInterval(()=>setQuoteClock(Date.now()),1000);return()=>clearInterval(timer)},[generationQuote]);
  const generationActionRef=useRef(null);
  useEffect(()=>{if(!submittedJobId)return;const timer=setInterval(()=>{if(document.visibilityState==='visible')generationActionRef.current?.('refresh')},15000);return()=>clearInterval(timer)},[submittedJobId]);
  const [history,setHistory]=useState([]),[historyState,setHistoryState]=useState('');
@@ -79,13 +82,13 @@ export default function Creator(){
    if(error)throw error;
    setGenerationDraftId(data.id);setGenerationQuote(null);generationRequestKey.current=crypto.randomUUID();
    setDraftMessage('Draft saved: '+data.id+'. All '+reference.paths.length+' image attachments and your prompt are saved privately. Reference video saved privately when supplied. No generation started and no credits charged.');await loadHistory();return data.id;
-  }catch(e){setDraftMessage(e?.message||'Unable to save draft.')}finally{setSavingDraft(false)}
+  }catch(e){const message=e?.message||'Unable to save draft.';setDraftMessage(message);setGenerationMessage(message);}finally{setSavingDraft(false)}
  }
  async function generationAction(action,jobOverride=null){
   if(generationBusy)return;
   const jobId=jobOverride||(action==='refresh'?submittedJobId:generationDraftId);
   if(!jobId){setGenerationMessage('Save your reference media and draft before reviewing generation cost.');return;}
-  setGenerationBusy(true);setGenerationMessage('');
+  setGenerationBusy(true);setGenerationMessage('');if(action==='quote')setGenerationQuote(null);
   try{
    const {data:{session}}=await createClient().auth.getSession();
    if(!session?.access_token)throw Error('Sign in to continue.');
@@ -100,7 +103,7 @@ export default function Creator(){
    if(!response.ok)throw Error('Unable to continue.');
    if(action==='quote'){
     setGenerationQuote({...result,reviewedAt:Date.now()});
-    setGenerationMessage(result.blocker==='CREDIT_PRICING_NOT_APPROVED'?'The draft estimate is ready. Customer credit pricing still needs owner approval.':result.blocker==='GENERATION_DISABLED'?'Quote verified. Generation is awaiting owner activation.':'Review the credit cost below before generating.');
+    setGenerationMessage(generationQuoteFeedback(result,locale));
    }else if(action==='submit'){
     setSubmittedJobId(jobId);setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage(result.creditsRefunded?'The provider rejected this request. Reserved credits were refunded.':'Generation submitted. Credits reserved: '+result.creditsReserved+'.');await loadHistory();
    }else{if(['completed','failed','cancelled'].includes(result.status)){setSubmittedJobId(null);if(result.status==='completed')setWorkspaceView('history')}setGenerationMessage(result.creditsRefunded?'Generation failed. Reserved credits were refunded.':'Job status: '+result.status+(result.status==='awaiting_output'?' — private video delivery is pending.':''));await loadHistory();}
@@ -108,7 +111,7 @@ export default function Creator(){
   finally{setGenerationBusy(false);}
  }
  useEffect(()=>{generationActionRef.current=generationAction});
- useEffect(()=>{setGenerationDraftId(null);setGenerationQuote(null);generationRequestKey.current=null;},[model,quality,prompt,video.file,character.file,extraImages,selectedPreset]);
+ useEffect(()=>{setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage('');generationRequestKey.current=null;},[model,quality,prompt,video.file,character.file,extraImages,selectedPreset]);
  async function saveReference(){
   if(!character.file||uploading)return;
   if(!video.file&&!selectedPreset){setUploadMessage('Choose a template or upload a reference video first.');return;}
@@ -145,7 +148,7 @@ export default function Creator(){
    const reference={paths,videoPath,presetId:selectedPreset?.id||null,videoFile:video.file,userId:user.id,file:character.file,extraFiles:extraImages.map(item=>item.file)};
    setSavedReference(reference);
    setUploadMessage(files.length+' image(s)'+(videoPath?' and reference video':'')+' saved privately. No AI generation or credit charge occurred.');return reference;
-  }catch(e){setUploadMessage(e?.message||'Unable to save reference image.')}finally{setUploading(false)}
+  }catch(e){const message=e?.message||'Unable to save reference media.';setUploadMessage(message);setGenerationMessage(message);}finally{setUploading(false)}
  }
  useEffect(()=>{setPreflightResult(null);setPreflightError('')},[model,quality,video.file,character.file,extraImages]);
  const pt=locale==='pt',es=locale==='es';
@@ -201,7 +204,13 @@ export default function Creator(){
      <button type="button" className="ks-prompt-toggle" aria-expanded={promptOpen} aria-controls="ks-prompt" onClick={()=>setPromptOpen(!promptOpen)}>{tr('Prompt','Instruções','Instrucciones')}<span>{promptOpen?'On':'Off'}</span></button><label hidden={!promptOpen} className="ks-prompt-label" htmlFor="ks-prompt">{tr('Creative direction','Direção criativa','Dirección creativa')}<span>{tr('Optional','Opcional','Opcional')}</span></label><textarea hidden={!promptOpen} id="ks-prompt" className="ks-prompt" value={prompt} onChange={e=>setPrompt(e.target.value.slice(0,1200))} maxLength={1200} rows={4} placeholder={tr('Keep the movement. Change the character, wardrobe or world…','Mantenha o movimento. Mude o personagem, a roupa ou o cenário…','Mantén el movimiento. Cambia el personaje, la ropa o el escenario…')}/>
      {error&&<p role="alert" className="ks-error">{error}</p>}
      {(uploadMessage||draftMessage)&&<details className="ks-save-details"><summary>{tr('Save details','Detalhes','Detalles')}</summary><p role="status">{uploadMessage}</p><p role="status">{draftMessage}</p></details>}
-     <div className="ks-submit-area"><button type="button" className="ks-generate" disabled={generationBusy||preparing||uploading||!character.file||!previewUrl} onClick={prepareProject}><Sparkles size={17}/>{(generationBusy||preparing)?tr('Checking…','Verificando…','Verificando…'):tr('Review generation cost','Conferir custo','Revisar coste')}<ArrowRight size={17}/></button><p>{tr('Media is saved privately. Confirm credits before generating.','Arquivos salvos em privado. Confirme os créditos antes de gerar.','Archivos guardados en privado. Confirma los créditos antes de generar.')}</p></div>
+     <div className="ks-submit-area" aria-label="Generate video and credit confirmation">
+      {generationQuote&&<div className="ks-cost-review"><strong>{generationQuote.customerCredits===null?tr('Pricing unavailable','Preço indisponível','Precio no disponible'):generationQuote.customerCredits+' '+tr('credits','créditos','créditos')}</strong>{Number.isFinite(generationQuote.creditBalance)&&<span>{tr('Your balance: ','Seu saldo: ','Tu saldo: ')+generationQuote.creditBalance}</span>}<small>{canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote.reviewedAt))?tr('Quote valid for five minutes.','Custo válido por cinco minutos.','Coste válido durante cinco minutos.'):generationQuote.generationEnabled?tr('Quote expired. Review the cost again.','Custo expirado. Confira novamente.','El coste ha caducado. Revísalo de nuevo.'):tr('Generation blocked — see the message below.','Geração bloqueada — veja a mensagem abaixo.','Generación bloqueada — consulta el mensaje.')}</small></div>}
+      <button type="button" className="ks-generate" disabled={generationBusy||preparing||uploading||savingDraft||!!submittedJobId||!character.file||!previewUrl} onClick={canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?()=>generationAction('submit'):prepareProject}><Sparkles size={17}/>{(generationBusy||preparing)?tr('Checking…','Verificando…','Verificando…'):submittedJobId?tr('Generating…','Gerando…','Generando…'):canConfirmGeneration(generationQuote,Math.max(quoteClock,generationQuote?.reviewedAt||0))?tr('Confirm & generate','Confirmar e gerar','Confirmar y generar')+' · '+generationQuote.customerCredits+' '+tr('credits','créditos','créditos'):generationQuote?tr('Review cost again','Conferir custo novamente','Revisar coste de nuevo'):tr('Generate video','Gerar vídeo','Generar vídeo')}<ArrowRight size={17}/></button>
+      <p>{tr('Review the credit cost first. You are charged only after confirmation.','Confira o custo primeiro. A cobrança ocorre somente após confirmar.','Revisa primero el coste. Solo se cobra después de confirmar.')}</p>
+      {generationMessage&&<p className="ks-generation-feedback" role={generationQuote?.blocker?'alert':'status'} aria-live="polite">{generationMessage}</p>}
+      {submittedJobId&&<button type="button" className="ks-check-status" disabled={generationBusy} onClick={()=>generationAction('refresh')}>{tr('Check generation status','Verificar geração','Comprobar generación')}</button>}
+     </div>
     </aside>
     <section className="ks-workspace" aria-label="Preview and inspiration">
      <div className="ks-library-tabs" role="group" aria-label="Workspace view"><button type="button" aria-pressed={workspaceView==='history'} onClick={()=>{setWorkspaceView('history');loadHistory()}}><FolderOpen size={14}/>{tr('History','Histórico','Historial')}</button><button type="button" aria-pressed={workspaceView==='library'} onClick={()=>setWorkspaceView('library')}><Film size={14}/>{tr('Motion library','Biblioteca de movimentos','Biblioteca de movimiento')}</button><button type="button" aria-pressed={workspaceView==='guide'} onClick={()=>setWorkspaceView('guide')}>{tr('How it works','Como funciona','Cómo funciona')}</button></div>
@@ -213,14 +222,9 @@ export default function Creator(){
       {previewUrl?<><video key={previewUrl} src={previewUrl} controls playsInline preload="metadata" poster={selectedPreset?.posterUrl||undefined} aria-label="Reference video preview"/><div className="ks-canvas-caption"><span>REFERENCE PREVIEW</span><strong>{previewTitle}</strong></div></>:<div className="ks-canvas-empty"><div className="ks-empty-icon"><Film size={28}/><span>✦</span></div><span className="ks-eyebrow">FROM REFERENCE TO REINVENTION</span><h2>{tr('One scene.','Uma cena.','Una escena.')}<br/><em>{tr('Your entire imagination.','Toda a sua imaginação.','Toda tu imaginación.')}</em></h2><p>{tr('Add a reference video and your character photos. Keep the movement. Give it a new identity.','Adicione um vídeo de referência e fotos dos personagens. Mantenha o movimento. Dê uma nova identidade.','Añade un vídeo y fotos de tus personajes. Conserva el movimiento. Dale una nueva identidad.')}</p><label htmlFor="ks-video" className="ks-canvas-upload"><Upload size={15}/>{tr('Upload your reference','Enviar referência','Subir referencia')}</label><small>{tr('Your preview appears here','Sua prévia aparece aqui','Tu vista previa aparece aquí')}</small></div>}
       <div className="ks-canvas-meta"><span><i/> {model==='lite'?'MOTION LITE':'MOTION PRO'}</span><span>{quality} · {referenceCount} {tr('references','referências','referencias')}</span></div>
      </div>
-     <section className="ks-confirmation" aria-label="Generation confirmation">
-      {generationQuote&&<><div><span className="ks-eyebrow">{tr('YOUR GENERATION','SUA GERAÇÃO','TU GENERACIÓN')}</span><h3>{generationQuote.customerCredits===null?tr('Pricing awaiting approval','Preço aguardando aprovação','Precio pendiente de aprobación'):generationQuote.customerCredits+' credits'}</h3><p>{tr('Quote valid for five minutes. Verified failures refund reserved credits.','Custo válido por cinco minutos. Falhas confirmadas devolvem os créditos.','Coste válido por cinco minutos. Los fallos confirmados devuelven los créditos.')}</p></div>{generationQuote.generationEnabled&&generationQuote.quoteToken&&<button type="button" disabled={generationBusy} onClick={()=>generationAction('submit')}>Confirm generation · {generationQuote.customerCredits} credits <ArrowRight size={15}/></button>}</>}
-      {generationMessage&&<p role="status" aria-live="polite">{generationMessage}</p>}
-      {submittedJobId&&<button type="button" disabled={generationBusy} onClick={()=>generationAction('refresh')}>{tr('Check generation status','Verificar geração','Comprobar generación')}</button>}
-     </section>
      <section className="ks-inspiration"><div className="ks-section-heading"><div><span className="ks-eyebrow">THE STARTING POINT</span><h2>{tr('Borrow the motion. Own the idea.','Inspire-se no movimento. Crie sua ideia.','Toma el movimiento. Haz tuya la idea.')}</h2></div><Link href="/k4k-app/explore">{tr('Explore all','Explorar todos','Explorar todo')}<ArrowUpRight size={15}/></Link></div><div className="ks-template-tools"><div role="group" aria-label="Motion library filter"><button type="button" aria-pressed={presetFilter!=='short'} onClick={()=>setPresetFilter('trending')}>{tr('K4K originals','Originais K4K','Originales K4K')}</button><button type="button" aria-pressed={presetFilter==='short'} onClick={()=>setPresetFilter('short')}>{tr('15 seconds or less','Até 15 segundos','Hasta 15 segundos')}</button></div><input aria-label="Search motion templates" placeholder={tr('Search scenes…','Buscar cenas…','Buscar escenas…')} value={templateSearch} onChange={e=>setTemplateSearch(e.target.value)}/></div><div className="ks-template-grid">{catalogue.trending.filter(preset=>(presetFilter!=='short'||preset.durationSeconds<=15)&&preset.title.toLowerCase().includes(templateSearch.toLowerCase())).map(preset=><button type="button" key={preset.id} className={'ks-template'+(selectedPreset?.id===preset.id?' selected':'')} aria-pressed={selectedPreset?.id===preset.id} onClick={()=>{setSelectedPreset(preset);setWorkspaceView('library');video.setFile(null);setSavedReference(null);setDraftMessage('')}}><div><video src={preset.videoUrl} muted playsInline preload="metadata" poster={preset.posterUrl||undefined} onMouseEnter={e=>e.currentTarget.play().catch(()=>{})} onMouseLeave={e=>e.currentTarget.pause()}/><span><Play size={12}/>{Math.round(preset.durationSeconds)}s</span></div><strong>{preset.title}</strong><small>{preset.requiredImages} {tr('reference photos','fotos de referência','fotos de referencia')}</small></button>)}</div></section>
      <details className="ks-history"><summary><FolderOpen size={16}/>{tr('Saved drafts & activity','Projetos salvos e atividade','Proyectos guardados y actividad')}</summary><button type="button" onClick={loadHistory}>{tr('Refresh history','Atualizar histórico','Actualizar historial')}</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}><span>{job.model==='lite'?'Motion Lite':'Motion Pro'}</span><span>{job.status}</span></p>)}</details>
-     <p className="ks-status-note">{tr('Preview workspace · AI generation is disabled until activation. No credits are charged for preparing a draft.','Estúdio em prévia · geração de IA aguardando ativação. Preparar projetos não consome créditos.','Estudio en vista previa · generación pendiente de activación. Preparar proyectos no consume créditos.')}</p>
+     <p className="ks-status-note">{tr('Preview workspace · generation availability and credit cost are checked before confirmation.','Estúdio em prévia · disponibilidade e custo verificados antes da confirmação.','Estudio en vista previa · disponibilidad y coste verificados antes de confirmar.')}</p>
      </>}
     </section>
    </div>

@@ -1,4 +1,4 @@
-import {generationEnvironmentAllowed,generationUserAllowed,generationProviderEnabled} from '../../../../../lib/server/generation-policy.mjs';
+import {generationEnvironmentAllowed,generationUserAllowed,generationProviderEnabled,generationAccountBlocker} from '../../../../../lib/server/generation-policy.mjs';
 import {generationContext,prepareGenerationInput,generationError} from '../../../../../lib/server/generation-route-context.mjs';
 import {createGenerationProvider,generationProviderName,generationSigningSecret} from '../../../../../lib/server/generation-provider.mjs';
 import {generationCredits,draftFingerprint,quoteSigner} from '../../../../../lib/server/generation-quote.mjs';
@@ -21,6 +21,10 @@ export async function POST(request){
   const testAuthorized=generationUserAllowed(user.id,process.env,providerName);
   const budget=Number(process.env.K4K_GENERATION_MAX_USD);
   const budgetApproved=Number.isFinite(budget)&&budget>0&&budget<=5&&usd<=budget;
-  return Response.json({jobId:job.id,tier:job.model,resolution,provider:providerName,providerAuthenticated:estimate.providerAuthenticated??true,providerQuoteVerified:estimate.providerQuoteVerified,providerRateCardVerified:estimate.providerRateCardVerified,pricingMode:estimate.pricingMode,estimatedProviderUsd:usd,customerCredits:credits,quoteToken,expiresInSeconds:quoteToken?300:null,generationEnabled:generationEnabled&&testAuthorized&&budgetApproved&&!!quoteToken,blocker:blocker||(!generationEnabled?'GENERATION_DISABLED':!testAuthorized?'TEST_GENERATION_NOT_AUTHORIZED':!budgetApproved?'PROVIDER_BUDGET_BLOCKED':null),creditsReserved:0},{headers:{'Cache-Control':'no-store'}});
+  const {data:account,error:accountError}=await database.from('studio_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
+  if(accountError)throw Error('UNAVAILABLE');
+  const creditBalance=account?.balance??0;
+  const accountBlocker=generationAccountBlocker({balance:creditBalance,billingHold:account?.billing_hold,credits});
+  return Response.json({jobId:job.id,tier:job.model,resolution,provider:providerName,providerAuthenticated:estimate.providerAuthenticated??true,providerQuoteVerified:estimate.providerQuoteVerified,providerRateCardVerified:estimate.providerRateCardVerified,pricingMode:estimate.pricingMode,estimatedProviderUsd:usd,customerCredits:credits,creditBalance,quoteToken,expiresInSeconds:quoteToken?300:null,generationEnabled:generationEnabled&&testAuthorized&&budgetApproved&&!!quoteToken&&!accountBlocker,blocker:blocker||(!generationEnabled?'GENERATION_DISABLED':!testAuthorized?'TEST_GENERATION_NOT_AUTHORIZED':!budgetApproved?'PROVIDER_BUDGET_BLOCKED':accountBlocker),creditsReserved:0},{headers:{'Cache-Control':'no-store'}});
  }catch(error){return generationError(error)}
 }
