@@ -33,10 +33,15 @@ test('dark background and input themes are present in the account workspace',()=
  assert.match(css,/\.k4k-light \.k4k-card/);
 });
 
-test('K4K homepage provides original template discovery and customer routes',()=>{
+test('K4K waitlist homepage preserves the separate template discovery routes',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/MobileTemplateFeed/);
+ assert.match(homepage,/WaitlistLanding/);
+ assert.match(homepage,/4 December 2026/);
+ const waitlist=source('app/k4k-app/WaitlistLanding.js');
+ assert.match(waitlist,/Get priority access/);
+ assert.match(waitlist,/href="\/academy"/);
+ assert.match(waitlist,/consent/);
  assert.match(source('app/k4k-app/explore/page.js'),/MobileTemplateFeed/);
  assert.match(feed,/template-catalogue\.json/);
  assert.match(feed,/kf-scroll/);

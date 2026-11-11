@@ -16,6 +16,7 @@ function json(body, status) {
 // Creates a Stripe test-mode subscription Checkout session for a signed-in user.
 // The browser sends only plan and currency. The price is resolved on the server.
 export async function POST(request) {
+  if(process.env.K4K_WAITLIST_ONLY==='true')return Response.json({error:'WAITLIST_ONLY'},{status:503});
   const token = request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   if (!token) return json({error: 'UNAUTHENTICATED'}, 401);
 

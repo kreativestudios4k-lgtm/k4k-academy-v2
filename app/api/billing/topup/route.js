@@ -6,6 +6,7 @@ import {stripeCheckoutDestination} from '../../../../lib/stripe-checkout-destina
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request){
+ if(process.env.K4K_WAITLIST_ONLY==='true')return Response.json({error:'WAITLIST_ONLY'},{status:503});
  try{
   const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   if(!token)return json({error:'UNAUTHENTICATED'},401);

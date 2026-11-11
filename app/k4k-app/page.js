@@ -1,3 +1,3 @@
-import MobileTemplateFeed from './MobileTemplateFeed';
-export const metadata={title:'K4K APP — Don’t just scroll. Steal the scene.',description:'Find your next scene in K4K’s video-first template feed. Explore references, add your characters and prepare your own version.'};
-export default function StudioHome(){return <MobileTemplateFeed/>;}
+import WaitlistLanding from './WaitlistLanding';
+export const metadata={title:{absolute:'K4K APP — Your next viral video starts here'},description:'K4K APP is coming. Planned launch: 4 December 2026. Join the free waitlist for priority access to AI video creation, motion transfer and creative templates.',openGraph:{title:'K4K APP — Your next viral video starts here',description:'Planned launch 4 December 2026. Join the waitlist for priority access.',siteName:'K4K APP'},twitter:{card:'summary_large_image',title:'K4K APP — Join the waitlist',description:'Your ideas. Your characters. A whole new story. Planned launch: 4 December 2026.'}};
+export default function StudioHome(){return <WaitlistLanding/>}
