@@ -8,9 +8,10 @@ test('model accepts supported inputs and rejects invalid references',()=>{
  assert.throws(()=>validateGenjutsuLightInput({...input,resolution:'4k'}));
  assert.throws(()=>validateGenjutsuLightInput({...input,video_url:'http://example.com/video.mp4'}));
  assert.throws(()=>validateGenjutsuLightInput({...input,image_urls:Array(9).fill('https://example.com/x.png')}));
+ assert.throws(()=>estimateGenjutsuLightCost({resolution:'720p',outputSeconds:5}),/duration or resolution/);
 });
 test('billing estimate includes rounded output seconds',()=>{
- assert.equal(estimateGenjutsuLightCost({resolution:'720p',outputSeconds:14.2}),1.5);
+ assert.equal(estimateGenjutsuLightCost({resolution:'720p',outputSeconds:14.2,referenceSeconds:14.2}),2.92);
  assert.equal(estimateGenjutsuLightCost({resolution:'480p',outputSeconds:10,referenceSeconds:5}),0.75);
 });
 test('provider fails closed without explicit enablement',async()=>{
