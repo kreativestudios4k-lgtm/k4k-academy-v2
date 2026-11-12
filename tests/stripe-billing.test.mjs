@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHmac} from 'node:crypto';
 import {PLAN_PRICES, PLAN_CURRENCIES} from '../lib/k4k-plan-prices.mjs';
-import {assertTestModeKey, buildCheckoutForm, resolvePrice, verifyStripeSignature} from '../lib/server/stripe-billing.mjs';
+import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice, verifyStripeSignature} from '../lib/server/stripe-billing.mjs';
 
 const SECRET = 'whsec_test_secret';
 const PAYLOAD = '{"id":"evt_1","type":"invoice.paid"}';
@@ -37,6 +37,13 @@ test('only test-mode keys are accepted', () => {
   assert.throws(() => assertTestModeKey('sk_live_abc'), /test key/);
   assert.throws(() => assertTestModeKey('rk_live_abc'), /test key/);
   assert.throws(() => assertTestModeKey(undefined), /test key/);
+});
+
+test('Checkout origin is derived only from a trusted Preview deployment host', () => {
+  assert.equal(previewDeploymentOrigin({vercelEnv: 'preview', vercelUrl: 'k4k-preview-123.vercel.app'}), 'https://k4k-preview-123.vercel.app');
+  assert.throws(() => previewDeploymentOrigin({vercelEnv: 'production', vercelUrl: 'k4k.example.com'}), /Preview environment/);
+  assert.throws(() => previewDeploymentOrigin({vercelEnv: 'preview', vercelUrl: 'attacker.example/path'}), /Invalid Preview deployment URL/);
+  assert.throws(() => previewDeploymentOrigin({vercelEnv: 'preview', vercelUrl: 'attacker.example@evil.example'}), /Invalid Preview deployment URL/);
 });
 
 test('a correctly signed, fresh webhook verifies', () => {
