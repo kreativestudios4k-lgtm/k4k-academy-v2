@@ -1,6 +1,3 @@
-import MobileTemplateFeed from './MobileTemplateFeed';
-export const metadata={title:{absolute:'K4K APP — Don’t just scroll. Steal the scene.'},description:'Find your next scene in K4K’s video-first template feed. Explore references, add your characters and create your own version.',openGraph:{title:'K4K APP — Don’t just scroll. Steal the scene.',description:'Your ideas. Your characters. A whole new story.',siteName:'K4K APP'},twitter:{card:'summary_large_image',title:'K4K APP — Create · Swap · Generate',description:'Your ideas. Your characters. A whole new story.'}};
-// The live homepage is the template feed. The waitlist landing and its
-// release-date banner are no longer shown; the components stay in the
-// repository, unused, in case a pre-launch page is needed again.
-export default function StudioHome(){return <MobileTemplateFeed/>;}
+import CinematicLaunch from './CinematicLaunch';
+export const metadata={title:{absolute:'K4K APP — Don’t follow the trend. Create it.'},description:'Discover K4K Originals and the next chapter of K4K APP. Planned release 4 December 2026.',openGraph:{title:'K4K APP — Don’t follow the trend. Create it.',description:'Your imagination. Your characters. Your next viral video.',siteName:'K4K APP'},twitter:{card:'summary_large_image',title:'K4K APP — Create it.',description:'K4K Originals. Planned release 4 December 2026.'}};
+export default function StudioHome(){return <CinematicLaunch/>;}
