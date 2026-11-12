@@ -77,3 +77,13 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
+
+test('cinematic desktop navigation cannot cover authentication actions',()=>{
+ const css=source('app/k4k-app/cinematic-launch.css');
+ assert.match(css,/\.kc-header \.kc-desktop-nav\{position:static;inset:auto;width:auto;height:auto/);
+ assert.match(css,/\.kc-header-right\{position:relative;z-index:2;min-width:0;pointer-events:auto\}/);
+ assert.match(css,/\.kc-auth-dialog:not\(\[open\]\)\{display:none\}/);
+ const launch=source('app/k4k-app/CinematicLaunch.js');
+ assert.match(launch,/className="kc-login" onClick=\{\(\)=>setAuthOpen\(true\)\}/);
+ assert.match(launch,/className="kc-join" href="\/k4k-app\/register"/);
+});
