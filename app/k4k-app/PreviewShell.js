@@ -4,6 +4,7 @@ import {useState} from 'react';
 import {MessageCircle,X,Mail,HelpCircle} from 'lucide-react';
 import './preview.css';
 import AccountStatus from './AccountStatus';
+import HiggsfieldKeyManager from './HiggsfieldKeyManager';
 import {useK4KLocale} from './locale';
 
 const navigation=[
@@ -24,7 +25,7 @@ export default function PreviewShell({active,children}){
  return <div className="k4k-light">
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/k4k-app"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
-   <nav aria-label="Customer links"><AccountStatus/></nav>
+   <nav aria-label="Customer links"><HiggsfieldKeyManager/><AccountStatus/></nav>
   </header>
   <main className="k4k-light-main">{children}</main>
   <div className="k4k-support-dock"><button type="button" className="k4k-support-fab" aria-label={supportOpen?"Close support":"Open support"} aria-expanded={supportOpen} aria-controls="k4k-support-panel" onClick={()=>setSupportOpen(v=>!v)}>{supportOpen?<X size={23}/>:<MessageCircle size={23}/>}<span>Support</span></button>{supportOpen&&<section className="k4k-support-panel" id="k4k-support-panel" aria-label="K4K support"><div className="k4k-support-panel-head"><strong>How can we help?</strong><button type="button" aria-label="Close support" onClick={()=>setSupportOpen(false)}><X size={19}/></button></div><p>Choose an option below. Our team responds by email.</p><a href="/k4k-app/support"><HelpCircle size={18}/> Help centre & FAQs</a><a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20Support"><Mail size={18}/> Email K4K support</a><small>Do not share passwords or payment card details.</small></section>}</div>
