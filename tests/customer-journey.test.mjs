@@ -78,6 +78,8 @@ test('public K4K signup continues to the selected plan page after email confirma
  assert.match(subscribe,/\/signup\?next=/);
  assert.match(credits,/\/signup\?next=%2Fk4k-app%2Fcredits/);
  assert.match(auth,/\/signup\?next=%2Fpricing/);
+ assert.match(auth,/'\/k4k-app\/videos'/);
+ assert.match(auth,/'\/k4k-app\/account'/);
  assert.match(pricing,/currencyForCountry/);
  assert.match(pricing,/optional learning space/);
 });
