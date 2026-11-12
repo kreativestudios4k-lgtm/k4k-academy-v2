@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
+import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 
 export const runtime = 'nodejs';
@@ -14,6 +14,7 @@ function json(body, status) {
 // Creates a Stripe test-mode subscription Checkout session for a signed-in user.
 // The browser sends only plan and currency. The price is resolved on the server.
 export async function POST(request) {
+  if (process.env.VERCEL_ENV !== 'preview') return json({error: 'PREVIEW_ONLY'}, 403);
   const token = request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   if (!token) return json({error: 'UNAUTHENTICATED'}, 401);
 
@@ -62,10 +63,15 @@ export async function POST(request) {
     return json({error: 'ALREADY_SUBSCRIBED'}, 409);
   }
 
-  // Keep Stripe test Checkout returning to this exact Preview deployment rather
-  // than a shared production site URL. Do not trust a client-supplied origin.
-  const requestUrl = new URL(request.url);
-  const origin = requestUrl.origin;
+  // Bind success/cancel URLs to Vercel's trusted deployment host, not the
+  // incoming Host header. This route is Preview-only and cannot redirect Checkout
+  // back to a caller-controlled or production origin.
+  let origin;
+  try {
+    origin = previewDeploymentOrigin({vercelEnv: process.env.VERCEL_ENV, vercelUrl: process.env.VERCEL_URL});
+  } catch {
+    return json({error: 'PREVIEW_URL_UNAVAILABLE'}, 503);
+  }
   let res;
   try {
     res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
