@@ -3,7 +3,7 @@
 **Target repository:** `kreativestudios4k-lgtm/k4k-academy-v2`  
 **Target branch:** `integration/k4k-billing-checkout-20261107`  
 **Latest verified application source/test commit:** `9c9f98f7cb9e7bf2dd7d91fc201df36a37904dcb`  
-**Latest verified Preview deployment (including readiness documentation):** READY — `https://kreativestudios4k-site-8a36q1wox-kreative-studios4k.vercel.app`  
+**Verified application-code Preview deployment (source/test commit above):** READY — `https://kreativestudios4k-site-8a36q1wox-kreative-studios4k.vercel.app`  
 **Launch verdict:** NOT READY — payment, credit, and provider-generation end-to-end checks remain unverified.
 
 ## Product and customer journey
