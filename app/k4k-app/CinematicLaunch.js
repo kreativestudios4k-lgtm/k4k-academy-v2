@@ -35,13 +35,13 @@ export default function CinematicLaunch(){
  useEffect(()=>{const media=window.matchMedia('(prefers-reduced-motion: reduce)');if(media.matches)setPaused(true);},[]);
  return <div className="kc-launch">
  <header className="kc-header"><div className="kc-nav-inner">
-  <Link href="/" className="kc-logo" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/><span className="kc-wordmark">K4K<span>APP</span></span></Link>
+  <Link href="/" className="kc-logo" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/><span className="kc-brand-lockup"><span className="kc-wordmark">K4K<span> APP</span></span><span className="kc-brand-byline">by KreativeStudios4K</span></span></Link>
   <nav className="kc-desktop-nav" aria-label="Main navigation"><a href="#showcase">{tr('Showcase','Vitrine','Galería')}</a><a href="#release">{tr('Launch','Lançamento','Lanzamiento')}</a><Link href="/academy">Academy</Link></nav>
   <div className="kc-header-right"><label className="kc-language"><Globe2 size={15}/><select aria-label={tr('Language','Idioma','Idioma')} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label><Link className="kc-login" href="/k4k-app/account">{tr('Sign in','Entrar','Entrar')}<ArrowUpRight size={15}/></Link><button className="kc-menu-toggle" type="button" aria-label={menuOpen?'Close menu':'Open menu'} aria-expanded={menuOpen} aria-controls="kc-mobile-nav" onClick={()=>setMenuOpen(v=>!v)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button></div>
  </div>{menuOpen&&<nav id="kc-mobile-nav" className="kc-mobile-nav" aria-label="Mobile navigation"><a href="#showcase" onClick={()=>setMenuOpen(false)}>{tr('Showcase','Vitrine','Galería')}</a><a href="#release" onClick={()=>setMenuOpen(false)}>{tr('Launch','Lançamento','Lanzamiento')}</a><Link href="/academy" onClick={()=>setMenuOpen(false)}>Academy</Link><Link href="/k4k-app/account" onClick={()=>setMenuOpen(false)}>{tr('Sign in','Entrar','Entrar')}</Link></nav>}</header>
  <main>
  <section className="kc-hero">
- <div className="kc-kicker"><i/> KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
+ <div className="kc-kicker"><i/> BY KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
  <h1><span>{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}</span><span>{tr('THE TREND.','A TENDÊNCIA.','LA TENDENCIA.')}</span><em>{tr('CREATE IT.','CRIE A SUA.','CRÉALA.')}</em></h1>
  <p>{tr('Your imagination. Your characters. Your next viral video.','Sua imaginação. Seus personagens. Seu próximo vídeo viral.','Tu imaginación. Tus personajes. Tu próximo vídeo viral.')}</p>
  <a className="kc-release" href="#release"><span>{tr('PLANNED RELEASE','LANÇAMENTO PREVISTO','LANZAMIENTO PREVISTO')}</span><strong>04.12.2026</strong><ArrowUpRight size={22}/></a>
