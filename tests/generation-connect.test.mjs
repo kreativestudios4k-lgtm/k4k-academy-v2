@@ -9,7 +9,7 @@ const env={K4K_GENERATION_TEST_USERS:user,VERCEL_ENV:'preview',HF_CREDENTIALS:'o
 const job={id:jobId,user_id:user,status:'draft',model:'pro',reference_paths:['owned.jpg'],reference_video_path:'owned.mp4',prompt:''};
 function setup({newlyReserved=true,providerError=false,usd=1.2}={}){
  const calls=[];
- const database={rpc:async(name,args)=>{calls.push({name,args});return {data:{newly_reserved:newlyReserved,status:'reserved'}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>{calls.push({name:'record'});return {data:{id:jobId,user_id:user,provider_job_id:'provider_job',status:'processing'}}}})})})})})})})};
+ const database={rpc:async(name,args)=>{calls.push({name,args});return {data:{newly_reserved:newlyReserved,status:name==='k4k_generation_finish'?'refunded':'reserved'}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>{calls.push({name:'record'});return {data:{id:jobId,user_id:user,provider_job_id:'provider_job',status:'processing'}}}})})})})})})})};
  const provider={estimate:async()=>{calls.push({name:'estimate'});return {usd}},submit:async(tier,payload,options)=>{calls.push({name:'submit',options});if(providerError){const error=Error('timeout');if(typeof providerError==='number')error.httpStatus=providerError;throw error;}return {request_id:'provider_job'}}};
  const token=quoteSigner(env.HF_CREDENTIALS).issue({userId:user,jobId,resolution:'720p',usd:1.2,credits:12,fingerprint:draftFingerprint(job,'720p')});
  const run=createGenerationSubmitService({database,provider,prepare:async()=>input,env});
@@ -68,7 +68,7 @@ test('changed price and changed draft fail before reservation or submission',asy
 });
 test('wrong owner and non-draft jobs never reserve credits',async()=>{
  const {run,args,calls}=setup();await assert.rejects(run({...args,userId:key}),/INVALID_JOB/);
- await assert.rejects(run({...args,job:{...job,status:'processing'}}),/JOB_NOT_DRAFT/);assert.equal(calls.length,0);
+ const replay=await run({...args,job:{...job,status:'processing'}});assert.equal(replay.replayed,true);assert.equal(replay.status,'processing');assert.equal(calls.length,0);
 });
 test('ambiguous provider submission preserves reservation without a refund or retry',async()=>{
  const {run,args,calls}=setup({providerError:true});await assert.rejects(run(args),/PROVIDER_SUBMISSION_UNCERTAIN/);
