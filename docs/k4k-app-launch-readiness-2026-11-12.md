@@ -2,8 +2,8 @@
 
 **Target repository:** `kreativestudios4k-lgtm/k4k-academy-v2`  
 **Target branch:** `integration/k4k-billing-checkout-20261107`  
-**Latest verified feature/test commit:** `2950bf242017337fa39b571c2bf0b77eb2bfda07`  
-**Latest verified Preview deployment at that commit:** READY  
+**Latest verified source/test commit:** `90648614bec5492fb8cb26ededb42165233eb9cd`  
+**Latest verified Preview deployment:** READY — `https://kreativestudios4k-site-7bj3no4mk-kreative-studios4k.vercel.app`  
 **Launch verdict:** NOT READY — payment, credit, and provider-generation end-to-end checks remain unverified.
 
 ## Product and customer journey
@@ -68,6 +68,43 @@ Read-only integration checks:
 
 **Blocker:** Stripe TEST checkout, tax configuration, webhook delivery/idempotency, and first-payment/renewal credit provisioning still need an isolated test-mode run. The code being present is not proof that the connected Stripe account and price IDs are correct.
 
+## Current-run verification and billing hardening — 12 November 2026
+
+At source commit `90648614bec5492fb8cb26ededb42165233eb9cd`:
+
+- Vercel Preview state: `READY`.
+- Build events show `npm run test:all` followed by `Build Completed`; no failing test or build error appeared in the returned log window. The exact test count was not exposed in the returned log excerpt.
+- Deployed `/signup`, `/pricing`, and `/k4k-app/credits` returned HTTP 200.
+- Deployed `/api/generation/provider-readiness` returned HTTP 200 and reported `generationEnabled: false`, `providerAuthenticated: false`, `providerQuoteVerified: false`, `customerPricingApproved: false`, and `testReady: false`.
+- GET requests to the POST-only checkout and webhook routes returned HTTP 405, as expected. No authenticated checkout POST or signed webhook event was sent.
+
+### Stripe webhook ordering fix
+
+A concrete race was found in the webhook handler: Stripe can deliver `invoice.paid` after `checkout.session.completed` but before `customer.subscription.created`. The previous code treated the missing `stripe_subscription_id` as stale, then marked the invoice event processed. That could permanently lose first-payment credits.
+
+The Preview branch now:
+- Detects an invoice whose subscription has not yet been linked and returns a retryable error instead of marking the event processed.
+- Continues to ignore genuinely older invoices for a replaced subscription when a newer membership event is already recorded.
+- Adds regression coverage for the early-invoice retry/replay path and the replaced-subscription stale path.
+
+### Stripe Preview-only guard
+
+- Checkout and the K4K APP subscription webhook now reject requests outside `VERCEL_ENV=preview`.
+- Both require a Stripe `sk_test_` key.
+- Checkout success/cancel URLs now derive from Vercel's trusted `VERCEL_URL`, not the inbound Host header; invalid or missing deployment hosts fail closed.
+- Unit and customer-journey source tests cover these restrictions.
+- These changes do not enable live checkout and do not alter Academy's separate billing flow.
+
+### Higgsfield documentation and model-catalog verification
+
+Official shared docs currently specify `https://api.higgsfield.ai` and `Authorization: Key KEY_ID:KEY_SECRET`. The Genjutsu Light model API reference page also contains a conflicting legacy example using `Bearer` and a different SDK package, while its current Playground sample and shared docs use the Key credential scheme. K4K retains the user-requested `Key` scheme and does not treat the conflicting page as proof of account authentication.
+
+The official Wan 3.0 Prime Reference-to-Video page documents model ID `alibaba/wan-3.0-prime/reference-to-video`, endpoint `https://api.higgsfield.ai/alibaba/wan-3.0-prime/reference-to-video`, prompt, duration, image/video references, resolution, aspect ratio, audio and thinking parameters. This is documented model availability only; access with the K4K API credential is not verified.
+
+The connected Higgsfield application catalog exposes additional video models including Seedance, Kling, Wan, Genjutsu and others. That connector catalog is not proof of the developer API account's entitlements. The current K4K Creator UI still exposes only its two existing Lite/Pro motion-transfer choices; the wider model-catalog requirement remains open. Do not silently map or remove models until each model-specific endpoint/schema and the intended K4K operation are verified.
+
+**No provider request was submitted.** No billable generation, test generation, or credential authentication probe was run in this verification pass.
+
 ## Read-only Supabase snapshot
 
 Project: `KreativeStudios4k Academy` (`eu-west-2`). No SQL writes, migrations, account changes, or balance changes were made.
@@ -104,6 +141,8 @@ These are point-in-time counts, not a migration or entitlement reconciliation. E
 - Updated customer-facing signup links from the legacy registration route to `/signup`.
 - Corrected Genjutsu/Genjutsu Light rate-card estimates and Genjutsu Light reference-video billing.
 - Added customer-journey and provider-cost regression tests.
+- Fixed the out-of-order Stripe invoice/subscription delivery race and added regression tests.
+- Restricted K4K APP checkout and subscription webhook routes to Preview plus Stripe test-mode keys, and pinned checkout return URLs to the trusted deployment host.
 - Updated the repository README to document K4K APP as the primary product and preserve Academy.
 
 All code changes were committed only to the target Preview branch. No merge to `main`, production deployment, live Stripe action, database mutation, customer contact, or billable AI request occurred.
