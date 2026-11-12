@@ -71,3 +71,13 @@
 
 .kc-auth-dialog .kc-auth-error p{color:#ffc0b8!important;text-align:left}
 .kc-auth-dialog .kc-auth-error a{display:inline-block;margin-top:8px;color:#fff!important;text-decoration:underline!important;font-size:12px}
+
+/* Scope legacy global nav positioning: an absolute full-width nav was
+   covering the desktop authentication controls and intercepting clicks. */
+.kc-header .kc-desktop-nav{position:static;inset:auto;width:auto;height:auto;padding:0;border:0;z-index:auto;justify-content:center;align-items:center}
+.kc-nav-inner{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+.kc-header-right{position:relative;z-index:2;min-width:0;pointer-events:auto}
+.kc-header-right button,.kc-header-right a,.kc-header-right select{pointer-events:auto}
+.kc-header .kc-mobile-nav{position:static;inset:auto;width:100%;height:auto;z-index:auto;align-items:stretch;justify-content:flex-start}
+.kc-auth-dialog:not([open]){display:none}
+@media(min-width:761px) and (max-width:1100px){.kc-nav-inner{gap:12px;padding-inline:20px;grid-template-columns:auto minmax(0,1fr) auto}.kc-desktop-nav a{padding-inline:8px}.kc-header-right{gap:8px}}
