@@ -5,13 +5,13 @@ import {quoteSigner,draftFingerprint,generationCredits} from '../lib/server/gene
 import {createGenerationSubmitService} from '../lib/server/generation-submit-service.mjs';
 const user='11111111-1111-4111-8111-111111111111',jobId='22222222-2222-4222-8222-222222222222',key='33333333-3333-4333-8333-333333333333';
 const input={video_url:'https://storage.example/video.mp4',image_urls:['https://storage.example/image.jpg'],resolution:'720p',prompt:''};
-const env={K4K_GENERATION_TEST_USERS:user,VERCEL_ENV:'preview',HF_CREDENTIALS:'opaque_copied_key',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_MAX_USD:'5',K4K_ENABLE_TEST_GENERATION:'true',HIGGSFIELD_GENJUTSU_ENABLED:'true'};
+const env={K4K_GENERATION_TEST_USERS:user,VERCEL_ENV:'preview',FAL_KEY:'opaque_copied_key',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_MAX_USD:'5',K4K_ENABLE_TEST_GENERATION:'true',K4K_FAL_WAN_ENABLED:'true'};
 const job={id:jobId,user_id:user,status:'draft',model:'pro',reference_paths:['owned.jpg'],reference_video_path:'owned.mp4',prompt:''};
 function setup({newlyReserved=true,providerError=false,usd=1.2}={}){
  const calls=[];
  const database={rpc:async(name,args)=>{calls.push({name,args});return {data:{newly_reserved:newlyReserved,status:name==='k4k_generation_finish'?'refunded':'reserved'}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>{calls.push({name:'record'});return {data:{id:jobId,user_id:user,provider_job_id:'provider_job',status:'processing'}}}})})})})})})})};
  const provider={estimate:async()=>{calls.push({name:'estimate'});return {usd}},submit:async(tier,payload,options)=>{calls.push({name:'submit',options});if(providerError){const error=Error('timeout');if(typeof providerError==='number')error.httpStatus=providerError;throw error;}return {request_id:'provider_job'}}};
- const token=quoteSigner(env.HF_CREDENTIALS).issue({userId:user,jobId,resolution:'720p',usd:1.2,credits:12,fingerprint:draftFingerprint(job,'720p')});
+ const token=quoteSigner(env.FAL_KEY).issue({userId:user,jobId,resolution:'720p',usd:1.2,credits:12,fingerprint:draftFingerprint(job,'720p')});
  const run=createGenerationSubmitService({database,provider,prepare:async()=>input,env});
  return {calls,run,args:{userId:user,job,quoteToken:token,requestKey:key}};
 }
