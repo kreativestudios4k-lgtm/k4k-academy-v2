@@ -7,7 +7,17 @@ export async function GET(request){
  // Only the dedicated recovery flow may enter the password editor.
  // All regular email/Google sign-ins continue to the membership gate.
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
- const target=new URL(isPasswordRecovery?'/update-password':'/membership-required',origin);
+ const next=searchParams.get('next');
+ // Explicit allowlist for public K4K registration and post-login destinations.
+ // Arbitrary redirects and Academy entitlement bypasses are not permitted.
+ const K4K_PUBLIC_DESTINATIONS=new Set([
+  '/k4k-app/account',
+  '/k4k-app/credits',
+  '/k4k-app/creator',
+  '/k4k-app/videos',
+ ]);
+ const safeNext=K4K_PUBLIC_DESTINATIONS.has(next)?next:null;
+ const target=new URL(isPasswordRecovery?'/update-password':(safeNext||'/membership-required'),origin);
  if(!code)return NextResponse.redirect(new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin));
  let response=NextResponse.redirect(target);
  const supabase=createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{

@@ -5,18 +5,25 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test:billing": "node --test tests/stripe-invoice-safety.test.mjs",
+    "test:journey": "node --test tests/customer-journey.test.mjs",
+    "prebuild": "npm run test:all",
+    "test:theme": "node --test tests/theme.test.mjs",
+    "test:all": "node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "4.0.103",
+    "@ai-sdk/react": "4.0.102",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.76.1",
+    "ai": "7.0.123",
+    "lucide-react": "^0.468.0",
     "next": "16.3.8",
     "react": "19.2.1",
-    "react-dom": "19.2.1",
-    "lucide-react": "^0.468.0",
-    "@supabase/supabase-js": "^2.76.1",
-    "@supabase/ssr": "^0.7.0",
-    "ai": "7.0.123",
-    "@ai-sdk/gateway": "4.0.103",
-    "@ai-sdk/react": "4.0.102"
+    "react-dom": "19.2.1"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@electric-sql/pglite": "^0.5.15"
+  }
 }

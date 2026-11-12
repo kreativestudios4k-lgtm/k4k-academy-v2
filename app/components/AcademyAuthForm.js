@@ -2,8 +2,12 @@
 
 import {useCallback,useEffect,useState} from 'react';
 import Link from 'next/link';
-import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,ShieldCheck} from 'lucide-react';
+import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,MessageCircle,X,HelpCircle} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
+import '../kx-redesign.css';
+import catalogue from '../k4k-app/template-catalogue.json';
+const featuredClips=[...catalogue.trending,...catalogue.topPerforming].filter(item=>item.videoUrl).slice(0,3);
+const videoHooks=['TURN ONE PHOTO INTO A SCENE','YOUR IDEAS. NOW IN MOTION.','CREATE THE NEXT VIRAL MOMENT'];
 
 const isEmail=(value)=>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 function GoogleIcon(){
@@ -26,6 +30,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
  const [lookup,setLookup]=useState(registering?'loading':'not-needed');
  const [message,setMessage]=useState('');
  const [error,setError]=useState('');
+ const [supportOpen,setSupportOpen]=useState(false);
 
  const verifyCheckout=useCallback(async()=>{
   if(!registering||!sessionId)return;
@@ -86,7 +91,9 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    }
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
-   const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':'/membership-required';
+  const requested=new URLSearchParams(window.location.search).get('next');
+  const safeNext=requested==='/k4k-app/credits'?requested:null;
+  const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':(safeNext||'/membership-required');
    window.location.assign(next);
   }catch(err){
    const reason=String(err?.message||'');
@@ -116,17 +123,31 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   }catch{setError('Google login could not be started. Please use your email and password.');setBusy(false)}
  }
 
- return <main className="k4k-auth-page">
+ return <main className="k4k-auth-page kx-auth">
   <header className="k4k-auth-header">
-   <Link className="k4k-auth-brand" href="/" aria-label="K4K Academy home">K4K<span>✳</span> <small>ACADEMY</small></Link>
+   <Link className="k4k-auth-brand" href="/" aria-label="K4K APP home"><span className="kx-brand-mark" aria-hidden="true">K<span>✳</span></span><span className="kx-brand-name">K4K <small>APP</small></span></Link>
    <Link href="/" className="k4k-auth-back">Home <ArrowRight size={15}/></Link>
   </header>
-  <div className="k4k-auth-centre">
+  <div className="k4k-auth-centre kx-auth-grid">
+   <aside className="kx-stage" aria-hidden="true">
+    <p className="kx-stage-kicker">K4K APP · AI VIDEO STUDIO</p>
+    <h2 className="kx-stage-title">Your imagination. <em>On screen.</em></h2>
+    <p className="kx-stage-copy">Create bold AI videos, transform characters and bring your next big idea to life.</p>
+    <div className="kx-showreel" aria-label="Examples of K4K video templates">
+     {featuredClips.map((clip,i)=><div className="kx-showreel-card" key={clip.id}>
+      <video src={clip.videoUrl} autoPlay muted loop playsInline preload="metadata" aria-label={clip.title}/>
+      <span className="kx-showreel-shade" aria-hidden="true"/>
+      <span className="kx-showreel-number">0{i+1} / K4K ORIGINAL</span>
+      <strong>{videoHooks[i]}</strong>
+     </div>)}
+    </div>
+    <p className="kx-showreel-footnote">Real template previews · Videos play muted on loop</p>
+   </aside>
    <section className="k4k-auth-card" aria-label={registering?'Create paid Academy account':'Member sign in'}>
     <div className="k4k-auth-icon">{registering?<Mail size={25}/>:<Lock size={25}/>}</div>
-    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'K4K ACADEMY · MEMBERS AREA'}</div>
-    <h1>{registering?'Create your account':'Welcome back'}</h1>
-    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Log in with the email you used to buy the course.'}</p>
+    <div className="k4k-auth-step">{registering?(lookup==='verified'?'STEP 2 OF 2 · PAYMENT VERIFIED':'STEP 2 OF 2 · VERIFYING PAYMENT'):'YOUR ACCOUNT'}</div>
+    <h1>{registering?'Create your account':'Welcome back to K4K'}</h1>
+    <p className="k4k-auth-subtitle">{registering?'Your email comes from your secure checkout. Choose a name and password to finish.':'Sign in to your account to create videos and manage your projects.'}</p>
 
     {registering&&lookup!=='verified'&&<div className="k4k-auth-verify" role="status">
      {lookup==='loading'?<><RefreshCw size={19} className="k4k-auth-spin"/>Checking your Stripe payment…</>:
@@ -156,7 +177,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
       <label htmlFor="academy-password-confirm">Confirm password</label>
       <input id="academy-password-confirm" type={showPassword?'text':'password'} autoComplete="new-password" required minLength={8} value={confirmation} onChange={e=>setConfirmation(e.target.value)} placeholder="Repeat your password" disabled={busy}/>
      </>}
-     <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Log in'}<ArrowRight size={18}/></button>
+     <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Sign in'}<ArrowRight size={18}/></button>
     </form>}
 
     {!registering&&<div className="k4k-auth-google-wrap">
@@ -164,11 +185,11 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}
     <p className="k4k-auth-footer">
-     {registering?<>Already have an Academy account? <Link href="/login">Log in</Link></>:<>New to K4K Academy? <Link href="/">Buy the course first</Link></>}
+     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K? <Link href="/k4k-app/register">Create an account</Link></>}
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
-   <p className="k4k-auth-support"><ShieldCheck size={16}/> Already paid but need help? <a href="mailto:hello@kreativestudios4k.com">Contact Academy support</a>. Don't pay twice.</p>
+   <div className="k4k-auth-support-dock"><button type="button" className="k4k-auth-support-fab" aria-label={supportOpen?"Close support":"Open support"} aria-expanded={supportOpen} aria-controls="k4k-auth-support-panel" onClick={()=>setSupportOpen(v=>!v)}>{supportOpen?<X size={21}/>:<MessageCircle size={21}/>}<span>Support</span></button>{supportOpen&&<section id="k4k-auth-support-panel" className="k4k-auth-support-panel" aria-label="Account support"><div className="k4k-auth-support-panel-head"><strong>How can we help?</strong><button type="button" onClick={()=>setSupportOpen(false)} aria-label="Close support"><X size={18}/></button></div><p>Need help signing in or creating your account?</p><Link href="/k4k-app/support"><HelpCircle size={17}/> Help centre & FAQs</Link><a href="mailto:hello@kreativestudios4k.com?subject=K4K%20APP%20Account%20Support"><Mail size={17}/> Email K4K support</a><small>Already paid? Please contact us before making another payment.</small></section>}</div>
   </div>
  </main>;
 }
