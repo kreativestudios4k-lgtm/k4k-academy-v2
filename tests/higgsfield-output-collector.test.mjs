@@ -7,7 +7,7 @@ function harness({owner=userId,exists=false,uploadError=false,settleError=false,
  const calls=[];let stored=exists;
  const storage={from:bucket=>({info:async path=>stored?{data:{size:2048,contentType:'video/mp4'}}:{error:{message:'not found'}},upload:async(path,bytes,options)=>{calls.push(['upload',bucket,path,options.upsert]);if(uploadError)return {error:{}};stored=true;return {error:null}}})};
  const jobStore={getOwnedJob:async()=>({id:jobId,user_id:owner,provider_job_id:providerJobId,status:'processing'})};
- const ledger={finish:async(...args)=>{calls.push(['settle',...args]);if(settleError)throw Error('SETTLEMENT_UNAVAILABLE')}};
+ const ledger={finish:async(...args)=>{calls.push(['settle',...args]);if(settleError)throw Error('SETTLEMENT_UNAVAILABLE');return {status:'settled'}}};
  const bytes=new Uint8Array(2048);bytes.set([0,0,0,24,102,116,121,112]);
  const fetchImpl=async()=>{calls.push(['download']);return {ok:true,headers:{get:key=>key==='content-type'?'video/mp4':null},body:new ReadableStream({start(c){c.enqueue(bytes);c.close()}})}};
  const collect=createHiggsfieldOutputCollector({storage,jobStore,ledger,fetchImpl,enabled,...(allowedHosts?{allowedHosts}:{} )});

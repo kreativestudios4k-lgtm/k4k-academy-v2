@@ -33,11 +33,18 @@ test('dark background and input themes are present in the account workspace',()=
  assert.match(css,/\.k4k-light \.k4k-card/);
 });
 
-test('K4K homepage is the live template feed, with no waitlist or release-date banner',()=>{
+test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/return <MobileTemplateFeed\/>/);
- assert.doesNotMatch(homepage,/import WaitlistLanding|<WaitlistLanding|4 December 2026|04\.12\.2026|coming soon/i);
+ assert.match(homepage,/return <CinematicLaunch\/>/);
+ const launch=source('app/k4k-app/CinematicLaunch.js');
+ assert.match(launch,/04\.12\.2026/);
+ assert.match(launch,/catalogue\.trending/);
+ assert.match(launch,/IntersectionObserver/);
+ assert.match(launch,/muted=\{muted\} loop playsInline/);
+ assert.doesNotMatch(launch,/href="\/academy"/);
+ assert.doesNotMatch(homepage,/import WaitlistLanding|<WaitlistLanding/);
+ assert.doesNotMatch(launch,/WaitlistSignup|Motion Pro|Motion Lite/);
  const waitlist=source('app/k4k-app/WaitlistSignup.js');
  assert.match(waitlist,/Get priority access/);
  assert.match(feed,/href:'\/login'/);
@@ -69,4 +76,14 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(pricing,/Stripe test checkout/);
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
+});
+
+test('cinematic desktop navigation cannot cover authentication actions',()=>{
+ const css=source('app/k4k-app/cinematic-launch.css');
+ assert.match(css,/\.kc-header \.kc-desktop-nav\{position:static;inset:auto;width:auto;height:auto/);
+ assert.match(css,/\.kc-header-right\{position:relative;z-index:2;min-width:0;pointer-events:auto\}/);
+ assert.match(css,/\.kc-auth-dialog:not\(\[open\]\)\{display:none\}/);
+ const launch=source('app/k4k-app/CinematicLaunch.js');
+ assert.match(launch,/className="kc-login" onClick=\{\(\)=>setAuthOpen\(true\)\}/);
+ assert.match(launch,/className="kc-join" href="\/k4k-app\/register"/);
 });

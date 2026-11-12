@@ -7,7 +7,9 @@ export async function GET(request){
  const code=searchParams.get('code');
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
  const target=new URL(isPasswordRecovery?'/update-password':studioDestination(searchParams.get('next')),origin);
- if(!code)return NextResponse.redirect(new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin));
+ const failure=new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin);
+ if(!isPasswordRecovery)failure.searchParams.set('next',target.pathname);
+ if(!code)return NextResponse.redirect(failure);
  let response=NextResponse.redirect(target);
  const supabase=createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{
   cookies:{
@@ -16,6 +18,6 @@ export async function GET(request){
   }
  });
  const {error}=await supabase.auth.exchangeCodeForSession(code);
- if(error)return NextResponse.redirect(new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin));
+ if(error)return NextResponse.redirect(failure);
  return response;
 }

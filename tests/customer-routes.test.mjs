@@ -28,8 +28,11 @@ test('the Academy course stays reachable behind the membership gate',()=>{
  assert.match(proxy,/\/membership-required/);
  // The lesson pages themselves are still in the build.
  for(const page of ['app/academy/page.js','app/academy/lessons/[slug]/page.js','app/academy/studio/page.js'])assert.ok(readFileSync(page,'utf8').length>200);
- // Members get a route back to the course from the account page.
- assert.match(readFileSync('app/k4k-app/account/page.js','utf8'),/href="\/academy"/);
+ // Existing students retain direct, membership-gated course access; the new
+ // customer dashboard and public landing must not advertise the Academy.
+ assert.doesNotMatch(readFileSync('app/k4k-app/account/page.js','utf8'),/href="\/academy"/);
+ assert.doesNotMatch(readFileSync('app/k4k-app/CinematicLaunch.js','utf8'),/href="\/academy"/);
+ assert.match(proxy,/searchParams\.set\('next','\/academy'\)/);
 });
 
 test('retiring the interface preserves verified legacy checkout registration and customer data',()=>{

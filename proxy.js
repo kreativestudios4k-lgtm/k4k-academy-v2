@@ -14,7 +14,7 @@ export async function proxy(request){
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return response;
  const supabase=createServerClient(url,key,{cookies:{getAll(){return request.cookies.getAll()},setAll(cs){cs.forEach(({name,value})=>request.cookies.set(name,value));response=NextResponse.next({request:{headers:h}});cs.forEach(({name,value,options})=>response.cookies.set(name,value,options))}}});
  const{data}=await supabase.auth.getClaims();const user=data?.claims;const protectedPath=request.nextUrl.pathname.startsWith('/academy')||request.nextUrl.pathname.startsWith('/prompts')||request.nextUrl.pathname.startsWith('/mentor')||request.nextUrl.pathname.startsWith('/api/mentor')||request.nextUrl.pathname.startsWith('/api/realtime');
- if(protectedPath&&!user){if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Authentication required'},{status:401});const u=request.nextUrl.clone();u.pathname='/login';return NextResponse.redirect(u)}
+ if(protectedPath&&!user){if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Authentication required'},{status:401});const u=request.nextUrl.clone();u.pathname='/login';u.search='';u.searchParams.set('next','/academy');return NextResponse.redirect(u)}
  if(protectedPath&&user){
   const uid=user.sub;
   const [{data:admin},{data:membership}]=await Promise.all([
