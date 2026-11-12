@@ -42,7 +42,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(launch,/catalogue\.trending/);
  assert.match(launch,/IntersectionObserver/);
  assert.match(launch,/muted=\{muted\} loop playsInline/);
- assert.match(launch,/href="\/academy"/);
+ assert.doesNotMatch(launch,/href="\/academy"/);
  assert.doesNotMatch(homepage,/import WaitlistLanding|<WaitlistLanding/);
  assert.doesNotMatch(launch,/WaitlistSignup|Motion Pro|Motion Lite/);
  const waitlist=source('app/k4k-app/WaitlistSignup.js');
