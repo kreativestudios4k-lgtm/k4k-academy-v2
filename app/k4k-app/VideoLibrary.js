@@ -16,7 +16,7 @@ export default function VideoLibrary({embedded=false,onReuse,activeJobId=null,op
  const [downloadNotice,setDownloadNotice]=useState('');
  const [menuJob,setMenuJob]=useState(null);
  const [urls,setUrls]=useState({}),[busy,setBusy]=useState(null),[selected,setSelected]=useState(null),[actionError,setActionError]=useState('');
- const dialog=useRef(null),accountId=useRef(null),authVersion=useRef(0),refreshLock=useRef(false),alive=useRef(true);
+ const dialog=useRef(null),accountId=useRef(null),authVersion=useRef(0),refreshLock=useRef(false),alive=useRef(true),pollCursor=useRef(0);
  const refresh=useCallback(async()=>{
   if(refreshLock.current)return;
   refreshLock.current=true;
@@ -76,7 +76,7 @@ export default function VideoLibrary({embedded=false,onReuse,activeJobId=null,op
   const timer=setInterval(async()=>{
    if(document.visibilityState!=='visible'||polling)return;
    polling=true;
-   try{for(const job of jobs.filter(item=>pending.has(item.status)).slice(0,3))await checkJob(job.id,true)}finally{polling=false}
+   try{const active=jobs.filter(item=>pending.has(item.status));const batch=Array.from({length:Math.min(3,active.length)},(_,i)=>active[(pollCursor.current+i)%active.length]);pollCursor.current=(pollCursor.current+batch.length)%active.length;for(const job of batch)await checkJob(job.id,true)}finally{polling=false}
   },15000);
   return()=>clearInterval(timer);
  },[jobs,checkJob]);
