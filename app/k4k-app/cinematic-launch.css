@@ -68,3 +68,6 @@
 @media(max-width:760px){.kc-launch .kc-login{min-height:36px;padding:0 10px;font-size:12px}.kc-join{min-height:36px;padding:0 10px;font-size:11px}.kc-join svg{display:none}.kc-header-right{gap:6px}.kc-header .kc-mobile-nav button{padding:13px 12px;border:0;border-radius:8px;background:#141414;font-size:14px;color:#fff;text-align:left}}
 @media(max-width:600px){.kc-header-right .kc-login{display:none}.kc-auth-inner{padding:30px 22px 24px}.kc-launch .kc-auth-dialog h2{font-size:31px!important}.kc-auth-dialog{border-radius:18px}}
 @media(max-width:360px){.kc-join{padding-inline:7px;font-size:10px}.kc-header-right{gap:4px}}
+
+.kc-auth-dialog .kc-auth-error p{color:#ffc0b8!important;text-align:left}
+.kc-auth-dialog .kc-auth-error a{display:inline-block;margin-top:8px;color:#fff!important;text-decoration:underline!important;font-size:12px}
