@@ -36,3 +36,10 @@
  .kc-hero{padding:48px 4% 42px}.kc-showcase-head{align-items:flex-end}.kc-showcase-head>div{min-width:0}
 }
 @media(max-width:360px){.kc-nav-inner{gap:7px;padding-inline:10px}.kc-header-right{gap:5px}.kc-logo .kc-wordmark{font-size:19px}.kc-logo img{width:24px;height:24px}.kc-launch .kc-login{padding-inline:9px}.kc-menu-toggle{width:34px}.kc-launch .kc-hero h1{font-size:clamp(29px,9.5vw,35px)!important}.kc-release{gap:7px}}
+
+/* Brand signature: K4K APP by KreativeStudios4K. */
+.kc-brand-lockup{display:flex;flex-direction:column;align-items:flex-start;gap:4px;white-space:nowrap}
+.kc-logo .kc-brand-lockup .kc-wordmark{display:block;line-height:1}
+.kc-logo .kc-brand-byline{font-size:9px;font-weight:500;letter-spacing:.15px;color:#a3a3a3;line-height:1.15}
+@media(max-width:760px){.kc-brand-lockup{gap:3px}.kc-logo .kc-brand-byline{font-size:7px;letter-spacing:0}}
+@media(max-width:360px){.kc-logo .kc-brand-byline{font-size:6.5px}.kc-logo .kc-wordmark{font-size:17px}}
