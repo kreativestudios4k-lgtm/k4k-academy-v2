@@ -9,9 +9,9 @@ test('only two models and their exact endpoints are allowed',()=>{
  assert.deepEqual(validateK4KGeneration('pro',input),{...input,prompt:''});
 });
 test('pricing and duration caps differ by tier',()=>{
- assert.equal(estimateK4KProviderCost('lite',{sourceSeconds:15}),1.5);
- assert.equal(estimateK4KProviderCost('pro',{sourceSeconds:15}),10.215);
- assert.equal(estimateK4KProviderCost('pro',{sourceSeconds:30,resolution:'1080p'}),48.96);
+ assert.equal(estimateK4KProviderCost('lite',{sourceSeconds:15}),3);
+ assert.equal(estimateK4KProviderCost('pro',{sourceSeconds:15}),5.169);
+ assert.equal(estimateK4KProviderCost('pro',{sourceSeconds:30,resolution:'1080p'}),25.038);
  assert.throws(()=>estimateK4KProviderCost('lite',{sourceSeconds:16}));
  assert.throws(()=>estimateK4KProviderCost('pro',{sourceSeconds:31}));
 });
