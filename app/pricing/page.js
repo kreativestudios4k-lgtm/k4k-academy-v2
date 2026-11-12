@@ -1,6 +1,8 @@
 import Link from 'next/link';
+import {headers} from 'next/headers';
 import SubscribeButton from './SubscribeButton';
 import {PLAN_PRICES} from '../../lib/k4k-plan-prices.mjs';
+import {currencyForCountry} from '../../lib/k4k-market.mjs';
 import '../kx-redesign.css';
 
 export const metadata={title:'K4K APP | Pricing'};
@@ -18,13 +20,16 @@ const PLANS=[
 
 const WHY=[
  {title:'Failed jobs are refunded',body:'If a generation fails or is blocked by moderation, its credits go back to your balance automatically. Each job is refunded once.'},
- {title:'Academy included',body:'Every plan includes K4K Academy, so you can learn the workflow as well as run it.'},
+ {title:'Optional learning',body:'Use K4K Academy when you want guided lessons; the AI video studio remains the main product.'},
  {title:'Monthly, no annual lock-in',body:'Every plan is billed monthly. You are not signed up for a year without choosing it.'},
 ];
 
-const money=(minor,currency)=>(minor/100).toLocaleString('en-GB',{style:'currency',currency});
+const MONEY_LOCALES={GBP:'en-GB',EUR:'de-DE',USD:'en-US',BRL:'pt-BR'};
+const money=(minor,currency)=>new Intl.NumberFormat(MONEY_LOCALES[currency]||'en-GB',{style:'currency',currency}).format(minor/100);
 
-export default function PricingPage(){
+export default async function PricingPage(){
+ const requestHeaders=await headers();
+ const currency=currencyForCountry(requestHeaders.get('x-vercel-ip-country'));
  return <main className="kx-pricing">
   <header className="kx-pricing-top">
    <Link href="/" className="kx-pricing-brand">K4K<span> APP</span></Link>
@@ -32,14 +37,14 @@ export default function PricingPage(){
   </header>
 
   <section className="kx-pricing-hero">
-   <p className="kx-pricing-kicker">Plans · Billed monthly · GBP</p>
+   <p className="kx-pricing-kicker">Plans · Billed monthly · {currency}</p>
    <h1 className="kx-hook">Pick the plan that <em>powers your next scene.</em></h1>
-   <p>Every plan includes K4K Academy.</p>
+   <p>AI video creation is the core product. K4K Academy is an optional learning space included with every plan.</p>
   </section>
 
   <section className="kx-plans" aria-label="Subscription plans">
    {PLANS.map(plan=>{
-    const price=PLAN_PRICES[plan.key].GBP;
+    const price=PLAN_PRICES[plan.key][currency];
     const meter=Math.round((CREDITS[plan.key]/MAX_CREDITS)*100);
     return <article key={plan.key} className="kx-plan">
      <div className="kx-plan-name">
@@ -47,14 +52,14 @@ export default function PricingPage(){
       <h2>{plan.name}</h2>
       <p>{plan.audience}</p>
      </div>
-     <p className="kx-price">{money(price,'GBP')}<small>/ month</small></p>
+     <p className="kx-price">{money(price,currency)}<small>/ month</small></p>
      <div className="kx-credits">
       <strong>{CREDITS[plan.key]} credits / month</strong>
       <div className="kx-meter" style={{'--w':`${meter}%`}} aria-hidden="true"/>
       <p className="kx-credit-note">Credit charges depend on video duration (3–30 seconds), model and resolution. Actual generation is disabled until provider prices and safeguards are validated.</p>
      </div>
      <div className="kx-plan-cta">
-      <SubscribeButton plan={plan.key} currency="GBP" style={{width:'100%'}} />
+      <SubscribeButton plan={plan.key} currency={currency} style={{width:'100%'}} />
      </div>
     </article>;
    })}
