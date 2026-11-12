@@ -79,7 +79,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
     const {data,error:signUpError}=await supabase.auth.signUp({
      email:address,password,
      options:{
-      emailRedirectTo:window.location.origin+'/auth/callback',
+      emailRedirectTo:window.location.origin+'/auth/callback?next=%2Facademy',
       data:{full_name:name.trim().replace(/\s+/g,' ')}
      }
     });
