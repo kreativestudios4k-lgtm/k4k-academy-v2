@@ -136,6 +136,18 @@ function paidInvoice(id, reason, priceId = CREATOR_GBP) {
     lines: {data: [{price: {id: priceId}, period: {end: 1800000000}}]}};
 }
 
+test('same-second paid invoice is accepted after its subscription event', async () => {
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {
+    user_1: {status: 'incomplete', stripe_subscription_id: 'sub_1', last_event_created: 200},
+  }});
+  const event = {id: 'evt_same_second_invoice', type: 'invoice.paid', created: 200,
+    data: {object: paidInvoice('in_same_second', 'subscription_create')}};
+  const result = await handleStripeEvent(event, store);
+  assert.equal(result.credits.granted, true);
+  assert.equal(store.granted.has('in_same_second'), true);
+});
+
+
 test('invoice delivered before subscription creation remains retryable and grants after linkage', async () => {
   const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', last_event_created: 10}}});
   const invoiceEvent = {id: 'evt_invoice_early', type: 'invoice.paid', created: 20,
