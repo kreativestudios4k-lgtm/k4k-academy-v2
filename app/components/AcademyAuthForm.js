@@ -50,6 +50,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
  },[registering,sessionId]);
 
  useEffect(()=>{if(registering)verifyCheckout()},[registering,verifyCheckout]);
+ useEffect(()=>{if(registering)return;const params=new URLSearchParams(window.location.search);if(params.get('error')==='oauth')setError('Sign-in could not be completed. If you used Google or an email confirmation link, return to the same K4K website and try again. You can also sign in with your email and password.');},[registering]);
 
  async function submit(event){
   event.preventDefault();if(busy)return;
