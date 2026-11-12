@@ -23,7 +23,7 @@ The legacy `public.k4k_launch_waitlist` and `public.k4k_waitlist_rate_limits` ta
 
 ## Build and route verification
 
-At application source/test commit `90648614bec5492fb8cb26ededb42165233eb9cd`:
+At application source/test commit `9c9f98f7cb9e7bf2dd7d91fc201df36a37904dcb`:
 
 - Vercel Preview deployment state: `READY`.
 - Build logs show `npm run test:all` invoked by the `prebuild` hook, followed by `Build Completed`; no failing test or compile error appeared in the returned build events.
@@ -70,7 +70,7 @@ Read-only integration checks:
 
 ## Current-run verification and billing hardening — 12 November 2026
 
-At source commit `90648614bec5492fb8cb26ededb42165233eb9cd`:
+At source commit `9c9f98f7cb9e7bf2dd7d91fc201df36a37904dcb`:
 
 - Vercel Preview state: `READY`.
 - Build events show `npm run test:all` followed by `Build Completed`; no failing test or build error appeared in the returned log window. The exact test count was not exposed in the returned log excerpt.
