@@ -40,7 +40,7 @@ export default function Creator(){
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
  const [savedReference,setSavedReference]=useState(null),[savingDraft,setSavingDraft]=useState(false),[draftMessage,setDraftMessage]=useState('');
  const [generationDraftId,setGenerationDraftId]=useState(null),[generationQuote,setGenerationQuote]=useState(null),[generationBusy,setGenerationBusy]=useState(false),[generationMessage,setGenerationMessage]=useState(''),[submittedJobId,setSubmittedJobId]=useState(null);
- const generationRequestKey=useRef(null),generationActionLock=useRef(false);
+ const generationRequestKey=useRef(null),generationActionLock=useRef(false),prepareLock=useRef(false);
  const [libraryFocusId,setLibraryFocusId]=useState(null),[optimisticGeneration,setOptimisticGeneration]=useState(null);
  const [localEstimate,setLocalEstimate]=useState(null),[estimateReading,setEstimateReading]=useState(false),[estimateError,setEstimateError]=useState('');
  const onActiveJobStatus=useCallback(job=>{if(['completed','failed','cancelled'].includes(job.status)){setSubmittedJobId(current=>current===job.id?null:current);setGenerationMessage(job.status==='completed'?'Your video is ready to play and download.':'Generation has stopped. Check the video details.')}},[]);
@@ -138,7 +138,7 @@ export default function Creator(){
     }
    }
    if(kind==='submit'){
-    showInLibrary(result.creditsRefunded?'failed':'processing',session.user.id);
+    showInLibrary(result.creditsRefunded?'failed':result.status==='already_reserved'?'queued':result.status||'processing',session.user.id);
     setGenerationMessage(result.creditsRefunded?'Generation could not start. Reserved credits were refunded.':'Your video is generating. It appears at the top of your library.');await loadHistory();
    }else{
     if(['completed','failed','cancelled'].includes(result.status))setSubmittedJobId(null);
@@ -202,15 +202,15 @@ export default function Creator(){
    setExtraImages(old=>[...old,...next]);
   }
   async function prepareProject(){
-   if(preparing||generationBusy||!localEstimate||estimateError)return;
-   setPreparing(true);
+   if(prepareLock.current||generationActionLock.current||preparing||generationBusy||!localEstimate||estimateError)return;
+   prepareLock.current=true;setPreparing(true);
    try{
     const unchanged=savedReference&&savedReference.file===character.file&&savedReference.videoFile===video.file&&savedReference.presetId===(selectedPreset?.id||null)&&savedReference.extraFiles.length===extraImages.length&&extraImages.every((item,i)=>item.file===savedReference.extraFiles[i]);
     const reference=unchanged?savedReference:await saveReference();
     if(!reference)return;
     const jobId=generationDraftId||await saveDraft(reference);
     if(jobId)await generationAction('quote',jobId,localEstimate.credits);
-   }finally{setPreparing(false)}
+   }finally{prepareLock.current=false;setPreparing(false)}
   }
   const tr=(en,br,esText)=>pt?br:es?esText:en;
   const referenceCount=extraImages.length+(character.file?1:0);
