@@ -56,7 +56,7 @@ test('fal approval and signing are separate from Higgsfield; a provider change i
  const config={...env,VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_GENERATION_TEST_USERS:id};
  assert.equal(generationUserAllowed(id,config,'fal'),true);assert.equal(generationUserAllowed(id,config,'higgsfield'),false);
  assert.equal(generationSigningSecret(config,'fal'),'secret');
- assert.equal(generationProviderName({}),'higgsfield');assert.throws(()=>generationProviderName({provider:'other'}));
+ assert.equal(generationProviderName({}),'fal');assert.throws(()=>generationProviderName({provider:'other'}));assert.throws(()=>generationProviderName({provider:'higgsfield'}),/LEGACY_PROVIDER_RETIRED/);assert.throws(()=>generationSigningSecret(config,'higgsfield'),/UNSUPPORTED_PROVIDER/);
  assert.notEqual(draftFingerprint({id,provider:'fal'},'720p'),draftFingerprint({id,provider:'higgsfield'},'720p'));
 });
 test('customer fal submission reserves once, passes trusted duration, and records provider request',async()=>{
