@@ -92,7 +92,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
   const requested=new URLSearchParams(window.location.search).get('next');
-  const safeNext=['/k4k-app/credits','/pricing'].includes(requested)?requested:null;
+  const safeNext=['/k4k-app/credits','/k4k-app/videos','/k4k-app/account','/k4k-app/creator','/pricing'].includes(requested)?requested:null;
   const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':(safeNext||'/membership-required');
    window.location.assign(next);
   }catch(err){
