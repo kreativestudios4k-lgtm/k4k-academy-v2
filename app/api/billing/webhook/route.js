@@ -7,8 +7,8 @@ export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
 
-// Until the database migration is approved and SUPABASE_SERVICE_ROLE_KEY is set,
-// subscription events are refused with 503 so Stripe keeps retrying them.
+// Subscription events require the server-only Supabase service-role credential.
+// If it is absent, return 503 so Stripe retries without acknowledging the event.
 const SUBSCRIPTION_EVENTS = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
