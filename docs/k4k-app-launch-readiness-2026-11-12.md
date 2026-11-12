@@ -2,8 +2,8 @@
 
 **Target repository:** `kreativestudios4k-lgtm/k4k-academy-v2`  
 **Target branch:** `integration/k4k-billing-checkout-20261107`  
-**Latest verified source/test commit:** `90648614bec5492fb8cb26ededb42165233eb9cd`  
-**Latest verified Preview deployment:** READY — `https://kreativestudios4k-site-7bj3no4mk-kreative-studios4k.vercel.app`  
+**Latest verified application source/test commit:** `90648614bec5492fb8cb26ededb42165233eb9cd`  
+**Latest verified Preview deployment (including readiness documentation):** READY — `https://kreativestudios4k-site-cb5i5as41-kreative-studios4k.vercel.app`  
 **Launch verdict:** NOT READY — payment, credit, and provider-generation end-to-end checks remain unverified.
 
 ## Product and customer journey
@@ -114,11 +114,11 @@ Project: `KreativeStudios4k Academy` (`eu-west-2`). No SQL writes, migrations, a
 | `academy_students` | 32 |
 | `academy_orders` | 3 |
 | `memberships` | 11 |
-| `academy_subscription_claims` | 13 |
+| `academy_subscription_claims` | 13 |\n| `academy_entitlements` | 3 |
 | `studio_generation_jobs` | 5 |
 | `studio_credit_accounts` | 1 |
-| `stripe_webhook_events` | 0 |
-| `k4k_launch_waitlist` | 0 |
+| `stripe_webhook_events` | 0 |\n| `k4k_credit_grants` | 1 |\n| `k4k_generation_reservations` | 1 |
+| `k4k_launch_waitlist` | 0 |\n| `k4k_waitlist_rate_limits` | 1 |
 
 These are point-in-time counts, not a migration or entitlement reconciliation. Existing Academy data was left untouched.
 
@@ -133,6 +133,15 @@ These are point-in-time counts, not a migration or entitlement reconciliation. E
 7. **Mobile/accessibility:** automated source tests and route checks ran, but no full mobile browser, keyboard-only, screen-reader, or cross-user manual acceptance pass was performed.
 8. **Supabase security advisor:** read-only inspection reported leaked-password protection disabled; nine RLS-enabled tables without policies (including server-only billing/ledger tables); and four `SECURITY DEFINER` functions executable by authenticated users. The inspected function bodies contain caller checks (admin-table, own-membership, or confirmed owner-email checks), but the hard-coded owner-email checks should be consolidated into `k4k_admins` and the advisor findings formally reviewed. No Supabase settings, policies, grants, or schema were changed.
 9. **Vercel secret hygiene:** Vercel metadata flags `BLOB_READ_WRITE_TOKEN` with a `readable-secret` security issue. Do not expose it; assess rotation separately because it is shared across environments and rotation could disrupt storage.
+10. **Full Higgsfield model catalog:** the connected model catalog includes more video models than the two options currently exposed in K4K Creator. The connector catalog does not prove developer-API entitlements, and model-specific endpoint/schema coverage is incomplete. Preserve catalog entries as pending verification; do not silently map unsupported operations.
+
+### Current read-only security and account inspection
+
+- Supabase project `tqlvfqjvfqfigsauqjtl` remains `ACTIVE_HEALTHY`; no SQL writes, migrations, settings changes, grants, or account changes were made.
+- Current table snapshot still shows 32 Academy students, 3 Academy orders, 3 Academy entitlements, 11 memberships, 13 Academy subscription claims, 5 generation jobs, 1 studio credit account, 0 K4K Stripe webhook events, 1 invoice credit grant, 1 generation reservation, 0 launch-waitlist rows and 1 waitlist-rate-limit row.
+- Security advisor currently reports 9 RLS-enabled tables without policies (INFO), 4 `SECURITY DEFINER` functions executable by authenticated users (WARN), and leaked-password protection disabled (WARN).
+- The four function definitions were read without modification. They contain caller checks: `k4k_admin_summary` uses `k4k_admins`; `k4k_ericm_has_paid_access` checks only the caller's own membership/admin status; the two `k4k_studio_admin_*` functions check the confirmed owner email. The linter findings remain open for formal privilege review; no function grants or bodies were changed.
+- Stripe account discovery returned only `K4KAPP` with `livemode=true`. No TEST-mode account context is available in the current Stripe connection, so no test Checkout session or webhook event could be safely exercised.
 
 ## Changes made safely in this run
 
