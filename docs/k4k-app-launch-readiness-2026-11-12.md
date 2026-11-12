@@ -23,7 +23,7 @@ The legacy `public.k4k_launch_waitlist` and `public.k4k_waitlist_rate_limits` ta
 
 ## Build and route verification
 
-At commit `2950bf242017337fa39b571c2bf0b77eb2bfda07`:
+At application source/test commit `90648614bec5492fb8cb26ededb42165233eb9cd`:
 
 - Vercel Preview deployment state: `READY`.
 - Build logs show `npm run test:all` invoked by the `prebuild` hook, followed by `Build Completed`; no failing test or compile error appeared in the returned build events.
