@@ -114,11 +114,15 @@ Project: `KreativeStudios4k Academy` (`eu-west-2`). No SQL writes, migrations, a
 | `academy_students` | 32 |
 | `academy_orders` | 3 |
 | `memberships` | 11 |
-| `academy_subscription_claims` | 13 |\n| `academy_entitlements` | 3 |
+| `academy_subscription_claims` | 13 |
+| `academy_entitlements` | 3 |
 | `studio_generation_jobs` | 5 |
 | `studio_credit_accounts` | 1 |
-| `stripe_webhook_events` | 0 |\n| `k4k_credit_grants` | 1 |\n| `k4k_generation_reservations` | 1 |
-| `k4k_launch_waitlist` | 0 |\n| `k4k_waitlist_rate_limits` | 1 |
+| `stripe_webhook_events` | 0 |
+| `k4k_credit_grants` | 1 |
+| `k4k_generation_reservations` | 1 |
+| `k4k_launch_waitlist` | 0 |
+| `k4k_waitlist_rate_limits` | 1 |
 
 These are point-in-time counts, not a migration or entitlement reconciliation. Existing Academy data was left untouched.
 
