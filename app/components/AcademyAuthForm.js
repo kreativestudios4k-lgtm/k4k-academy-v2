@@ -92,7 +92,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
   const requested=new URLSearchParams(window.location.search).get('next');
-  const safeNext=requested==='/k4k-app/credits'?requested:null;
+  const safeNext=['/k4k-app/credits','/pricing'].includes(requested)?requested:null;
   const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':address==='hello@kreativestudios4k.com'?'/admin':(safeNext||'/membership-required');
    window.location.assign(next);
   }catch(err){
@@ -116,8 +116,12 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
   setError('');setBusy(true);
   try{
    const supabase=createClient();
+   const requested=new URLSearchParams(window.location.search).get('next');
+   const safeNext=['/k4k-app/credits','/pricing'].includes(requested)?requested:null;
+   const callback=new URL('/auth/callback',window.location.origin);
+   if(safeNext)callback.searchParams.set('next',safeNext);
    const {error:oauthError}=await supabase.auth.signInWithOAuth({
-    provider:'google',options:{redirectTo:window.location.origin+'/auth/callback',queryParams:{prompt:'select_account'}}
+    provider:'google',options:{redirectTo:callback.toString(),queryParams:{prompt:'select_account'}}
    });
    if(oauthError)throw oauthError;
   }catch{setError('Google login could not be started. Please use your email and password.');setBusy(false)}
@@ -185,7 +189,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}
     <p className="k4k-auth-footer">
-     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K? <Link href="/k4k-app/register">Create an account</Link></>}
+     {registering?<>Already have a K4K APP account? <Link href="/login">Log in</Link></>:<>New to K4K? <Link href="/signup?next=%2Fpricing">Create an account</Link></>}
     </p>
     {registering&&<p className="k4k-auth-policy">By registering you agree to the <Link href="/terms">Terms</Link> and <Link href="/privacy">Privacy Policy</Link>. Membership access requires a verified email and active subscription.</p>}
    </section>
