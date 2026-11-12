@@ -111,3 +111,29 @@
 .k4k-support-panel a:hover{border-color:#caff39}
 .k4k-support-panel small{display:block;color:#aebba9;margin-top:15px;font-size:11px;line-height:1.5}
 @media(max-width:640px){.k4k-light .k4k-global-header{min-height:65px;padding:12px 16px}.k4k-light .k4k-global-brand{font-size:18px}.k4k-support-dock{right:15px;bottom:calc(90px + env(safe-area-inset-bottom))}.k4k-support-fab{padding:13px 15px}.k4k-support-fab span{display:none}}
+
+
+/* Higgsfield credential connection — accessible, compact and responsive */
+.k4k-hf-key-trigger{border:1px solid #b8d7e5;background:#eaf7fb;color:#0b455c;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800;cursor:pointer}
+.k4k-hf-key-trigger:hover{background:#d9f0f8}
+.k4k-hf-key-trigger:focus-visible,.k4k-hf-key-dialog button:focus-visible,.k4k-hf-key-dialog input:focus-visible{outline:3px solid #8ce6ff;outline-offset:3px}
+.k4k-hf-key-backdrop{position:fixed;inset:0;z-index:10020;background:#06151dcc;display:grid;place-items:center;padding:18px}
+.k4k-hf-key-dialog{width:min(100%,480px);max-height:min(88dvh,700px);overflow:auto;background:#101b20;color:#f4fbfd;border:1px solid #356879;border-radius:24px;padding:25px;box-shadow:0 28px 90px #0009}
+.k4k-hf-key-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.k4k-hf-key-dialog-head span{font-size:10px;letter-spacing:1.6px;color:#8ad8ee;font-weight:900}
+.k4k-hf-key-dialog-head h2{margin:8px 0 0;color:#fff;font-size:25px;letter-spacing:-.04em}
+.k4k-hf-key-close{width:38px;height:38px;border:1px solid #3c6572;border-radius:50%;background:#1a2a30;color:#fff;font-size:25px;line-height:1;cursor:pointer}
+.k4k-hf-key-dialog>p{font-size:13px;color:#b7cbd0;line-height:1.65}
+.k4k-hf-key-dialog .k4k-hf-key-saved{background:#1d3420;border:1px solid #71994b;border-radius:12px;padding:10px 12px;color:#c7ff36}
+.k4k-hf-key-dialog form{margin-top:20px}
+.k4k-hf-key-dialog label{display:block;margin:0 0 8px;color:#e8f7fa;font-size:12px;font-weight:800}
+.k4k-hf-key-dialog input{width:100%;margin:0;padding:14px 15px;border:1px solid #527987;border-radius:12px;background:#071216;color:#fff;font-size:14px}
+.k4k-hf-key-dialog input::placeholder{color:#829da5}
+.k4k-hf-key-error{color:#ffb8b8!important;font-size:12px}
+.k4k-hf-key-notice{color:#c7ff36!important;font-size:12px}
+.k4k-hf-key-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.k4k-hf-key-actions button{border:0;border-radius:999px;background:#c7ff36;color:#14200a;padding:12px 17px;font-size:12px;font-weight:900;cursor:pointer}
+.k4k-hf-key-actions button:disabled{opacity:.55;cursor:not-allowed}
+.k4k-hf-key-actions .k4k-hf-key-remove{border:1px solid #815555;background:#301d1d;color:#ffdede}
+.k4k-hf-key-dialog .k4k-hf-key-footnote{border-top:1px solid #29454d;padding-top:14px;margin:18px 0 0;font-size:10px;color:#9bb1b8}
+@media(max-width:520px){.k4k-global-header{padding-left:15px;padding-right:15px}.k4k-global-header nav{gap:8px}.k4k-hf-key-trigger{font-size:10px;padding:8px 10px}.k4k-hf-key-dialog{padding:20px;border-radius:20px}}
