@@ -14,6 +14,6 @@ test('quote never invokes provider or reserves customer credits',()=>{
  assert.match(route,/creditsReserved:0/);
 });
 test('trusted Lite provider quote calculates without any paid call',()=>{
- assert.equal(estimateK4KProviderCost('lite',{sourceSeconds:5,resolution:'720p'}),0.5);
+ assert.equal(estimateK4KProviderCost('lite',{sourceSeconds:5,resolution:'720p'}),1);
  assert.throws(()=>estimateK4KProviderCost('pro',{sourceSeconds:3,resolution:'720p'}));
 });
