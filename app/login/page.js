@@ -1,8 +1,8 @@
 import AcademyAuthForm from '../components/AcademyAuthForm';
 
 export const metadata={
- title:'Log In — K4K Academy',
- description:'Sign in to your K4K Academy account to continue learning.',
+ title:'Sign In — K4K APP',
+ description:'Sign in to create AI videos, manage your K4K workspace, and access optional Academy learning.',
  robots:{index:false,follow:false}
 };
 
