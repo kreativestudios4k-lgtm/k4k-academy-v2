@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
@@ -11,6 +11,11 @@ export default function SignUp(){
  const [busy,setBusy]=useState(false);
  const [message,setMessage]=useState('');
  const [error,setError]=useState('');
+ const [nextPath,setNextPath]=useState('/pricing');
+ useEffect(()=>{
+  const requested=new URLSearchParams(window.location.search).get('next');
+  setNextPath(requested==='/k4k-app/credits'?requested:'/pricing');
+ },[]);
  async function submit(event){
   event.preventDefault();
   if(busy)return;
@@ -25,11 +30,11 @@ export default function SignUp(){
    const supabase=createClient();
    const {data,error:signUpError}=await supabase.auth.signUp({
     email:address,password,
-    options:{emailRedirectTo:window.location.origin+'/auth/callback',data:{full_name:cleanName}}
+    options:{emailRedirectTo:window.location.origin+'/auth/callback?next='+encodeURIComponent(nextPath),data:{full_name:cleanName}}
    });
    if(signUpError)throw signUpError;
    setPassword('');
-   if(data?.session){window.location.assign('/pricing');return;}
+   if(data?.session){window.location.assign(nextPath);return;}
    setMessage('Check your inbox to confirm your email. Then sign in and choose a plan. Registration does not activate a paid subscription or grant credits.');
   }catch(err){
    const reason=String(err?.message||'');
@@ -50,7 +55,7 @@ export default function SignUp(){
     <label htmlFor="signup-password">Password</label><input id="signup-password" type="password" autoComplete="new-password" required minLength={8} value={password} onChange={e=>setPassword(e.target.value)} disabled={busy}/>
     <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Creating account…':'Create account'}</button>
    </form>
-   <p className="k4k-auth-footer">Already registered? <Link href="/login">Sign in</Link></p>
+   <p className="k4k-auth-footer">Already registered? <Link href={'/login?next='+encodeURIComponent(nextPath)}>Sign in</Link></p>
    <p className="k4k-auth-policy">Credits and generation are only available after a verified paid subscription. No charge is made during registration.</p>
   </section></div>
  </main>;
