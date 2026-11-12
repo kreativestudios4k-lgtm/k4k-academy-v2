@@ -69,3 +69,13 @@ test('Stripe Checkout fails closed when membership status cannot be loaded',()=>
  assert.match(route,/STRIPE_UNREACHABLE/);
  assert.match(route,/AbortSignal\.timeout/);
 });
+
+test('K4K launch login and Google OAuth use studio, never Academy by default',()=>{
+ const dialog=read('app/k4k-app/LaunchAuthDialog.js');
+ assert.match(dialog,/provider:'google'/);
+ assert.match(dialog,/auth\/callback\?next=%2Fk4k-app%2Fcreator/);
+ assert.match(dialog,/window\.location\.assign\(data\.user\.user_metadata\?\.k4k_temp_password\?'\/update-password':'\/k4k-app\/creator'\)/);
+ assert.doesNotMatch(dialog,/membership-required|%2Facademy/);
+ const proxy=read('proxy.js');
+ assert.match(proxy,/searchParams\.set\('next','\/academy'\)/);
+});
