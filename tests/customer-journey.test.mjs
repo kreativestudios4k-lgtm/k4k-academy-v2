@@ -63,6 +63,25 @@ test('signup redirect lands on the public K4K account rather than Academy member
  assert.match(callback,/safeNext\|\|'\/membership-required'/);
 });
 
+test('public K4K signup continues to the selected plan page after email confirmation',()=>{
+ const signup=read('app/signup/page.js');
+ const callback=read('app/auth/callback/route.js');
+ const pricing=read('app/pricing/page.js');
+ const subscribe=read('app/pricing/SubscribeButton.js');
+ const credits=read('app/k4k-app/credits/page.js');
+ const auth=read('app/components/AcademyAuthForm.js');
+ assert.match(signup,/setNextPath\(requested==='\/k4k-app\/credits'\?requested:'\/pricing'\)/);
+ assert.match(signup,/auth\/callback\?next=/);
+ assert.match(signup,/window\.location\.assign\(nextPath\)/);
+ assert.match(callback,/'\/pricing'/);
+ assert.match(callback,/K4K_PUBLIC_DESTINATIONS\.has\(next\)/);
+ assert.match(subscribe,/\/signup\?next=/);
+ assert.match(credits,/\/signup\?next=%2Fk4k-app%2Fcredits/);
+ assert.match(auth,/\/signup\?next=%2Fpricing/);
+ assert.match(pricing,/currencyForCountry/);
+ assert.match(pricing,/optional learning space/);
+});
+
 test('Stripe Checkout fails closed when membership status cannot be loaded',()=>{
  const route=read('app/api/billing/checkout/route.js');
  assert.match(route,/if \(membershipError\)/);
