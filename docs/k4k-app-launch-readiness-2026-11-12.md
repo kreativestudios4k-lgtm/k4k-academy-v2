@@ -2,8 +2,8 @@
 
 **Target repository:** `kreativestudios4k-lgtm/k4k-academy-v2`  
 **Target branch:** `integration/k4k-billing-checkout-20261107`  
-**Latest verified application source/test commit:** `90648614bec5492fb8cb26ededb42165233eb9cd`  
-**Latest verified Preview deployment (including readiness documentation):** READY — `https://kreativestudios4k-site-cb5i5as41-kreative-studios4k.vercel.app`  
+**Latest verified application source/test commit:** `9c9f98f7cb9e7bf2dd7d91fc201df36a37904dcb`  
+**Latest verified Preview deployment (including readiness documentation):** READY — `https://kreativestudios4k-site-8a36q1wox-kreative-studios4k.vercel.app`  
 **Launch verdict:** NOT READY — payment, credit, and provider-generation end-to-end checks remain unverified.
 
 ## Product and customer journey
@@ -85,6 +85,7 @@ A concrete race was found in the webhook handler: Stripe can deliver `invoice.pa
 The Preview branch now:
 - Detects an invoice whose subscription has not yet been linked and returns a retryable error instead of marking the event processed.
 - Continues to ignore genuinely older invoices for a replaced subscription when a newer membership event is already recorded.
+- Accepts equal-second timestamps for a paid invoice when the matching subscription is already linked; Stripe event timestamps have one-second precision, so a strict less-than filter could otherwise drop a legitimate invoice.
 - Adds regression coverage for the early-invoice retry/replay path and the replaced-subscription stale path.
 
 ### Stripe Preview-only guard
@@ -154,7 +155,7 @@ These are point-in-time counts, not a migration or entitlement reconciliation. E
 - Updated customer-facing signup links from the legacy registration route to `/signup`.
 - Corrected Genjutsu/Genjutsu Light rate-card estimates and Genjutsu Light reference-video billing.
 - Added customer-journey and provider-cost regression tests.
-- Fixed the out-of-order Stripe invoice/subscription delivery race and added regression tests.
+- Fixed the out-of-order Stripe invoice/subscription delivery race, including same-second event timestamps, and added regression tests.
 - Restricted K4K APP checkout and subscription webhook routes to Preview plus Stripe test-mode keys, and pinned checkout return URLs to the trusted deployment host.
 - Updated the repository README to document K4K APP as the primary product and preserve Academy.
 
