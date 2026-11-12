@@ -174,7 +174,7 @@ test('first payment and each renewal grant that plan credits', async () => {
 });
 
 test('a retried invoice does not grant credits twice', async () => {
-  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', last_event_created: 1}}});
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', stripe_subscription_id: 'sub_1', last_event_created: 1}}});
   const once = {id: 'evt_r1', type: 'invoice.paid', created: 10, data: {object: paidInvoice('in_9', 'subscription_cycle')}};
   const again = {id: 'evt_r2', type: 'invoice.paid', created: 11, data: {object: paidInvoice('in_9', 'subscription_cycle')}};
   await handleStripeEvent(once, store);
@@ -183,7 +183,7 @@ test('a retried invoice does not grant credits twice', async () => {
 });
 
 test('plan changes and manual invoices grant no credits', async () => {
-  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'active', last_event_created: 1}}});
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'active', stripe_subscription_id: 'sub_1', last_event_created: 1}}});
   const change = {id: 'evt_c1', type: 'invoice.paid', created: 10, data: {object: paidInvoice('in_c', 'subscription_update')}};
   const result = await handleStripeEvent(change, store);
   assert.equal(result.credits, undefined);
