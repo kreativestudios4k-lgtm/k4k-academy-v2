@@ -49,6 +49,17 @@ test('checkout remains restricted to Stripe test keys and AI generation remains 
  assert.match(creator,/AI generation is disabled/);
 });
 
+test('K4K Stripe checkout and webhook are restricted to Preview and trusted deployment origins',()=>{
+ const checkout=read('app/api/billing/checkout/route.js');
+ const webhook=read('app/api/billing/webhook/route.js');
+ const billing=read('lib/server/stripe-billing.mjs');
+ assert.match(checkout,/VERCEL_ENV !== 'preview'/);
+ assert.match(checkout,/previewDeploymentOrigin/);
+ assert.match(webhook,/VERCEL_ENV !== 'preview'/);
+ assert.match(webhook,/assertTestModeKey\(process\.env\.STRIPE_SECRET_KEY\)/);
+ assert.match(billing,/parsed\.hostname !== vercelUrl/);
+});
+
 test('public account registration does not promise paid generation',()=>{
  const register=read('app/k4k-app/register/page.js');
  assert.match(register,/AI generation remains disabled/);
