@@ -31,7 +31,7 @@ test('key is stored only in an HTTP-only secure-in-preview cookie and never retu
  const actions=readFileSync('app/k4k-app/higgsfield-key-actions.js','utf8');
  assert.match(actions,/httpOnly:true/);
  assert.match(actions,/sameSite:'lax'/);
- assert.match(actions,/path:'\\/'/);
+ assert.ok(actions.includes("path:'/'"));
  assert.match(actions,/VERCEL_ENV==='preview'/);
  assert.match(actions,/maxAge:60\*60\*24\*30/);
  assert.match(actions,/return \{ok:true,saved:true\}/);
