@@ -1,5 +1,5 @@
 import {NextResponse} from 'next/server';
-import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
+import {assertTestModeKey, verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
 import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 
@@ -32,6 +32,14 @@ function isNonSubscriptionEvent(event) {
 }
 
 export async function POST(request) {
+  if (process.env.VERCEL_ENV !== 'preview') {
+    return NextResponse.json({error: 'PREVIEW_ONLY'}, {status: 403, headers: NO_STORE});
+  }
+  try {
+    assertTestModeKey(process.env.STRIPE_SECRET_KEY);
+  } catch {
+    return NextResponse.json({error: 'TEST_MODE_ONLY'}, {status: 503, headers: NO_STORE});
+  }
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return NextResponse.json({error: 'UNAVAILABLE'}, {status: 503, headers: NO_STORE});
 
