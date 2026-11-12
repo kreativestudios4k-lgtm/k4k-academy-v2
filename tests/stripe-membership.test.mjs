@@ -36,9 +36,16 @@ function memoryStore({customers = {}, memberships = {}} = {}) {
       memberships[userId] = {...membership, last_event_created: eventCreated};
       return {handled: true};
     },
-    async applyInvoiceStatus({userId, status, eventCreated}) {
+    async applyInvoiceStatus({userId, stripeSubscriptionId, status, eventCreated}) {
       const current = memberships[userId];
-      if (!current || isStale(current.last_event_created, eventCreated)) return {handled: false, reason: 'STALE_EVENT'};
+      if (!current) return {handled: false, reason: 'SUBSCRIPTION_NOT_LINKED'};
+      if (current.stripe_subscription_id !== stripeSubscriptionId) {
+        if (Number.isFinite(current.last_event_created) && Number.isFinite(eventCreated) && current.last_event_created > eventCreated) {
+          return {handled: false, reason: 'STALE_EVENT'};
+        }
+        return {handled: false, reason: 'SUBSCRIPTION_NOT_LINKED'};
+      }
+      if (isStale(current.last_event_created, eventCreated)) return {handled: false, reason: 'STALE_EVENT'};
       memberships[userId] = {...current, status, last_event_created: eventCreated};
       return {handled: true};
     },
@@ -101,7 +108,7 @@ test('deletion marks the membership canceled', async () => {
 });
 
 test('failed payment marks past_due and a later paid invoice restores active', async () => {
-  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'active', last_event_created: 100}}});
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'active', stripe_subscription_id: 'sub_1', last_event_created: 100}}});
   const failed = {id: 'evt_fail', type: 'invoice.payment_failed', created: 200, data: {object: {customer: 'cus_1', subscription: 'sub_1'}}};
   const paid = {id: 'evt_paid', type: 'invoice.paid', created: 300, data: {object: {customer: 'cus_1', subscription: 'sub_1'}}};
   await handleStripeEvent(failed, store);
@@ -129,8 +136,37 @@ function paidInvoice(id, reason, priceId = CREATOR_GBP) {
     lines: {data: [{price: {id: priceId}, period: {end: 1800000000}}]}};
 }
 
+test('invoice delivered before subscription creation remains retryable and grants after linkage', async () => {
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', last_event_created: 10}}});
+  const invoiceEvent = {id: 'evt_invoice_early', type: 'invoice.paid', created: 20,
+    data: {object: paidInvoice('in_early', 'subscription_create')}};
+
+  await assert.rejects(handleStripeEvent(invoiceEvent, store), /SUBSCRIPTION_NOT_LINKED/);
+  assert.equal(store.processed.has(invoiceEvent.id), false);
+  assert.equal(store.granted.has('in_early'), false);
+
+  const subscriptionEvent = {id: 'evt_subscription_later', type: 'customer.subscription.created', created: 15,
+    data: {object: subscription()}};
+  await handleStripeEvent(subscriptionEvent, store);
+  const replayed = await handleStripeEvent(invoiceEvent, store);
+  assert.equal(replayed.credits.granted, true);
+  assert.equal(store.granted.has('in_early'), true);
+});
+
+test('older invoice for a replaced subscription is acknowledged as stale, not retried forever', async () => {
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {
+    user_1: {status: 'active', stripe_subscription_id: 'sub_new', last_event_created: 300},
+  }});
+  const event = {id: 'evt_old_sub_invoice', type: 'invoice.paid', created: 200,
+    data: {object: {...paidInvoice('in_old_sub', 'subscription_cycle'), subscription: 'sub_old'}}};
+  const result = await handleStripeEvent(event, store);
+  assert.equal(result.reason, 'STALE_EVENT');
+  assert.equal(store.processed.has(event.id), true);
+  assert.equal(store.granted.has('in_old_sub'), false);
+});
+
 test('first payment and each renewal grant that plan credits', async () => {
-  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', last_event_created: 1}}});
+  const store = memoryStore({customers: {cus_1: 'user_1'}, memberships: {user_1: {status: 'incomplete', stripe_subscription_id: 'sub_1', last_event_created: 1}}});
   const first = {id: 'evt_p1', type: 'invoice.paid', created: 10, data: {object: paidInvoice('in_1', 'subscription_create')}};
   const renewal = {id: 'evt_p2', type: 'invoice.paid', created: 20, data: {object: paidInvoice('in_2', 'subscription_cycle')}};
   assert.equal((await handleStripeEvent(first, store)).credits.credits, 160);
