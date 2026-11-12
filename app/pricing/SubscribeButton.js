@@ -19,7 +19,7 @@ export default function SubscribeButton({plan,currency='GBP',style}){
    const supabase=createClient();
    const {data:{session}}=await supabase.auth.getSession();
    if(!session?.access_token){
-    window.location.href=`/login?next=${encodeURIComponent(`/pricing`)}`;
+    window.location.href=`/signup?next=${encodeURIComponent('/pricing')}`;
     return;
    }
    const res=await fetch('/api/billing/checkout',{
