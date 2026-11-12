@@ -15,6 +15,7 @@ export async function GET(request){
   '/k4k-app/credits',
   '/k4k-app/creator',
   '/k4k-app/videos',
+  '/pricing',
  ]);
  const safeNext=K4K_PUBLIC_DESTINATIONS.has(next)?next:null;
  const target=new URL(isPasswordRecovery?'/update-password':(safeNext||'/membership-required'),origin);
