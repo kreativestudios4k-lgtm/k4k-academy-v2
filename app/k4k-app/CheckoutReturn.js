@@ -9,13 +9,24 @@ export default function CheckoutReturn(){
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
  const [state,setState]=useState(null),[balance,setBalance]=useState(null);
  useEffect(()=>{
-  if(new URLSearchParams(window.location.search).get('checkout')!=='success')return;
-  let stopped=false,timer,attempts=0;setState('checking');
+  const params=new URLSearchParams(window.location.search);
+  if(params.get('checkout')!=='success')return;
+  const sessionId=params.get('session_id');
+  let stopped=false,timer,attempts=0,asked=false;setState('checking');
+  // The webhook may be late or fail. Ask the server to confirm the payment
+  // with Stripe and grant the credits itself; it cannot grant them twice.
+  async function reconcile(token){
+   if(asked)return;asked=true;
+   try{await fetch('/api/billing/reconcile',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(sessionId?{sessionId}:{})})}catch{}
+  }
   async function check(){
    try{
     const client=createClient();const {data:{user},error}=await client.auth.getUser();
     if(stopped)return;
     if(error||!user){setState('sign-in');return;}
+    const {data:{session}}=await client.auth.getSession();
+    if(session?.access_token)await reconcile(session.access_token);
+    if(stopped)return;
     const [membership,wallet]=await Promise.all([
      client.from('memberships').select('status').eq('user_id',user.id).maybeSingle(),
      client.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle()
