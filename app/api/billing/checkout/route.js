@@ -7,6 +7,7 @@ import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 import {REFERRAL_COOKIE,recordReferral,referralsEnabled} from '../../../../lib/server/referral-tracking.mjs';
 
+import {exclusivePartner,isMatheusCode} from '../../../../lib/server/matheus-partner.mjs';
 export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
@@ -77,7 +78,10 @@ export async function POST(request) {
       const limits=launchLimits();
       const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!serviceKey)throw Error('LAUNCH_UNAVAILABLE');
       const database=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
-      const referral=referralsEnabled()?await recordReferral(database,user.id,request.cookies?.get(REFERRAL_COOKIE)?.value):null;
+      const partner=referralsEnabled()?await exclusivePartner(database):null;
+      const code=request.cookies?.get(REFERRAL_COOKIE)?.value;
+      const referral=partner&&user.id!==partner.user_id?await recordReferral(database,user.id,isMatheusCode(code)?code:null):null;
+      if(referral&&!isMatheusCode(referral))throw Error('REFERRAL_REVIEW_REQUIRED');
       const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
