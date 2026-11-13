@@ -38,7 +38,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  const homepage=source('app/k4k-app/page.js');
  assert.match(homepage,/return <CinematicLaunch\/>/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
- assert.match(launch,/04\.12\.2026/);
+ assert.match(launch,/14\.11\.2026/);
  assert.match(launch,/catalogue\.trending/);
  assert.match(launch,/IntersectionObserver/);
  assert.match(launch,/muted=\{muted\} loop playsInline/);

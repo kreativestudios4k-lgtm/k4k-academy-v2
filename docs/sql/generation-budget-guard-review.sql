@@ -18,7 +18,7 @@ grant select,insert on public.k4k_generation_budget_allocations to service_role;
 
 create or replace function public.k4k_generation_reserve_budgeted(
  p_user uuid,p_job uuid,p_key uuid,p_credits integer,p_enabled boolean,
- p_provider text,p_quote_micros bigint,p_daily_budget_micros bigint,p_max_active integer
+ p_provider text,p_quote_micros bigint,p_daily_budget_micros bigint,p_max_active integer,p_total_budget_micros bigint
 ) returns jsonb
 language plpgsql security invoker set search_path='' as $$
 declare
@@ -26,15 +26,17 @@ declare
  v_job public.studio_generation_jobs%rowtype;
  v_used bigint;
  v_active bigint;
+ v_total bigint;
  v_day_start timestamptz;
  v_result jsonb;
 begin
- if coalesce(auth.role(),'') <> 'service_role' then raise exception 'FORBIDDEN'; end if;
+ if current_user <> 'service_role' or coalesce(auth.role(),'') <> 'service_role' then raise exception 'FORBIDDEN'; end if;
  if p_enabled is distinct from true then raise exception 'GENERATION_DISABLED'; end if;
- if p_provider is null or p_provider not in ('higgsfield','fal')
+ if p_provider is distinct from 'fal'
   or p_quote_micros is null or p_quote_micros < 1 or p_quote_micros > 5000000
   or p_daily_budget_micros is null or p_daily_budget_micros < 1
   or p_daily_budget_micros > 100000000000
+  or p_total_budget_micros is null or p_total_budget_micros<1 or p_total_budget_micros>100000000000
   or p_max_active is null or p_max_active not between 1 and 10
   or p_credits is null or p_credits not between 1 and 10000
  then raise exception 'PROVIDER_BUDGET_BLOCKED'; end if;
@@ -55,7 +57,7 @@ begin
  end if;
  select * into v_job from public.studio_generation_jobs where id=p_job and user_id=p_user;
  if not found or v_job.status<>'draft' then raise exception 'JOB_NOT_DRAFT'; end if;
- if coalesce(v_job.provider,'higgsfield')<>p_provider then raise exception 'INVALID_JOB'; end if;
+ if v_job.provider is distinct from p_provider or v_job.model is distinct from 'lite' then raise exception 'INVALID_JOB'; end if;
  select count(*) into v_active from public.studio_generation_jobs
   where user_id=p_user and status in ('queued','processing');
  if v_active>=p_max_active then raise exception 'ACTIVE_JOB_LIMIT'; end if;
@@ -63,6 +65,8 @@ begin
  select coalesce(sum(quote_micros),0) into v_used from public.k4k_generation_budget_allocations
   where created_at>=v_day_start;
  if v_used+p_quote_micros>p_daily_budget_micros then raise exception 'PROVIDER_DAILY_BUDGET_BLOCKED'; end if;
+ select coalesce(sum(quote_micros),0) into v_total from public.k4k_generation_budget_allocations;
+ if v_total+p_quote_micros>p_total_budget_micros then raise exception 'PROVIDER_TOTAL_BUDGET_BLOCKED'; end if;
  v_result:=public.k4k_generation_reserve_checked(p_user,p_job,p_key,p_credits,true);
  if (v_result->>'newly_reserved')::boolean is true then
   insert into public.k4k_generation_budget_allocations(job_id,user_id,provider,quote_micros)
@@ -71,8 +75,8 @@ begin
  return v_result;
 end;
 $$;
-revoke all on function public.k4k_generation_reserve_budgeted(uuid,uuid,uuid,integer,boolean,text,bigint,bigint,integer) from public,anon,authenticated;
-grant execute on function public.k4k_generation_reserve_budgeted(uuid,uuid,uuid,integer,boolean,text,bigint,bigint,integer) to service_role;
+revoke all on function public.k4k_generation_reserve_budgeted(uuid,uuid,uuid,integer,boolean,text,bigint,bigint,integer,bigint) from public,anon,authenticated;
+grant execute on function public.k4k_generation_reserve_budgeted(uuid,uuid,uuid,integer,boolean,text,bigint,bigint,integer,bigint) to service_role;
 commit;
 -- Daily allocations intentionally remain counted even after a rejection/refund:
 -- conservative upper bound, including uncertain dispatches, prevents overspend.

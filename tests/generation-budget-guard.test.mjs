@@ -9,8 +9,8 @@ test('production submissions fail closed without the budget guard',()=>{
  assert.equal(generationBudgetPolicy({VERCEL_ENV:'preview'},'fal',0.25),null);
 });
 test('budget policy requires valid limits and converts USD to integer micros',()=>{
- const env={VERCEL_ENV:'preview',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_MAX_ACTIVE_JOBS_PER_USER:'2'};
- assert.deepEqual(generationBudgetPolicy(env,'fal',0.25),{provider:'fal',quoteMicros:250000,dailyBudgetMicros:15000000,maxActive:2});
+ const env={VERCEL_ENV:'preview',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_PROVIDER_TOTAL_BUDGET_USD:'280',K4K_MAX_ACTIVE_JOBS_PER_USER:'2'};
+ assert.deepEqual(generationBudgetPolicy(env,'fal',0.25),{provider:'fal',quoteMicros:250000,dailyBudgetMicros:15000000,maxActive:2,totalBudgetMicros:280000000});
  assert.throws(()=>generationBudgetPolicy({...env,K4K_MAX_ACTIVE_JOBS_PER_USER:'0'},'fal',0.25),/PROVIDER_BUDGET_BLOCKED/);
  assert.throws(()=>generationBudgetPolicy(env,'fal',16),/PROVIDER_BUDGET_BLOCKED/);
 });
@@ -18,7 +18,7 @@ test('budget-enabled ledger uses only the transactional budgeted RPC',async()=>{
  const calls=[];
  const client={rpc:async(name,args)=>{calls.push({name,args});return {data:{newly_reserved:false,status:'reserved'}}}};
  const ledger=createGuardedGenerationLedger(client,{enabled:true});
- const budget={provider:'fal',quoteMicros:250000,dailyBudgetMicros:15000000,maxActive:2};
+ const budget={provider:'fal',quoteMicros:250000,dailyBudgetMicros:15000000,maxActive:2,totalBudgetMicros:280000000};
  const result=await ledger.reserve('u','j','k',5,budget);
  assert.equal(result.newlyReserved,false);
  assert.equal(calls.length,1);
