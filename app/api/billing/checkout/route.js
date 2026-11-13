@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
-import {assertBillingKey,assertTaxReady,billingMode} from '../../../../lib/server/billing-policy.mjs';
+import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 
@@ -49,7 +49,7 @@ export async function POST(request) {
   if (!secret) return json({error: 'UNAVAILABLE'}, 503);
   try {
     if(billingMode()==='test')assertTestModeKey(secret);
-    assertBillingKey(secret);assertTaxReady();
+    assertBillingKey(secret);assertTaxReady();assertLiveLaunchReady();
 
   } catch {
     return json({error:'BILLING_SETUP_REQUIRED'},503);
@@ -60,7 +60,7 @@ export async function POST(request) {
     global: {headers: {Authorization: `Bearer ${token}`}},
     auth: {persistSession: false, autoRefreshToken: false},
   });
-  const {data: membership, error: membershipError} = await scoped.from('memberships').select('status').eq('user_id', user.id).maybeSingle();
+  const {data: membership, error: membershipError} = await scoped.from(billingMode()==='live'?'k4k_app_memberships':'memberships').select('status').eq('user_id', user.id).maybeSingle();
   // Failure to read the subscription guard must not permit a duplicate Checkout.
   if (membershipError) {
     console.error('Checkout membership guard unavailable', {code: membershipError.code || 'unknown'});
