@@ -46,12 +46,12 @@ export default function CinematicLaunch(){
  <div className="kc-kicker"><i/> BY KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
  <h1><span>{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}</span><span>{tr('THE TREND.','A TENDÊNCIA.','LA TENDENCIA.')}</span><em>{tr('CREATE IT.','CRIE A SUA.','CRÉALA.')}</em></h1>
  <p>{tr('Your imagination. Your characters. Your next viral video.','Sua imaginação. Seus personagens. Seu próximo vídeo viral.','Tu imaginación. Tus personajes. Tu próximo vídeo viral.')}</p>
- <a className="kc-release" href="#release"><span>{tr('PLANNED RELEASE','LANÇAMENTO PREVISTO','LANZAMIENTO PREVISTO')}</span><strong>04.12.2026</strong><ArrowUpRight size={22}/></a>
+ <a className="kc-release" href="#release"><span>{tr('PLANNED RELEASE','LANÇAMENTO PREVISTO','LANZAMIENTO PREVISTO')}</span><strong>14.11.2026</strong><ArrowUpRight size={22}/></a>
  </section>
  <section className="kc-showcase" id="showcase"><div className="kc-showcase-head"><div><span>K4K ORIGINALS</span><h2>{tr('THE WORLD IS WATCHING.','O MUNDO ESTÁ ASSISTINDO.','EL MUNDO ESTÁ MIRANDO.')}</h2></div><button type="button" onClick={()=>setPaused(p=>!p)} aria-label={paused?'Play previews':'Pause previews'}>{paused?<Play size={17}/>:<Pause size={17}/>} {paused?tr('Play','Reproduzir','Reproducir'):tr('Pause','Pausar','Pausar')}</button></div>
  <div className="kc-video-grid">{videos.map((item,index)=><ShowcaseVideo key={item.id} item={item} index={index} paused={paused||authOpen}/>)}</div>
  </section>
- <section id="release" className="kc-final"><span>K4K APP / {tr('COMING SOON','EM BREVE','PRÓXIMAMENTE')}</span><h2><span>{tr('THE NEXT ERA','A NOVA ERA','LA NUEVA ERA')}</span><em>{tr('OF CREATORS.','DOS CRIADORES.','DE LOS CREADORES.')}</em></h2><strong className="kc-final-date">04.12.2026</strong><p>{tr('Planned launch. Final timing depends on testing and readiness.','Lançamento previsto. A data final depende dos testes e da preparação.','Lanzamiento previsto. La fecha final depende de las pruebas y la preparación.')}</p></section>
+ <section id="release" className="kc-final"><span>K4K APP / {tr('COMING SOON','EM BREVE','PRÓXIMAMENTE')}</span><h2><span>{tr('THE NEXT ERA','A NOVA ERA','LA NUEVA ERA')}</span><em>{tr('OF CREATORS.','DOS CRIADORES.','DE LOS CREADORES.')}</em></h2><strong className="kc-final-date">14.11.2026</strong><p>{tr('Planned launch. Final timing depends on testing and readiness.','Lançamento previsto. A data final depende dos testes e da preparação.','Lanzamiento previsto. La fecha final depende de las pruebas y la preparación.')}</p></section>
  </main><footer className="kc-footer"><strong>K4K™</strong><span>CREATED BY KREATIVESTUDIOS4K</span><div><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/k4k-app/support">Support</Link></div></footer>
  <LaunchAuthDialog open={authOpen} onClose={()=>setAuthOpen(false)}/>
  </div>;

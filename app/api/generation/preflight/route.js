@@ -17,6 +17,7 @@ export async function POST(request){
  try{body=await request.json()}catch{return reply({error:'INVALID_JSON'},400)}
  if(!body||typeof body!=='object'||Array.isArray(body))return reply({error:'INVALID_INPUT'},400);
  const {tier,resolution='720p',sourceSeconds,imageCount}=body;
+ if(tier!=='lite'||resolution!=='720p')return reply({error:'INVALID_RESOLUTION'},400);
  if(!Number.isInteger(imageCount)||imageCount<1||imageCount>8)return reply({error:'IMAGE_COUNT_OUT_OF_RANGE'},400);
  try{
   if(body.provider&&body.provider!=='fal')return reply({error:'UNSUPPORTED_PROVIDER'},400);
