@@ -8,7 +8,7 @@
     "start": "next start",
     "test:billing": "node --test tests/stripe-invoice-safety.test.mjs",
     "test:journey": "node --test tests/customer-journey.test.mjs",
-    "prebuild": "npm run test:all",
+    "prebuild": "npm run test:all && node scripts/verify-live-stripe.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
     "test:all": "node --test tests/*.test.mjs"
   },
