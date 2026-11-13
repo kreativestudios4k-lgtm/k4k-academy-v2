@@ -4,6 +4,7 @@ import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.m
 import {billingMode} from '../../../../lib/server/billing-policy.mjs';
 import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
+import {isK4KLiveEvent} from '../../../../lib/server/live-webhook-scope.mjs';
 
 export const runtime = 'nodejs';
 
@@ -59,6 +60,8 @@ export async function POST(request) {
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
   }
+
+  try { if(!isK4KLiveEvent(event))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE}); } catch { return NextResponse.json({error:'RETRY',reason:'LIVE_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE}); }
 
   let nonSubscription;
   try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
