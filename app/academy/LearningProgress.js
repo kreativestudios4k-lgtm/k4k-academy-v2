@@ -3,11 +3,8 @@ import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../lib/supabase/client';
 import {CheckCircle2,ArrowRight,LoaderCircle} from 'lucide-react';
-import {k4kLessons} from '../../lib/k4k-course-v3';
 
-const lessons=k4kLessons.map(l=>({id:l.id,name:'Lab '+l.number+' · '+l.title,href:'/academy/lessons/'+l.slug}));
-
-export default function LearningProgress({workflowTwoAvailable=false}){
+export default function LearningProgress({lessons=[]}){
  const [progress,setProgress]=useState({});const [status,setStatus]=useState('loading');
  useEffect(()=>{let alive=true;(async()=>{try{
   const supabase=createClient();const {data:{user}}=await supabase.auth.getUser();
