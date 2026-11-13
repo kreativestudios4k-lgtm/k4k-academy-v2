@@ -2,8 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {motionCreditPreview,maySubmitDisplayedQuote,libraryJobsWithActive} from '../lib/generation-experience.mjs';
 
-test('local estimate includes reference and output and rounds duration conservatively',()=>{
- for(const [model,seconds,credits] of [['lite',5,14],['pro',5,28],['lite',10,28],['pro',10,56],['lite',5.01,17],['pro',15,84]]){
+test('local estimate bills generated output only and rounds duration conservatively',()=>{
+ for(const [model,seconds,credits] of [['lite',5,7],['pro',5,14],['lite',10,14],['pro',10,28],['lite',5.01,9],['pro',15,42]]){
   const result=motionCreditPreview(model,seconds);
   assert.equal(result.credits,credits);
   assert.equal(result.outputSeconds,Math.ceil(seconds));

@@ -1,3 +1,4 @@
+import {requireAcademyAccess} from '../../lib/server/academy-access';
 import Link from 'next/link';
 import {ArrowUpRight,ArrowLeft} from 'lucide-react';
 import {IdeaHeader} from '../components/IdeaUI';
@@ -6,7 +7,8 @@ import CopyLessonPrompt from '../academy/topics/[slug]/CopyLessonPrompt';
 export const dynamic='force-dynamic';
 export const metadata={robots:{index:false,follow:false}};
 
-export default function K4KPromptVault(){
+export default async function K4KPromptVault(){
+ await requireAcademyAccess();
  return <main className="k4k-classroom"><IdeaHeader privateArea/><div className="k4k-course-shell">
   <nav className="k4k-course-breadcrumb"><Link href="/academy"><ArrowLeft size={16}/> YOUR STUDIO</Link><span>THE K4K PROMPT CONTROL ROOM</span></nav>
   <header style={{padding:'55px 0 33px'}}><span className="k4k-course-kicker">K4K ACADEMY / CONTROLLED GENERATION</span><h1 style={{fontSize:'clamp(53px,7vw,98px)',letterSpacing:'-.09em',lineHeight:'.88',margin:'20px 0'}}>PROMPT LESS.<br/><span style={{color:'#caff39'}}>DIRECT BETTER.</span></h1><p style={{fontSize:15,color:'#bfccb7',lineHeight:1.7,maxWidth:720}}>Eleven original reusable templates using one repeatable K4K principle: define the reference, lock what matters, request one change and audit the output. Replace placeholders, use authorised inputs and test before publishing.</p></header>

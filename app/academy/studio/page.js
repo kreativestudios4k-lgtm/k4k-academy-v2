@@ -1,3 +1,4 @@
+import {requireAcademyAccess} from '../../../lib/server/academy-access';
 import Link from 'next/link';
 import {ArrowLeft,ArrowUpRight,Clapperboard,LockKeyhole,ShieldCheck,Sparkles} from 'lucide-react';
 import {IdeaHeader} from '../../components/IdeaUI';
@@ -9,7 +10,8 @@ export const metadata={
  description:'Private K4K IDEA workflow to preview a reference video, assign character sheets and create Genjutsu prompts. Media stays in the browser.',
  robots:{index:false,follow:false}
 };
-export default function AcademyCharacterSwapStudio(){
+export default async function AcademyCharacterSwapStudio(){
+ await requireAcademyAccess();
  return <main className="k4k-classroom k4k-creator-studio"><IdeaHeader privateArea/>
   <div className="k4k-course-shell">
    <nav className="k4k-course-breadcrumb"><Link href="/academy"><ArrowLeft size={16}/> BACK TO ACADEMY</Link><span>PAID MEMBER TOOL / K4K IDEA</span><Link href="/academy/lessons/viral-character-swap">WORKFLOW LESSON <ArrowUpRight size={15}/></Link></nav>

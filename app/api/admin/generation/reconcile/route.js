@@ -6,9 +6,9 @@ const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control
 const uuid=/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/i;
 
 // The support API uses the existing database-backed administrator role.
-// Preview only until explicitly reviewed and enabled for production.
+// Preview is available; production recovery is separately enabled without enabling new generation.
 async function adminContext(request){
- if(process.env.VERCEL_ENV!=='preview')throw Error('NOT_AVAILABLE');
+ if(process.env.VERCEL_ENV!=='preview'&&!(process.env.VERCEL_ENV==='production'&&process.env.K4K_ADMIN_RECONCILE_ENABLED==='true'))throw Error('NOT_AVAILABLE');
  const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,secret=process.env.SUPABASE_SERVICE_ROLE_KEY;
  if(!token)throw Error('UNAUTHENTICATED');

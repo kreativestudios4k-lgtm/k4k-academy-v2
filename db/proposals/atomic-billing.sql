@@ -25,7 +25,7 @@ create or replace function public.k4k_apply_invoice_event(
 ) returns jsonb language plpgsql security invoker set search_path='' as $$
 declare m public.memberships%rowtype; g public.k4k_credit_grants%rowtype; result jsonb;
 begin
- if p_event is null or p_type not in ('invoice.paid','invoice.payment_failed') or p_created is null or p_user is null or p_subscription is null or p_invoice is null or p_credits is null or p_credits not between 0 and 10000 or p_status not in ('active','past_due') or (p_type<>'invoice.paid' and p_credits<>0) then raise exception 'INVALID_INVOICE';end if;
+ if p_event is null or p_type not in ('invoice.paid','invoice.payment_failed') or p_created is null or p_user is null or p_subscription is null or p_invoice is null or p_credits is null or p_credits not between 0 and 10000 or (p_type='invoice.paid' and p_status is distinct from 'active') or (p_type='invoice.payment_failed' and (p_status is distinct from 'past_due' or p_credits<>0)) then raise exception 'INVALID_INVOICE';end if;
  perform pg_advisory_xact_lock(hashtext('k4k-event:'||p_event));
  if exists(select 1 from public.stripe_webhook_events where event_id=p_event) then return jsonb_build_object('handled',false,'reason','DUPLICATE');end if;
  perform pg_advisory_xact_lock(hashtext('k4k-invoice:'||p_invoice));
@@ -35,15 +35,23 @@ begin
   -- Subscription-created may arrive after its first invoice. Retry while unlinked.
   if m.stripe_subscription_id is null then raise exception 'SUBSCRIPTION_NOT_LINKED';end if;
   result=jsonb_build_object('handled',false,'reason','SUBSCRIPTION_MISMATCH');
- elsif m.last_event_created is not null and m.last_event_created>p_created then
-  result=jsonb_build_object('handled',false,'reason','STALE_EVENT');
  else
+  -- Membership chronology and the invoice's financial entitlement are independent.
+  -- An older paid renewal for this verified subscription must still grant once.
   select * into g from public.k4k_credit_grants where invoice_id=p_invoice;
-  if found and (g.user_id<>p_user or g.credits<>p_credits) then raise exception 'CREDIT_GRANT_CONFLICT';end if;
-  update public.memberships set status=p_status,last_event_created=p_created,current_period_end=coalesce(p_period_end,current_period_end),updated_at=now() where user_id=p_user;
-  result=jsonb_build_object('handled',true);
-  if p_credits>0 then
-   result=result||jsonb_build_object('credits',public.k4k_grant_subscription_credits(p_user,p_invoice,p_credits));
+  if found and (g.user_id<>p_user or (p_credits>0 and g.credits<>p_credits)) then raise exception 'CREDIT_GRANT_CONFLICT';end if;
+  if p_type='invoice.payment_failed' and g.invoice_id is not null then
+   result=jsonb_build_object('handled',false,'reason','INVOICE_ALREADY_PAID');
+  elsif (m.last_event_created is not null and m.last_event_created>p_created)
+     or (p_period_end is not null and m.current_period_end is not null and p_period_end<m.current_period_end)
+     or m.status in ('canceled','incomplete_expired') then
+   result=jsonb_build_object('handled',false,'reason','STALE_MEMBERSHIP_STATE');
+  else
+   update public.memberships set status=p_status,last_event_created=p_created,current_period_end=coalesce(p_period_end,current_period_end),updated_at=now() where user_id=p_user;
+   result=jsonb_build_object('handled',true);
+  end if;
+  if p_type='invoice.paid' and p_credits>0 then
+   result=result||jsonb_build_object('handled',true,'credits',public.k4k_grant_subscription_credits(p_user,p_invoice,p_credits));
   end if;
  end if;
  insert into public.stripe_webhook_events(event_id,type) values(p_event,p_type);

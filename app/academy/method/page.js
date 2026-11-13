@@ -1,3 +1,4 @@
+import {requireAcademyAccess} from '../../../lib/server/academy-access';
 import Link from 'next/link';
 import {ArrowUpRight,CheckCircle2,ClipboardList} from 'lucide-react';
 import {IdeaHeader} from '../../components/IdeaUI';
@@ -5,9 +6,11 @@ import K4KReferencePhoto from '../../components/K4KReferencePhoto';
 import CopyLessonPrompt from '../topics/[slug]/CopyLessonPrompt';
 import {ideaSteps} from '../../../lib/k4k-idea';
 import {k4kLessons} from '../../../lib/k4k-course-v3';
+export const dynamic='force-dynamic';
 export const metadata={title:'The K4K IDEA Method — Academy',robots:{index:false,follow:false}};
 const template="K4K IDEA / PRODUCTION NOTE\n\nI — INVESTIGATE\nOne-sentence goal:\nInput photo or footage and usage permission:\nWhat must stay consistent:\nFinal platform and size:\n\nD — DIRECT\nIdentity / glasses / mask / proportions:\nChange exactly one thing:\nCamera / lighting / environment:\nInput image order and role:\n\nE — EXECUTE\nAI tool / model / version:\nPrompt version:\nNumber of attempts / credit budget:\nStrongest attempt and faults:\n\nA — AUDIT\nIdentity and anatomy review:\nBackground, clothing and object check:\nRights, disclosure and export:\nOne correction / final learning:";
-export default function Method(){
+export default async function Method(){
+ await requireAcademyAccess();
  return <main className="k4k-classroom"><IdeaHeader privateArea/><div className="k4k-course-shell">
  <nav className="k4k-course-breadcrumb"><Link href="/academy">← RETURN TO STUDIO</Link><span>K4K / OWN PRODUCTION METHOD</span></nav>
  <header className="k4k-lesson-hero"><div><span className="k4k-course-kicker">FOUR DECISIONS · ONE REPEATABLE SYSTEM</span><h1>YOUR IDEA.<br/><span style={{color:'#caff39'}}>YOUR CONTROL.</span></h1><p className="k4k-lesson-subtitle">I → D → E → A</p><p>K4K IDEA is our way of learning through evidence. We don't promise a perfect image from a magic sentence; we ask the creator to choose references, direct one change, test it, and audit what really happened.</p><Link className="k4k-course-primary" href="/academy/lessons/viral-character-swap">START GENJUTSU LAB 01 <ArrowUpRight size={16}/></Link></div><div className="k4k-lesson-photo"><K4KReferencePhoto index={1}/><span>YOUR CREATOR IDENTITY · THE CONSISTENT REFERENCE</span></div></header>

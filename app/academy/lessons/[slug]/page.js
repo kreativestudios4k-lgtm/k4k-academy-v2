@@ -1,3 +1,4 @@
+import {requireAcademyAccess} from '../../../../lib/server/academy-access';
 import Link from 'next/link';
 import {notFound} from 'next/navigation';
 import {ArrowLeft,ArrowRight,ArrowUpRight,CheckCircle2,ClipboardCheck,Clock3,ShieldCheck} from 'lucide-react';
@@ -10,6 +11,7 @@ export const dynamic='force-dynamic';
 export function generateStaticParams(){return k4kLessons.map(x=>({slug:x.slug}))}
 export async function generateMetadata({params}){const {slug}=await params;const l=k4kLessons.find(x=>x.slug===slug);return {title:l?l.title+' | K4K Academy':'Academy lesson',robots:{index:false,follow:false}}}
 export default async function K4KLab({params}){
+ await requireAcademyAccess();
  const {slug}=await params;const l=k4kLessons.find(x=>x.slug===slug);if(!l)notFound();
  const index=k4kLessons.findIndex(x=>x.slug===slug);
  const prev=k4kLessons[index-1],next=k4kLessons[index+1];

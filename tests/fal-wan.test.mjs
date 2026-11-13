@@ -9,10 +9,11 @@ const id='11111111-1111-4111-8111-111111111111';
 const input={video_url:'https://private.example/reference.mp4',image_urls:['https://private.example/face.jpg'],resolution:'720p',prompt:'Keep the motion.'};
 const env={FAL_KEY:'secret',K4K_FAL_WAN_ENABLED:'true',K4K_FAL_RATE_CARD_APPROVED:'true'};
 const ok=body=>({ok:true,json:async()=>body});
-test('Lite is fixed to 720p; Pro is fixed to 1080p; both bill reference plus output',()=>{
- assert.equal(falMotionEstimate('lite',{resolution:'720p',sourceSeconds:5}).usd,1.4);
- assert.equal(falMotionEstimate('pro',{resolution:'1080p',sourceSeconds:5}).usd,2.8);
- assert.equal(falMotionEstimate('lite',{resolution:'720p',sourceSeconds:5.01}).usd,1.68);
+test('Lite is fixed to 720p; Pro is fixed to 1080p; both bill output seconds only',()=>{
+ assert.equal(falMotionEstimate('lite',{resolution:'720p',sourceSeconds:5}).usd,0.7);
+ assert.equal(falMotionEstimate('pro',{resolution:'1080p',sourceSeconds:5}).usd,1.4);
+ assert.equal(falMotionEstimate('lite',{resolution:'720p',sourceSeconds:5.01}).usd,0.84);
+ assert.equal(falMotionEstimate('pro',{resolution:'1080p',sourceSeconds:15}).usd,4.2);
  for(const tier of ['lite','pro'])for(const seconds of [0,1.9,15.01,30,NaN])assert.throws(()=>falMotionEstimate(tier,{resolution:tier==='lite'?'720p':'1080p',sourceSeconds:seconds}),/REFERENCE_DURATION/);
  assert.throws(()=>falMotionEstimate('lite',{resolution:'1080p',sourceSeconds:5}),/INVALID_RESOLUTION/);
  assert.throws(()=>falMotionEstimate('pro',{resolution:'720p',sourceSeconds:5}),/INVALID_RESOLUTION/);
@@ -33,9 +34,9 @@ test('estimate is local, explicitly unverified, and cannot use an unapproved rat
 test('submission guards prevent network access; accepted job URLs must match fal queue exactly',async()=>{
  const calls=[];const base='https://queue.fal.run/alibaba/wan-3.0-prime/requests/'+id;
  const rest=createFalWanRest({credentials:'key',env,fetchImpl:async(url,options)=>{calls.push({url,options});return ok({request_id:id,status_url:base+'/status',response_url:base})}});
- const options={enabled:true,idempotencyKey:id,maxUsd:5,quotedUsd:1.4,sourceSeconds:5};
+ const options={enabled:true,idempotencyKey:id,maxUsd:5,quotedUsd:0.7,sourceSeconds:5};
  await assert.rejects(rest.submit('lite',input),/GENERATION_DISABLED/);
- await assert.rejects(rest.submit('lite',input,{...options,maxUsd:1}),/BUDGET_BLOCKED/);
+ await assert.rejects(rest.submit('lite',input,{...options,maxUsd:0.5}),/BUDGET_BLOCKED/);
  assert.equal(calls.length,0);
  assert.equal((await rest.submit('lite',input,options)).request_id,id);
  assert.equal(calls.length,1);assert.equal(calls[0].url,'https://queue.fal.run/alibaba/wan-3.0-prime/reference-to-video');
@@ -62,13 +63,13 @@ test('fal approval and signing are separate from Higgsfield; a provider change i
 test('customer fal submission reserves once, passes trusted duration, and records provider request',async()=>{
  const config={...env,VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_GENERATION_TEST_USERS:id,K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_MAX_USD:'5'};
  const job={id,user_id:id,status:'draft',provider:'fal',model:'lite'};
- const token=quoteSigner('secret').issue({provider:'fal',userId:id,jobId:id,resolution:'720p',usd:1.4,credits:14,fingerprint:draftFingerprint(job,'720p')});
+ const token=quoteSigner('secret').issue({provider:'fal',userId:id,jobId:id,resolution:'720p',usd:0.7,credits:7,fingerprint:draftFingerprint(job,'720p')});
  const calls=[];
  const database={rpc:async()=>{calls.push('reserve');return {data:{newly_reserved:true}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>({data:{id,user_id:id,provider_job_id:id,status:'processing'}})})})})})})})})};
- const provider={estimate:async()=>({usd:1.4}),submit:async(tier,body,options)=>{calls.push('submit');assert.equal(options.sourceSeconds,5);return {request_id:id}}};
+ const provider={estimate:async()=>({usd:0.7}),submit:async(tier,body,options)=>{calls.push('submit');assert.equal(options.sourceSeconds,5);return {request_id:id}}};
  const submit=createGenerationSubmitService({database,provider,env:config,prepare:async()=>({input,sourceSeconds:5})});
  assert.equal((await submit({userId:id,job,quoteToken:token,requestKey:id})).status,'processing');
  assert.deepEqual(calls,['reserve','submit']);
- const invalid=quoteSigner('secret').issue({provider:'higgsfield',userId:id,jobId:id,resolution:'720p',usd:1.4,credits:14,fingerprint:draftFingerprint(job,'720p')});
+ const invalid=quoteSigner('secret').issue({provider:'higgsfield',userId:id,jobId:id,resolution:'720p',usd:0.7,credits:7,fingerprint:draftFingerprint(job,'720p')});
  await assert.rejects(submit({userId:id,job,quoteToken:invalid,requestKey:id}),/QUOTE_CHANGED/);
 });

@@ -1,3 +1,4 @@
+import {requireAcademyAccess} from '../../lib/server/academy-access';
 import Link from 'next/link';
 import {ArrowUpRight,ArrowRight,CheckCircle2,BookOpen,ShieldCheck,Image as ImageIcon,Lightbulb,LockKeyhole,Sparkles,Clapperboard} from 'lucide-react';
 import {IdeaHeader} from '../components/IdeaUI';
@@ -9,7 +10,8 @@ import {k4kLessons} from '../../lib/k4k-course-v3';
 export const dynamic='force-dynamic';
 export const metadata={title:'Your K4K IDEA Studio — Academy Course',robots:{index:false,follow:false}};
 
-export default function Academy(){
+export default async function Academy(){
+ await requireAcademyAccess();
  return <main className="k4k-classroom">
   <IdeaHeader privateArea/>
   <div className="k4k-course-shell">
