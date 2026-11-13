@@ -17,6 +17,8 @@ test('isolated K4K APP purchase preserves existing Academy membership, grants cr
  create table public.stripe_webhook_events(event_id text primary key,type text,processed_at timestamptz default now());
  grant all on all tables in schema public to service_role;grant usage on schema public to service_role;`);
  await db.exec(read('db/proposals/2026-11-07_subscription_credit_grants.sql'));
+ // Mirror the verified production grants on this pre-existing ledger.
+ await db.exec('grant select,insert on public.k4k_credit_grants to service_role');
  await db.exec(read('docs/sql/soft-launch-admission.sql'));
  await db.exec(read('docs/sql/k4k-app-service-separation.sql'));
  await db.exec(`set role service_role;set request.jwt.claim.role='service_role';`);
