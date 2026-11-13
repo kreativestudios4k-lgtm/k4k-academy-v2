@@ -55,13 +55,20 @@ export async function POST(request) {
     return NextResponse.json({error: 'INVALID_PAYLOAD'}, {status: 400, headers: NO_STORE});
   }
 
-  if(event.livemode!==(billingMode()==='live'))return NextResponse.json({error:'BILLING_MODE_MISMATCH'},{status:400,headers:NO_STORE});
+  // Production uses a live endpoint secret regardless of whether checkout is open.
+  // Preview must never process a live event or write live membership state.
+  const production=process.env.VERCEL_ENV==='production';
+  if(event.livemode!==production)return NextResponse.json({error:'BILLING_MODE_MISMATCH'},{status:400,headers:NO_STORE});
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
   }
 
   try { if(!isK4KLiveEvent(event))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE}); } catch { return NextResponse.json({error:'RETRY',reason:'LIVE_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE}); }
+
+  // No K4K live payments should exist before activation. Retry any genuine
+  // K4K event instead of dropping it; unrelated Academy events already exit 200.
+  if(production&&billingMode()!=='live')return NextResponse.json({error:'LIVE_PROCESSING_NOT_ENABLED'},{status:503,headers:NO_STORE});
 
   let nonSubscription;
   try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
