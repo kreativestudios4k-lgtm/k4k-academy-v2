@@ -61,7 +61,7 @@ export default function Academy(){
     </div>
    </section>
 
-   <LearningProgress/>
+   <LearningProgress lessons={k4kLessons.map(l=>({id:l.id,name:'Lab '+l.number+' · '+l.title,href:'/academy/lessons/'+l.slug}))}/>
 
    <section className="k4k-course-module-section" id="curriculum">
     <div className="k4k-course-section-head"><div><span className="k4k-course-kicker">THE ACTUAL COURSE</span><h2>SIX LABS.<br/><em>ONE CREATOR METHOD.</em></h2></div><p>Step-by-step decisions, an original K4K prompt, a practical assignment and a quality check in every lesson.</p></div>
