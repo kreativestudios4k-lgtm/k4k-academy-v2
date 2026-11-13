@@ -25,6 +25,8 @@ export async function POST(request) {
   const {data: {user} = {}, error} = await createClient(url, publishableKey, {auth: {persistSession: false, autoRefreshToken: false}}).auth.getUser(token);
   if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
 
+  if(process.env.K4K_BILLING_QA_ONLY==='true'&&(process.env.VERCEL_ENV!=='preview'||user.app_metadata?.k4k_billing_qa!==true||user.email!=='k4k-launch-qa-20261113@example.com'))return json({error:'QA_ACCOUNT_REQUIRED'},403);
+
   let mode;
   try { mode = assertBillingKey(secret); } catch { return json({error: 'BILLING_SETUP_REQUIRED'}, 503); }
 

@@ -70,6 +70,13 @@ export async function POST(request) {
   // K4K event instead of dropping it; unrelated Academy events already exit 200.
   if(production&&billingMode()!=='live')return NextResponse.json({error:'LIVE_PROCESSING_NOT_ENABLED'},{status:503,headers:NO_STORE});
 
+  if(process.env.K4K_BILLING_QA_ONLY==='true'){
+    const o=event?.data?.object;const marker='20261113';
+    const isQA=event.livemode===false&&(o?.metadata?.k4k_billing_qa===marker||o?.parent?.subscription_details?.metadata?.k4k_billing_qa===marker||o?.subscription_details?.metadata?.k4k_billing_qa===marker);
+    if(!isQA)return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_QA_ACCOUNT'},{status:200,headers:NO_STORE});
+    // Checkout requires the synthetic user's verified server-owned auth marker.
+    if(event.type.startsWith('checkout.session.')&&o?.client_reference_id!==process.env.K4K_QA_USER_ID&&o?.customer_email!=='k4k-launch-qa-20261113@example.com')return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_QA_ACCOUNT'},{status:200,headers:NO_STORE});
+  }
   let nonSubscription;
   try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
   if (nonSubscription) {

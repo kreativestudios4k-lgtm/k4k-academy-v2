@@ -29,6 +29,9 @@ export async function POST(request) {
   const {data: {user} = {}, error} = await auth.auth.getUser(token);
   if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
 
+  // Dedicated QA preview may only create test sessions for its synthetic user.
+  if(process.env.K4K_BILLING_QA_ONLY==='true'&&(process.env.VERCEL_ENV!=='preview'||user.app_metadata?.k4k_billing_qa!==true||user.email!=='k4k-launch-qa-20261113@example.com'))return json({error:'QA_ACCOUNT_REQUIRED'},403);
+
   let body;
   try {
     body = await request.json();
@@ -91,13 +94,13 @@ export async function POST(request) {
   // Keep Stripe test Checkout returning to this exact Preview deployment rather
   // than a shared production site URL. Do not trust a client-supplied origin.
   const requestUrl = new URL(request.url);
-  const origin = requestUrl.origin;
+  const origin = process.env.K4K_BILLING_QA_ONLY==='true'&&process.env.VERCEL_ENV==='preview'&&process.env.VERCEL_URL ? 'https://'+process.env.VERCEL_URL : requestUrl.origin;
   let res;
   try {
     res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
-      body: (()=>{const form=buildCheckoutForm({priceId,userId:user.id,origin,plan:body.plan,currency:expectedCurrency});form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');return form.toString()})(),
+      body: (()=>{const form=buildCheckoutForm({priceId,userId:user.id,origin,plan:body.plan,currency:expectedCurrency});form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');if(process.env.K4K_BILLING_QA_ONLY==='true'){form.set('metadata[k4k_billing_qa]','20261113');form.set('subscription_data[metadata][k4k_billing_qa]','20261113');form.set('customer_email',user.email);}return form.toString()})(),
       signal: AbortSignal.timeout(12000),
     });
   } catch (error) {
