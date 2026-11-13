@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/qa-verify-corrected-webhook.mjs",
+    "build": "next build && node scripts/qa-inclusive-prices.mjs",
     "start": "next start",
     "test:billing": "node --test tests/stripe-invoice-safety.test.mjs",
     "test:journey": "node --test tests/customer-journey.test.mjs",
