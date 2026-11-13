@@ -1,6 +1,6 @@
 import {createClient} from '@supabase/supabase-js';
 import {referralsEnabled} from '../../../../lib/server/referral-tracking.mjs';
-import {isMatheusAccount,exclusivePartner,MATHEUS_TERMS} from '../../../../lib/server/matheus-partner.mjs';
+import {PARTNER_TERMS,approvedPartner} from '../../../../lib/server/partner-policy.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function GET(request){
@@ -12,11 +12,12 @@ export async function GET(request){
  const options={auth:{persistSession:false,autoRefreshToken:false}};
  const {data:{user}={},error}=await createClient(url,key,options).auth.getUser(token);
  if(error||!user||user.is_anonymous)return json({error:'UNAUTHENTICATED'},401);
- if(!isMatheusAccount(user.id))return json({error:'PARTNER_NOT_ACTIVE'},403);
  const db=createClient(url,secret,options);
- try{if(!await exclusivePartner(db))return json({error:'PARTNER_NOT_ACTIVE'},403)}catch{return json({error:'UNAVAILABLE'},503)}
+ const {data:partner,error:partnerError}=await db.from('k4k_app_partners').select('user_id,code,active,commission_bps').eq('user_id',user.id).maybeSingle();
+ if(partnerError)return json({error:'UNAVAILABLE'},503);
+ if(!approvedPartner(partner)||partner.user_id!==user.id)return json({error:'PARTNER_NOT_ACTIVE'},403);
  const {data,error:statsError}=await db.rpc('k4k_app_partner_stats',{p_partner:user.id});
  if(statsError||!data)return json({error:'UNAVAILABLE'},503);
  if(!data.active)return json({error:'PARTNER_NOT_ACTIVE'},403);
- return json({...data,ambassador:MATHEUS_TERMS});
+ return json({...data,terms:PARTNER_TERMS});
 }

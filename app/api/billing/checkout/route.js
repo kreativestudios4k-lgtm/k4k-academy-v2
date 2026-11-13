@@ -5,9 +5,9 @@ import {livePrices} from '../../../../lib/server/live-price-config.mjs';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
-import {REFERRAL_COOKIE,recordReferral,referralsEnabled} from '../../../../lib/server/referral-tracking.mjs';
+import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
 
-import {exclusivePartner,isMatheusCode} from '../../../../lib/server/matheus-partner.mjs';
+import {findPartner} from '../../../../lib/server/partner-policy.mjs';
 import {studentCode,studentDiscountRequested,applyStudentDiscount} from '../../../../lib/k4k-student-discount.mjs';
 export const runtime = 'nodejs';
 
@@ -81,16 +81,16 @@ export async function POST(request) {
       const limits=launchLimits();
       const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!serviceKey)throw Error('LAUNCH_UNAVAILABLE');
       const database=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
-      const partner=referralsEnabled()?await exclusivePartner(database):null;
       const code=requestedDiscount?'matheusborrascah':request.cookies?.get(REFERRAL_COOKIE)?.value;
+      const partner=referralsEnabled()?await findPartner(database,code):null;
       if(requestedDiscount&&(!partner||user.id===partner.user_id))return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
-      const referral=partner&&user.id!==partner.user_id?await recordReferral(database,user.id,isMatheusCode(code)?code:null):null;
-      if(referral&&!isMatheusCode(referral))throw Error('REFERRAL_REVIEW_REQUIRED');
-      if(requestedDiscount&&!isMatheusCode(referral))return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
+      const referral=referralsEnabled()?await recordReferral(database,user.id,partner&&user.id!==partner.user_id?code:null):null;
+      if(referral&&(!validReferralCode(referral)||!await findPartner(database,referral)))throw Error('REFERRAL_REVIEW_REQUIRED');
+      if(requestedDiscount&&referral!=='matheusborrascah')return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
       const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
-      if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);applyStudentDiscount(form);}
+      if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(referral==='matheusborrascah')applyStudentDiscount(form);}
       const destination=await openLaunchCheckout({database,claim,secret,form});
       return json({url:destination},200);
     }catch(problem){
