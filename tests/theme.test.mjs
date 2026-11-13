@@ -78,7 +78,9 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  const pricing=source('app/k4k-app/credits/page.js');
  const creator=source('app/k4k-app/creator/page.js');
  assert.match(pricing,/k4k-pricing-grid/);
- assert.match(pricing,/Stripe test checkout/);
+ assert.match(pricing,/checkoutReady/);
+ assert.match(pricing,/Published prices include applicable tax/);
+ assert.match(pricing,/disabled=\{!currency\|\|checkoutBusy\|\|!checkoutReady\}/);
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
