@@ -81,3 +81,7 @@
 .kc-header .kc-mobile-nav{position:static;inset:auto;width:100%;height:auto;z-index:auto;align-items:stretch;justify-content:flex-start}
 .kc-auth-dialog:not([open]){display:none}
 @media(min-width:761px) and (max-width:1100px){.kc-nav-inner{gap:12px;padding-inline:20px;grid-template-columns:auto minmax(0,1fr) auto}.kc-desktop-nav a{padding-inline:8px}.kc-header-right{gap:8px}}
+
+/* Early access: long translated copy must wrap on narrow phones. */
+.kc-final-spots{display:block;color:var(--kc-neon);font-size:clamp(24px,5vw,60px);line-height:1.08;letter-spacing:-.035em;max-width:950px;margin:0 auto;overflow-wrap:anywhere}
+.kc-early-cta{max-width:100%;justify-content:center;white-space:normal}.kc-early-cta strong{white-space:normal;font-size:clamp(13px,2.5vw,18px)}.kc-early-cta svg{flex-shrink:0}
