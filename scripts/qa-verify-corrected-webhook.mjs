@@ -1,7 +1,7 @@
 // One-off TEST-only webhook delivery verification; never creates payments.
 import {createHmac} from 'node:crypto';
 const env=process.env;if(env.VERCEL_ENV!=='preview'||env.K4K_BILLING_QA_ONLY!=='true'||env.K4K_QA_VERIFY_WEBHOOK!=='true')process.exit(0);
-if(!env.STRIPE_SECRET_KEY?.startsWith('sk_test_')||env.K4K_LIVE_PAYMENTS_ENABLED==='true'||env.K4K_QA_USER_ID!=='a1e90744-a600-4823-88ae-e81c25609fd3'||!env.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_'))throw Error('QA_UNSAFE');
+const safe={testKey:env.STRIPE_SECRET_KEY?.startsWith('sk_test_')===true,liveDisabled:env.K4K_LIVE_PAYMENTS_ENABLED!=='true',qaUser:env.K4K_QA_USER_ID==='a1e90744-a600-4823-88ae-e81c25609fd3',webhookConfigured:typeof env.STRIPE_WEBHOOK_SECRET==='string'&&env.STRIPE_WEBHOOK_SECRET.length>10,webhookPrefix:env.STRIPE_WEBHOOK_SECRET?.startsWith('whsec_')===true};console.log('QA_SAFETY '+JSON.stringify(safe));if(!safe.testKey||!safe.liveDisabled||!safe.qaUser||!safe.webhookConfigured)throw Error('QA_UNSAFE');
 const base='https://api.stripe.com/v1/',headers={Authorization:'Bearer '+env.STRIPE_SECRET_KEY};const get=async path=>{const r=await fetch(base+path,{headers,signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('QA_READ_'+r.status);return r.json()};
 const id='we_1UZJX3L7fmdMaK0kpnrZzeGo',ep=await get('webhook_endpoints/'+id);
 const old=new URL(ep.url),target='https://kreativestudios4k-site-2q6r4vsyk-kreative-studios4k.vercel.app';
