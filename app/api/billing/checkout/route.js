@@ -4,6 +4,7 @@ import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../li
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
 import {assertBillingKey,assertTaxReady,billingMode} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
+import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 
 export const runtime = 'nodejs';
 
@@ -67,6 +68,24 @@ export async function POST(request) {
   }
   if (membership && ['active', 'trialing'].includes(membership.status)) {
     return json({error: 'ALREADY_SUBSCRIBED'}, 409);
+  }
+
+  // A live customer must hold a funded seat before a Stripe Session exists.
+  if(billingMode()==='live'){
+    try{
+      const limits=launchLimits();
+      const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!serviceKey)throw Error('LAUNCH_UNAVAILABLE');
+      const database=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
+      const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
+      const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
+      form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
+      const destination=await openLaunchCheckout({database,claim,secret,form});
+      return json({url:destination},200);
+    }catch(problem){
+      const conflict=['LAUNCH_SOLD_OUT','LAUNCH_CREDIT_CAPACITY','LAUNCH_CHECKOUT_PENDING','ALREADY_SUBSCRIBED','CHECKOUT_EXPIRED_RETRY','CHECKOUT_RECONCILE_REQUIRED'];
+      const known=[...conflict,'LAUNCH_NOT_OPEN','LAUNCH_CONFIG_INVALID','LAUNCH_CHECKOUT_REVIEW','STRIPE_UNREACHABLE','CHECKOUT_FAILED','LAUNCH_SESSION_INVALID'];
+      return json({error:known.includes(problem?.message)?problem.message:'LAUNCH_UNAVAILABLE'},conflict.includes(problem?.message)?409:503);
+    }
   }
 
   // Keep Stripe test Checkout returning to this exact Preview deployment rather

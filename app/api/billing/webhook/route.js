@@ -14,6 +14,7 @@ const NO_STORE = {'Cache-Control': 'no-store'};
 const SUBSCRIPTION_EVENTS = new Set([
   'checkout.session.completed',
   'checkout.session.async_payment_succeeded',
+  'checkout.session.expired',
   'charge.refunded',
   'charge.dispute.created',
   'customer.subscription.created',
