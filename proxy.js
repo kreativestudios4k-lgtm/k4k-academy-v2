@@ -11,9 +11,11 @@ export async function proxy(request){
  if(path==='/api/mentor'||path.startsWith('/api/mentor/')||path==='/api/realtime'||path.startsWith('/api/realtime/'))return NextResponse.json({error:'This Academy feature has been discontinued.'},{status:410});
  const h=new Headers(request.headers);const country=h.get('x-vercel-ip-country')||'US';h.set('x-k4k-country',country);h.set('x-k4k-currency',market(country));
  let response=NextResponse.next({request:{headers:h}});
- const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;if(!url||!key)return response;
+ const protectedPath=path.startsWith('/academy')||path.startsWith('/prompts')||path.startsWith('/mentor')||path.startsWith('/api/mentor')||path.startsWith('/api/realtime');
+ const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+ if(!url||!key){if(protectedPath)return new NextResponse('Protected content temporarily unavailable.',{status:503,headers:{'Cache-Control':'no-store'}});return response;}
  const supabase=createServerClient(url,key,{cookies:{getAll(){return request.cookies.getAll()},setAll(cs){cs.forEach(({name,value})=>request.cookies.set(name,value));response=NextResponse.next({request:{headers:h}});cs.forEach(({name,value,options})=>response.cookies.set(name,value,options))}}});
- const{data}=await supabase.auth.getClaims();const user=data?.claims;const protectedPath=request.nextUrl.pathname.startsWith('/academy')||request.nextUrl.pathname.startsWith('/prompts')||request.nextUrl.pathname.startsWith('/mentor')||request.nextUrl.pathname.startsWith('/api/mentor')||request.nextUrl.pathname.startsWith('/api/realtime');
+ const{data}=await supabase.auth.getClaims();const user=data?.claims;
  if(protectedPath&&!user){if(request.nextUrl.pathname.startsWith('/api/'))return NextResponse.json({error:'Authentication required'},{status:401});const u=request.nextUrl.clone();u.pathname='/login';u.search='';u.searchParams.set('next','/academy');return NextResponse.redirect(u)}
  if(protectedPath&&user){
   const uid=user.sub;
