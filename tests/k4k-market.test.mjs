@@ -17,6 +17,6 @@ test('every region price maps to an approved test checkout price ID',()=>{
 test('pricing UI uses canonical prices and passes the selected displayed currency',()=>{
  const source=readFileSync(new URL('../app/k4k-app/credits/page.js',import.meta.url),'utf8');
  assert.match(source,/PLAN_PRICES\[plan\.key\]\[currency\]/);
- assert.match(source,/body:JSON\.stringify\(\{plan:selected,currency\}\)/);
+ assert.match(source,/body:JSON\.stringify\(\{plan:selected,currency,discountCode:discountCode\.trim\(\)\|\|undefined\}\)/);
  assert.doesNotMatch(source,/currency:brazil\?'BRL':'GBP'/);
 });
