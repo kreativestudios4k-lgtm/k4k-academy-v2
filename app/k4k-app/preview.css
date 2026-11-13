@@ -129,3 +129,16 @@
 @media(min-width:1100px){.k4k-light.k4k-studio-shell{padding-left:88px}.k4k-light.k4k-studio-shell .k4k-light-nav{left:0!important;top:0!important;bottom:0!important;right:auto!important;transform:none!important;width:88px!important;border-radius:0;background:#090c08;border:0;border-right:1px solid #ffffff16;box-shadow:none;flex-direction:column;justify-content:flex-start;gap:12px;padding:93px 6px 20px!important}.k4k-light.k4k-studio-shell .k4k-light-nav a{min-height:67px;gap:5px;font-weight:500}.k4k-light.k4k-studio-shell .k4k-light-nav a>span{width:45px;height:39px;border-radius:10px;color:#a9b59c;background:transparent;box-shadow:none}.k4k-light.k4k-studio-shell .k4k-light-nav a.active>span{background:#c7ff361b;color:#c7ff36;box-shadow:none}.k4k-light.k4k-studio-shell .k4k-light-nav a small{font-size:10px}.k4k-light.k4k-studio-shell .k4k-light-main{padding-bottom:45px!important}.k4k-studio-shell .k4k-support-dock{bottom:24px}}
 @media(max-width:1099px){.k4k-light.k4k-studio-shell .k4k-studio-topnav{display:none}.k4k-light.k4k-studio-shell .k4k-global-header{padding:12px 18px}.k4k-light.k4k-studio-shell .k4k-light-nav a>span{height:36px;width:43px;border-radius:10px}.k4k-light.k4k-studio-shell .k4k-light-nav small{font-size:10px}.k4k-light.k4k-studio-shell .k4k-light-main{padding:16px 14px 125px!important}}
 @media(max-width:700px){.k4k-account-summary{grid-template-columns:1fr}.k4k-account-panel{padding:20px}.k4k-account-heading{margin-bottom:22px}.k4k-account-section-heading{align-items:flex-start}.k4k-account-section-heading h2{font-size:18px}.k4k-studio-shell .k4k-global-header nav{gap:8px}.k4k-studio-shell select{max-width:76px}.k4k-studio-shell .k4k-profile-link{display:none}.k4k-light.k4k-studio-shell .k4k-global-brand{font-size:17px}.k4k-studio-shell .k4k-global-brand img{width:27px;height:27px}}
+
+/* Shared workspace header: reset the landing page's global absolute nav rule.
+   Both header menus must remain normal-flow flex items on every app route. */
+.k4k-light .k4k-global-header{position:relative;min-width:0}
+.k4k-light .k4k-global-header>nav{position:static;inset:auto;width:auto;height:auto;padding:0;margin:0;border:0;background:transparent;transform:none;z-index:auto;min-width:0}
+.k4k-light .k4k-global-header>.k4k-global-brand{flex:0 0 auto;white-space:nowrap}
+.k4k-light .k4k-global-header>.k4k-global-brand img{flex:0 0 auto}
+.k4k-light .k4k-global-header>.k4k-studio-topnav{flex:1 1 auto;justify-content:flex-start;flex-wrap:wrap;gap:8px clamp(12px,1.5vw,24px)}
+.k4k-light .k4k-global-header>.k4k-studio-topnav a{white-space:nowrap}
+.k4k-light .k4k-global-header>.k4k-customer-nav{flex:0 0 auto;justify-content:flex-end;flex-wrap:nowrap}
+.k4k-light .k4k-global-header>.k4k-customer-nav .k4k-account-status{white-space:nowrap;min-width:0}
+@media(max-width:1099px){.k4k-light.k4k-studio-shell .k4k-global-header>.k4k-studio-topnav{display:none}.k4k-light .k4k-global-header{justify-content:space-between;gap:12px}}
+@media(max-width:700px){.k4k-light .k4k-global-header{gap:8px;flex-wrap:wrap}.k4k-light .k4k-global-header>.k4k-customer-nav{gap:6px;flex:1 1 auto}.k4k-light .k4k-global-header>.k4k-customer-nav select{width:76px;min-width:0}.k4k-light .k4k-global-header>.k4k-customer-nav .k4k-account-status{padding:8px 10px;font-size:11px}}
