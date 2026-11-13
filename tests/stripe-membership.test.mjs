@@ -153,3 +153,5 @@ test('plan changes and manual invoices grant no credits', async () => {
   assert.equal(result.credits, undefined);
   assert.equal(store.granted.size, 0);
 });
+
+test('Stripe incomplete, unpaid, paused and incomplete_expired map to database-supported inactive status',()=>{for(const status of ['incomplete','incomplete_expired','unpaid','paused'])assert.equal(membershipFromSubscription(subscription({status})).status,'inactive')});
