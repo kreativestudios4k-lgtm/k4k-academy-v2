@@ -11,7 +11,7 @@ const stripe=async path=>{const response=await fetch('https://api.stripe.com/v1/
 const p=await stripe('prices/'+PLAN_PRICES.starter.stripePriceIds.GBP);
 if(p.livemode!==false||p.currency!=='gbp'||p.unit_amount!==1599||p.recurring?.interval!=='month'||!p.active)throw Error('QA_PRICE_MISMATCH');
 console.log('K4K QA test price verified: GBP 15.99, tax behavior '+p.tax_behavior);
-try{const endpoints=await stripe('webhook_endpoints?limit=100');console.log('K4K QA test webhook destinations: '+JSON.stringify(endpoints.data?.map(x=>({id:x.id,url:x.url,status:x.status,events:x.enabled_events}))||[]))}catch(error){console.log('K4K QA webhook inventory unavailable: '+error.message)}
+try{const endpoints=await stripe('webhook_endpoints?limit=100');console.log('K4K QA test webhook destinations: '+JSON.stringify(endpoints.data?.map(x=>({id:x.id,url:new URL(x.url).origin+new URL(x.url).pathname,status:x.status,events:x.enabled_events}))||[]))}catch(error){console.log('K4K QA webhook inventory unavailable: '+error.message)}
 const db=createClient(env.NEXT_PUBLIC_SUPABASE_URL,env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
 const password=randomBytes(32).toString('hex');
 const create=await db.auth.admin.createUser({email,password,email_confirm:true,app_metadata:{k4k_billing_qa:true},user_metadata:{display_name:'K4K Launch QA'}});
