@@ -1,4 +1,5 @@
 import {createClient} from '@supabase/supabase-js';
+import {accountMembershipView} from '../../../../lib/server/account-membership-view.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function GET(request){
@@ -10,13 +11,21 @@ export async function GET(request){
  const {data:{user}={},error}=await client.auth.getUser(token);
  if(error||!user||user.is_anonymous)return json({error:'UNAUTHENTICATED'},401);
  const fields='status,plan,current_period_end,cancel_at_period_end';
- const legacy=await client.from('memberships').select(fields).eq('user_id',user.id).maybeSingle();
+ const legacy=await client.from('memberships').select(fields+',stripe_subscription_id,stripe_price_id').eq('user_id',user.id).maybeSingle();
  if(legacy.error)return json({error:'UNAVAILABLE'},503);
- // Preview QA uses the old test-only ledger. Production never treats an
- // Academy subscription or a preview Stripe test as a paid K4K APP plan.
- if(process.env.VERCEL_ENV!=='production')return json({app:legacy.data,academy:null});
- const app=await client.from('k4k_app_memberships').select(fields).eq('user_id',user.id).maybeSingle();
+ // Look up only the authenticated owner's existing subscription. Never infer
+ // Academy status from the plan label: legacy Academy customers use starter.
+ let academyClaim=false;
+ if(legacy.data?.stripe_subscription_id){
+  const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if(!serviceKey)return json({error:'UNAVAILABLE'},503);
+  const service=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
+  const claim=await service.from('academy_subscription_claims').select('stripe_subscription_id').eq('stripe_subscription_id',legacy.data.stripe_subscription_id).maybeSingle();
+  if(claim.error)return json({error:'UNAVAILABLE'},503);
+  academyClaim=Boolean(claim.data);
+ }
+ const production=process.env.VERCEL_ENV==='production';
+ const app=production?await client.from('k4k_app_memberships').select(fields).eq('user_id',user.id).maybeSingle():{data:null,error:null};
  if(app.error)return json({error:'UNAVAILABLE'},503);
- const academy=legacy.data&&!['starter','creator','pro','studio'].includes(legacy.data.plan)?legacy.data:null;
- return json({app:app.data,academy});
+ return json(accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}));
 }
