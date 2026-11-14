@@ -53,7 +53,7 @@ export default function ToolsIndex() {
         <Link href="/k4k-app" className="market-logo">K4K<span> APP</span></Link>
         <nav>
           <Link href="/k4k-app">Home</Link>
-          <Link href="/k4k-app/coming-soon">New features</Link>
+          <Link href="/">New features</Link>
         </nav>
       </header>
 
@@ -79,7 +79,7 @@ export default function ToolsIndex() {
               </div>
               <p><b>{tool.status}</b></p>
               <p className="market-note">{tool.detail}</p>
-              <Link className="market-use" href="/k4k-app/coming-soon">See what is next ↗</Link>
+              <Link className="market-use" href="/">See what is next ↗</Link>
             </article>
           ))}
         </div>
