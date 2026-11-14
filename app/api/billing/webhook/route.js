@@ -6,6 +6,7 @@ import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 import {isK4KLiveEvent} from '../../../../lib/server/live-webhook-scope.mjs';
 import {resolveLiveBillingReview} from '../../../../lib/server/live-billing-review.mjs';
+import {firstPaidAppSubscription,ensureAppRenewalHold,renewalFundingGuardEnabled} from '../../../../lib/server/live-renewal-funding.mjs';
 import {isLiveWebhookAudit} from '../../../../lib/server/live-webhook-audit.mjs';
 
 export const runtime = 'nodejs';
@@ -104,6 +105,12 @@ export async function POST(request) {
 
   try {
     const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey, liveMode:production}),{liveMode:production,billingReviewKind});
+    // Do this after the entitlement transaction so payment is never lost if the
+    // renewal hold needs a retry. Duplicate deliveries re-check the hold too.
+    if(production&&renewalFundingGuardEnabled()){
+      const target=firstPaidAppSubscription(event);
+      if(target)await ensureAppRenewalHold(target);
+    }
     return NextResponse.json({received: true, type: event.type, ...result}, {status: 200, headers: NO_STORE});
   } catch (error) {
     // Any failure returns 503 so Stripe retries the event later.

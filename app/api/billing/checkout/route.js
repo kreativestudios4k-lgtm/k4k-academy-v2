@@ -90,6 +90,7 @@ export async function POST(request) {
       const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
+      if(!ownerLivePilot())form.set('custom_text[submit][message]','Your first month is charged now. During our funded launch, subsequent renewal invoices are held until generation capacity is funded. No new monthly credits are added until a renewal is paid. Contact support for cancellation or billing help.');
       if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(referral==='matheusborrascah')applyStudentDiscount(form);}
       if(ownerLivePilot())form.set('metadata[k4k_owner_live_pilot]','true');
       const destination=await openLaunchCheckout({database,claim,secret,form});
