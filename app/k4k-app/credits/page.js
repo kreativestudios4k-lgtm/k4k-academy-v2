@@ -29,8 +29,8 @@ export default function Credits(){
  useEffect(()=>{const params=new URLSearchParams(window.location.search);const selectedPlan=validPlan(params.get('plan'));setCancelled(params.get('checkout')==='cancelled');if(selectedPlan)setSelected(selectedPlan);let active=true;createClient().auth.getUser().then(({data})=>{if(active)setSignedIn(Boolean(data?.user&&!data.user.is_anonymous))}).catch(()=>{if(active)setSignedIn(false)});return()=>{active=false}},[]);
  const [billing,setBilling]=useState(null);
  const [discountCode,setDiscountCode]=useState('');
- useEffect(()=>{let active=true;fetch('/api/billing/readiness',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(active)setBilling(data)}).catch(()=>{});return()=>{active=false}},[]);
- const checkoutReady=billing?.checkoutReady===true;
+ useEffect(()=>{let active=true;setBilling(null);createClient().auth.getSession().then(({data})=>fetch('/api/billing/readiness',{cache:'no-store',headers:data?.session?.access_token?{Authorization:'Bearer '+data.session.access_token}:{}})).then(r=>r.ok?r.json():null).then(data=>{if(active){setBilling(data);if(data?.ownerPilot)setSelected('starter')}}).catch(()=>{});return()=>{active=false}},[signedIn]);
+ const checkoutReady=billing?.checkoutReady===true&&(!billing?.ownerPilot||selected==='starter');
  const live=billing?.mode==='live';
  const [checkoutBusy,setCheckoutBusy]=useState(false),[checkoutError,setCheckoutError]=useState('');
  useEffect(()=>{let active=true;fetch('/api/k4k-region',{cache:'no-store'})
@@ -80,6 +80,7 @@ export default function Credits(){
  return <PreviewShell active="Credits">
   <div className="k4k-pricing-page">
    <section className="k4k-pricing-hero"><span className="k4k-workspace-eyebrow">✦ K4K APP / CREATOR PLANS</span><h1>{tr('Create more. Go further.','Crie mais. Vá além.','Crea más. Llega más lejos.')}<span>✦</span></h1><p>{tr('Step 3 of 4 · Confirm your plan and continue to secure checkout when payments open.','Templates, projetos criativos, conta e créditos em um só lugar.','Plantillas, proyectos creativos, tu cuenta y tus créditos en un solo lugar.')}</p><div className="k4k-pricing-status"><span>● {checkoutReady?(live?tr('EARLY ACCESS','ACESSO ANTECIPADO','ACCESO ANTICIPADO'):tr('TEST MODE ONLY','SOMENTE MODO TESTE','SOLO MODO PRUEBA')):tr('EARLY ACCESS · CHECKOUT CLOSED','ACESSO ANTECIPADO · PAGAMENTO FECHADO','ACCESO ANTICIPADO · PAGO CERRADO')}</span><span>{tr('Monthly plans · generation credits','Planos mensais · créditos de geração','Planes mensuales · créditos de generación')}</span></div></section>
+   {billing?.ownerPilot&&<p role="status" className="k4k-pricing-note">Owner live verification: Starter only, real recurring payment. Public checkout remains closed.</p>}
    <div className="k4k-pricing-grid" role="group" aria-label="Choose a monthly plan">{plans.map(plan=><button type="button" key={plan.key} onClick={()=>{setSelected(plan.key);window.history.replaceState(null,'',planDestination(plan.key));setCheckoutError('')}} className={'k4k-pricing-plan'+(plan.key===selected?' selected':'')} aria-pressed={plan.key===selected}>
     <div className="k4k-pricing-plan-top"><span>{plan.name.toUpperCase()}</span>{plan.key==='creator'&&<strong>{tr('POPULAR','POPULAR','POPULAR')}</strong>}</div>
     <div className="k4k-pricing-price">{amount(plan)}<small>/{tr('month','mês','mes')}</small></div>

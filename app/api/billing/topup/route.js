@@ -1,12 +1,12 @@
 import {createClient} from '@supabase/supabase-js';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {creditPack,buildTopupCheckout} from '../../../../lib/server/credit-packs.mjs';
-import {assertBillingKey,assertTaxReady,billingMode} from '../../../../lib/server/billing-policy.mjs';
+import {assertBillingKey,assertTaxReady,billingMode,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
 import {stripeCheckoutDestination} from '../../../../lib/stripe-checkout-destination.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request){
- if(billingMode()==='live'&&process.env.K4K_SOFT_LAUNCH_ENABLED==='true')return json({error:'TOPUPS_DISABLED'},503);
+ if(ownerLivePilot()||(billingMode()==='live'&&process.env.K4K_SOFT_LAUNCH_ENABLED==='true'))return json({error:'TOPUPS_DISABLED'},503);
  if(process.env.K4K_WAITLIST_ONLY==='true')return Response.json({error:'WAITLIST_ONLY'},{status:503});
  try{
   const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
