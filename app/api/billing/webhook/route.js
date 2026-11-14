@@ -1,7 +1,7 @@
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
 import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
-import {billingMode} from '../../../../lib/server/billing-policy.mjs';
+import {billingProcessingMode} from '../../../../lib/server/billing-policy.mjs';
 import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 import {isK4KLiveEvent} from '../../../../lib/server/live-webhook-scope.mjs';
@@ -57,7 +57,7 @@ export async function POST(request) {
 
   // Production uses a live endpoint secret regardless of whether checkout is open.
   // Preview must never process a live event or write live membership state.
-  const production=process.env.VERCEL_ENV==='production';
+  const production=billingProcessingMode()==='live';
   if(event.livemode!==production)return NextResponse.json({error:'BILLING_MODE_MISMATCH'},{status:400,headers:NO_STORE});
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
@@ -66,9 +66,8 @@ export async function POST(request) {
 
   try { if(!isK4KLiveEvent(event))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE}); } catch { return NextResponse.json({error:'RETRY',reason:'LIVE_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE}); }
 
-  // No K4K live payments should exist before activation. Retry any genuine
-  // K4K event instead of dropping it; unrelated Academy events already exit 200.
-  if(production&&billingMode()!=='live')return NextResponse.json({error:'LIVE_PROCESSING_NOT_ENABLED'},{status:503,headers:NO_STORE});
+  // Pausing new purchases must not interrupt existing subscriptions, refunds
+  // or paid checkouts. Only verified, correctly scoped events reach the store.
 
   let nonSubscription;
   try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
@@ -86,7 +85,7 @@ export async function POST(request) {
   }
 
   try {
-    const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey}));
+    const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey, liveMode:production}),{liveMode:production});
     return NextResponse.json({received: true, type: event.type, ...result}, {status: 200, headers: NO_STORE});
   } catch (error) {
     // Any failure returns 503 so Stripe retries the event later.

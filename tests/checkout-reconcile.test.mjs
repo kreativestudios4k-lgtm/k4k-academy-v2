@@ -139,7 +139,9 @@ test('the route authenticates the caller and never trusts browser-supplied ident
   const route = read('app/api/billing/reconcile/route.js');
   assert.match(route, /auth\.getUser\(token\)/);
   assert.match(route, /userId: user\.id/);
-  assert.match(route, /assertBillingKey\(secret\)/);
+  assert.match(route, /assertProcessingKey\(secret\)/);
+  assert.match(route, /liveMode:mode==='live'/); // store uses the same server-verified processing mode
+  assert.doesNotMatch(route, /body\.liveMode/); // caller cannot select the payment environment
   assert.doesNotMatch(route, /body\.(userId|credits|plan|customer|invoiceId|amount)/);
   assert.doesNotMatch(route, /STRIPE_SECRET_KEY[^;]*json|console\.log/);
   // Only the session id may come from the browser.

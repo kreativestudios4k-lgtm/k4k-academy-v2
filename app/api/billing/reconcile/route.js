@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 import {reconcileCheckout, ReconcileError} from '../../../../lib/server/checkout-reconcile.mjs';
-import {assertBillingKey, billingMode} from '../../../../lib/server/billing-policy.mjs';
+import {assertProcessingKey} from '../../../../lib/server/billing-policy.mjs';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -26,7 +26,7 @@ export async function POST(request) {
   if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
 
   let mode;
-  try { mode = assertBillingKey(secret); } catch { return json({error: 'BILLING_SETUP_REQUIRED'}, 503); }
+  try { mode = assertProcessingKey(secret); } catch { return json({error: 'BILLING_SETUP_REQUIRED'}, 503); }
 
   let body = {};
   try { body = await request.json(); } catch { /* a session id is optional */ }
@@ -35,7 +35,7 @@ export async function POST(request) {
       const outcome = await reconcileCheckout({
         userId: user.id,
         sessionId: typeof body.sessionId === 'string' ? body.sessionId : null,
-        secret, store: createMembershipStore({url, serviceKey}), liveMode: mode === 'live',
+        secret, store: createMembershipStore({url, serviceKey, liveMode:mode==='live'}), liveMode: mode === 'live',
       });
       return json(outcome, 200);
     } catch (problem) {
