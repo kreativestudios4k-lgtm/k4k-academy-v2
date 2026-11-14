@@ -1,38 +1,31 @@
-// Payment-only QA fixture. Never invokes an AI provider. All writes use a
-// dedicated synthetic account and a test Stripe key; idempotent across builds.
+// Isolated payment-only lifecycle verification. Never calls any AI provider.
 import {createClient} from '@supabase/supabase-js';
-import {buildCheckoutForm,resolvePrice} from '../lib/server/stripe-billing.mjs';
 const env=process.env;
 if(env.VERCEL_ENV!=='preview'||env.K4K_BILLING_QA_ONLY!=='true'||env.K4K_QA_CORRECTED_CHECKOUT!=='true')process.exit(0);
 if(env.K4K_LIVE_PAYMENTS_ENABLED==='true'||env.K4K_ENABLE_PRODUCTION_GENERATION==='true'||env.K4K_ENABLE_TEST_GENERATION==='true'||!env.STRIPE_SECRET_KEY?.startsWith('sk_test_')||!env.SUPABASE_SERVICE_ROLE_KEY)throw Error('QA_UNSAFE_OR_MISSING_CREDENTIALS');
+const userId='59f0e952-cad3-4aa6-b5cc-d2a9a5f3fef1',clockId='clock_1Ubd0FL7fmdMaK0kxOcEiT2Y',subId='sub_1Ubd0IL7fmdMaK0kVqDPz68j',customerId='cus_VcsluaUkRoSLPH',price='price_1UbT9fL7fmdMaK0kzG16byXx';
 const db=createClient(env.NEXT_PUBLIC_SUPABASE_URL,env.SUPABASE_SERVICE_ROLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
-const marker='20261114',price=resolvePrice('starter','GBP'),base='https://kreativestudios4k-site-git-qa-k4k-sta-7be2d9-kreative-studios4k.vercel.app';
-const stripe=async(path,form,key)=>{const res=await fetch('https://api.stripe.com/v1/'+path,{method:form?'POST':'GET',headers:{Authorization:'Bearer '+env.STRIPE_SECRET_KEY,...(form?{'Content-Type':'application/x-www-form-urlencoded','Idempotency-Key':'k4k-qa-'+marker+'-'+key}:{})},body:form?.toString(),signal:AbortSignal.timeout(20000)});const j=await res.json();if(!res.ok)throw Error('QA_STRIPE_'+res.status+'_'+(j.error?.code||j.error?.type||'unknown'));if(j.livemode===true)throw Error('QA_LIVE_OBJECT');return j;};
-const form=o=>new URLSearchParams(o);
-async function user(kind){
- const email='k4k-'+kind+'-qa-'+marker+'@example.com';
- let existing=null;
- for(let page=1;page<=20;page++){const r=await db.auth.admin.listUsers({page,perPage:100});if(r.error)throw Error('QA_USER_LIST');existing=r.data.users.find(u=>u.email===email);if(existing||r.data.users.length<100)break;}
- if(!existing){const r=await db.auth.admin.createUser({email,email_confirm:true,app_metadata:{k4k_billing_qa:true,k4k_qa_run:marker,k4k_qa_kind:kind}});if(r.error)throw Error('QA_USER_CREATE');existing=r.data.user;}
- if(existing?.email!==email||existing.app_metadata?.k4k_billing_qa!==true||existing.app_metadata?.k4k_qa_run!==marker||existing.app_metadata?.k4k_qa_kind!==kind)throw Error('QA_USER_MISMATCH');
- return existing;
+const owner=await db.auth.admin.getUserById(userId);
+if(owner.error||owner.data.user?.email!=='k4k-lifecycle-qa-20261114@example.com'||owner.data.user?.app_metadata?.k4k_qa_run!=='20261114'||owner.data.user?.app_metadata?.k4k_qa_kind!=='lifecycle')throw Error('QA_OWNER_MISMATCH');
+const stripe=async(path,form,key)=>{const res=await fetch('https://api.stripe.com/v1/'+path,{method:form?'POST':'GET',headers:{Authorization:'Bearer '+env.STRIPE_SECRET_KEY,...(form?{'Content-Type':'application/x-www-form-urlencoded','Idempotency-Key':'k4k-qa-lifecycle-20261114-'+key}:{})},body:form?new URLSearchParams(form).toString():undefined,signal:AbortSignal.timeout(20000)});const j=await res.json();if(!res.ok)throw Error('QA_STRIPE_'+res.status+'_'+(j.error?.code||j.error?.type||'unknown'));if(j.livemode===true)throw Error('QA_LIVE_OBJECT');return j;};
+const sub=()=>stripe('subscriptions/'+subId);
+const clock=()=>stripe('test_helpers/test_clocks/'+clockId);
+const checkSub=s=>{if(s.id!==subId||s.customer!==customerId||s.test_clock!==clockId||s.metadata?.k4k_billing_qa!=='20261114'||s.items?.data?.[0]?.price?.id!==price)throw Error('QA_SUB_MISMATCH');return s;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function ledger(){const m=await db.from('memberships').select('status,plan,stripe_customer_id,stripe_subscription_id,current_period_end,cancel_at_period_end').eq('user_id',userId).single();const c=await db.from('studio_credit_accounts').select('balance,billing_hold').eq('user_id',userId).single();const g=await db.from('k4k_credit_grants').select('invoice_id,credits').eq('user_id',userId);if(m.error||c.error||g.error||m.data.stripe_customer_id!==customerId||m.data.stripe_subscription_id!==subId)throw Error('QA_LEDGER_READ');return {status:m.data.status,periodEnd:m.data.current_period_end,cancelAtPeriodEnd:m.data.cancel_at_period_end,balance:c.data.balance,billingHold:c.data.billing_hold,grants:g.data.length,totalGranted:g.data.reduce((n,x)=>n+x.credits,0),invoices:g.data.map(x=>x.invoice_id)};}
+async function waitLedger(predicate,label){for(let i=0;i<30;i++){const x=await ledger();if(predicate(x)){console.log(label+' '+JSON.stringify(x));return x}await sleep(2000)}throw Error(label+'_TIMEOUT');}
+async function ready(){for(let i=0;i<45;i++){const x=await clock();if(x.id!==clockId)throw Error('QA_CLOCK_MISMATCH');if(x.status==='ready')return x;if(x.status!=='advancing')throw Error('QA_CLOCK_FAILED');await sleep(2000)}throw Error('QA_CLOCK_TIMEOUT');}
+async function advance(target,key){const x=await ready();if(x.frozen_time<target)await stripe('test_helpers/test_clocks/'+clockId+'/advance',{frozen_time:String(target)},key);return ready();}
+const renewalAt=Math.floor(Date.parse('2026-12-14T11:00:00Z')/1000),cancelAt=Math.floor(Date.parse('2027-01-14T11:00:00Z')/1000);
+let s=checkSub(await sub());let c=await ready();
+if(c.frozen_time<renewalAt){await waitLedger(x=>x.balance===80&&x.grants===1&&x.totalGranted===80&&x.status==='active','QA_FIRST_INVOICE_PASS');await advance(renewalAt,'advance-renewal');}
+s=checkSub(await sub());c=await ready();
+if(c.frozen_time<cancelAt){
+ await waitLedger(x=>x.balance===160&&x.grants===2&&x.totalGranted===160&&x.status==='active','QA_RENEWAL_PASS');
+ const invoices=await stripe('invoices?subscription='+encodeURIComponent(subId)+'&limit=10');const paid=invoices.data.filter(i=>i.status==='paid');if(paid.length!==2||paid.some(i=>i.amount_paid!==1599||i.currency!=='gbp'))throw Error('QA_RENEWAL_PRICE_MISMATCH');console.log('QA_INVOICES_PASS '+JSON.stringify(paid.map(i=>({id:i.id,reason:i.billing_reason,amount:i.amount_paid,currency:i.currency}))));
+ if(!s.cancel_at_period_end){s=checkSub(await stripe('subscriptions/'+subId,{cancel_at_period_end:'true'},'schedule-cancel'));}
+ await waitLedger(x=>x.status==='active'&&x.cancelAtPeriodEnd===true&&x.balance===160,'QA_SCHEDULE_CANCEL_PASS');
+ await advance(cancelAt,'advance-cancellation');
 }
-const p=await stripe('prices/'+price);
-if(p.unit_amount!==1599||p.currency!=='gbp'||p.tax_behavior!=='inclusive'||p.recurring?.interval!=='month')throw Error('QA_PRICE_MISMATCH');
-const checkout=await user('checkout');
-const checkoutForm=buildCheckoutForm({priceId:price,userId:checkout.id,origin:base,plan:'starter',currency:'GBP'});
-checkoutForm.set('automatic_tax[enabled]','true');checkoutForm.set('tax_id_collection[enabled]','true');checkoutForm.set('customer_email',checkout.email);
-checkoutForm.set('metadata[k4k_billing_qa]',marker);checkoutForm.set('subscription_data[metadata][k4k_billing_qa]',marker);
-const session=await stripe('checkout/sessions',checkoutForm,'checkout-session');
-if(session.livemode!==false||session.amount_total!==1599||session.currency!=='gbp'||session.client_reference_id!==checkout.id)throw Error('QA_CHECKOUT_MISMATCH');
-console.log('QA_CORRECTED_CHECKOUT '+JSON.stringify({id:session.id,status:session.status,amount:session.amount_total,currency:session.currency,userId:checkout.id,price}));
-try{
- const lifecycle=await user('lifecycle');
- const frozen=Math.floor(Date.parse('2026-11-14T09:00:00Z')/1000);
- const clock=await stripe('test_helpers/test_clocks',form({frozen_time:String(frozen),name:'K4K Starter lifecycle 20261114'}),'clock');
- const customer=await stripe('customers',form({email:lifecycle.email,test_clock:clock.id,payment_method:'pm_card_visa','invoice_settings[default_payment_method]':'pm_card_visa','address[country]':'GB','address[postal_code]':'L1 1AA','address[city]':'Liverpool','address[line1]':'10 Test Street','metadata[k4k_billing_qa]':marker}),'clock-customer');
- const old=await db.from('memberships').select('stripe_customer_id').eq('user_id',lifecycle.id).maybeSingle();if(old.error||old.data&&old.data.stripe_customer_id!==customer.id)throw Error('QA_MEMBERSHIP_MISMATCH');
- if(!old.data){const r=await db.from('memberships').insert({user_id:lifecycle.id,status:'inactive',plan:'starter',stripe_customer_id:customer.id});if(r.error)throw Error('QA_LINK_CUSTOMER');}
- const sub=await stripe('subscriptions',form({customer:customer.id,'items[0][price]':price,'automatic_tax[enabled]':'true','metadata[plan_key]':'starter','metadata[k4k_billing_qa]':marker,payment_behavior:'error_if_incomplete'}),'clock-subscription');
- console.log('QA_LIFECYCLE_CREATED '+JSON.stringify({userId:lifecycle.id,clock:clock.id,customer:customer.id,subscription:sub.id,status:sub.status,periodEnd:sub.items?.data?.[0]?.current_period_end??sub.current_period_end}));
-}catch(error){console.log('QA_LIFECYCLE_BLOCKED '+String(error.message).replace(/[^A-Za-z0-9_-]/g,'').slice(0,100));}
+s=checkSub(await sub());if(s.status!=='canceled')throw Error('QA_STRIPE_CANCEL_MISMATCH');
+await waitLedger(x=>x.status==='canceled'&&x.balance===160&&x.grants===2&&x.totalGranted===160,'QA_CANCEL_PASS');
