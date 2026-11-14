@@ -72,6 +72,7 @@ test('checkout form carries the mode, price, user and plan, and never an amount'
     currency: 'GBP',
   });
   assert.equal(form.get('mode'), 'subscription');
+  assert.equal(form.get('managed_payments[enabled]'), 'false');
   assert.equal(form.get('line_items[0][price]'), 'price_x');
   assert.equal(form.get('client_reference_id'), 'user-1');
   assert.equal(form.get('metadata[plan_key]'), 'starter');
