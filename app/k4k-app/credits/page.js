@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import {createClient} from '../../../lib/supabase/client';
@@ -24,7 +24,9 @@ export default function Credits(){
  const tr=(en,br,spa)=>pt?br:es?spa:en;
  const [selected,setSelected]=useState('creator'),[currency,setCurrency]=useState(null);
  const [signedIn,setSignedIn]=useState(null);
- useEffect(()=>{const selectedPlan=validPlan(new URLSearchParams(window.location.search).get('plan'));if(selectedPlan)setSelected(selectedPlan);let active=true;createClient().auth.getUser().then(({data})=>{if(active)setSignedIn(Boolean(data?.user&&!data.user.is_anonymous))}).catch(()=>{if(active)setSignedIn(false)});return()=>{active=false}},[]);
+ const checkoutLock=useRef(false);
+ const [cancelled,setCancelled]=useState(false);
+ useEffect(()=>{const params=new URLSearchParams(window.location.search);const selectedPlan=validPlan(params.get('plan'));setCancelled(params.get('checkout')==='cancelled');if(selectedPlan)setSelected(selectedPlan);let active=true;createClient().auth.getUser().then(({data})=>{if(active)setSignedIn(Boolean(data?.user&&!data.user.is_anonymous))}).catch(()=>{if(active)setSignedIn(false)});return()=>{active=false}},[]);
  const [billing,setBilling]=useState(null);
  const [discountCode,setDiscountCode]=useState('');
  useEffect(()=>{let active=true;fetch('/api/billing/readiness',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(active)setBilling(data)}).catch(()=>{});return()=>{active=false}},[]);
@@ -41,7 +43,8 @@ export default function Credits(){
  const amount=plan=>!currency?'—':formatPrice(plan,currency);
  const discounted=currency&&studentCode(discountCode)?new Intl.NumberFormat(currency==='BRL'?'pt-BR':currency==='EUR'?'de-DE':currency==='USD'?'en-US':'en-GB',{style:'currency',currency}).format(discountedMinorUnits(PLAN_PRICES[current.key][currency])/100):null;
  async function startTestCheckout(){
-  if(checkoutBusy||!checkoutReady||signedIn!==true)return;
+  if(checkoutLock.current||checkoutBusy||!checkoutReady||signedIn!==true)return;
+  checkoutLock.current=true;
   setCheckoutBusy(true);setCheckoutError('');
   try{
    const {data:{session},error:authError}=await createClient().auth.getSession();
@@ -53,6 +56,7 @@ export default function Credits(){
    const result=await response.json().catch(()=>({}));
    if(!response.ok||!result.url){
     const reason=result.error||'HTTP_'+response.status;
+    if(reason==='CURRENCY_REGION_MISMATCH'&&supportedCurrencies.has(result.currency)){setCurrency(result.currency);setCheckoutError(tr('Your billing currency changed. Review the updated price and try again.','Sua moeda mudou. Confira o preço atualizado e tente novamente.','Tu moneda cambió. Revisa el precio actualizado e inténtalo de nuevo.'));return;}
     const message={
      INVALID_DISCOUNT_CODE:tr('Invalid discount code.','Código de desconto inválido.','Código de descuento no válido.'),
      STUDENT_DISCOUNT_UNAVAILABLE:tr('This student discount is not available for your account yet.','O desconto de aluno ainda não está disponível para sua conta.','El descuento de estudiante aún no está disponible para tu cuenta.'),
@@ -71,7 +75,7 @@ export default function Credits(){
    if(target.protocol!=='https:'||target.hostname!=='checkout.stripe.com'){setCheckoutError('Unexpected checkout destination. No payment was taken.');return;}
    window.location.assign(target.href);
   }catch{setCheckoutError('Unable to start Stripe checkout. No payment was taken.');}
-  finally{setCheckoutBusy(false);}
+  finally{checkoutLock.current=false;setCheckoutBusy(false);}
  }
  return <PreviewShell active="Credits">
   <div className="k4k-pricing-page">
@@ -86,6 +90,7 @@ export default function Credits(){
    </button>)}</div>
    <section className="k4k-pricing-note"><h2>{tr('Student discount','Desconto de aluno','Descuento de estudiante')}</h2><label htmlFor="k4k-student-code">{tr('Have a discount code?','Tem um código de desconto?','¿Tienes un código de descuento?')}</label><input id="k4k-student-code" value={discountCode} onChange={e=>{setDiscountCode(e.target.value);setCheckoutError('')}} placeholder={tr('Enter your code','Digite seu código','Introduce tu código')} autoComplete="off" maxLength={40} style={{maxWidth:300,textTransform:'uppercase'}}/><p>{tr('Eligible student discounts apply to the first month only. The regular monthly price resumes afterwards.','Descontos elegíveis de alunos valem apenas no primeiro mês. Depois, volta o preço mensal normal.','Los descuentos elegibles se aplican solo al primer mes. Después se cobra el precio mensual normal.')}</p>{discounted&&<p role="status"><strong>{STUDENT_CODE} · 10% — {discounted}</strong> {tr('first month, subject to eligibility at checkout.','no primeiro mês, sujeito à elegibilidade no checkout.','el primer mes, sujeto a elegibilidad al pagar.')}</p>}</section>
    <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Published prices include applicable tax. Credits appear after verified payment.','Os preços publicados incluem os impostos aplicáveis. Os créditos são liberados após a confirmação do pagamento.','Los precios publicados incluyen los impuestos aplicables. Los créditos se acreditan tras confirmar el pago.')}</p></div>{signedIn===false?<Link className="k4k-plan-account-cta" href={planRegistration(selected)}>{tr('Create account to continue','Crie sua conta para continuar','Crea una cuenta para continuar')} ↗</Link>:<button type="button" disabled={!currency||checkoutBusy||!checkoutReady||signedIn!==true} onClick={startTestCheckout}>{checkoutBusy?'Opening…':!checkoutReady?tr('Checkout not open yet','Pagamento ainda não disponível','Pago aún no disponible'):live?tr('Continue to secure checkout','Continuar para pagamento seguro','Continuar al pago seguro'):tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button>}</section>
+   {cancelled&&<p role="status" className="k4k-pricing-note">{tr('Checkout cancelled. No payment was taken by this attempt. Your selected plan is still here.','Pagamento cancelado. Nenhum pagamento foi feito nesta tentativa. Seu plano continua selecionado.','Pago cancelado. No se cobró nada en este intento. Tu plan sigue seleccionado.')}</p>}
    {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
    <CreditProposal currency={currency}/>
    <div className="k4k-pricing-links"><Link href={planRegistration(selected)}>{tr('New creator? Create an account','Novo criador? Criar conta','¿Nuevo creador? Crear cuenta')}</Link><Link href={'/login?next='+encodeURIComponent(planDestination(selected))}>{tr('Already registered? Sign in','Já tem conta? Entrar','¿Tienes cuenta? Entrar')}</Link><Link href="/k4k-app/creator">{tr('Back to studio','Voltar ao estúdio','Volver al estudio')}</Link></div>
