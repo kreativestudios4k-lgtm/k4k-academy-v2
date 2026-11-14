@@ -10,7 +10,7 @@
     "test:journey": "node --test tests/customer-journey.test.mjs",
     "prebuild": "npm run test:all && node scripts/verify-live-stripe.mjs",
     "test:theme": "node --test tests/theme.test.mjs",
-    "test:all": "node --test tests/*.test.mjs"
+    "test:all": "node --import ./tests/test-environment.mjs --test tests/*.test.mjs"
   },
   "dependencies": {
     "@ai-sdk/gateway": "4.0.103",
