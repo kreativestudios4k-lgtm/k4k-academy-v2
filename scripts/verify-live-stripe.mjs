@@ -49,3 +49,17 @@ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_LIVE_WEBHOOK_AU
  console.log('K4K_WEBHOOK_AUDIT_EXPIRED '+session.id+' no charge or subscription');
  // Delivery verification is performed independently with the Stripe event API.
 }
+
+ // The owner pilot must prove its actual production environment passes every
+ // payment and generation gate. No charge, customer or session is created.
+ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_OWNER_LIVE_PILOT_ENABLED==='true'){
+  const {assertBillingKey,assertTaxReady,assertLiveLaunchReady,ownerLivePilotAllowed}=await import('../lib/server/billing-policy.mjs');
+  const {launchLimits}=await import('../lib/server/soft-launch.mjs');
+  const {generationUserAllowed}=await import('../lib/server/generation-policy.mjs');
+  const owner=process.env.K4K_OWNER_LIVE_PILOT_USER_ID;
+  assertBillingKey(process.env.STRIPE_SECRET_KEY);assertTaxReady();
+  assertLiveLaunchReady(process.env,{userId:owner,plan:'starter'});
+  if(!ownerLivePilotAllowed(owner,'starter')||!generationUserAllowed(owner)||generationUserAllowed('another-user'))throw Error('OWNER_PILOT_SCOPE_INVALID');
+  const limits=launchLimits();if(limits.seats!==1||limits.credits!==80)throw Error('OWNER_PILOT_CAPACITY_INVALID');
+  console.log('K4K_OWNER_LIVE_PILOT_READY: verified owner checkout gates, Starter-only 80-credit capacity, generation scope and production credentials; no payment created.');
+ }
