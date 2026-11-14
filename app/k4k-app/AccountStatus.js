@@ -16,8 +16,11 @@ export default function AccountStatus(){
     const {data:{user},error}=await client.auth.getUser();
     if(!alive)return;
     if(error||!user){setState({signedIn:false,balance:null,ready:true});return;}
-    const {data:wallet,error:walletError}=await client.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle();
-    if(alive)setState({signedIn:true,balance:walletError?null:(wallet?.balance??0),ready:true});
+    const {data:{session}}=await client.auth.getSession();
+    if(!session||session.user.id!==user.id){if(alive)setState({signedIn:false,balance:null,ready:true});return;}
+    const response=await fetch('/api/billing/account',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'});
+    const wallet=response.ok?await response.json():null;
+    if(alive)setState({signedIn:true,balance:wallet?.creditBalance??null,ready:true});
    }catch{if(alive)setState({signedIn:false,balance:null,ready:true})}
   }
   refresh();
