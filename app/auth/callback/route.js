@@ -8,7 +8,7 @@ export async function GET(request){
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
  const target=new URL(isPasswordRecovery?'/update-password':studioDestination(searchParams.get('next')),origin);
  const failure=new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin);
- if(!isPasswordRecovery)failure.searchParams.set('next',target.pathname);
+ if(!isPasswordRecovery)failure.searchParams.set('next',target.pathname+target.search);
  if(!code)return NextResponse.redirect(failure);
  let response=NextResponse.redirect(target);
  const supabase=createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{

@@ -39,11 +39,13 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(homepage,/return <CinematicLaunch\/>/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.doesNotMatch(launch,/\d{2}\.\d{2}\.\d{4}|PLANNED RELEASE|COMING SOON/);
- assert.match(launch,/50 FOUNDING CREATOR SPOTS/);
- assert.match(launch,/starting with 25 paid places/);
- assert.match(launch,/JOIN EARLY ACCESS/);
- assert.match(launch,/ACESSO ANTECIPADO/);
- assert.match(launch,/ACCESO ANTICIPADO/);
+ assert.match(launch,/STARTING FROM ONLY/);
+ assert.match(launch,/CHOOSE YOUR PLAN/);
+ assert.match(launch,/A PARTIR DE APENAS/);
+ assert.match(launch,/DESDE SOLO/);
+ assert.match(launch,/id="plans"/);
+ assert.match(launch,/planRegistration\(plan\.key\)/);
+ assert.match(launch,/paid checkout is not open yet/);
  assert.match(launch,/catalogue\.trending/);
  assert.match(launch,/IntersectionObserver/);
  assert.match(launch,/muted=\{muted\} loop playsInline/);
@@ -80,7 +82,7 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(pricing,/k4k-pricing-grid/);
  assert.match(pricing,/checkoutReady/);
  assert.match(pricing,/Published prices include applicable tax/);
- assert.match(pricing,/disabled=\{!currency\|\|checkoutBusy\|\|!checkoutReady\}/);
+ assert.match(pricing,/disabled=\{!currency\|\|checkoutBusy\|\|!checkoutReady\|\|signedIn!==true\}/);
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
@@ -92,5 +94,5 @@ test('cinematic desktop navigation cannot cover authentication actions',()=>{
  assert.match(css,/\.kc-auth-dialog:not\(\[open\]\)\{display:none\}/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.match(launch,/className="kc-login" onClick=\{\(\)=>setAuthOpen\(true\)\}/);
- assert.match(launch,/className="kc-join" href="\/k4k-app\/register"/);
+ assert.match(launch,/className="kc-join" href="\/k4k-app\/register\?plan=starter"/);
 });

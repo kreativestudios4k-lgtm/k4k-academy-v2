@@ -28,7 +28,7 @@ export default function CheckoutReturn(){
     if(session?.access_token)await reconcile(session.access_token);
     if(stopped)return;
     const [membership,wallet]=await Promise.all([
-     client.from('memberships').select('status').eq('user_id',user.id).maybeSingle(),
+     session?.access_token?fetch('/api/billing/account',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'}).then(async r=>({data:r.ok?(await r.json()).app:null,error:!r.ok})):Promise.resolve({data:null,error:true}),
      client.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle()
     ]);
     if(stopped)return;
