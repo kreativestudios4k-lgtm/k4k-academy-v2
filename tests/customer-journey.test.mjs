@@ -31,7 +31,9 @@ test('project and credit history require the authenticated owner',()=>{
  assert.match(projects,/auth\.getUser\(\)/);
  assert.match(projects,/\.eq\('user_id',user\.id\)/);
  assert.match(status,/auth\.getUser\(\)/);
- assert.match(status,/\.eq\('user_id',user\.id\)/);
+ assert.match(status,/\/api\/billing\/account/);
+ assert.match(status,/session\.user\.id!==user\.id/);
+ assert.match(read('app/api/billing/account/route.js'),/\.eq\('user_id',user\.id\)/);
 });
 
 test('support is explicit about its current email-only channel',()=>{
