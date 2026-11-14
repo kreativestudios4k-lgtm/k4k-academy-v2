@@ -22,7 +22,12 @@ export default function Credits(){
  const {locale}=useK4KLocale();
  const pt=locale==='pt',es=locale==='es';
  const tr=(en,br,spa)=>pt?br:es?spa:en;
- const [selected,setSelected]=useState('creator'),[currency,setCurrency]=useState(null);
+ // Prices render immediately in the prerendered HTML, as the landing page already does,
+ // so crawlers and no-script visitors never see a placeholder instead of a price.
+ // regionResolved, not the currency, gates checkout, so no purchase can start
+ // before the visitor's real billing currency is known.
+ const [selected,setSelected]=useState('creator'),[currency,setCurrency]=useState('GBP');
+ const [regionResolved,setRegionResolved]=useState(false);
  const [signedIn,setSignedIn]=useState(null);
  const checkoutLock=useRef(false);
  const [cancelled,setCancelled]=useState(false);
@@ -35,15 +40,15 @@ export default function Credits(){
  const [checkoutBusy,setCheckoutBusy]=useState(false),[checkoutError,setCheckoutError]=useState('');
  useEffect(()=>{let active=true;fetch('/api/k4k-region',{cache:'no-store'})
   .then(response=>response.ok?response.json():null)
-  .then(data=>{if(active)setCurrency(supportedCurrencies.has(data?.currency)?data.currency:'GBP')})
-  .catch(()=>{if(active)setCurrency('GBP')});
+  .then(data=>{if(active){setCurrency(supportedCurrencies.has(data?.currency)?data.currency:'GBP');setRegionResolved(true)}})
+  .catch(()=>{if(active){setCurrency('GBP');setRegionResolved(true)}});
   return()=>{active=false};
  },[]);
  const current=plans.find(plan=>plan.key===selected)||plans[1];
- const amount=plan=>!currency?'—':formatPrice(plan,currency);
+ const amount=plan=>formatPrice(plan,currency);
  const discounted=currency&&studentCode(discountCode)?new Intl.NumberFormat(currency==='BRL'?'pt-BR':currency==='EUR'?'de-DE':currency==='USD'?'en-US':'en-GB',{style:'currency',currency}).format(discountedMinorUnits(PLAN_PRICES[current.key][currency])/100):null;
  async function startTestCheckout(){
-  if(checkoutLock.current||checkoutBusy||!checkoutReady||signedIn!==true)return;
+  if(checkoutLock.current||checkoutBusy||!checkoutReady||signedIn!==true||!regionResolved)return;
   checkoutLock.current=true;
   setCheckoutBusy(true);setCheckoutError('');
   try{
@@ -89,7 +94,7 @@ export default function Credits(){
     <span className="k4k-pricing-select">{plan.key===selected?tr('Selected ✓','Selecionado ✓','Seleccionado ✓'):tr('Select plan','Escolher plano','Elegir plan')} <span aria-hidden="true">↗</span></span>
    </button>)}</div>
    <section className="k4k-pricing-note"><h2>{tr('Student discount','Desconto de aluno','Descuento de estudiante')}</h2><label htmlFor="k4k-student-code">{tr('Have a discount code?','Tem um código de desconto?','¿Tienes un código de descuento?')}</label><input id="k4k-student-code" value={discountCode} onChange={e=>{setDiscountCode(e.target.value);setCheckoutError('')}} placeholder={tr('Enter your code','Digite seu código','Introduce tu código')} autoComplete="off" maxLength={40} style={{maxWidth:300,textTransform:'uppercase'}}/><p>{tr('Eligible student discounts apply to the first month only. The regular monthly price resumes afterwards.','Descontos elegíveis de alunos valem apenas no primeiro mês. Depois, volta o preço mensal normal.','Los descuentos elegibles se aplican solo al primer mes. Después se cobra el precio mensual normal.')}</p>{discounted&&<p role="status"><strong>{STUDENT_CODE} · 10% — {discounted}</strong> {tr('first month, subject to eligibility at checkout.','no primeiro mês, sujeito à elegibilidade no checkout.','el primer mes, sujeto a elegibilidad al pagar.')}</p>}</section>
-   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Published prices include applicable tax. Credits appear after verified payment.','Os preços publicados incluem os impostos aplicáveis. Os créditos são liberados após a confirmação do pagamento.','Los precios publicados incluyen los impuestos aplicables. Los créditos se acreditan tras confirmar el pago.')}</p></div>{signedIn===false?<Link className="k4k-plan-account-cta" href={planRegistration(selected)}>{tr('Create account to continue','Crie sua conta para continuar','Crea una cuenta para continuar')} ↗</Link>:<button type="button" disabled={!currency||checkoutBusy||!checkoutReady||signedIn!==true} onClick={startTestCheckout}>{checkoutBusy?'Opening…':!checkoutReady?tr('Checkout not open yet','Pagamento ainda não disponível','Pago aún no disponible'):live?tr('Continue to secure checkout','Continuar para pagamento seguro','Continuar al pago seguro'):tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button>}</section>
+   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Published prices include applicable tax. Credits appear after verified payment.','Os preços publicados incluem os impostos aplicáveis. Os créditos são liberados após a confirmação do pagamento.','Los precios publicados incluyen los impuestos aplicables. Los créditos se acreditan tras confirmar el pago.')}</p></div>{signedIn===false?<Link className="k4k-plan-account-cta" href={planRegistration(selected)}>{tr('Create account to continue','Crie sua conta para continuar','Crea una cuenta para continuar')} ↗</Link>:<button type="button" disabled={!regionResolved||checkoutBusy||!checkoutReady||signedIn!==true} onClick={startTestCheckout}>{checkoutBusy?'Opening…':!checkoutReady?tr('Checkout not open yet','Pagamento ainda não disponível','Pago aún no disponible'):live?tr('Continue to secure checkout','Continuar para pagamento seguro','Continuar al pago seguro'):tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button>}</section>
    {cancelled&&<p role="status" className="k4k-pricing-note">{tr('Checkout cancelled. No payment was taken by this attempt. Your selected plan is still here.','Pagamento cancelado. Nenhum pagamento foi feito nesta tentativa. Seu plano continua selecionado.','Pago cancelado. No se cobró nada en este intento. Tu plan sigue seleccionado.')}</p>}
    {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
    <CreditProposal currency={currency}/>
