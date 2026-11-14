@@ -81,3 +81,40 @@ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_LIVE_WEBHOOK_AU
   if(!Number.isFinite(total)||total<limits.credits*0.1+30)throw Error('PUBLIC_LAUNCH_FUNDING_BUFFER_REQUIRED');
   console.log('K4K_PUBLIC_LAUNCH_READY: live checkout, funded seats '+limits.seats+', initial credits '+limits.credits+', verified renewal guard, no payment created.');
  }
+
+ // One-time BRL Checkout audit: use the exact production key and PIX request
+ // parameters, then immediately expire the unpaid, unshared sessions. No
+ // customer, subscription, mandate, payment or launch claim is created.
+ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_BRAZIL_PIX==='20261114-pix-v1'){
+  const {configureBrazilPixCheckout,brazilPixHeaders,checkoutSupportsPix}=await import('../lib/server/brazil-pix.mjs');
+  const key=process.env.STRIPE_SECRET_KEY;
+  if(!/^([rs]k)_live_/.test(key||''))throw Error('PIX_AUDIT_LIVE_KEY_MISSING');
+  const marker='k4k-pix-20261114-v1';
+  const priceMap=configuredLivePrices('plans');
+  async function request(path,{method='GET',form,idem,headers={}}={}){
+   const res=await fetch('https://api.stripe.com/v1/'+path,{method,headers:{Authorization:'Bearer '+key,...headers,...(form?{'Content-Type':'application/x-www-form-urlencoded'}:{}),...(idem?{'Idempotency-Key':idem}:{})},...(form?{body:form.toString()}:{}),redirect:'error',cache:'no-store',signal:AbortSignal.timeout(15000)});
+   if(!res.ok){const e=await res.json().catch(()=>({}));const code=String(e.error?.code||e.error?.type||'unknown').replace(/[^a-zA-Z0-9_]/g,'').slice(0,60);const param=String(e.error?.param||'').replace(/[^a-zA-Z0-9_\[\].]/g,'').slice(0,100);throw Error('PIX_AUDIT_STRIPE_HTTP_'+res.status+'_'+code+'_'+param);}
+   return res.json();
+  }
+  async function expireAudit(id,expected,headers={}){
+   let s=await request('checkout/sessions/'+encodeURIComponent(id),{headers});
+   if(s.id!==id||s.livemode!==true||s.mode!=='subscription'||s.currency!=='brl'||s.payment_status!=='unpaid'||s.customer||s.subscription||s.payment_intent||s.client_reference_id||s.metadata?.k4k_launch_claim||!(s.metadata?.audit===expected||s.metadata?.k4k_pix_audit===expected))throw Error('PIX_AUDIT_SCOPE_INVALID');
+   if(s.status==='open')s=await request('checkout/sessions/'+encodeURIComponent(id)+'/expire',{method:'POST',form:new URLSearchParams(),idem:marker+'-expire-'+id,headers});
+   if(s.status!=='expired'||s.payment_status!=='unpaid'||s.customer||s.subscription||s.payment_intent)throw Error('PIX_AUDIT_EXPIRY_FAILED');
+  }
+  // Clean up the two earlier no-charge provider-eligibility probes.
+  await expireAudit('cs_live_a0q4HZEGu0V6OZaGkb4oAiRLNUi4Yd4O26Cd8QArdvz2b7Oc79sLEt49GA','k4k_pix_20261114_no_charge');
+  await expireAudit('cs_live_a0WnXxi2LDaffQ44KOjXtN4uuYWIJAVS8TrAjT3KocyTY2wf4StBzqoiKx','k4k_pix_20261114_explicit_no_charge');
+  for(const plan of ['starter','creator','pro','studio']){
+   const audit=marker+'-'+plan;
+   const form=new URLSearchParams({mode:'subscription','line_items[0][price]':priceMap[plan].BRL,'line_items[0][quantity]':'1','managed_payments[enabled]':'false','automatic_tax[enabled]':'true','tax_id_collection[enabled]':'true',success_url:'https://kreativestudios4k.com/',cancel_url:'https://kreativestudios4k.com/','metadata[k4k_pix_audit]':audit});
+   if(!configureBrazilPixCheckout(form,'BRL'))throw Error('PIX_AUDIT_CONFIG_DISABLED');
+   const headers=brazilPixHeaders(form);
+   const session=await request('checkout/sessions',{method:'POST',form,idem:audit,headers});
+   const eligible=checkoutSupportsPix(session)&&session.payment_method_types.includes('card')&&session.currency==='brl'&&session.livemode===true;
+   await expireAudit(session.id,audit,headers);
+   if(!eligible)throw Error('PIX_AUDIT_NOT_ELIGIBLE_'+plan);
+   console.log('K4K_BR_PIX_VERIFIED '+plan+' pix+card; unpaid audit expired.');
+  }
+  console.log('K4K_BR_PIX_ALL_PLANS_VERIFIED: four Brazilian plans support PIX and card; no charge created.');
+ }
