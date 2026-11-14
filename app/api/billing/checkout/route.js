@@ -2,7 +2,7 @@ import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
-import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady} from '../../../../lib/server/billing-policy.mjs';
+import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
@@ -54,10 +54,10 @@ export async function POST(request) {
   if (!secret) return json({error: 'UNAVAILABLE'}, 503);
   try {
     if(billingMode()==='test')assertTestModeKey(secret);
-    assertBillingKey(secret);assertTaxReady();assertLiveLaunchReady();
+    assertBillingKey(secret);assertTaxReady();assertLiveLaunchReady(process.env,{userId:user.id,plan:body?.plan});
 
-  } catch {
-    return json({error:'BILLING_SETUP_REQUIRED'},503);
+  } catch (error) {
+    return json({error:error.message==='OWNER_LIVE_PILOT_ONLY'?'OWNER_LIVE_PILOT_ONLY':'BILLING_SETUP_REQUIRED'},error.message==='OWNER_LIVE_PILOT_ONLY'?403:503);
   }
 
   // Block a second subscription while an active membership exists.
@@ -91,6 +91,7 @@ export async function POST(request) {
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
       if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(referral==='matheusborrascah')applyStudentDiscount(form);}
+      if(ownerLivePilot())form.set('metadata[k4k_owner_live_pilot]','true');
       const destination=await openLaunchCheckout({database,claim,secret,form});
       return json({url:destination},200);
     }catch(problem){
