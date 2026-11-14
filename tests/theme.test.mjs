@@ -82,7 +82,11 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(pricing,/k4k-pricing-grid/);
  assert.match(pricing,/checkoutReady/);
  assert.match(pricing,/Published prices include applicable tax/);
- assert.match(pricing,/disabled=\{!currency\|\|checkoutBusy\|\|!checkoutReady\|\|signedIn!==true\}/);
+ // Prices render straight away, so the region gate is tracked explicitly rather than
+ // inferred from an unset currency. Checkout stays shut until the region is known.
+ assert.match(pricing,/disabled=\{!regionResolved\|\|checkoutBusy\|\|!checkoutReady\|\|signedIn!==true\}/);
+ assert.match(pricing,/useState\('GBP'\)/);
+ assert.doesNotMatch(pricing,/\?'—'/);
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
