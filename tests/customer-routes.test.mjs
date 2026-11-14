@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {studioDestination,retiredCustomerDestination,isAcademyPath,validPlan,planDestination,planRegistration} from '../lib/customer-routes.mjs';
+import {studioDestination,retiredCustomerDestination,isAcademyPath,validPlan,planDestination,planRegistration,checkoutReturnDestination} from '../lib/customer-routes.mjs';
 
 test('all customer auth methods use studio by default and reject outside or retired destinations',()=>{
  for(const requested of [null,undefined,'','/admin','/membership-required','//evil.test','https://evil.test','/k4k-app/creator?next=https://evil.test','/k4k-app/creator/../admin','/academy/lessons/example'])assert.equal(studioDestination(requested),'/k4k-app/creator');
@@ -51,3 +51,5 @@ test('retiring the interface preserves verified legacy checkout registration and
 });
 
 test('plan choice survives signup and OAuth without allowing open redirects or injected plans',()=>{for(const p of ['starter','creator','pro','studio']){assert.equal(validPlan(p),p);assert.equal(studioDestination(planDestination(p)),planDestination(p));assert.equal(planRegistration(p),'/k4k-app/register?plan='+p)}for(const p of ['unknown','starter&next=https://evil.test','__proto__',null]){assert.equal(validPlan(p),null);assert.equal(planDestination(p),'/k4k-app/credits')}for(const url of ['/k4k-app/credits?plan=starter&next=https://evil.test','/k4k-app/credits?plan=unknown','/k4k-app/credits?plan=starter#x'])assert.equal(studioDestination(url),'/k4k-app/creator');const callback=readFileSync('app/auth/callback/route.js','utf8');assert.match(callback,/target\.pathname\+target\.search/);const landing=readFileSync('app/k4k-app/CinematicLaunch.js','utf8');assert.match(landing,/planRegistration\(plan\.key\)/);assert.match(landing,/format\('starter',currency\)/);const credits=readFileSync('app/k4k-app/credits/page.js','utf8');assert.match(credits,/validPlan\(new URLSearchParams/);assert.match(credits,/planRegistration\(selected\)/);const checkout=readFileSync('app/k4k-app/CheckoutReturn.js','utf8');assert.match(checkout,/\/api\/billing\/account/);assert.doesNotMatch(checkout,/from\('memberships'\)/)});
+
+test('checkout return preserves only a validated session through sign-in',()=>{const id='cs_test_123456789abcdef';const dest=checkoutReturnDestination(id);assert.equal(studioDestination(dest),dest);assert.equal(studioDestination(checkoutReturnDestination(null)),'/k4k-app/creator?checkout=success');for(const value of ['cs_test_bad&next=https://evil.test','https://evil.test','cs_test_x'])assert.equal(checkoutReturnDestination(value),'/k4k-app/creator?checkout=success');assert.equal(studioDestination(dest+'&next=https://evil.test'),'/k4k-app/creator');assert.match(readFileSync('app/k4k-app/CheckoutReturn.js','utf8'),/encodeURIComponent\(returnPath\)/);});
