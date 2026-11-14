@@ -5,7 +5,7 @@ import {quoteSigner,draftFingerprint,generationCredits} from '../lib/server/gene
 import {createGenerationSubmitService} from '../lib/server/generation-submit-service.mjs';
 const user='11111111-1111-4111-8111-111111111111',jobId='22222222-2222-4222-8222-222222222222',key='33333333-3333-4333-8333-333333333333';
 const input={video_url:'https://storage.example/video.mp4',image_urls:['https://storage.example/image.jpg'],resolution:'720p',prompt:''};
-const env={K4K_GENERATION_TEST_USERS:user,VERCEL_ENV:'preview',FAL_KEY:'opaque_copied_key',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_MAX_USD:'5',K4K_ENABLE_TEST_GENERATION:'true',K4K_FAL_WAN_ENABLED:'true'};
+const env={K4K_GENERATION_TEST_USERS:user,VERCEL_ENV:'preview',FAL_KEY:'opaque_copied_key',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_PROVIDER_TOTAL_BUDGET_USD:'200',K4K_MAX_ACTIVE_JOBS_PER_USER:'1',K4K_GENERATION_MAX_USD:'5',K4K_ENABLE_TEST_GENERATION:'true',K4K_FAL_WAN_ENABLED:'true'};
 const job={id:jobId,user_id:user,status:'draft',model:'lite',reference_paths:['owned.jpg'],reference_video_path:'owned.mp4',prompt:''};
 function setup({newlyReserved=true,providerError=false,usd=1.2}={}){
  const calls=[];
@@ -54,12 +54,12 @@ test('credit pricing requires explicit approval and a configured conversion',()=
 test('submission verifies quote then atomically reserves before one provider call and recording',async()=>{
  const {run,args,calls}=setup();const result=await run(args);
  assert.equal(result.status,'processing');assert.equal(result.creditsReserved,12);
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit','record']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_budgeted','submit','record']);
  assert.equal(calls[2].options.idempotencyKey,jobId);
 });
 test('duplicate reservation cannot trigger another paid submission',async()=>{
  const {run,args,calls}=setup({newlyReserved:false});assert.equal((await run(args)).status,'already_reserved');
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_budgeted']);
 });
 test('changed price and changed draft fail before reservation or submission',async()=>{
  const first=setup({usd:1.3});await assert.rejects(first.run(first.args),/QUOTE_CHANGED/);
@@ -72,13 +72,13 @@ test('wrong owner and non-draft jobs never reserve credits',async()=>{
 });
 test('ambiguous provider submission preserves reservation without a refund or retry',async()=>{
  const {run,args,calls}=setup({providerError:true});await assert.rejects(run(args),/PROVIDER_SUBMISSION_UNCERTAIN/);
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_budgeted','submit']);
 });
 
 test('definitive synchronous rejection refunds through the atomic ledger',async()=>{
  const {run,args,calls}=setup({providerError:401});const result=await run(args);
  assert.equal(result.creditsRefunded,true);assert.equal(result.status,'failed');
- assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_checked','submit','k4k_generation_finish']);
+ assert.deepEqual(calls.map(c=>c.name),['estimate','k4k_generation_reserve_budgeted','submit','k4k_generation_finish']);
 });
 
 test('verified Pro rate card uses trusted duration rounded up and rejects changed pricing',async()=>{
