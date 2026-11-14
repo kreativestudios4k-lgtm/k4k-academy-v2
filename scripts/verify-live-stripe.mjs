@@ -63,3 +63,21 @@ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_LIVE_WEBHOOK_AU
   const limits=launchLimits();if(limits.seats!==1||limits.credits!==80)throw Error('OWNER_PILOT_CAPACITY_INVALID');
   console.log('K4K_OWNER_LIVE_PILOT_READY: verified owner checkout gates, Starter-only 80-credit capacity, generation scope and production credentials; no payment created.');
  }
+
+ // Verify the exact deployed restricted Stripe credential can apply the renewal
+ // guard to the already-paid APP owner subscription, without creating a charge.
+ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_RENEWAL_HOLD?.startsWith('sub_')){
+  const {ensureAppRenewalHold}=await import('../lib/server/live-renewal-funding.mjs');
+  const outcome=await ensureAppRenewalHold({subscriptionId:process.env.K4K_VERIFY_RENEWAL_HOLD,customerId:process.env.K4K_VERIFY_RENEWAL_CUSTOMER,verifyWrite:true});
+  if(!outcome.guarded)throw Error('RENEWAL_HOLD_AUDIT_FAILED');
+  console.log('K4K_LIVE_RENEWAL_HOLD_VERIFIED: paid APP subscription protected; no additional charge created.');
+ }
+ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_LIVE_PAYMENTS_ENABLED==='true'){
+  const {assertBillingKey,assertTaxReady,assertLiveLaunchReady,ownerLivePilot}=await import('../lib/server/billing-policy.mjs');
+  const {launchLimits}=await import('../lib/server/soft-launch.mjs');
+  if(ownerLivePilot())throw Error('PUBLIC_LAUNCH_OWNER_PILOT_CONFLICT');
+  assertBillingKey(process.env.STRIPE_SECRET_KEY);assertTaxReady();assertLiveLaunchReady();
+  const limits=launchLimits();const total=Number(process.env.K4K_PROVIDER_TOTAL_BUDGET_USD);
+  if(!Number.isFinite(total)||total<limits.credits*0.1+30)throw Error('PUBLIC_LAUNCH_FUNDING_BUFFER_REQUIRED');
+  console.log('K4K_PUBLIC_LAUNCH_READY: live checkout, funded seats '+limits.seats+', initial credits '+limits.credits+', verified renewal guard, no payment created.');
+ }
