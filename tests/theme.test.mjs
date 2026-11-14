@@ -40,7 +40,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.doesNotMatch(launch,/\d{2}\.\d{2}\.\d{4}|PLANNED RELEASE|COMING SOON/);
  assert.match(launch,/STARTING FROM ONLY/);
- assert.match(launch,/CHOOSE YOUR PLAN/);
+ assert.match(launch,/CREATE YOUR ACCOUNT/);
  assert.match(launch,/A PARTIR DE APENAS/);
  assert.match(launch,/DESDE SOLO/);
  assert.match(launch,/id="plans"/);
@@ -94,5 +94,5 @@ test('cinematic desktop navigation cannot cover authentication actions',()=>{
  assert.match(css,/\.kc-auth-dialog:not\(\[open\]\)\{display:none\}/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.match(launch,/className="kc-login" onClick=\{\(\)=>setAuthOpen\(true\)\}/);
- assert.match(launch,/className="kc-join" href="\/k4k-app\/register\?plan=starter"/);
+ assert.match(launch,/className="kc-join" href="\/k4k-app\/register"/);
 });
