@@ -1,5 +1,5 @@
 import {createClient} from '@supabase/supabase-js';
-import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
+import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot,ownerLivePilotAllowed} from '../../../../lib/server/billing-policy.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
 import {launchLimits} from '../../../../lib/server/soft-launch.mjs';
 export const dynamic='force-dynamic';
@@ -14,6 +14,8 @@ export async function GET(request){
   if(token&&url&&key){try{const {data:{user}={},error}=await createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}).auth.getUser(token);if(!error&&user&&!user.is_anonymous)userId=user.id}catch{}}
  }
  try{assertTaxReady();assertBillingKey(process.env.STRIPE_SECRET_KEY);livePrices('plans');if(billingMode()==='live'){assertLiveLaunchReady(process.env,{userId,plan:'starter'});launchLimits();}checkoutReady=true;if(!pilot&&process.env.K4K_TOPUPS_ENABLED==='true'){livePrices('packs');topupsReady=true;}}
- catch(error){reason=['TAX_SETUP_REQUIRED','OWNER_LIVE_PILOT_ONLY'].includes(error.message)?error.message:'BILLING_SETUP_REQUIRED';}
+ catch(error){reason=['TAX_SETUP_REQUIRED','OWNER_LIVE_PILOT_ONLY'].includes(error.message)?error.message:'BILLING_SETUP_REQUIRED';
+  // Only the authenticated configured owner may see exact safe readiness codes.
+  if(pilot&&ownerLivePilotAllowed(userId,'starter')&&['APP_MEMBERSHIP_SEPARATION_REQUIRED','WEBHOOK_SETUP_REQUIRED','LIVE_CREDIT_ISOLATION_REQUIRED','GENERATION_NOT_READY','LIVE_KEY_NOT_CONFIGURED','LAUNCH_CONFIG_INVALID','LIVE_PRICES_NOT_CONFIGURED','TAX_SETUP_REQUIRED'].includes(error.message))reason=error.message;}
  return Response.json({mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady},{headers:{'Cache-Control':'no-store'}});
 }
