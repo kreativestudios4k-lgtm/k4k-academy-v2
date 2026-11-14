@@ -17,7 +17,7 @@ function json(body, status) {
   return NextResponse.json(body, {status, headers: NO_STORE});
 }
 
-// Creates a Stripe test-mode subscription Checkout session for a signed-in user.
+// Creates a Stripe subscription Checkout session for a signed-in user.
 // The browser sends only plan and currency. The price is resolved on the server.
 export async function POST(request) {
   if(process.env.K4K_WAITLIST_ONLY==='true')return Response.json({error:'WAITLIST_ONLY'},{status:503});
@@ -98,7 +98,9 @@ export async function POST(request) {
     }catch(problem){
       const conflict=['LAUNCH_SOLD_OUT','LAUNCH_CREDIT_CAPACITY','LAUNCH_CHECKOUT_PENDING','ALREADY_SUBSCRIBED','CHECKOUT_EXPIRED_RETRY','CHECKOUT_RECONCILE_REQUIRED'];
       const known=[...conflict,'LAUNCH_NOT_OPEN','LAUNCH_CONFIG_INVALID','LAUNCH_CHECKOUT_REVIEW','STRIPE_UNREACHABLE','CHECKOUT_FAILED','LAUNCH_SESSION_INVALID'];
-      return json({error:known.includes(problem?.message)?problem.message:'LAUNCH_UNAVAILABLE'},conflict.includes(problem?.message)?409:503);
+      const reason=known.includes(problem?.message)?problem.message:'LAUNCH_UNAVAILABLE';
+      console.warn('Live checkout blocked',{reason,plan:body.plan,currency:expectedCurrency});
+      return json({error:reason},conflict.includes(problem?.message)?409:503);
     }
   }
 
