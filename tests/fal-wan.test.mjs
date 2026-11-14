@@ -61,11 +61,11 @@ test('fal approval and signing are separate from Higgsfield; a provider change i
  assert.notEqual(draftFingerprint({id,provider:'fal'},'720p'),draftFingerprint({id,provider:'higgsfield'},'720p'));
 });
 test('customer fal submission reserves once, passes trusted duration, and records provider request',async()=>{
- const config={...env,VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_GENERATION_TEST_USERS:id,K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_MAX_USD:'5'};
+ const config={...env,VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_GENERATION_TEST_USERS:id,K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.1',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_PROVIDER_TOTAL_BUDGET_USD:'200',K4K_MAX_ACTIVE_JOBS_PER_USER:'1',K4K_GENERATION_MAX_USD:'5'};
  const job={id,user_id:id,status:'draft',provider:'fal',model:'lite'};
  const token=quoteSigner('secret').issue({provider:'fal',userId:id,jobId:id,resolution:'720p',usd:0.7,credits:7,fingerprint:draftFingerprint(job,'720p')});
  const calls=[];
- const database={rpc:async()=>{calls.push('reserve');return {data:{newly_reserved:true}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>({data:{id,user_id:id,provider_job_id:id,status:'processing'}})})})})})})})})};
+ const database={rpc:async(name,args)=>{assert.equal(name,'k4k_generation_reserve_budgeted');assert.equal(args.p_quote_micros,700000);calls.push('reserve');return {data:{newly_reserved:true}}},from:()=>({update:()=>({eq:()=>({eq:()=>({eq:()=>({is:()=>({select:()=>({maybeSingle:async()=>({data:{id,user_id:id,provider_job_id:id,status:'processing'}})})})})})})})})};
  const provider={estimate:async()=>({usd:0.7}),submit:async(tier,body,options)=>{calls.push('submit');assert.equal(options.sourceSeconds,5);return {request_id:id}}};
  const submit=createGenerationSubmitService({database,provider,env:config,prepare:async()=>({input,sourceSeconds:5})});
  assert.equal((await submit({userId:id,job,quoteToken:token,requestKey:id})).status,'processing');

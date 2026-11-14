@@ -18,7 +18,7 @@ const subscription = (over = {}) => ({id: 'sub_1UawKrL7fmdMaK0kWyaLbJM7', custom
   created: 1794483512, current_period_end: 1797075512, cancel_at_period_end: false,
   latest_invoice: 'in_1UawKqL7fmdMaK0k157SYU4u', items: {data: [{price: {id: PRICE}, current_period_end: 1797075512}]}, ...over});
 const invoice = (over = {}) => ({id: 'in_1UawKqL7fmdMaK0k157SYU4u', status: 'paid', created: 1794483512,
-  customer: 'cus_VcAgctjuIpRYT6', lines: {data: [{period: {end: 1797075512}, pricing: {price_details: {price: PRICE}}}]}, ...over});
+  customer: 'cus_VcAgctjuIpRYT6', subscription: 'sub_1UawKrL7fmdMaK0kWyaLbJM7', billing_reason: 'subscription_create', lines: {data: [{period: {end: 1797075512}, pricing: {price_details: {price: PRICE}}}]}, ...over});
 
 function harness({sessions = [session()], sub = subscription(), inv = invoice(), fail = null} = {}) {
   const calls = {paths: [], link: [], membership: [], invoice: []};
@@ -149,8 +149,13 @@ test('checkout sends the session id back so the return page can complete the pur
   assert.match(read('lib/server/stripe-billing.mjs'), /success_url.*session_id=\{CHECKOUT_SESSION_ID\}/);
   const ret = read('app/k4k-app/CheckoutReturn.js');
   assert.match(ret, /\/api\/billing\/reconcile/);
-  assert.match(ret, /asked=true/); // asks once, not on every poll
+  assert.match(ret, /asked=true/); // one in-flight request; transient failures can retry
+  assert.match(ret,/verified&&/);
+  assert.match(read('lib/server/stripe-billing.mjs'),/cancel_url.*plan=/);
 });
 
 test('live reconciliation refuses a paid Academy checkout before writing any membership',async()=>{const h=harness({sessions:[session({livemode:true})]});await rejects(run(h,{sessionId:SESSION,liveMode:true}),'SESSION_NOT_PAYABLE',409);assert.equal(h.calls.link.length,0)});
 test('live reconciliation refuses mismatched launch-claim subscription before writes',async()=>{const claim='11111111-1111-4111-8111-111111111111';const h=harness({sessions:[session({livemode:true,metadata:{plan_key:'starter',k4k_launch_claim:claim}})],sub:subscription({metadata:{k4k_launch_claim:'22222222-2222-4222-8222-222222222222'}})});await rejects(run(h,{sessionId:SESSION,liveMode:true}),'SESSION_NOT_PAYABLE',409);assert.equal(h.calls.link.length,0)});
+
+test('old cancelled subscription cannot be reactivated from a historical paid checkout',async()=>{const h=harness({sub:subscription({status:'canceled'})});assert.deepEqual(await run(h,{sessionId:SESSION}),{reconciled:false,reason:'SUBSCRIPTION_NOT_ACTIVE'});assert.equal(h.calls.invoice.length,0);assert.equal(h.calls.link.length,0)});
+test('a non-cycle invoice or invoice belonging to a different subscription cannot grant credits',async()=>{const h=harness({inv:invoice({billing_reason:'subscription_update'})});assert.deepEqual(await run(h,{sessionId:SESSION}),{reconciled:false,reason:'INVOICE_NOT_SUBSCRIPTION_CREDIT'});assert.equal(h.calls.invoice.length,0);const bad=harness({inv:invoice({subscription:'sub_other'})});await rejects(run(bad,{sessionId:SESSION}),'STRIPE_ERROR',502);assert.equal(bad.calls.invoice.length,0)});
