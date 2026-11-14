@@ -21,14 +21,13 @@ export default function Account(){
   if(!user?.id)return;
   const client=createClient();setLoading(true);setMessage('');
   Promise.all([
-   client.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle(),
    client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(6),
    client.auth.getSession().then(({data})=>fetch('/api/billing/account',{headers:{Authorization:'Bearer '+data.session?.access_token},cache:'no-store'})).then(async response=>({data:response.ok?await response.json():null,error:!response.ok})),
    client.from('k4k_academy_migration_bonuses').select('status').eq('user_id',user.id).maybeSingle()
-  ]).then(([wallet,history,plan,gift])=>{
+  ]).then(([history,plan,gift])=>{
    if(!alive)return;
-   if(wallet.error||history.error||plan.error){setMessage('Some account details are unavailable. Please retry or contact support.');return;}
-   setBalance(wallet.data?.balance??0);setJobs(history.data||[]);setMembership(plan.data);if(!gift.error)setBonus(gift.data?.status||null);
+   if(history.error||plan.error){setMessage('Some account details are unavailable. Please retry or contact support.');return;}
+   setBalance(plan.data?.creditBalance??0);setJobs(history.data||[]);setMembership(plan.data);if(!gift.error)setBonus(gift.data?.status||null);
   }).catch(()=>{if(alive)setMessage('Unable to load account activity. Please retry.');}).finally(()=>{if(alive)setLoading(false)});
   return()=>{alive=false};
  },[user?.id]);

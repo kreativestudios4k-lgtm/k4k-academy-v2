@@ -21,7 +21,7 @@ export async function POST(request){
   const testAuthorized=generationUserAllowed(user.id,process.env,providerName);
   const budget=Number(process.env.K4K_GENERATION_MAX_USD);
   const budgetApproved=Number.isFinite(budget)&&budget>0&&budget<=5&&usd<=budget;
-  const {data:account,error:accountError}=await database.from('studio_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
+  const {data:account,error:accountError}=await database.from(process.env.VERCEL_ENV==='production'?'k4k_live_credit_accounts':'studio_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
   if(accountError)throw Error('UNAVAILABLE');
   const creditBalance=account?.balance??0;
   const accountBlocker=generationAccountBlocker({balance:creditBalance,billingHold:account?.billing_hold,credits});

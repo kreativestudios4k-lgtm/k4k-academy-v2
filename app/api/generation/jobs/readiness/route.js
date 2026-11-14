@@ -25,7 +25,7 @@ export async function POST(request){
  if(jobError)return reply({error:'UNAVAILABLE'},503);
  if(!job)return reply({error:'NOT_FOUND'},404);
  if(job.status!=='draft'||!K4K_MODELS[job.model])return reply({error:'INVALID_JOB_STATE'},409);
- const {data:account,error:balanceError}=await admin.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle();
+ const {data:account,error:balanceError}=await admin.from(process.env.VERCEL_ENV==='production'?'k4k_live_credit_accounts':'studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle();
  if(balanceError)return reply({error:'CREDIT_ACCOUNT_UNAVAILABLE'},503);
  try{
   const verified=await verifyStudioMedia({client:admin,userId:user.id,referencePaths:job.reference_paths,videoPath:job.reference_video_path});

@@ -27,5 +27,7 @@ export async function GET(request){
  const production=process.env.VERCEL_ENV==='production';
  const app=production?await client.from('k4k_app_memberships').select(fields).eq('user_id',user.id).maybeSingle():{data:null,error:null};
  if(app.error)return json({error:'UNAVAILABLE'},503);
- return json(accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}));
+ const wallet=await client.from(production?'k4k_live_credit_accounts':'studio_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
+ if(wallet.error)return json({error:'UNAVAILABLE'},503);
+ return json({...accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}),creditBalance:wallet.data?.balance??0,billingHold:wallet.data?.billing_hold??false,creditMode:production?'live':'test'});
 }
