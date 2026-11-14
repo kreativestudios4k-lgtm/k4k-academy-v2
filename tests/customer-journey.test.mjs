@@ -57,7 +57,8 @@ test('public account registration does not promise paid generation',()=>{
 test('signup and callback lead to the studio rather than the retired membership gate',()=>{
  const register=read('app/k4k-app/register/page.js');
  const callback=read('app/auth/callback/route.js');
- assert.match(register,/planDestination\(plan\)/);\n assert.match(register,/encodeURIComponent\(next\)/);
+ assert.match(register,/planDestination\(plan\)/);
+ assert.match(register,/encodeURIComponent\(next\)/);
  assert.match(callback,/studioDestination\(searchParams.get\('next'\)\)/);
  assert.doesNotMatch(callback,/membership-required/);
 });
