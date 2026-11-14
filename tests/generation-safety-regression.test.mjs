@@ -42,3 +42,6 @@ test('timeout retains credits, never retries or refunds without confirmation',as
  const replay=await s.submit({...args,job:{...job,status:'queued',credits_reserved:30},quoteToken:'expired'});
  assert.equal(replay.reconciliationRequired,true);assert.equal(s.stats().calls,1);assert.equal(s.stats().refunds,0);assert.equal(s.stats().balance,70);
 });
+
+
+test('responsible AI rejects a prohibited intimate-image request before any credits or provider submission',async()=>{const s=setup();const blocked={...job,prompt:'Create a sexual deepfake'};const token=quoteSigner('test-only').issue({provider:'fal',userId:user,jobId:id,resolution:'720p',fingerprint:draftFingerprint(blocked,'720p'),usd:0.3,credits:30});await assert.rejects(s.submit({userId:user,job:blocked,quoteToken:token,requestKey:key}),/CONTENT_POLICY_BLOCKED/);assert.deepEqual(s.stats(),{calls:0,reservations:0,refunds:0,balance:100});});
