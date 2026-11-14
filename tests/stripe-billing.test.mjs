@@ -77,7 +77,7 @@ test('checkout form carries the mode, price, user and plan, and never an amount'
   assert.equal(form.get('metadata[plan_key]'), 'starter');
   // The session id lets the return page complete the purchase if the webhook is late.
  assert.equal(form.get('success_url'), 'https://example.test/k4k-app/creator?checkout=success&session_id={CHECKOUT_SESSION_ID}');
-  assert.equal(form.get('cancel_url'), 'https://example.test/k4k-app/credits?checkout=cancelled');
+  assert.equal(form.get('cancel_url'), 'https://example.test/k4k-app/credits?plan=starter&checkout=cancelled');
   assert.equal(form.get('line_items[0][quantity]'), '1');
   assert.equal(form.get('subscription_data[metadata][plan_key]'), 'starter');
   assert.equal(form.has('line_items[0][price_data][unit_amount]'), false);
