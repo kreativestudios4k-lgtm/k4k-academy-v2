@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {fulfillBrazilPix} from '../lib/server/brazil-pix-fulfillment.mjs';
+import {nextBrazilPixExpiry} from '../lib/server/brazil-pix.mjs';
+const event=()=>({type:'checkout.session.async_payment_succeeded',created:1794696792,data:{object:{id:'cs_test_pix',mode:'payment',currency:'brl',payment_method_types:['pix'],payment_status:'paid',amount_total:10999,client_reference_id:'user1',payment_intent:'pi_test_pix',metadata:{payment_flow:'brazil_pix_30d',currency:'BRL',plan_key:'starter'}}}});
+test('paid Pix uses approved credits and payment identity',async()=>{let input;await fulfillBrazilPix(event(),{applyPaidPixAtomically:async x=>{input=x;return {handled:true}}});assert.equal(input.credits,80);assert.equal(input.paymentId,'pi_test_pix');assert.equal(input.userId,'user1')});
+test('pending Pix never grants',async()=>{const e=event();e.data.object.payment_status='unpaid';assert.equal((await fulfillBrazilPix(e,{})).reason,'PENDING')});
+test('wrong price fails closed',async()=>{const e=event();e.data.object.amount_total=1;await assert.rejects(()=>fulfillBrazilPix(e,{}),/INVALID_PIX_PAYMENT/)});
+test('non-Brazil currency fails closed',async()=>{const e=event();e.data.object.currency='usd';await assert.rejects(()=>fulfillBrazilPix(e,{}),/INVALID_PIX_SESSION/)});
+test('subscription events remain separate',async()=>{const e=event();delete e.data.object.metadata.payment_flow;assert.equal((await fulfillBrazilPix(e,{})).reason,'OTHER_FLOW')});
+test('early renewal preserves remaining days',()=>{assert.equal(nextBrazilPixExpiry({paidAt:'2026-11-14T00:00:00Z',currentExpiry:'2026-11-16T00:00:00Z'}),'2026-12-16T00:00:00.000Z')});
