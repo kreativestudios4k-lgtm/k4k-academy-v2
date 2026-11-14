@@ -64,7 +64,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(feed,/k4k-mark\.svg/);
  assert.match(feed,/CREATE · SWAP · GENERATE/);
  assert.match(source('app/k4k-app/landing.css'),/@media\(max-width:680px\)/);
- assert.match(feed,/href=\{'\/k4k-app\/template\/'/);
+ assert.match(feed,/href=\{'\/k4k-app\/creator\?template='/);
  assert.match(feed,/setTab/);
  assert.match(feed,/\/k4k-app\/creator/);
 });
