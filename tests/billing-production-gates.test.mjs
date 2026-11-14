@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {billingMode,assertBillingKey,assertTaxReady} from '../lib/server/billing-policy.mjs';
+import {billingMode,assertBillingKey,assertTaxReady,assertLiveLaunchReady} from '../lib/server/billing-policy.mjs';
 import {livePrices} from '../lib/server/live-price-config.mjs';
 import {generationUserAllowed} from '../lib/server/generation-policy.mjs';
 test('preview can never accept a live payment key, even with a live flag',()=>{const env={VERCEL_ENV:'preview',K4K_LIVE_PAYMENTS_ENABLED:'true'};assert.equal(billingMode(env),'test');assert.throws(()=>assertBillingKey('sk_live_mock',env));assert.equal(assertBillingKey('sk_test_mock',env),'test')});
@@ -9,3 +9,5 @@ test('tax readiness cannot be inferred from a payment key or registration claim'
 test('production generation remains off without explicit production AND provider-use approval',()=>{const env={VERCEL_ENV:'production',K4K_FAL_WAN_ENABLED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_ENABLE_PRODUCTION_GENERATION:'true'};assert.equal(generationUserAllowed('user',env),false);env.K4K_PROVIDER_USE_APPROVED='true';assert.equal(generationUserAllowed('user',env),true)});
 
 test('dedicated restricted live key is accepted only when production checkout is explicitly enabled',()=>{const key='rk_live_mock';assert.throws(()=>assertBillingKey(key,{VERCEL_ENV:'preview',K4K_LIVE_PAYMENTS_ENABLED:'true'}));assert.throws(()=>assertBillingKey(key,{VERCEL_ENV:'production',K4K_LIVE_PAYMENTS_ENABLED:'false'}));assert.equal(assertBillingKey(key,{VERCEL_ENV:'production',K4K_LIVE_PAYMENTS_ENABLED:'true'}),'live')});
+
+test('live launch is blocked until isolated memberships, webhook, payment E2E and generation all pass',()=>{const env={VERCEL_ENV:'production',K4K_LIVE_PAYMENTS_ENABLED:'true'};assert.throws(()=>assertLiveLaunchReady(env),/APP_MEMBERSHIP_SEPARATION_REQUIRED/);env.K4K_APP_MEMBERSHIP_SEPARATION_READY='true';assert.throws(()=>assertLiveLaunchReady(env),/WEBHOOK_SETUP_REQUIRED/);Object.assign(env,{K4K_STRIPE_WEBHOOK_SECRET_VERIFIED:'true',STRIPE_WEBHOOK_SECRET:'whsec_test'});assert.throws(()=>assertLiveLaunchReady(env),/PAYMENT_E2E_REQUIRED/);env.K4K_PAYMENT_E2E_VERIFIED='true';assert.throws(()=>assertLiveLaunchReady(env),/GENERATION_NOT_READY/);for(const key of ['K4K_ENABLE_PRODUCTION_GENERATION','K4K_PROVIDER_USE_APPROVED','K4K_FAL_WAN_ENABLED','K4K_FAL_RATE_CARD_APPROVED','K4K_CUSTOMER_CREDIT_PRICING_APPROVED','K4K_GENERATION_BUDGET_GUARD_ENABLED'])env[key]='true';assert.doesNotThrow(()=>assertLiveLaunchReady(env));assert.doesNotThrow(()=>assertLiveLaunchReady({VERCEL_ENV:'preview'}));});

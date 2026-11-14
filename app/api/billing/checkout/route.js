@@ -2,10 +2,13 @@ import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
-import {assertBillingKey,assertTaxReady,billingMode} from '../../../../lib/server/billing-policy.mjs';
+import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
+import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
 
+import {findPartner} from '../../../../lib/server/partner-policy.mjs';
+import {studentCode,studentDiscountRequested,applyStudentDiscount} from '../../../../lib/k4k-student-discount.mjs';
 export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
@@ -29,9 +32,6 @@ export async function POST(request) {
   const {data: {user} = {}, error} = await auth.auth.getUser(token);
   if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
 
-  // Dedicated QA preview may only create test sessions for its synthetic user.
-  if(process.env.K4K_BILLING_QA_ONLY==='true'&&(process.env.VERCEL_ENV!=='preview'||user.app_metadata?.k4k_billing_qa!==true||user.email!=='k4k-launch-qa-20261113@example.com'))return json({error:'QA_ACCOUNT_REQUIRED'},403);
-
   let body;
   try {
     body = await request.json();
@@ -39,6 +39,8 @@ export async function POST(request) {
     return json({error: 'INVALID_REQUEST'}, 400);
   }
 
+  const requestedDiscount=studentDiscountRequested(body?.discountCode);
+  if(requestedDiscount&&!studentCode(body.discountCode))return json({error:'INVALID_DISCOUNT_CODE'},400);
   // Region must be derived from the trusted Vercel edge header, not browser input.
   // Reject mismatches before any Stripe API request to avoid currency/price surprises.
   const expectedCurrency = currencyForCountry(request.headers.get('x-vercel-ip-country'));
@@ -52,7 +54,7 @@ export async function POST(request) {
   if (!secret) return json({error: 'UNAVAILABLE'}, 503);
   try {
     if(billingMode()==='test')assertTestModeKey(secret);
-    assertBillingKey(secret);assertTaxReady();
+    assertBillingKey(secret);assertTaxReady();assertLiveLaunchReady();
 
   } catch {
     return json({error:'BILLING_SETUP_REQUIRED'},503);
@@ -63,7 +65,7 @@ export async function POST(request) {
     global: {headers: {Authorization: `Bearer ${token}`}},
     auth: {persistSession: false, autoRefreshToken: false},
   });
-  const {data: membership, error: membershipError} = await scoped.from('memberships').select('status').eq('user_id', user.id).maybeSingle();
+  const {data: membership, error: membershipError} = await scoped.from(billingMode()==='live'?'k4k_app_memberships':'memberships').select('status').eq('user_id', user.id).maybeSingle();
   // Failure to read the subscription guard must not permit a duplicate Checkout.
   if (membershipError) {
     console.error('Checkout membership guard unavailable', {code: membershipError.code || 'unknown'});
@@ -79,9 +81,16 @@ export async function POST(request) {
       const limits=launchLimits();
       const serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!serviceKey)throw Error('LAUNCH_UNAVAILABLE');
       const database=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
+      const code=requestedDiscount?'matheusborrascah':request.cookies?.get(REFERRAL_COOKIE)?.value;
+      const partner=referralsEnabled()?await findPartner(database,code):null;
+      if(requestedDiscount&&(!partner||user.id===partner.user_id))return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
+      const referral=referralsEnabled()?await recordReferral(database,user.id,partner&&user.id!==partner.user_id?code:null):null;
+      if(referral&&(!validReferralCode(referral)||!await findPartner(database,referral)))throw Error('REFERRAL_REVIEW_REQUIRED');
+      if(requestedDiscount&&referral!=='matheusborrascah')return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
       const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
+      if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(referral==='matheusborrascah')applyStudentDiscount(form);}
       const destination=await openLaunchCheckout({database,claim,secret,form});
       return json({url:destination},200);
     }catch(problem){
@@ -94,13 +103,13 @@ export async function POST(request) {
   // Keep Stripe test Checkout returning to this exact Preview deployment rather
   // than a shared production site URL. Do not trust a client-supplied origin.
   const requestUrl = new URL(request.url);
-  const origin = process.env.K4K_BILLING_QA_ONLY==='true'&&process.env.VERCEL_ENV==='preview'&&process.env.VERCEL_URL ? 'https://'+process.env.VERCEL_URL : requestUrl.origin;
+  const origin = requestUrl.origin;
   let res;
   try {
     res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {Authorization: `Bearer ${secret}`, 'Content-Type': 'application/x-www-form-urlencoded'},
-      body: (()=>{const form=buildCheckoutForm({priceId,userId:user.id,origin,plan:body.plan,currency:expectedCurrency});form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');if(process.env.K4K_BILLING_QA_ONLY==='true'){form.set('metadata[k4k_billing_qa]','20261113');form.set('subscription_data[metadata][k4k_billing_qa]','20261113');form.set('customer_email',user.email);}return form.toString()})(),
+      body: (()=>{const form=buildCheckoutForm({priceId,userId:user.id,origin,plan:body.plan,currency:expectedCurrency});form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');if(requestedDiscount)applyStudentDiscount(form);return form.toString()})(),
       signal: AbortSignal.timeout(12000),
     });
   } catch (error) {

@@ -151,3 +151,6 @@ test('checkout sends the session id back so the return page can complete the pur
   assert.match(ret, /\/api\/billing\/reconcile/);
   assert.match(ret, /asked=true/); // asks once, not on every poll
 });
+
+test('live reconciliation refuses a paid Academy checkout before writing any membership',async()=>{const h=harness({sessions:[session({livemode:true})]});await rejects(run(h,{sessionId:SESSION,liveMode:true}),'SESSION_NOT_PAYABLE',409);assert.equal(h.calls.link.length,0)});
+test('live reconciliation refuses mismatched launch-claim subscription before writes',async()=>{const claim='11111111-1111-4111-8111-111111111111';const h=harness({sessions:[session({livemode:true,metadata:{plan_key:'starter',k4k_launch_claim:claim}})],sub:subscription({metadata:{k4k_launch_claim:'22222222-2222-4222-8222-222222222222'}})});await rejects(run(h,{sessionId:SESSION,liveMode:true}),'SESSION_NOT_PAYABLE',409);assert.equal(h.calls.link.length,0)});

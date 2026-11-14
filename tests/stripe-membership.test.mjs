@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {membershipFromSubscription, planForPrice, isStale} from '../lib/server/stripe-membership.mjs';
 import {handleStripeEvent} from '../lib/server/stripe-webhook-handler.mjs';
-import {PLAN_PRICES} from '../lib/k4k-plan-prices.mjs';
+import {PLAN_PRICES, LEGACY_TEST_PRICE_IDS} from '../lib/k4k-plan-prices.mjs';
 
 const CREATOR_GBP = PLAN_PRICES.creator.stripePriceIds.GBP;
 
@@ -155,3 +155,5 @@ test('plan changes and manual invoices grant no credits', async () => {
 });
 
 test('Stripe incomplete, unpaid, paused and incomplete_expired map to database-supported inactive status',()=>{for(const status of ['incomplete','incomplete_expired','unpaid','paused'])assert.equal(membershipFromSubscription(subscription({status})).status,'inactive')});
+
+test('older test subscriptions map to the same entitlement without being migrated',()=>{for(const [plan,prices] of Object.entries(LEGACY_TEST_PRICE_IDS))for(const [currency,id] of Object.entries(prices))assert.deepEqual(planForPrice(id),{plan,currency})});
