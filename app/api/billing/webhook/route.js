@@ -6,6 +6,7 @@ import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 import {isK4KLiveEvent} from '../../../../lib/server/live-webhook-scope.mjs';
 import {resolveLiveBillingReview} from '../../../../lib/server/live-billing-review.mjs';
+import {isLiveWebhookAudit} from '../../../../lib/server/live-webhook-audit.mjs';
 
 export const runtime = 'nodejs';
 
@@ -63,6 +64,15 @@ export async function POST(request) {
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
+  }
+
+  if(production&&isLiveWebhookAudit(event)){
+    const url=process.env.NEXT_PUBLIC_SUPABASE_URL,serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if(!url||!serviceKey)return NextResponse.json({error:'NOT_PROCESSING_YET'},{status:503,headers:NO_STORE});
+    try{
+      await createMembershipStore({url,serviceKey,liveMode:true}).markProcessed({eventId:event.id,type:event.type});
+      return NextResponse.json({received:true,handled:true,audit:true},{status:200,headers:NO_STORE});
+    }catch{return NextResponse.json({error:'RETRY',reason:'AUDIT_RECEIPT_UNAVAILABLE'},{status:503,headers:NO_STORE});}
   }
 
   let billingReviewKind=null;
