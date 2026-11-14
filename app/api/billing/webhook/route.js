@@ -5,6 +5,7 @@ import {billingProcessingMode} from '../../../../lib/server/billing-policy.mjs';
 import {invoiceSubscriptionId} from '../../../../lib/server/stripe-invoice-shape.mjs';
 import {createMembershipStore} from '../../../../lib/server/stripe-membership-store.mjs';
 import {isK4KLiveEvent} from '../../../../lib/server/live-webhook-scope.mjs';
+import {resolveLiveBillingReview} from '../../../../lib/server/live-billing-review.mjs';
 
 export const runtime = 'nodejs';
 
@@ -64,7 +65,14 @@ export async function POST(request) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
   }
 
-  try { if(!isK4KLiveEvent(event))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE}); } catch { return NextResponse.json({error:'RETRY',reason:'LIVE_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE}); }
+  let billingReviewKind=null;
+  try {
+    if(production&&['charge.refunded','charge.dispute.created'].includes(event.type)){
+      const review=await resolveLiveBillingReview(event);
+      if(!review)return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE});
+      event=review.event;billingReviewKind=review.kind;
+    }else if(!isK4KLiveEvent(event))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_K4K_APP'},{status:200,headers:NO_STORE});
+  } catch { return NextResponse.json({error:'RETRY',reason:'LIVE_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE}); }
 
   // Pausing new purchases must not interrupt existing subscriptions, refunds
   // or paid checkouts. Only verified, correctly scoped events reach the store.
@@ -85,7 +93,7 @@ export async function POST(request) {
   }
 
   try {
-    const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey, liveMode:production}),{liveMode:production});
+    const result = await handleStripeEvent(event, createMembershipStore({url, serviceKey, liveMode:production}),{liveMode:production,billingReviewKind});
     return NextResponse.json({received: true, type: event.type, ...result}, {status: 200, headers: NO_STORE});
   } catch (error) {
     // Any failure returns 503 so Stripe retries the event later.
