@@ -5,7 +5,7 @@ import {livePrices} from '../../../../lib/server/live-price-config.mjs';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
-import {configureBrazilPixCheckout} from '../../../../lib/server/brazil-pix.mjs';
+import {configureBrazilPixCheckout,brazilPixEnabled,BRAZIL_PIX_SUBMIT_MESSAGE} from '../../../../lib/server/brazil-pix.mjs';
 import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
 
 import {findPartner} from '../../../../lib/server/partner-policy.mjs';
@@ -91,8 +91,10 @@ export async function POST(request) {
       const claim=await claimPaidSeat(database,{userId:user.id,plan:body.plan,priceId,currency:expectedCurrency,limits});
       const form=buildCheckoutForm({priceId,userId:user.id,origin:'https://kreativestudios4k.com',plan:body.plan,currency:expectedCurrency});
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
-      if(!ownerLivePilot())form.set('custom_text[submit][message]','Your first month is charged now. During our funded launch, subsequent renewal invoices are held until generation capacity is funded. No new monthly credits are added until a renewal is paid. Contact support for cancellation or billing help.');
-      configureBrazilPixCheckout(form,expectedCurrency);
+      // PIX does not charge at checkout, so Brazil gets wording that matches
+      // what actually happens rather than "charged now".
+      if(!ownerLivePilot())form.set('custom_text[submit][message]',brazilPixEnabled(expectedCurrency)?BRAZIL_PIX_SUBMIT_MESSAGE:'Your first month is charged now. During our funded launch, subsequent renewal invoices are held until generation capacity is funded. No new monthly credits are added until a renewal is paid. Contact support for cancellation or billing help.');
+      configureBrazilPixCheckout(form,expectedCurrency,body.plan);
       if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(referral==='matheusborrascah')applyStudentDiscount(form);}
       if(ownerLivePilot())form.set('metadata[k4k_owner_live_pilot]','true');
       const destination=await openLaunchCheckout({database,claim,secret,form});
