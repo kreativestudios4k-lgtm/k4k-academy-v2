@@ -4,9 +4,9 @@ import {generationBudgetPolicy} from '../lib/server/generation-submit-service.mj
 import {createGuardedGenerationLedger} from '../lib/server/guarded-generation-ledger.mjs';
 import {reconcileGenerationJob} from '../lib/server/generation-reconcile-service.mjs';
 
-test('production submissions fail closed without the budget guard',()=>{
+test('all environments fail closed without the budget guard',()=>{
  assert.throws(()=>generationBudgetPolicy({VERCEL_ENV:'production'},'fal',0.25),/GENERATION_BUDGET_GUARD_REQUIRED/);
- assert.equal(generationBudgetPolicy({VERCEL_ENV:'preview'},'fal',0.25),null);
+ assert.throws(()=>generationBudgetPolicy({VERCEL_ENV:'preview'},'fal',0.25),/GENERATION_BUDGET_GUARD_REQUIRED/);
 });
 test('budget policy requires valid limits and converts USD to integer micros',()=>{
  const env={VERCEL_ENV:'preview',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_PROVIDER_TOTAL_BUDGET_USD:'280',K4K_MAX_ACTIVE_JOBS_PER_USER:'2'};
