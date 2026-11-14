@@ -3,6 +3,7 @@ import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import {createClient} from '../../../lib/supabase/client';
+import {loadCheckoutState} from '../../../lib/checkout-state.mjs';
 import {useK4KLocale} from '../locale';
 import {PLAN_PRICES} from '../../../lib/k4k-plan-prices.mjs';
 import './credits.css';
@@ -32,23 +33,10 @@ export default function Credits(){
  const [discountCode,setDiscountCode]=useState('');
  const refreshCheckout=useCallback(async()=>{
   const sequence=++refreshSequence.current;
-  const client=createClient();
-  let session=null,user=null;
-  try{
-   const result=await client.auth.getSession();
-   if(!result.error)session=result.data?.session;
-   if(session?.access_token){const check=await client.auth.getUser();if(!check.error&&check.data?.user&&!check.data.user.is_anonymous&&check.data.user.id===session.user?.id)user=check.data.user;}
-  }catch{}
+  const result=await loadCheckoutState({auth:createClient().auth});
   if(sequence!==refreshSequence.current)return;
-  setSignedIn(Boolean(user));
-  try{
-   // Public readiness does not require a session. A stale token must not hide an open launch.
-   const response=await fetch('/api/billing/readiness',{cache:'no-store',headers:user&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{},signal:AbortSignal.timeout(10000)});
-   if(!response.ok)throw Error('READINESS_UNAVAILABLE');
-   const data=await response.json();
-   if(sequence!==refreshSequence.current)return;
-   setBilling(data);setReadinessError(false);if(data.ownerPilot)setSelected('starter');
-  }catch{if(sequence===refreshSequence.current){setBilling(null);setReadinessError(true);}}
+  setSignedIn(result.signedIn);setBilling(result.billing);setReadinessError(result.readinessError);
+  if(result.billing?.ownerPilot)setSelected('starter');
  },[]);
  useEffect(()=>{
   const client=createClient();let alive=true;
