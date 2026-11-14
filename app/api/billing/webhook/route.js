@@ -70,6 +70,14 @@ export async function POST(request) {
   // K4K event instead of dropping it; unrelated Academy events already exit 200.
   if(production&&billingMode()!=='live')return NextResponse.json({error:'LIVE_PROCESSING_NOT_ENABLED'},{status:503,headers:NO_STORE});
 
+  // The sandbox QA endpoint must never consume unrelated Academy test events.
+  if(process.env.K4K_BILLING_QA_ONLY==='true'){
+    if(production||event.livemode!==false)return NextResponse.json({error:'QA_MODE_MISMATCH'},{status:400,headers:NO_STORE});
+    const o=event?.data?.object;
+    const markers=[o?.metadata?.k4k_billing_qa,o?.parent?.subscription_details?.metadata?.k4k_billing_qa,o?.subscription_details?.metadata?.k4k_billing_qa];
+    if(!markers.some(m=>m==='20261113'||m==='20261114'))return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_QA_ACCOUNT'},{status:200,headers:NO_STORE});
+  }
+ 
   let nonSubscription;
   try{nonSubscription=isNonSubscriptionEvent(event)}catch{return NextResponse.json({error:'CONFLICTING_INVOICE_FIELDS'}, {status:400,headers:NO_STORE})}
   if (nonSubscription) {
