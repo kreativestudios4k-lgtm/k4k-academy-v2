@@ -1,4 +1,2 @@
-import Workspace from './workspace';
-import MotionAccess from './MotionAccess';
-export const metadata={title:'Create video — K4K APP'};
-export default async function Create({searchParams}){const q=await searchParams;const n=Number(q.template);return <MotionAccess><Workspace template={q.template!==undefined&&Number.isInteger(n)&&n>=0&&n<10?n:null}/></MotionAccess>}
+import {redirect} from 'next/navigation';
+export default function Create(){redirect('/k4k-app/creator');}

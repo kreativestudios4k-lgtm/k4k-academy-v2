@@ -38,7 +38,13 @@ export default function Creator(){
  const targetFor=file=>characterTargets.get(file)||'';
  function setCharacterTarget(file,value){setCharacterTargets(old=>{const next=new Map(old);if(value)next.set(file,value);else next.delete(file);return next})}
  const [workspaceView,setWorkspaceView]=useState('library'),[promptOpen,setPromptOpen]=useState(false),[templateSearch,setTemplateSearch]=useState(''),[preparing,setPreparing]=useState(false);
- useEffect(()=>{if(new URL(window.location.href).searchParams.get('view')==='history')setWorkspaceView('history')},[]);
+ useEffect(()=>{
+  const params=new URL(window.location.href).searchParams;
+  if(params.get('view')==='history'){setWorkspaceView('history');return;}
+  const id=params.get('template');
+  const preset=[...catalogue.trending,...catalogue.topPerforming].find(item=>item.id===id);
+  if(preset){setSelectedPreset(preset);setWorkspaceView('library');}
+ },[]);
  const [model,setModel]=useState('lite');
  const [preflightBusy,setPreflightBusy]=useState(false),[preflightResult,setPreflightResult]=useState(null),[preflightError,setPreflightError]=useState('');
  const [uploading,setUploading]=useState(false),[uploadMessage,setUploadMessage]=useState('');
@@ -224,7 +230,7 @@ export default function Creator(){
    <CheckoutReturn/>
    <div className={'ks k4k-creator-layout ks-view-'+workspaceView}>
     <aside className="ks-panel" aria-label="Video creation settings">
-     <div className="ks-panel-title"><span><Sparkles size={17}/> {tr('Create video','Criar vídeo','Crear vídeo')}</span><span className="ks-preview-badge">PREVIEW</span></div>
+     <div className="ks-panel-title"><span><Sparkles size={17}/> {tr('Create video','Criar vídeo','Crear vídeo')}</span><span className="ks-preview-badge">K4K MOTION</span></div>
      <div className="ks-workflow-nav"><button type="button" aria-pressed={workspaceView==='library'} onClick={()=>setWorkspaceView('library')}>{tr('Create video','Criar vídeo','Crear vídeo')}</button><button type="button" aria-pressed={workspaceView==='history'} onClick={()=>setWorkspaceView('history')}>{tr('My library','Biblioteca','Biblioteca')}</button><button type="button" aria-pressed={workspaceView==='guide'} onClick={()=>setWorkspaceView('guide')}>{tr('Learn','Aprender','Aprender')}</button></div><div className="ks-model-banner"><img src="/posters/k4k-019.webp" alt=""/><div><img src="/k4k-mark.svg" alt="K4K"/><strong>K4K MOTION STUDIO</strong><small>Reality. Recast by you.</small></div></div><div className="ks-mode"><Film size={15}/><div><strong>{tr('Motion transfer','Transferência de movimento','Transferencia de movimiento')}</strong><small>{tr('Same motion. Your characters.','Mesmo movimento. Seus personagens.','Mismo movimiento. Tus personajes.')}</small></div></div>
      <section className="ks-input-section"><div className="ks-label"><label htmlFor="ks-video">{tr('Motion reference','Vídeo de referência','Vídeo de referencia')}</label><small>01</small></div>
       <label className={'ks-upload'+(previewUrl?' has-media':'')} htmlFor="ks-video" onDragOver={e=>e.preventDefault()} onDrop={e=>{e.preventDefault();const file=e.dataTransfer.files?.[0];if(file){setSelectedPreset(null);choose({target:{files:[file],value:''}},video,'video',MAX_VIDEO)}}}>
