@@ -5,13 +5,13 @@ import {draftFingerprint,quoteSigner} from '../lib/server/generation-quote.mjs';
 const user='25d0e48c-5dd5-4d84-a3b9-0e5bd6227a65';
 const id='d7411f09-a330-49b4-a953-2838b75eb99a';
 const key='7c92fe60-10eb-4185-9b2d-36a8f23ab3d3';
-const env={VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_FAL_WAN_ENABLED:'true',K4K_GENERATION_TEST_USERS:user,K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.01',K4K_GENERATION_MAX_USD:'5',K4K_GENERATION_QUOTE_SECRET:'test-only'};
+const env={VERCEL_ENV:'preview',K4K_ENABLE_TEST_GENERATION:'true',K4K_FAL_WAN_ENABLED:'true',K4K_GENERATION_TEST_USERS:user,K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.01',K4K_GENERATION_BUDGET_GUARD_ENABLED:'true',K4K_PROVIDER_DAILY_BUDGET_USD:'15',K4K_PROVIDER_TOTAL_BUDGET_USD:'200',K4K_MAX_ACTIVE_JOBS_PER_USER:'1',K4K_GENERATION_MAX_USD:'5',K4K_GENERATION_QUOTE_SECRET:'test-only'};
 const job={id,user_id:user,provider:'fal',model:'lite',status:'draft',reference_paths:[user+'/'+id+'.jpg'],reference_video_path:user+'/'+id+'.mp4',prompt:''};
 const quoteToken=()=>quoteSigner('test-only').issue({provider:'fal',userId:user,jobId:id,resolution:'720p',fingerprint:draftFingerprint(job,'720p'),usd:0.3,credits:30});
 function setup({reject=null}={}){
  let calls=0,reservations=0,refunds=0,balance=100;
  const database={rpc:async(name)=>{
-  if(name==='k4k_generation_reserve_checked'){
+  if(name==='k4k_generation_reserve_budgeted'){
    if(reservations)return {data:{newly_reserved:false,status:'reserved'}};
    reservations++;balance-=30;return {data:{newly_reserved:true,status:'reserved'}};
   }
