@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
 import {createClient} from '../../../lib/supabase/client';
@@ -26,10 +26,39 @@ export default function Credits(){
  const [signedIn,setSignedIn]=useState(null);
  const checkoutLock=useRef(false);
  const [cancelled,setCancelled]=useState(false);
- useEffect(()=>{const params=new URLSearchParams(window.location.search);const selectedPlan=validPlan(params.get('plan'));setCancelled(params.get('checkout')==='cancelled');if(selectedPlan)setSelected(selectedPlan);let active=true;createClient().auth.getUser().then(({data})=>{if(active)setSignedIn(Boolean(data?.user&&!data.user.is_anonymous))}).catch(()=>{if(active)setSignedIn(false)});return()=>{active=false}},[]);
- const [billing,setBilling]=useState(null);
+ useEffect(()=>{const params=new URLSearchParams(window.location.search);const selectedPlan=validPlan(params.get('plan'));setCancelled(params.get('checkout')==='cancelled');if(selectedPlan)setSelected(selectedPlan);},[]);
+ const [billing,setBilling]=useState(null),[readinessError,setReadinessError]=useState(false);
+ const refreshSequence=useRef(0);
  const [discountCode,setDiscountCode]=useState('');
- useEffect(()=>{let active=true;setBilling(null);createClient().auth.getSession().then(({data})=>fetch('/api/billing/readiness',{cache:'no-store',headers:data?.session?.access_token?{Authorization:'Bearer '+data.session.access_token}:{}})).then(r=>r.ok?r.json():null).then(data=>{if(active){setBilling(data);if(data?.ownerPilot)setSelected('starter')}}).catch(()=>{});return()=>{active=false}},[signedIn]);
+ const refreshCheckout=useCallback(async()=>{
+  const sequence=++refreshSequence.current;
+  const client=createClient();
+  let session=null,user=null;
+  try{
+   const result=await client.auth.getSession();
+   if(!result.error)session=result.data?.session;
+   if(session?.access_token){const check=await client.auth.getUser();if(!check.error&&check.data?.user&&!check.data.user.is_anonymous&&check.data.user.id===session.user?.id)user=check.data.user;}
+  }catch{}
+  if(sequence!==refreshSequence.current)return;
+  setSignedIn(Boolean(user));
+  try{
+   // Public readiness does not require a session. A stale token must not hide an open launch.
+   const response=await fetch('/api/billing/readiness',{cache:'no-store',headers:user&&session?.access_token?{Authorization:'Bearer '+session.access_token}:{},signal:AbortSignal.timeout(10000)});
+   if(!response.ok)throw Error('READINESS_UNAVAILABLE');
+   const data=await response.json();
+   if(sequence!==refreshSequence.current)return;
+   setBilling(data);setReadinessError(false);if(data.ownerPilot)setSelected('starter');
+  }catch{if(sequence===refreshSequence.current){setBilling(null);setReadinessError(true);}}
+ },[]);
+ useEffect(()=>{
+  const client=createClient();let alive=true;
+  const refresh=()=>{if(alive)void refreshCheckout()};
+  refresh();
+  const {data:{subscription}}=client.auth.onAuthStateChange(()=>setTimeout(refresh,0));
+  const visibility=()=>{if(document.visibilityState==='visible')refresh()};
+  window.addEventListener('focus',refresh);window.addEventListener('pageshow',refresh);document.addEventListener('visibilitychange',visibility);
+  return()=>{alive=false;refreshSequence.current++;subscription.unsubscribe();window.removeEventListener('focus',refresh);window.removeEventListener('pageshow',refresh);document.removeEventListener('visibilitychange',visibility)};
+ },[refreshCheckout]);
  const checkoutReady=billing?.checkoutReady===true&&(!billing?.ownerPilot||selected==='starter');
  const live=billing?.mode==='live';
  const [checkoutBusy,setCheckoutBusy]=useState(false),[checkoutError,setCheckoutError]=useState('');
@@ -56,6 +85,8 @@ export default function Credits(){
    const result=await response.json().catch(()=>({}));
    if(!response.ok||!result.url){
     const reason=result.error||'HTTP_'+response.status;
+    if(reason==='UNAUTHENTICATED'){window.location.assign('/login?next='+encodeURIComponent(planDestination(selected)));return;}
+    if(reason==='OWNER_LIVE_PILOT_ONLY'||reason==='BILLING_SETUP_REQUIRED'||reason==='LAUNCH_NOT_OPEN')void refreshCheckout();
     if(reason==='CURRENCY_REGION_MISMATCH'&&supportedCurrencies.has(result.currency)){setCurrency(result.currency);setCheckoutError(tr('Your billing currency changed. Review the updated price and try again.','Sua moeda mudou. Confira o preço atualizado e tente novamente.','Tu moneda cambió. Revisa el precio actualizado e inténtalo de nuevo.'));return;}
     const message={
      INVALID_DISCOUNT_CODE:tr('Invalid discount code.','Código de desconto inválido.','Código de descuento no válido.'),
@@ -81,7 +112,8 @@ export default function Credits(){
  }
  return <PreviewShell active="Credits">
   <div className="k4k-pricing-page">
-   <section className="k4k-pricing-hero"><span className="k4k-workspace-eyebrow">✦ K4K APP / CREATOR PLANS</span><h1>{tr('Create more. Go further.','Crie mais. Vá além.','Crea más. Llega más lejos.')}<span>✦</span></h1><p>{tr('Choose your monthly plan and continue to secure checkout.','Templates, projetos criativos, conta e créditos em um só lugar.','Plantillas, proyectos creativos, tu cuenta y tus créditos en un solo lugar.')}</p><div className="k4k-pricing-status"><span>● {checkoutReady?(live?tr('LIVE CHECKOUT','PAGAMENTO DISPONÍVEL','PAGO DISPONIBLE'):tr('TEST MODE ONLY','SOMENTE MODO TESTE','SOLO MODO PRUEBA')):tr('EARLY ACCESS · CHECKOUT CLOSED','ACESSO ANTECIPADO · PAGAMENTO FECHADO','ACCESO ANTICIPADO · PAGO CERRADO')}</span><span>{tr('Monthly plans · generation credits','Planos mensais · créditos de geração','Planes mensuales · créditos de generación')}</span></div></section>
+   <section className="k4k-pricing-hero"><span className="k4k-workspace-eyebrow">✦ K4K APP / CREATOR PLANS</span><h1>{tr('Create more. Go further.','Crie mais. Vá além.','Crea más. Llega más lejos.')}<span>✦</span></h1><p>{tr('Choose your monthly plan and continue to secure checkout.','Templates, projetos criativos, conta e créditos em um só lugar.','Plantillas, proyectos creativos, tu cuenta y tus créditos en un solo lugar.')}</p><div className="k4k-pricing-status"><span>● {checkoutReady?(live?tr('LIVE CHECKOUT','PAGAMENTO DISPONÍVEL','PAGO DISPONIBLE'):tr('TEST MODE ONLY','SOMENTE MODO TESTE','SOLO MODO PRUEBA')):!billing&&!readinessError?tr('CHECKING CHECKOUT','VERIFICANDO PAGAMENTO','COMPROBANDO PAGO'):readinessError?tr('CHECKOUT STATUS UNAVAILABLE','STATUS INDISPONÍVEL','ESTADO NO DISPONIBLE'):tr('EARLY ACCESS · CHECKOUT CLOSED','ACESSO ANTECIPADO · PAGAMENTO FECHADO','ACCESO ANTICIPADO · PAGO CERRADO')}</span><span>{tr('Monthly plans · generation credits','Planos mensais · créditos de geração','Planes mensuales · créditos de generación')}</span></div></section>
+   {readinessError&&<p role="alert" className="k4k-pricing-note">{tr('Could not check checkout availability. No payment was taken.','Não foi possível verificar o pagamento. Nenhuma cobrança foi feita.','No se pudo comprobar el pago. No se cobró nada.')} <button type="button" onClick={refreshCheckout}>{tr('Try again','Tentar novamente','Reintentar')}</button></p>}
    {billing?.ownerPilot&&<p role="status" className="k4k-pricing-note">Owner live verification: Starter only, real recurring payment. Public checkout remains closed.</p>}
    {signedIn&&billing?.reason==='OWNER_LIVE_PILOT_ONLY'&&<p role="status" className="k4k-pricing-note">Live checkout is currently restricted to the authorized owner account. Sign out and sign in with the account approved for the payment verification. No payment has been taken.</p>}
    {signedIn&&billing?.mode==='live'&&!billing.checkoutReady&&billing.reason!=='OWNER_LIVE_PILOT_ONLY'&&<p role="alert" className="k4k-pricing-note">Checkout setup: {billing.reason||'Unavailable'}. No payment has been taken.</p>}
@@ -96,7 +128,7 @@ export default function Credits(){
     <span className="k4k-pricing-select">{plan.key===selected?tr('Selected ✓','Selecionado ✓','Seleccionado ✓'):tr('Select plan','Escolher plano','Elegir plan')} <span aria-hidden="true">↗</span></span>
    </button>)}</div>
    <section className="k4k-pricing-note"><h2>{tr('Student discount','Desconto de aluno','Descuento de estudiante')}</h2><label htmlFor="k4k-student-code">{tr('Have a discount code?','Tem um código de desconto?','¿Tienes un código de descuento?')}</label><input id="k4k-student-code" value={discountCode} onChange={e=>{setDiscountCode(e.target.value);setCheckoutError('')}} placeholder={tr('Enter your code','Digite seu código','Introduce tu código')} autoComplete="off" maxLength={40} style={{maxWidth:300,textTransform:'uppercase'}}/><p>{tr('Eligible student discounts apply to the first month only. The regular monthly price resumes afterwards.','Descontos elegíveis de alunos valem apenas no primeiro mês. Depois, volta o preço mensal normal.','Los descuentos elegibles se aplican solo al primer mes. Después se cobra el precio mensual normal.')}</p>{discounted&&<p role="status"><strong>{STUDENT_CODE} · 10% — {discounted}</strong> {tr('first month, subject to eligibility at checkout.','no primeiro mês, sujeito à elegibilidade no checkout.','el primer mes, sujeto a elegibilidad al pagar.')}</p>}</section>
-   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Published prices include applicable tax. Credits appear after verified payment.','Os preços publicados incluem os impostos aplicáveis. Os créditos são liberados após a confirmação do pagamento.','Los precios publicados incluyen los impuestos aplicables. Los créditos se acreditan tras confirmar el pago.')}</p></div>{signedIn===false?<Link className="k4k-plan-account-cta" href={planRegistration(selected)}>{tr('Create account to continue','Crie sua conta para continuar','Crea una cuenta para continuar')} ↗</Link>:<button type="button" disabled={!currency||checkoutBusy||!checkoutReady||signedIn!==true} onClick={startTestCheckout}>{checkoutBusy?'Opening…':!checkoutReady?(billing?.ownerPilot?tr('Select Starter','Selecione Starter','Selecciona Starter'):billing?.reason==='OWNER_LIVE_PILOT_ONLY'?tr('Owner checkout only','Pagamento apenas para o titular','Pago solo para el titular'):tr('Checkout not open yet','Pagamento ainda não disponível','Pago aún no disponible')):live?tr('Continue to secure checkout','Continuar para pagamento seguro','Continuar al pago seguro'):tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button>}</section>
+   <section className="k4k-pricing-checkout"><div><span className="k4k-workspace-eyebrow">{tr('YOUR SELECTION','SUA ESCOLHA','TU SELECCIÓN')}</span><h2>{current.name} — {amount(current)} <small>/{tr('month','mês','mes')}</small></h2><p>{tr('Published prices include applicable tax. Credits appear after verified payment.','Os preços publicados incluem os impostos aplicáveis. Os créditos são liberados após a confirmação do pagamento.','Los precios publicados incluyen los impuestos aplicables. Los créditos se acreditan tras confirmar el pago.')}</p></div>{signedIn===false?<Link className="k4k-plan-account-cta" href={planRegistration(selected)}>{tr('Create account to continue','Crie sua conta para continuar','Crea una cuenta para continuar')} ↗</Link>:<button type="button" disabled={!currency||checkoutBusy||!checkoutReady||signedIn!==true} onClick={startTestCheckout}>{checkoutBusy?'Opening…':!billing&&!readinessError?tr('Checking checkout…','Verificando pagamento…','Comprobando pago…'):!checkoutReady?(billing?.ownerPilot?tr('Select Starter','Selecione Starter','Selecciona Starter'):billing?.reason==='OWNER_LIVE_PILOT_ONLY'?tr('Owner checkout only','Pagamento apenas para o titular','Pago solo para el titular'):tr('Checkout not open yet','Pagamento ainda não disponível','Pago aún no disponible')):live?tr('Continue to secure checkout','Continuar para pagamento seguro','Continuar al pago seguro'):tr('Continue to TEST checkout','Continuar para checkout de TESTE','Continuar a checkout de PRUEBA')} ↗</button>}</section>
    {cancelled&&<p role="status" className="k4k-pricing-note">{tr('Checkout cancelled. No payment was taken by this attempt. Your selected plan is still here.','Pagamento cancelado. Nenhum pagamento foi feito nesta tentativa. Seu plano continua selecionado.','Pago cancelado. No se cobró nada en este intento. Tu plan sigue seleccionado.')}</p>}
    {checkoutError&&<p className="k4k-pricing-error" role="alert">{checkoutError}</p>}
    <CreditProposal currency={currency}/>
