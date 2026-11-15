@@ -89,3 +89,15 @@ test('Live owner-only activation fails closed without an approved user and leave
  assert.equal(owner.get('allowed_payment_method_types[0]'),'card');
  assert.equal(other.get('allowed_payment_method_types[0]'),'pix');
 });
+
+test('approved Live custom Stripe product IDs pass source and checkout validation per plan',()=>{
+ for(const key of ['starter','creator','pro','studio']){
+  const p=manualPixPlan(key,{liveMode:true,env});
+  const price={id:p.sourcePrice,livemode:true,active:true,currency:'brl',unit_amount:p.amount,tax_behavior:'inclusive',recurring:{interval:'month',interval_count:1},product:`k4k_app_${key}_2026`};
+  assert.equal(assertManualPixSource(price,p,true),price.product);
+  assert.throws(()=>assertManualPixSource({...price,product:'k4k_app_unapproved_2026'},p,true),/PRICE_INVALID/);
+  const {order}=fixture(true);
+  Object.assign(order,{plan_key:key,amount:p.amount,source_price_id:p.sourcePrice,product_id:price.product});
+  assert.equal(buildManualPixCheckout({order,plan:p,userId:user,origin:'https://preview.test'}).get('line_items[0][price_data][product]'),price.product);
+ }
+});
