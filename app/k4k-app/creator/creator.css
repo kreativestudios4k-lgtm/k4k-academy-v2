@@ -109,3 +109,22 @@
 .ks-picker-grid span{display:block;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:3px}
 .ks-picker-grid .ks-picker-upload{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border-style:dashed;font-size:12px}
 @media(max-width:760px){.ks.k4k-creator-layout{display:flex;max-width:480px}.ks .ks-template-grid{display:flex;overflow-x:auto}.ks .ks-template{flex:0 0 150px}.ks .ks-media-picker{position:fixed;inset:auto 12px 90px;width:auto;max-height:70dvh;overflow:auto;z-index:70}.ks-picker-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.ks .ks-library-hero h1{font-size:21px!important}}
+
+/* Dedicated creator redesign, independent of legacy promotional gallery. */
+.ks.ks-redesign{display:grid;grid-template-columns:290px minmax(0,1fr);max-width:none;gap:12px;margin:0}
+.ks-redesign .ks-panel{background:#202020;border-radius:14px;padding:10px;max-height:calc(100dvh - 90px)}
+.ks-redesign .ks-workspace{background:#101010;border:0;padding:12px 18px}
+.ks-redesign .ks-new-hero{text-align:center;padding:22px 8px 18px}
+.ks-redesign .ks-new-hero span{font-size:10px;letter-spacing:2px;color:#a0a0a0}
+.ks-redesign .ks-new-hero h1{font-size:clamp(22px,2.4vw,34px);line-height:1.1;margin:10px 0;font-weight:800}
+.ks-redesign .ks-new-hero p{font-size:13px;color:#aaa;margin:0}
+.ks-new-filter{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:8px 0 14px}
+.ks-new-filter input{background:#222;border:1px solid #444;border-radius:8px;padding:9px;color:white;max-width:180px;min-width:0}
+.ks-new-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:start}
+.ks-new-card{position:relative;overflow:hidden;border-radius:12px;background:#242424;min-width:0}
+.ks-new-card video{width:100%;aspect-ratio:16/10;object-fit:contain;background:#090909;display:block;cursor:pointer}
+.ks-new-card>div{padding:9px 10px;display:flex;justify-content:space-between;gap:6px;align-items:center}
+.ks-new-card strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ks-new-card small{font-size:10px;color:#aaa;white-space:nowrap}
+.ks-redesign .ks-upload{height:126px}.ks-redesign .ks-add-reference{min-height:100px}
+@media(max-width:760px){.ks.ks-redesign{display:flex;flex-direction:column;max-width:480px;margin:auto}.ks-redesign .ks-panel{max-height:none}.ks-redesign .ks-workspace{padding:10px}.ks-new-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ks-new-card>div{display:block}.ks-new-card small{display:block;margin-top:4px}.ks-new-filter input{max-width:130px}}
