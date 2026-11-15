@@ -9,11 +9,19 @@ test('explicit Pix switch expires an unused card checkout before releasing its c
  await prepareManualPixCardSwitch({claim,userId,readSession:async()=>{calls.push('read');return original},expireSession:async()=>{calls.push('expire');return {...original,status:'expired'}},releaseClaim:async()=>calls.push('release')});
  assert.deepEqual(calls,['read','expire','release']);
 });
-test('Pix switching never interrupts customer-bound, funded, in-flight or foreign checkouts',async()=>{
- for(const patch of [{customer:'cus_started'},{customer_account:'acct_started'},{subscription:'sub_started'},{payment_intent:'pi_started'},{setup_intent:'seti_started'},{payment_status:'paid'},{status:'complete'},{client_reference_id:'other'},{livemode:false}]){
+test('Pix switching never interrupts funded, in-flight or foreign checkouts',async()=>{
+ for(const patch of [{subscription:'sub_started'},{payment_intent:'pi_started'},{setup_intent:'seti_started'},{payment_status:'paid'},{status:'complete'},{client_reference_id:'other'},{livemode:false}]){
   let mutations=0;
   await assert.rejects(prepareManualPixCardSwitch({claim,userId,readSession:async()=>({...original,...patch}),expireSession:async()=>{mutations++},releaseClaim:async()=>{mutations++}}));
   assert.equal(mutations,0);
+ }
+});
+test('entering billing details alone does not prevent switching an unpaid checkout to Pix',async()=>{
+ for(const patch of [{customer:'cus_details_only'},{customer_account:'acct_details_only'}]){
+  const calls=[];
+  const session={...original,...patch};
+  await prepareManualPixCardSwitch({claim,userId,readSession:async()=>session,expireSession:async()=>{calls.push('expire');return {...session,status:'expired'}},releaseClaim:async()=>calls.push('release')});
+  assert.deepEqual(calls,['expire','release']);
  }
 });
 test('only confirmed terminal Stripe expiry releases capacity, and failures preserve the claim',async()=>{
