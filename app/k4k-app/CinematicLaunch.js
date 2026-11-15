@@ -39,6 +39,8 @@ export default function CinematicLaunch(){
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
  const [paused,setPaused]=useState(false);
  const [featured,setFeatured]=useState(0);
+ const storyRef=useRef(null);
+ useEffect(()=>{let frame=0;const update=()=>{frame=0;const node=storyRef.current;if(!node)return;const stage=node.firstElementChild;const range=Math.max(1,node.offsetHeight-stage.offsetHeight);const progress=Math.max(0,Math.min(1,(stage.getBoundingClientRect().top-node.getBoundingClientRect().top)/range));setFeatured(Math.min(videos.length-1,Math.floor(progress*videos.length)));};const onScroll=()=>{if(!frame)frame=requestAnimationFrame(update)};window.addEventListener('scroll',onScroll,{passive:true});window.addEventListener('resize',onScroll);update();return()=>{window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',onScroll);cancelAnimationFrame(frame)}},[]);
  const [menuOpen,setMenuOpen]=useState(false);
  const [authOpen,setAuthOpen]=useState(false);
  const [currency,setCurrency]=useState('GBP');
@@ -52,21 +54,19 @@ export default function CinematicLaunch(){
   <div className="kc-header-right"><label className="kc-language"><Globe2 size={15}/><select aria-label={tr('Language','Idioma','Idioma')} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label><button type="button" className="kc-login" onClick={()=>setAuthOpen(true)}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link className="kc-join" href="/k4k-app/register?plan=starter">{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}<ArrowUpRight size={15}/></Link><button className="kc-menu-toggle" type="button" aria-label={menuOpen?'Close menu':'Open menu'} aria-expanded={menuOpen} aria-controls="kc-mobile-nav" onClick={()=>setMenuOpen(v=>!v)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button></div>
  </div>{menuOpen&&<nav id="kc-mobile-nav" className="kc-mobile-nav" aria-label="Mobile navigation"><a href="#showcase" onClick={()=>setMenuOpen(false)}>{tr('Showcase','Vitrine','Galería')}</a><a href="#plans" onClick={()=>setMenuOpen(false)}>{tr('Plans','Planos','Planes')}</a><button type="button" onClick={()=>{setMenuOpen(false);setAuthOpen(true)}}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link href="/k4k-app/register?plan=starter" onClick={()=>setMenuOpen(false)}>{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}</Link></nav>}</header>
  <main>
- <section className="kc-hero kc-split-landing">
+ <div ref={storyRef} className="kc-scroll-story" style={{"--kc-story-count":videos.length}}><section className="kc-hero kc-split-landing">
  <div className="kc-kicker"><i/> BY KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
  <h1 className="kc-split-title" aria-label={tr("DON’T FOLLOW THE TREND. CREATE IT.","NÃO SIGA A TENDÊNCIA. CRIE A SUA.","NO SIGAS LA TENDENCIA. CRÉALA.")}>
  <span className="kc-split-left">{tr("DON’T","NÃO","NO")}<span>{tr("FOLLOW","SIGA","SIGAS")}</span></span>
  <span className="kc-split-right">{tr("THE","A","LA")}<span>{tr("TREND.","TENDÊNCIA.","TENDENCIA.")}</span><em>{tr("CREATE","CRIE","CRÉALA.")}<span>{tr("IT.","A SUA.","")}</span></em></span>
  </h1>
  <div className="kc-split-center">
- <div className="kc-reels-feed" tabIndex={0} aria-label="Swipe vertically to browse videos" onScroll={e=>{const n=e.currentTarget;setFeatured(Math.max(0,Math.min(videos.length-1,Math.round(n.scrollTop/n.clientHeight))))}}>
- {videos.map((item,index)=><div className="kc-reels-slide" key={item.id}><ShowcaseVideo item={item} index={index} paused={paused||authOpen||featured!==index}/></div>)}
- </div>
+ <div className="kc-reels-feed kc-page-scroll-player" aria-label="Featured video"><ShowcaseVideo key={videos[featured].id} item={videos[featured]} index={featured} paused={paused||authOpen}/></div>
  <Link href="/k4k-app/explore" className="kc-join kc-reels-cta">{tr("Use template","Usar template","Usar plantilla")}<ArrowUpRight size={16}/></Link>
  <small className="kc-reels-hint">↑ {tr("Swipe up for next video","Deslize para o próximo vídeo","Desliza para el siguiente vídeo")} · {featured+1}/{videos.length}</small>
  </div>
  <div className="kc-split-description"><p className="kc-purpose">{tr("K4K APP is an AI video creation studio for original creative projects, social media videos and licensed character-based storytelling. Google Sign-In is used only to authenticate users; video generation uses a separate AI provider.","K4K APP é um estúdio de criação de vídeos com IA para projetos criativos originais, redes sociais e narrativas com personagens autorizados. O Login com Google serve apenas para autenticar utilizadores; a geração de vídeos utiliza um fornecedor de IA separado.","K4K APP es un estudio de creación de vídeos con IA para proyectos originales, redes sociales y narrativas con personajes autorizados. Google Sign-In solo autentica usuarios; la generación utiliza un proveedor de IA independiente.")}</p></div>
- </section>
+ </section></div>
  <section className="kc-showcase" id="showcase"><div className="kc-showcase-head"><div><span>K4K ORIGINALS</span><h2>{tr('THE WORLD IS WATCHING.','O MUNDO ESTÁ ASSISTINDO.','EL MUNDO ESTÁ MIRANDO.')}</h2></div><button type="button" onClick={()=>setPaused(p=>!p)} aria-label={paused?'Play previews':'Pause previews'}>{paused?<Play size={17}/>:<Pause size={17}/>} {paused?tr('Play','Reproduzir','Reproducir'):tr('Pause','Pausar','Pausar')}</button></div>
  <div className="kc-video-grid">{videos.map((item,index)=><ShowcaseVideo key={item.id} item={item} index={index} paused={paused||authOpen}/>)}</div>
  </section>
