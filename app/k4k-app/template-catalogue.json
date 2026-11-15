@@ -231,5 +231,70 @@
       "requiredImages": 2,
       "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
     }
+  ],
+  "discoveryPreviews": [
+    {
+      "id": "new-1",
+      "title": "The Main Character",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29125/qqA4Qxaiw4nQG2fPMCFrn_higgsfield-750d5afb-e069-4aa3-b8fe-521e90b05e16.mp4",
+      "durationSeconds": 15,
+      "previewOnly": true
+    },
+    {
+      "id": "new-2",
+      "title": "Pitch Invasion",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29126/5r8gBlT-JHql5wTCLLaev_higgsfield-14d8e3a0-6564-4647-8011-e00fcf606eed.mp4",
+      "durationSeconds": 24,
+      "previewOnly": true
+    },
+    {
+      "id": "new-3",
+      "title": "Luxury Lifestyle",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/DRLPXaCkv6LbrOxKtJ7FW_higgsfield-e81ffd4b-2e68-4687-98ad-faaa5b2518b0.mp4",
+      "durationSeconds": 11,
+      "previewOnly": true
+    },
+    {
+      "id": "new-4",
+      "title": "Street Court",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/EazWlisHQZMbfyJ5Rwz6j_higgsfield-12f3f57f-6ec8-4563-bf3e-0707522c3284.mp4",
+      "durationSeconds": 15,
+      "previewOnly": true
+    },
+    {
+      "id": "new-5",
+      "title": "Night Football",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/Bvk63mKZJROdI4IInmVC-_higgsfield-5a956e2b-e691-4ca3-b51a-c763cecbbab4.mp4",
+      "durationSeconds": 26,
+      "previewOnly": true
+    },
+    {
+      "id": "new-6",
+      "title": "Stadium Entrance",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29128/4xXofpIsFtJHbKNZ_WC3F_higgsfield-e4e73e76-c107-4639-b320-fff51e25b69a%281%29.mp4",
+      "durationSeconds": 23,
+      "previewOnly": true
+    },
+    {
+      "id": "new-7",
+      "title": "Living Room Dance",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29128/m76xZpIYoQtJ2yZJas2mH_higgsfield-f7abecea-0470-4aee-b819-20f4b2ca9c54.mp4",
+      "durationSeconds": 29,
+      "previewOnly": true
+    },
+    {
+      "id": "new-8",
+      "title": "Stadium Skills",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29129/qr1uRiBvjtwGe1Shl5wJR_K4K-5f2d7283-d331-493e-a6c1-cb8f1afb67d8%281%29.mp4",
+      "durationSeconds": 13,
+      "previewOnly": true
+    },
+    {
+      "id": "new-9",
+      "title": "Restaurant Moment",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29129/1SHwN0k7LHu-0vUX-uMfF_higgsfield-1bcbcf93-56d6-47fe-8ef9-a07f08aec2fc%281%29.mp4",
+      "durationSeconds": 11,
+      "previewOnly": true
+    }
   ]
 }
