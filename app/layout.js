@@ -4,6 +4,7 @@ import './course-v3.css';
 import './account-simple.css';
 import './character-swap-studio.css';
 import './kx-redesign.css';
+import './k4k-monochrome.css';
 export const metadata={
  metadataBase:new URL('https://kreativestudios4k.com'),
  title:{default:'K4K APP | AI Video Studio',template:'%s | K4K APP'},
