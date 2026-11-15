@@ -76,3 +76,11 @@
 .kf:not(.kf-waitlist) .kf-cta svg{margin:0}
 .kf:not(.kf-waitlist) .kf-caption>small{display:none}
 }
+
+/* Desktop campaign hook: reserve the left column without covering the feed. */
+@media(min-width:1100px){
+.kf:not(.kf-waitlist) .kf-editorial{display:block;left:112px;width:calc(50% - var(--video-width)/2 - 144px);max-width:380px;top:50%;transform:translateY(-50%);}
+.kf:not(.kf-waitlist) .kf-editorial h1{font-size:clamp(25px,2.65vw,48px);font-weight:800;letter-spacing:-.045em;line-height:1.05;overflow-wrap:normal;}
+.kf:not(.kf-waitlist) .kf-editorial>p{font-size:13px;max-width:100%;color:#aaa;}
+.kf:not(.kf-waitlist) .kf-editorial .kf-overline{font-size:9px;}
+}
