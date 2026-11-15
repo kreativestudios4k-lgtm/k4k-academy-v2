@@ -77,3 +77,8 @@
 .ks .ks-workflow-nav button{font-size:12px}
 .ks .ks-submit-area{position:static}
 }
+
+.ks .ks-inspiration{display:block}
+.ks .ks-template-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.ks .ks-template-tools{margin:12px 0}
+@media(max-width:760px){.ks .ks-template-grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding-bottom:8px}.ks .ks-template{flex:0 0 120px;scroll-snap-align:start}}
