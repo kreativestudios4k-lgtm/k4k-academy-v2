@@ -84,3 +84,12 @@
 .kf:not(.kf-waitlist) .kf-editorial>p{font-size:13px;max-width:100%;color:#aaa;}
 .kf:not(.kf-waitlist) .kf-editorial .kf-overline{font-size:9px;}
 }
+
+.kf-split-right{display:none}
+@media(min-width:1100px){
+.kf:not(.kf-waitlist) .kf-split-left{left:112px;width:calc(50% - var(--video-width)/2 - 132px);max-width:none;text-align:center;}
+.kf:not(.kf-waitlist) .kf-split-left h1,.kf-split-right h2{font-size:clamp(23px,3.1vw,56px);font-weight:850;line-height:1.04;letter-spacing:-.055em;margin:0;}
+.kf-split-right{display:block;position:absolute;left:calc(50% + var(--video-width)/2 + 90px);right:24px;top:50%;transform:translateY(-50%);text-align:center;pointer-events:none;}
+.kf-split-right h2{font-size:clamp(22px,2.8vw,52px);overflow-wrap:anywhere;}
+.kf-split-right em{display:block;color:#c7ff36;font-style:normal;margin-top:10px;}
+}
