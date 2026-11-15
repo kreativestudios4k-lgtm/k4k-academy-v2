@@ -18,7 +18,7 @@ async function context(request){
  if(!approvedPartner(partner)||partner.user_id!==user.id)return {error:json({error:'PARTNER_NOT_ACTIVE'},403)};
  return {db,user};
 }
-export function normalizeVideo(raw){
+function normalizeVideo(raw){
  if(typeof raw!=='string'||raw.length>500)return null;
  try{const u=new URL(raw);if(u.protocol!=='https:'||u.username||u.password||u.port)return null;
  const host=u.hostname.toLowerCase(),p=u.pathname;
