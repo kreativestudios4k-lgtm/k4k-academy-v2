@@ -1,3 +1,4 @@
+import {manualPixEnabled} from '../../../../lib/server/manual-pix.mjs';
 import {createClient} from '@supabase/supabase-js';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot,ownerLivePilotAllowed} from '../../../../lib/server/billing-policy.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
@@ -18,5 +19,5 @@ export async function GET(request){
  catch(error){reason=['TAX_SETUP_REQUIRED','OWNER_LIVE_PILOT_ONLY'].includes(error.message)?error.message:'BILLING_SETUP_REQUIRED';
   // Only the authenticated configured owner may see exact safe readiness codes.
   if(pilot&&ownerLivePilotAllowed(userId,'starter')&&['APP_MEMBERSHIP_SEPARATION_REQUIRED','WEBHOOK_SETUP_REQUIRED','LIVE_CREDIT_ISOLATION_REQUIRED','GENERATION_NOT_READY','LIVE_KEY_NOT_CONFIGURED','LAUNCH_CONFIG_INVALID','LIVE_PRICES_NOT_CONFIGURED','TAX_SETUP_REQUIRED'].includes(error.message))reason=error.message;}
- return Response.json({mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,pixReady:checkoutReady&&billingMode()==='live'&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
+ return Response.json({mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,manualPixReady:checkoutReady&&!pilot&&manualPixEnabled(),pixReady:checkoutReady&&billingMode()==='live'&&!manualPixEnabled()&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
 }

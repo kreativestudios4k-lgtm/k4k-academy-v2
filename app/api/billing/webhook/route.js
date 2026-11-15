@@ -18,6 +18,7 @@ const NO_STORE = {'Cache-Control': 'no-store'};
 const SUBSCRIPTION_EVENTS = new Set([
   'checkout.session.completed',
   'checkout.session.async_payment_succeeded',
+  'checkout.session.async_payment_failed',
   'checkout.session.expired',
   'charge.refunded',
   'charge.dispute.created',
@@ -36,7 +37,7 @@ function isNonSubscriptionEvent(event) {
     return !invoiceSubscriptionId(object);
   }
   if (event.type === 'checkout.session.completed') {
-    return object?.mode !== 'subscription'&&object?.metadata?.kind!=='k4k_credit_pack';
+    return object?.mode !== 'subscription'&&!['k4k_credit_pack','k4k_manual_pix'].includes(object?.metadata?.kind);
   }
   return false;
 }
