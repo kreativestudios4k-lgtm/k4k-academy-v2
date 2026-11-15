@@ -107,7 +107,7 @@ if(process.env.VERCEL_ENV==='production'&&process.env.K4K_VERIFY_LIVE_WEBHOOK_AU
   await expireAudit('cs_live_a0WnXxi2LDaffQ44KOjXtN4uuYWIJAVS8TrAjT3KocyTY2wf4StBzqoiKx','k4k_pix_20261114_explicit_no_charge');
   for(const plan of ['starter','creator','pro','studio']){
    const audit=marker+'-'+plan;
-   const form=new URLSearchParams({mode:'subscription','line_items[0][price]':priceMap[plan].BRL,'line_items[0][quantity]':'1','managed_payments[enabled]':'false','automatic_tax[enabled]':'true','tax_id_collection[enabled]':'true',success_url:'https://kreativestudios4k.com/',cancel_url:'https://kreativestudios4k.com/','metadata[k4k_pix_audit]':audit});
+   const form=new URLSearchParams({mode:'subscription','line_items[0][price]':priceMap[plan].BRL,'line_items[0][quantity]':'1','managed_payments[enabled]':'false','automatic_tax[enabled]':'true','tax_id_collection[enabled]':'true',success_url:'https://kreativestudios4k.com/',cancel_url:'https://kreativestudios4k.com/','metadata[k4k_pix_audit]':audit,'metadata[plan_key]':plan});
    if(!configureBrazilPixCheckout(form,'BRL'))throw Error('PIX_AUDIT_CONFIG_DISABLED');
    const headers=brazilPixHeaders(form);
    const session=await request('checkout/sessions',{method:'POST',form,idem:audit,headers});

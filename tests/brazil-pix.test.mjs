@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import {configureBrazilPixCheckout,brazilPixHeaders,checkoutSupportsPix,replaceableCardOnlyCheckout,BRAZIL_PIX_STRIPE_VERSION} from '../lib/server/brazil-pix.mjs';
 import {openLaunchCheckout} from '../lib/server/soft-launch.mjs';
 const env={VERCEL_ENV:'production',K4K_BRAZIL_PIX_ENABLED:'true'};
+const checkoutForm=(plan='starter')=>new URLSearchParams({mode:'subscription','metadata[plan_key]':plan});
 test('PIX uses new explicit compatible methods only for production BRL subscriptions',()=>{
- const form=new URLSearchParams({mode:'subscription'});
+ const form=checkoutForm();
  assert.equal(configureBrazilPixCheckout(form,'BRL',env),true);
  assert.equal(form.get('allowed_payment_method_types[0]'),'pix');
  assert.equal(form.get('allowed_payment_method_types[1]'),'card');
@@ -29,7 +30,7 @@ test('old unpaid card checkout is refreshed only before any customer/payment/sub
  assert.equal(checkoutSupportsPix({...session,payment_method_types:['pix','card']}),true);
 });
 test('returning BRL customer gets a safe expired checkout refresh rather than obsolete card-only session',async()=>{
- const form=new URLSearchParams();configureBrazilPixCheckout(form,'BRL',env);
+ const form=checkoutForm();configureBrazilPixCheckout(form,'BRL',env);
  const calls=[];const database={rpc:async(name,args)=>{calls.push({name,args});return {data:{id:claim.id}}}};
  const fetchImpl=async(url,options)=>{calls.push({url,options});return {ok:true,json:async()=>url.endsWith('/expire')?{...session,status:'expired'}:session}};
  await assert.rejects(openLaunchCheckout({database,claim,secret:'rk_live_fixture',form,fetchImpl,now:6500}),/CHECKOUT_EXPIRED_RETRY/);
@@ -37,7 +38,7 @@ test('returning BRL customer gets a safe expired checkout refresh rather than ob
  assert.equal(calls[0].options.headers['Stripe-Version'],BRAZIL_PIX_STRIPE_VERSION);
 });
 test('new Brazilian checkout sends PIX filter and pinned API version with existing claim binding',async()=>{
- const form=new URLSearchParams();configureBrazilPixCheckout(form,'BRL',env);
+ const form=checkoutForm();configureBrazilPixCheckout(form,'BRL',env);
  const calls=[];const database={rpc:async(name,args)=>{calls.push({name,args});return {data:{id:claim.id}}}};
  const fetchImpl=async(url,options)=>{calls.push({url,options});return {ok:true,json:async()=>({...session,payment_method_types:['pix','card']})}};
  assert.equal(await openLaunchCheckout({database,claim:{...claim,stripe_session_id:null},secret:'rk_live_fixture',form,fetchImpl,now:6500}),session.url);
@@ -46,8 +47,28 @@ test('new Brazilian checkout sends PIX filter and pinned API version with existi
  assert.equal(calls[1].args.p_outcome,'bind');
 });
 test('an existing payment in progress is never expired by PIX rollout',async()=>{
- const form=new URLSearchParams();configureBrazilPixCheckout(form,'BRL',env);
+ const form=checkoutForm();configureBrazilPixCheckout(form,'BRL',env);
  let calls=0;const database={rpc:async()=>{throw Error('must not mutate')}};
  const fetchImpl=async()=>{calls++;return {ok:true,json:async()=>({...session,customer:'cus_abc'})}};
  assert.equal(await openLaunchCheckout({database,claim,secret:'rk_live_fixture',form,fetchImpl,now:6500}),session.url);assert.equal(calls,1);
+});
+
+// API defaults must never cap higher-priced plans below their monthly charge.
+test('each approved BRL plan receives its own monthly Pix mandate limit',()=>{
+ for(const [plan,amount] of Object.entries({starter:10999,creator:20999,pro:44999,studio:89999})){
+  const form=checkoutForm(plan);configureBrazilPixCheckout(form,'BRL',env);
+  const prefix='payment_method_options[pix][mandate_options]';
+  assert.equal(form.get(prefix+'[amount]'),String(amount));
+  assert.equal(form.get(prefix+'[amount_type]'),'maximum');
+  assert.equal(form.get(prefix+'[currency]'),'brl');
+  assert.equal(form.get(prefix+'[payment_schedule]'),'monthly');
+  assert.equal(form.get(prefix+'[amount_includes_iof]'),'never');
+  assert.equal(form.has(prefix+'[start_date]'),false);
+ }
+});
+test('missing or invalid plan and non-subscription forms cannot authorize a Pix mandate',()=>{
+ for(const form of [checkoutForm('unknown'),checkoutForm('__proto__'),new URLSearchParams({mode:'subscription'}),new URLSearchParams({mode:'payment','metadata[plan_key]':'starter'})]){
+  assert.throws(()=>configureBrazilPixCheckout(form,'BRL',env),/PIX_PLAN_NOT_CONFIGURED/);
+  assert.equal(form.has('allowed_payment_method_types[0]'),false);
+ }
 });
