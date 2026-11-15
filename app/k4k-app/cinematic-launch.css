@@ -157,3 +157,14 @@
 .kc-launch .kc-plans>div[style] p{font-size:13px;line-height:1.5;margin:8px 0}
 @media(max-width:1100px){.kc-launch .kc-plan-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kc-launch .kc-plan-price{font-size:36px}}
 @media(max-width:560px){.kc-launch .kc-plan-grid{grid-template-columns:minmax(0,1fr)}.kc-launch .kc-plan-card{padding:20px}.kc-launch .kc-plan-price{font-size:34px}}
+
+/* Page-scroll discovery: pin the entire hero, not an inner scroll container. */
+.kc-scroll-story{position:relative;min-height:calc(100svh + (var(--kc-story-count) - 1)*55svh);overflow:visible}
+.kc-unified .kc-scroll-story>.kc-split-landing{position:sticky;top:76px;min-height:calc(100svh - 76px);align-content:center;margin-inline:auto;grid-template-rows:auto auto auto}
+.kc-page-scroll-player{overflow:hidden;scroll-snap-type:none;overscroll-behavior:auto;touch-action:pan-y}
+.kc-unified .kc-page-scroll-player>.kc-video{width:100%;height:100%;aspect-ratio:auto;border-radius:inherit}
+.kc-page-scroll-player video{object-fit:contain;background:#080808}
+.kc-scroll-story .kc-split-description .kc-purpose{font-size:12px!important;line-height:1.4!important;margin:6px auto!important}
+.kc-scroll-story .kc-split-title em{color:#c7ff36!important}
+@media(max-width:760px){.kc-unified .kc-scroll-story>.kc-split-landing{top:64px;min-height:calc(100svh - 64px);padding-block:12px;align-content:center}.kc-scroll-story .kc-split-description .kc-purpose{font-size:10px!important}.kc-scroll-story{min-height:calc(100svh + (var(--kc-story-count) - 1)*55svh)}}
+@media(prefers-reduced-motion:reduce){.kc-scroll-story{min-height:auto}.kc-unified .kc-scroll-story>.kc-split-landing{position:relative;top:auto;min-height:auto}}
