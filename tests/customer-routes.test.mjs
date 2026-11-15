@@ -65,7 +65,9 @@ test('all public template generation links use the single live creator studio',(
  assert.doesNotMatch(page,/TemplateCreator/);
  const feed=readFileSync('app/k4k-app/MobileTemplateFeed.js','utf8');
  assert.doesNotMatch(feed,/\/k4k-app\/template\//);
- assert.match(feed,/\/k4k-app\/creator\?template=/);
+ assert.match(feed,/onClick=\{\(\)=>setCreateItem\(item\)\}/);
+ assert.match(feed,/<TemplateCreateSheet item=\{createItem\}/);
+ assert.match(readFileSync('app/k4k-app/TemplateCreateSheet.js','utf8'),/\/api\/generation\/jobs\/submit/);
  const creator=readFileSync('app/k4k-app/creator/page.js','utf8');
  assert.match(creator,/params.get\('template'\)/);
  assert.match(creator,/setSelectedPreset\(preset\)/);
