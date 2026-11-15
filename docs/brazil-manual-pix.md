@@ -28,3 +28,7 @@ Manual and card admission share the same Postgres advisory lock, seat count and 
 6. Review Preview and obtain owner approval for a production code release and manual-Pix flag activation. Do not convert/cancel existing customer subscriptions or pending payments. Production rollout and real bank payment acceptance are separate from local tests.
 
 Rollback: disable `K4K_MANUAL_PIX_ENABLED` to close new Pix purchases. Retain schema, order records, event receipts and existing payment processing. Do not roll back to a webhook version that ignores already-created manual Pix orders.
+
+## Dedicated Test webhook
+
+The manual-Pix Preview uses `K4K_MANUAL_PIX_TEST_ONLY=true` and its own Test endpoint/signing secret. After signature verification, unrelated Academy, subscription and QA events return 200 without changing any receipt or financial row. Disputes resolve their actual Test charge before checking the manual-Pix marker. The existing QA endpoint is preserved and must not be repointed or disabled for this flow. Production never uses this Test-only filter.

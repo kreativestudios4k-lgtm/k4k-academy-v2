@@ -1,3 +1,4 @@
+import {scopeManualPixTestEvent} from '../../../../lib/server/manual-pix-webhook-scope.mjs';
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
 import {handleStripeEvent} from '../../../../lib/server/stripe-webhook-handler.mjs';
@@ -66,6 +67,16 @@ export async function POST(request) {
 
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
+  }
+
+  if(!production&&process.env.K4K_MANUAL_PIX_TEST_ONLY==='true'){
+    const url=process.env.NEXT_PUBLIC_SUPABASE_URL,serviceKey=process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if(!url||!serviceKey)return NextResponse.json({error:'NOT_PROCESSING_YET'},{status:503,headers:NO_STORE});
+    try{
+      const scoped=await scopeManualPixTestEvent(event,createMembershipStore({url,serviceKey,liveMode:false}));
+      if(!scoped)return NextResponse.json({received:true,handled:false,reason:'OUTSIDE_MANUAL_PIX_TEST'},{status:200,headers:NO_STORE});
+      event=scoped;
+    }catch{return NextResponse.json({error:'RETRY',reason:'MANUAL_PIX_TEST_SCOPE_UNAVAILABLE'},{status:503,headers:NO_STORE});}
   }
 
   if(production&&isLiveWebhookAudit(event)){
