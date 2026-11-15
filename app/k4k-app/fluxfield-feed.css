@@ -61,3 +61,18 @@
 .kf:not(.kf-waitlist) .kf-mobile-nav>a.kf-nav-create>span{width:52px;height:38px;border-radius:12px;box-shadow:0 3px 0 #8dbb19}
 .kf:not(.kf-waitlist) .kf-swipe-hint{display:none}
 }
+
+@media(min-width:761px){
+.kf:not(.kf-waitlist){--video-width:min(520px,calc((100dvh - 220px)*.9));--video-footer:112px}
+.kf:not(.kf-waitlist) .kf-slide{display:block;padding:0}
+.kf:not(.kf-waitlist) .kf-slide>video{position:absolute;inset:0 0 auto;width:100%;height:calc(100% - var(--video-footer));max-height:none;object-fit:cover}
+.kf:not(.kf-waitlist) .kf-shade{display:block;inset:0 0 var(--video-footer);background:linear-gradient(transparent 42%,#0002 65%,#000b 100%)}
+.kf:not(.kf-waitlist) .kf-caption{position:absolute;inset:auto 0 0;padding:0 16px 12px}
+.kf:not(.kf-waitlist) .kf-original{background:#ff2688;border:0;color:white;border-radius:7px;font-size:11px;padding:5px 9px;transform:rotate(-3deg)}
+.kf:not(.kf-waitlist) .kf-caption h2{font-size:25px;line-height:1.1;margin:8px 0}
+.kf:not(.kf-waitlist) .kf-scene-description{font-size:13px;line-height:1.4;min-height:36px;margin-bottom:10px}
+.kf:not(.kf-waitlist) .kf-caption>p{height:20px;font-size:12px;margin:0 0 10px;color:#c5c5c5}
+.kf:not(.kf-waitlist) .kf-caption .kf-cta{min-height:48px;font-size:16px;border-radius:999px;box-shadow:none}
+.kf:not(.kf-waitlist) .kf-cta svg{margin:0}
+.kf:not(.kf-waitlist) .kf-caption>small{display:none}
+}
