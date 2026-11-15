@@ -112,3 +112,14 @@
 .kc-unified .kc-plan-card{background:#202020;border-color:#393939;border-radius:16px}
 .kc-unified .kc-release,.kc-unified .kc-join,.kc-unified .kc-plan-cta{border-radius:999px}
 @media(max-width:760px){.kc-unified .kc-hero{display:flex;flex-direction:column;align-items:stretch;gap:20px;padding:28px 16px}.kc-unified .kc-hero h1{font-size:clamp(38px,10vw,56px)}.kc-unified .kc-hero-media .kc-video{aspect-ratio:4/3}.kc-unified .kc-showcase{padding:20px 16px}.kc-unified .kc-video-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.kc-unified .kc-final{padding:32px 16px}}
+
+/* Fluxfield-inspired creator showcase: portrait media, spacious cinematic hero. */
+.kc-unified .kc-hero{max-width:1440px;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:clamp(24px,5vw,80px);padding:48px clamp(20px,5vw,72px);background:radial-gradient(ellipse at 85% 40%,#25300f55,transparent 55%)}
+.kc-unified .kc-hero-media{width:100%;max-width:360px;justify-self:center;margin-inline:auto}
+.kc-unified .kc-hero-media .kc-video{aspect-ratio:9/16;border-radius:24px;border:1px solid #ffffff26;box-shadow:0 24px 70px #0008}
+.kc-unified .kc-hero-media video{object-fit:contain}
+.kc-unified .kc-showcase{max-width:1440px;padding:28px clamp(16px,4vw,56px) 48px}
+.kc-unified .kc-video-grid{display:grid;grid-auto-flow:column;grid-template-columns:none;grid-auto-columns:minmax(180px,calc((100% - 48px)/5));gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:#555 #171717;padding:4px 0 14px}
+.kc-unified .kc-video-grid .kc-video{aspect-ratio:9/16;scroll-snap-align:start;border-radius:16px;border:1px solid #ffffff18}
+.kc-unified .kc-video-grid video{object-fit:contain}
+@media(max-width:760px){.kc-unified .kc-hero{display:flex;flex-direction:column;gap:24px;padding:28px 16px}.kc-unified .kc-hero-media{max-width:320px}.kc-unified .kc-hero-media .kc-video{aspect-ratio:9/16}.kc-unified .kc-video-grid{grid-template-columns:none;grid-auto-columns:clamp(150px,44vw,240px);gap:10px}.kc-unified .kc-showcase{padding:20px 16px 32px}}
