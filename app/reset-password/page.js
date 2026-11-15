@@ -40,26 +40,26 @@ export default function ResetPassword(){
     <div><span className="authPremiumDot"/> SECURE PASSWORD RECOVERY</div>
    </div>
    <section className="authPremiumCard">
-    <small style={{color:'#caff39',letterSpacing:2,fontWeight:800}}>PRIVATE CREATOR ACCESS</small>
+    <small style={{color:'#faf9f6',letterSpacing:2,fontWeight:800}}>PRIVATE CREATOR ACCESS</small>
     <h1 style={{fontSize:'clamp(36px,6vw,56px)',lineHeight:1.05,letterSpacing:'-.05em',margin:'20px 0'}}>RESET YOUR<br/><i>PASSWORD.</i></h1>
-    <p style={{color:'#b9c5b3',lineHeight:1.7}}>Enter the email address you used for K4K APP. We'll send you a secure, single-use link to create a new password. <b>No new payment is needed.</b></p>
+    <p style={{color:'#c1c1c1',lineHeight:1.7}}>Enter the email address you used for K4K APP. We'll send you a secure, single-use link to create a new password. <b>No new payment is needed.</b></p>
     {linkExpired&&<p role="alert" style={{color:'#ffe3b3',background:'#ffb65014',padding:13,borderRadius:8}}>That link may have expired or been used already. Request a new one below.</p>}
     {sent?
-     <div role="status" style={{border:'1px solid #caff3955',background:'#caff3914',borderRadius:12,padding:22,marginTop:20,display:'grid',gap:14}}>
-      <Mail size={30} color="#caff39"/>
-      <b style={{color:'#e6ffd0'}}>Check your inbox</b>
-      <p style={{color:'#d6dfd2',lineHeight:1.7,margin:0}}>If this email belongs to an K4K account, a password reset link has been sent. Check spam if needed. Open the <b>newest link on the same device and browser</b> where you requested it.</p>
-      <button type="button" onClick={()=>setSent(false)} style={{background:'transparent',color:'#caff39',border:'1px solid #caff3950',borderRadius:8,padding:12,cursor:'pointer'}}>Request another link</button>
+     <div role="status" style={{border:'1px solid #faf9f655',background:'#faf9f614',borderRadius:12,padding:22,marginTop:20,display:'grid',gap:14}}>
+      <Mail size={30} color="#faf9f6"/>
+      <b style={{color:'#faf9f6'}}>Check your inbox</b>
+      <p style={{color:'#dcdcdc',lineHeight:1.7,margin:0}}>If this email belongs to an K4K account, a password reset link has been sent. Check spam if needed. Open the <b>newest link on the same device and browser</b> where you requested it.</p>
+      <button type="button" onClick={()=>setSent(false)} style={{background:'transparent',color:'#faf9f6',border:'1px solid #faf9f650',borderRadius:8,padding:12,cursor:'pointer'}}>Request another link</button>
      </div>:
      <form onSubmit={requestReset} style={{display:'grid',gap:14,margin:'28px 0'}}>
       <label htmlFor="reset-email" style={{fontSize:13,fontWeight:800}}>YOUR PAYMENT EMAIL</label>
-      <input id="reset-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{width:'100%',background:'#090e09',color:'#fff',border:'1px solid #ffffff50',padding:'16px',borderRadius:9,fontSize:16}}/>
+      <input id="reset-email" type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com" style={{width:'100%',background:'#0d0d0d',color:'#fff',border:'1px solid #ffffff50',padding:'16px',borderRadius:9,fontSize:16}}/>
       {error&&<p role="alert" style={{color:'#ffb6a6',lineHeight:1.6,margin:0}}>{error}</p>}
-      <button disabled={loading} type="submit" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:12,background:'#caff39',color:'#101510',border:0,padding:'17px',borderRadius:9,fontWeight:900,cursor:'pointer'}}>{loading?'SENDING SECURE LINK…':'EMAIL ME A PASSWORD RESET LINK'} <ArrowRight size={18}/></button>
+      <button disabled={loading} type="submit" style={{display:'flex',alignItems:'center',justifyContent:'center',gap:12,background:'#faf9f6',color:'#141414',border:0,padding:'17px',borderRadius:9,fontWeight:900,cursor:'pointer'}}>{loading?'SENDING SECURE LINK…':'EMAIL ME A PASSWORD RESET LINK'} <ArrowRight size={18}/></button>
      </form>}
-    <p style={{fontSize:13,color:'#abb8ad',lineHeight:1.6}}><ShieldCheck size={16} style={{verticalAlign:'middle',marginRight:6}}/>Only the owner of the mailbox can use the reset link. Password recovery does not change your subscription or credit balance.</p>
-    <Link href="/login" style={{display:'inline-flex',alignItems:'center',gap:8,color:'#caff39',fontSize:13,fontWeight:800,marginTop:15}}>BACK TO SIGN IN <ArrowRight size={16}/></Link>
-    <p style={{color:'#9ba8a1',fontSize:12,marginTop:25}}>Need help? <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20Academy%20password%20help" style={{textDecoration:'underline'}}>Contact K4K support</a>.</p>
+    <p style={{fontSize:13,color:'#b4b4b4',lineHeight:1.6}}><ShieldCheck size={16} style={{verticalAlign:'middle',marginRight:6}}/>Only the owner of the mailbox can use the reset link. Password recovery does not change your subscription or credit balance.</p>
+    <Link href="/login" style={{display:'inline-flex',alignItems:'center',gap:8,color:'#faf9f6',fontSize:13,fontWeight:800,marginTop:15}}>BACK TO SIGN IN <ArrowRight size={16}/></Link>
+    <p style={{color:'#a5a5a5',fontSize:12,marginTop:25}}>Need help? <a href="mailto:hello@kreativestudios4k.com?subject=K4K%20Academy%20password%20help" style={{textDecoration:'underline'}}>Contact K4K support</a>.</p>
    </section>
   </div>
  </main>

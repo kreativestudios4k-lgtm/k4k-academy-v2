@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 
 const source=(path)=>readFileSync(join(process.cwd(),path),'utf8');
-const green=/#c7ff36/i;
+const accent=/#faf9f6/i;
 const sections=[
  ['app/k4k-app/studio.css','public site and mobile feed',/\.k4k-market/],
  ['app/k4k-app/preview.css','account and customer workspace',/\.k4k-light/],
@@ -14,10 +14,11 @@ const sections=[
  ['app/k4k-app/landing.css','template-led homepage',/\.k4k-landing/],
 ];
 
-test('K4K surfaces share the neon-green / black palette',()=>{
+test('K4K surfaces share the monochrome black / warm white palette',()=>{
  for(const [path,name,scope] of sections){
   const css=source(path);
-  assert.match(css,green,name+' must include neon green');
+  assert.match(css,accent,name+' must include warm white');
+  assert.doesNotMatch(css,/#c7ff36/i,name+' must not include the old neon accent');
   assert.match(css,scope,name+' must be scoped');
  }
 });
@@ -82,7 +83,7 @@ test('template workflow does not trigger AI generation or credits',()=>{
  assert.match(template,/MAX_PHOTOS=30/);
 });
 
-test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
+test('K4K pricing and studio views use dedicated responsive monochrome layouts',()=>{
  const pricing=source('app/k4k-app/credits/page.js');
  const creator=source('app/k4k-app/creator/page.js');
  assert.match(pricing,/k4k-pricing-grid/);
@@ -101,4 +102,18 @@ test('cinematic desktop navigation cannot cover authentication actions',()=>{
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.match(launch,/className="kc-login" onClick=\{\(\)=>setAuthOpen\(true\)\}/);
  assert.match(launch,/className="kc-join" href="\/k4k-app\/register\?plan=starter"/);
+});
+
+test('the shared monochrome foundation is loaded and applied across customer surfaces',()=>{
+ assert.match(source('app/layout.js'),/import '\.\/k4k-monochrome\.css'/);
+ const theme=source('app/k4k-monochrome.css');
+ for(const token of ['--k4k-bg:#080808','--k4k-panel:#141414','--k4k-fg:#faf9f6','--k4k-muted:#b5b5b5'])assert.ok(theme.includes(token),token);
+ for(const path of ['app/k4k-app/creator/creator.css','app/k4k-app/credits/credits.css','app/k4k-app/feed.css','app/k4k-app/video-library.css','app/k4k-app/template-sheet.css','app/kx-redesign.css','app/account-simple.css','app/course-v3.css','app/globals.css']){
+  const css=source(path);
+  assert.match(css,/#faf9f6/i,path+' uses warm white');
+  assert.doesNotMatch(css,/#(?:c7ff36|caff39|d9ff3d)\b/i,path+' removes old neon branding');
+ }
+ assert.match(source('public/k4k-mark.svg'),/fill="#faf9f6"/i);
+ assert.match(source('app/k4k-app/template-sheet.css'),/\.kts-sheet\{background:#141414;color:#faf9f6/);
+ assert.match(source('app/affiliates/page.js'),/\.k4k-affiliate \.hero\{[^}]*min-height:0/);
 });
