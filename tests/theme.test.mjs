@@ -64,7 +64,13 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(feed,/k4k-mark\.svg/);
  assert.match(feed,/CREATE · SWAP · GENERATE/);
  assert.match(source('app/k4k-app/landing.css'),/@media\(max-width:680px\)/);
- assert.match(feed,/href=\{'\/k4k-app\/creator\?template='/);
+ assert.match(feed,/onClick=\{\(\)=>setCreateItem\(item\)\}/);
+ assert.match(feed,/<TemplateCreateSheet item=\{createItem\}/);
+ const sheet=source('app/k4k-app/TemplateCreateSheet.js');
+ assert.match(sheet,/role="dialog"/);
+ assert.match(sheet,/disabled=\{!file\|\|!consent\|\|busy\|\|!supported\}/);
+ assert.match(sheet,/\/api\/generation\/jobs\/quote/);
+ assert.match(sheet,/\/api\/generation\/jobs\/submit/);
  assert.match(feed,/setTab/);
  assert.match(feed,/\/k4k-app\/creator/);
 });
