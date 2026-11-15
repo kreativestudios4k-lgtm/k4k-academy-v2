@@ -18,6 +18,7 @@ async function setup(){
  insert into public.studio_credit_accounts(user_id,balance) values('${user}',999);
  `);
  await db.exec(readFileSync(new URL('../docs/sql/brazil-manual-pix-review.sql',import.meta.url),'utf8'));
+ await db.exec(readFileSync(new URL('../docs/sql/brazil-manual-pix-custom-products.sql',import.meta.url),'utf8'));
  await db.exec("set role service_role;set request.jwt.claim.role='service_role'");return db;
 }
 const reserve=(db,mode='live',who=user,cap=1600)=>db.query(`select public.k4k_manual_pix_reserve('${who}','${mode}','starter','price_starter','prod_starter',20,${cap}) as r`).then(r=>r.rows[0].r);
@@ -94,5 +95,16 @@ test('an unfulfilled dispute retains funding capacity and expiry updates are ide
   const expire=`select public.k4k_manual_pix_bind('${t.id}','${other}','cs_test_expired',true)`;
   await db.query(expire);await db.query(expire);
   const next=await reserve(db,'test',other);assert.notEqual(next.id,t.id);
+ }finally{await db.close()}
+});
+
+test('manual Pix accepts only the matching approved custom product and preserves duplicate reservation',async()=>{
+ const db=await setup();try{
+  const call=product=>db.query(`select public.k4k_manual_pix_reserve('${user}','live','starter','price_starter','${product}',20,1600) as r`);
+  for(const product of ['k4k_app_studio_2026','k4k_academy_starter_2026','unapproved'])await assert.rejects(call(product),/MANUAL_PIX_CONFIG_INVALID/);
+  const o=(await call('k4k_app_starter_2026')).rows[0].r;
+  assert.equal(o.product_id,'k4k_app_starter_2026');
+  assert.equal((await call('k4k_app_starter_2026')).rows[0].r.id,o.id);
+  assert.equal(await balance(db),undefined);
  }finally{await db.close()}
 });
