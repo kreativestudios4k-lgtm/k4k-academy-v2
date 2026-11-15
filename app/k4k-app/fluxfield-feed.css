@@ -1,0 +1,32 @@
+/* Reference layout: centered brand, separate media and caption, external controls. */
+.kf:not(.kf-waitlist){--video-width:min(520px,calc((100dvh - 235px)*.9));background:#101010}
+.kf:not(.kf-waitlist) .kf-editorial{display:none}
+.kf:not(.kf-waitlist) .kf-stage{top:0;height:100dvh;min-height:0;left:50%;width:var(--video-width);border:0;border-radius:0;background:transparent}
+.kf:not(.kf-waitlist) .kf-feed-header{position:relative;background:#101010;padding:24px 0 20px;gap:18px;height:110px}
+.kf:not(.kf-waitlist) .kf-feed-brand strong{font-size:26px}
+.kf:not(.kf-waitlist) .kf-tabs button{font-size:16px;text-shadow:none}
+.kf:not(.kf-waitlist) .kf-tabs button[aria-pressed=true]:after{background:white;width:26px;height:3px}
+.kf:not(.kf-waitlist) .kf-scroll{height:calc(100% - 110px)}
+.kf:not(.kf-waitlist) .kf-slide{background:#101010;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 16px}
+.kf:not(.kf-waitlist) .kf-slide>video{position:relative;inset:auto;flex:1;min-height:0;height:auto;max-height:calc(100% - 170px);object-fit:contain;background:#080808}
+.kf:not(.kf-waitlist) .kf-shade,.kf:not(.kf-waitlist) .kf-top-hook{display:none}
+.kf:not(.kf-waitlist) .kf-caption{position:relative;inset:auto;padding:12px 12px 0}
+.kf:not(.kf-waitlist) .kf-caption h2{font-size:26px;margin:7px 0;text-shadow:none}
+.kf:not(.kf-waitlist) .kf-caption>p{font-size:13px;margin-bottom:12px}
+.kf:not(.kf-waitlist) .kf-caption .kf-cta{border-radius:999px;font-size:15px;min-height:49px}
+.kf:not(.kf-waitlist) .kf-original{font-size:10px}
+.kf:not(.kf-waitlist) .kf-controls{left:calc(50% + var(--video-width)/2 + 20px);padding-bottom:70px}
+.kf:not(.kf-waitlist) .kf-detail-controls span{font-size:12px;color:white}
+.kf:not(.kf-waitlist) .kf-scene-index{display:none}
+@media(max-width:760px){
+.kf:not(.kf-waitlist){--video-width:100%;background:#101010}
+.kf:not(.kf-waitlist) .kf-stage{left:auto;top:auto;transform:none;height:calc(100dvh - var(--mobile-nav-height));width:100%}
+.kf:not(.kf-waitlist) .kf-feed-header{height:90px;padding:12px 0 10px;gap:10px}
+.kf:not(.kf-waitlist) .kf-scroll{height:calc(100% - 90px)}
+.kf:not(.kf-waitlist) .kf-slide{padding:0 60px 10px 10px}
+.kf:not(.kf-waitlist) .kf-caption{padding:8px 0 0}
+.kf:not(.kf-waitlist) .kf-caption h2{font-size:22px;max-width:none}
+.kf:not(.kf-waitlist) .kf-caption>p{font-size:11px;max-width:none}
+.kf:not(.kf-waitlist) .kf-mobile-tools{right:7px;bottom:175px}
+.kf:not(.kf-waitlist) .kf-mobile-tools>span,.kf:not(.kf-waitlist) .kf-mobile-tools button{background:#292929;border-radius:22px;width:44px;min-height:44px;justify-content:center}
+}
