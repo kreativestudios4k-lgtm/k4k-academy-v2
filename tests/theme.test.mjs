@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {join} from 'node:path';
 
 const source=(path)=>readFileSync(join(process.cwd(),path),'utf8');
-const green=/#c7ff36/i;
+const accent=/#faf9f6/i;
 const sections=[
  ['app/k4k-app/studio.css','public site and mobile feed',/\.k4k-market/],
  ['app/k4k-app/preview.css','account and customer workspace',/\.k4k-light/],
@@ -14,10 +14,11 @@ const sections=[
  ['app/k4k-app/landing.css','template-led homepage',/\.k4k-landing/],
 ];
 
-test('K4K surfaces share the neon-green / black palette',()=>{
+test('K4K surfaces share the monochrome black / warm white palette',()=>{
  for(const [path,name,scope] of sections){
   const css=source(path);
-  assert.match(css,green,name+' must include neon green');
+  assert.match(css,accent,name+' must include warm white');
+  assert.doesNotMatch(css,/#c7ff36/i,name+' must not include the old neon accent');
   assert.match(css,scope,name+' must be scoped');
  }
 });
@@ -82,7 +83,7 @@ test('template workflow does not trigger AI generation or credits',()=>{
  assert.match(template,/MAX_PHOTOS=30/);
 });
 
-test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
+test('K4K pricing and studio views use dedicated responsive monochrome layouts',()=>{
  const pricing=source('app/k4k-app/credits/page.js');
  const creator=source('app/k4k-app/creator/page.js');
  assert.match(pricing,/k4k-pricing-grid/);
