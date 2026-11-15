@@ -32,3 +32,9 @@ Rollback: disable `K4K_MANUAL_PIX_ENABLED` to close new Pix purchases. Retain sc
 ## Dedicated Test webhook
 
 The manual-Pix Preview uses `K4K_MANUAL_PIX_TEST_ONLY=true` and its own Test endpoint/signing secret. After signature verification, unrelated Academy, subscription and QA events return 200 without changing any receipt or financial row. Disputes resolve their actual Test charge before checking the manual-Pix marker. The existing QA endpoint is preserved and must not be repointed or disabled for this flow. Production never uses this Test-only filter.
+
+## Restricted real-payment acceptance
+
+Before any real-payment test, verify that the nominated account has no active APP subscription or unpaid checkout. Do not cancel or bypass an existing paid subscription to permit another purchase.
+
+A production test can be limited to a single authenticated account with `K4K_MANUAL_PIX_LIVE_TEST_ONLY=true` and `K4K_MANUAL_PIX_LIVE_TEST_USER_ID=<approved UUID>`, in addition to the normal manual-Pix/schema gates. Missing/invalid IDs deny access. Readiness exposes manual Pix only to that user, and the checkout route verifies the authenticated ID. Other customers retain their existing card/Pix Automático choices during this restricted test. No real payment is created by configuring the test; the owner completes the bank authorization themselves. Disabling the manual-Pix purchase flag stops new purchases while existing payment processing remains active.

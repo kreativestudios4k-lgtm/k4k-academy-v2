@@ -1,4 +1,4 @@
-import {manualPixEnabled} from '../../../../lib/server/manual-pix.mjs';
+import {manualPixUserAllowed,manualPixLiveTestOnly} from '../../../../lib/server/manual-pix.mjs';
 import {createClient} from '@supabase/supabase-js';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot,ownerLivePilotAllowed} from '../../../../lib/server/billing-policy.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
@@ -10,7 +10,7 @@ export async function GET(request){
  if(process.env.VERCEL_ENV==='production'&&billingMode()!=='live')return Response.json({mode:'closed',checkoutReady:false,topupsReady:false,reason:'LIVE_CHECKOUT_DISABLED'},{headers:{'Cache-Control':'no-store'}});
  let reason=null;let checkoutReady=false;let topupsReady=false;
  const pilot=ownerLivePilot();let userId;
- if(pilot){
+ if(pilot||manualPixLiveTestOnly()){
   const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY||process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if(token&&url&&key){try{const {data:{user}={},error}=await createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}}).auth.getUser(token);if(!error&&user&&!user.is_anonymous)userId=user.id}catch{}}
@@ -19,5 +19,5 @@ export async function GET(request){
  catch(error){reason=['TAX_SETUP_REQUIRED','OWNER_LIVE_PILOT_ONLY'].includes(error.message)?error.message:'BILLING_SETUP_REQUIRED';
   // Only the authenticated configured owner may see exact safe readiness codes.
   if(pilot&&ownerLivePilotAllowed(userId,'starter')&&['APP_MEMBERSHIP_SEPARATION_REQUIRED','WEBHOOK_SETUP_REQUIRED','LIVE_CREDIT_ISOLATION_REQUIRED','GENERATION_NOT_READY','LIVE_KEY_NOT_CONFIGURED','LAUNCH_CONFIG_INVALID','LIVE_PRICES_NOT_CONFIGURED','TAX_SETUP_REQUIRED'].includes(error.message))reason=error.message;}
- return Response.json({mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,manualPixReady:checkoutReady&&!pilot&&manualPixEnabled(),pixReady:checkoutReady&&billingMode()==='live'&&!manualPixEnabled()&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
+ return Response.json({mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,manualPixReady:checkoutReady&&!pilot&&manualPixUserAllowed(userId),pixReady:checkoutReady&&billingMode()==='live'&&!manualPixUserAllowed(userId)&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
 }

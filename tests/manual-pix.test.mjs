@@ -73,3 +73,19 @@ test('confirmed Pix failure releases the pending checkout; a late failure never 
  await assert.rejects(handleStripeEvent(event,store,{liveMode:false}),/FAILURE_NOT_FINAL/);assert.equal(expired,0);
  session.payment_intent.status='canceled';await handleStripeEvent(event,store,{liveMode:false});assert.equal(expired,1);
 });
+
+test('Live owner-only activation fails closed without an approved user and leaves other customers on the existing Pix/card flow',async()=>{
+ const {manualPixUserAllowed}=await import('../lib/server/manual-pix-policy.mjs');
+ const {configureBrazilPixCheckout}=await import('../lib/server/brazil-pix.mjs');
+ const flags={VERCEL_ENV:'production',K4K_MANUAL_PIX_ENABLED:'true',K4K_MANUAL_PIX_SCHEMA_READY:'true',K4K_MANUAL_PIX_LIVE_TEST_ONLY:'true',K4K_BRAZIL_PIX_ENABLED:'true'};
+ assert.equal(manualPixUserAllowed(user,flags),false);
+ const approved={...flags,K4K_MANUAL_PIX_LIVE_TEST_USER_ID:user};
+ assert.equal(manualPixUserAllowed(user,approved),true);
+ assert.equal(manualPixUserAllowed('33333333-3333-4333-8333-333333333333',approved),false);
+ assert.equal(manualPixUserAllowed(undefined,approved),false);
+ const form=who=>new URLSearchParams({mode:'subscription',client_reference_id:who,'metadata[plan_key]':'starter'});
+ const owner=form(user),other=form('33333333-3333-4333-8333-333333333333');
+ configureBrazilPixCheckout(owner,'BRL',approved);configureBrazilPixCheckout(other,'BRL',approved);
+ assert.equal(owner.get('allowed_payment_method_types[0]'),'card');
+ assert.equal(other.get('allowed_payment_method_types[0]'),'pix');
+});

@@ -2,7 +2,7 @@ import {createClient} from '@supabase/supabase-js';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 import {assertBillingKey,assertTaxReady,assertLiveLaunchReady,billingMode,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
 import {launchLimits} from '../../../../lib/server/soft-launch.mjs';
-import {manualPixEnabled,manualPixPlan,assertManualPixSource,buildManualPixCheckout,manualPixHeaders,MANUAL_PIX_KIND} from '../../../../lib/server/manual-pix.mjs';
+import {manualPixEnabled,manualPixUserAllowed,manualPixPlan,assertManualPixSource,buildManualPixCheckout,manualPixHeaders,MANUAL_PIX_KIND} from '../../../../lib/server/manual-pix.mjs';
 import {stripeCheckoutDestination} from '../../../../lib/stripe-checkout-destination.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
@@ -16,6 +16,7 @@ export async function POST(request){
   const options={auth:{persistSession:false,autoRefreshToken:false}};
   const {data:{user}={},error}=await createClient(url,key,options).auth.getUser(token);
   if(error||!user||user.is_anonymous)return json({error:'UNAUTHENTICATED'},401);
+  if(!manualPixUserAllowed(user.id))return json({error:'MANUAL_PIX_OWNER_TEST_ONLY'},403);
   let body;try{body=await request.json()}catch{return json({error:'INVALID_REQUEST'},400)}
   if(currencyForCountry(request.headers.get('x-vercel-ip-country'))!=='BRL'||body?.currency!=='BRL')return json({error:'MANUAL_PIX_BRAZIL_ONLY'},409);
   if(body.discountCode)return json({error:'MANUAL_PIX_DISCOUNT_UNAVAILABLE'},409);
