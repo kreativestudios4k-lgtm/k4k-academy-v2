@@ -234,6 +234,34 @@
   ],
   "discoveryPreviews": [
     {
+      "id": "featured-nov15-1",
+      "title": "Featured creation",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/e9JiMBF8CwUu1T2VHschk_higgsfield-62a55cab-8c60-40e9-a208-284ba9e2182c.mp4",
+      "durationSeconds": 6.03,
+      "previewOnly": true
+    },
+    {
+      "id": "featured-nov15-2",
+      "title": "K4K Original 02",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/nNaiAc3Cxd61D0HWDyiHX_higgsfield-ea4dd5cd-cb4e-4b35-b1ea-36929f161082.mp4",
+      "durationSeconds": 10.05,
+      "previewOnly": true
+    },
+    {
+      "id": "featured-nov15-3",
+      "title": "K4K Original 03",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/Q3tUvZzVdYRV8ASPMyup8_higgsfield-3d7f6d0a-83ae-43c5-a476-e62ed6edd750.mp4",
+      "durationSeconds": 14.72,
+      "previewOnly": true
+    },
+    {
+      "id": "featured-nov15-4",
+      "title": "K4K Original 04",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab29adb/vTgYxD0vx5Ce0kw_o6kG-_higgsfield-b5651126-aa51-4126-b253-36f102c2bcce.mp4",
+      "durationSeconds": 22.1,
+      "previewOnly": true
+    },
+    {
       "id": "new-1",
       "title": "The Main Character",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29125/qqA4Qxaiw4nQG2fPMCFrn_higgsfield-750d5afb-e069-4aa3-b8fe-521e90b05e16.mp4",
