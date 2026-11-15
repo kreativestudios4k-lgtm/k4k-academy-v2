@@ -56,6 +56,11 @@ export async function POST(request) {
     return NextResponse.json({error: 'INVALID_PAYLOAD'}, {status: 400, headers: NO_STORE});
   }
 
+  // A signed live event must never mutate the preview membership store.
+  if (event?.livemode !== false || typeof event.id !== 'string' || !event.id || typeof event.type !== 'string') {
+    return NextResponse.json({error: 'TEST_EVENT_REQUIRED'}, {status: 400, headers: NO_STORE});
+  }
+
   if (!SUBSCRIPTION_EVENTS.has(event.type)) {
     return NextResponse.json({received: true, type: event.type, handled: false}, {status: 200, headers: NO_STORE});
   }
