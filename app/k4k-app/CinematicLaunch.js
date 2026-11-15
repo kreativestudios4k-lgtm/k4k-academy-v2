@@ -11,7 +11,7 @@ const launchPlans=[{key:'starter',name:'Starter',credits:80},{key:'creator',name
 const format=(key,currency)=>new Intl.NumberFormat(currency==='BRL'?'pt-BR':currency==='EUR'?'de-DE':currency==='USD'?'en-US':'en-GB',{style:'currency',currency}).format(PLAN_PRICES[key][currency]/100);
 import './cinematic-launch.css';
 
-const videos=catalogue.trending.filter(item=>item.videoUrl).slice(0,10);
+const videos=(catalogue.discoveryPreviews||catalogue.trending).filter(item=>item.videoUrl).slice(0,10);
 function ShowcaseVideo({item,index,paused}){
  const ref=useRef(null);
  const [muted,setMuted]=useState(true);
@@ -25,11 +25,12 @@ function ShowcaseVideo({item,index,paused}){
   const node=ref.current;if(!node)return;
   if(visible&&!paused)node.play().catch(()=>{});else node.pause();
  },[visible,paused]);
+ function toggleSound(){const node=ref.current;if(!node)return;node.muted=!muted;setMuted(!muted);if(!paused)node.play().catch(()=>{});}
  return <article className="kc-video">
-  <video ref={ref} src={item.videoUrl} poster={item.posterUrl||undefined} muted={muted} loop playsInline preload="none" aria-label={item.title}/>
+  <video ref={ref} src={item.videoUrl} poster={item.posterUrl||undefined} muted={muted} loop playsInline preload="none" aria-label={item.title+" — tap to toggle sound"} tabIndex={0} onClick={toggleSound} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleSound();}}}/>
   <div className="kc-video-shade" aria-hidden="true"/>
   <span className="kc-video-number">{String(index+1).padStart(2,'0')} / K4K</span>
-  <div className="kc-video-caption"><strong>{item.title}</strong><button type="button" aria-label={muted?'Play with sound':'Mute video'} aria-pressed={!muted} onClick={()=>{const node=ref.current;if(!node)return;node.muted=muted?false:true;setMuted(!muted);if(!paused)node.play().catch(()=>{});}}>{muted?<VolumeX size={16}/>:<Volume2 size={16}/>}</button></div>
+  <div className="kc-video-caption"><strong>{item.title}</strong></div>
  </article>;
 }
 export default function CinematicLaunch(){
