@@ -68,7 +68,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(feed,/<TemplateCreateSheet item=\{createItem\}/);
  const sheet=source('app/k4k-app/TemplateCreateSheet.js');
  assert.match(sheet,/role="dialog"/);
- assert.match(sheet,/disabled=\{!file\|\|!consent\|\|busy\|\|!supported\}/);
+ assert.match(sheet,/disabled=\{!files.length\|\|!consent\|\|busy\|\|!supported\}/);
  assert.match(sheet,/\/api\/generation\/jobs\/quote/);
  assert.match(sheet,/\/api\/generation\/jobs\/submit/);
  assert.match(feed,/setTab/);
