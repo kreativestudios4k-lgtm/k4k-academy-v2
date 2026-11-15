@@ -8,6 +8,7 @@ import {checkoutReturnDestination} from '../../lib/customer-routes.mjs';
 export default function CheckoutReturn(){
  const {locale}=useK4KLocale();
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
+ const [manual,setManual]=useState(false);
  const [state,setState]=useState(null),[balance,setBalance]=useState(null),[returnPath,setReturnPath]=useState('/k4k-app/creator');
  useEffect(()=>{
   const params=new URLSearchParams(window.location.search);
@@ -19,7 +20,7 @@ export default function CheckoutReturn(){
   // with Stripe and grant the credits itself; it cannot grant them twice.
   async function reconcile(token){
    if(asked||permanentFailure)return;asked=true;
-   try{const response=await fetch('/api/billing/reconcile',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(sessionId?{sessionId}:{})});const result=await response.json().catch(()=>({}));verified=response.ok&&result.reconciled===true;permanentFailure=['INVALID_SESSION_ID','SESSION_NOT_FOUND','SESSION_NOT_PAYABLE','NO_PAID_SESSION'].includes(result.error);}catch{}
+   try{const response=await fetch('/api/billing/reconcile',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(sessionId?{sessionId}:{})});const result=await response.json().catch(()=>({}));verified=response.ok&&result.reconciled===true;if(verified)setManual(result.renewalMode==='manual');permanentFailure=['INVALID_SESSION_ID','SESSION_NOT_FOUND','SESSION_NOT_PAYABLE','NO_PAID_SESSION'].includes(result.error);}catch{}
    // Only retry transient failures. Never announce success based on a pre-existing wallet.
    if(!verified&&!permanentFailure)asked=false;
   }
@@ -31,13 +32,11 @@ export default function CheckoutReturn(){
     const {data:{session}}=await client.auth.getSession();
     if(session?.access_token)await reconcile(session.access_token);
     if(stopped)return;
-    const [membership,wallet]=await Promise.all([
-     session?.access_token?fetch('/api/billing/account',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'}).then(async r=>({data:r.ok?(await r.json()).app:null,error:!r.ok})):Promise.resolve({data:null,error:true}),
-     client.from('studio_credit_accounts').select('balance').eq('user_id',user.id).maybeSingle()
-    ]);
+    const account=session?.access_token?await fetch('/api/billing/account',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'}):null;
+    const details=account?.ok?await account.json():null;
     if(stopped)return;
-    if(verified&&!membership.error&&!wallet.error&&membership.data?.status==='active'&&Number.isFinite(wallet.data?.balance)){
-     setBalance(wallet.data.balance);setState('active');return;
+    if(verified&&details&&(details.app?.status==='active'||details.manualPix)&&Number.isFinite(details.creditBalance)){
+     setBalance(details.creditBalance);setState('active');return;
     }
    }catch{}
    if(stopped)return;
@@ -46,5 +45,5 @@ export default function CheckoutReturn(){
   check();return()=>{stopped=true;clearTimeout(timer)};
  },[]);
  if(!state)return null;
- return <section className="k4k-checkout-return" role="status"><strong>{state==='active'?tr('Your subscription is active','Sua assinatura está ativa','Tu suscripción está activa'):tr('Welcome to your studio','Bem-vindo ao seu estúdio','Bienvenido a tu estudio')}</strong><p>{state==='active'?tr('Current verified balance: ','Saldo atual verificado: ','Saldo actual verificado: ')+balance+tr(' credits.',' créditos.',' créditos.'):state==='sign-in'?tr('Sign in with your checkout account to see your subscription and credits.','Entre com a conta usada no checkout para ver seus créditos.','Inicia sesión con tu cuenta de compra para ver tus créditos.'):tr('We are checking your subscription. Credits appear after verified payment; returning from checkout alone does not add credits. If you already paid, do not pay again.','Estamos verificando sua assinatura. Os créditos aparecem após a confirmação do pagamento. Se já pagou, não pague novamente.','Estamos verificando tu suscripción. Los créditos aparecen tras confirmar el pago. Si ya pagaste, no vuelvas a pagar.')}</p><Link href={state==='sign-in'?'/login?next='+encodeURIComponent(returnPath):'/k4k-app/account'}>{tr('View account','Ver conta','Ver cuenta')} →</Link></section>;
+ return <section className="k4k-checkout-return" role="status"><strong>{state==='active'&&manual?tr('Your Pix payment is confirmed','Seu pagamento Pix foi confirmado','Tu pago Pix está confirmado'):state==='active'?tr('Your subscription is active','Sua assinatura está ativa','Tu suscripción está activa'):tr('Welcome to your studio','Bem-vindo ao seu estúdio','Bienvenido a tu estudio')}</strong><p>{state==='active'?tr('Current verified balance: ','Saldo atual verificado: ','Saldo actual verificado: ')+balance+tr(' credits.',' créditos.',' créditos.'):state==='sign-in'?tr('Sign in with your checkout account to see your subscription and credits.','Entre com a conta usada no checkout para ver seus créditos.','Inicia sesión con tu cuenta de compra para ver tus créditos.'):tr('We are checking your subscription. Credits appear after verified payment; returning from checkout alone does not add credits. If you already paid, do not pay again.','Estamos verificando sua assinatura. Os créditos aparecem após a confirmação do pagamento. Se já pagou, não pague novamente.','Estamos verificando tu suscripción. Los créditos aparecen tras confirmar el pago. Si ya pagaste, no vuelvas a pagar.')}</p><Link href={state==='sign-in'?'/login?next='+encodeURIComponent(returnPath):'/k4k-app/account'}>{tr('View account','Ver conta','Ver cuenta')} →</Link></section>;
 }

@@ -29,5 +29,11 @@ export async function GET(request){
  if(app.error)return json({error:'UNAVAILABLE'},503);
  const wallet=await client.from(production?'k4k_live_credit_accounts':'studio_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
  if(wallet.error)return json({error:'UNAVAILABLE'},503);
- return json({...accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}),creditBalance:wallet.data?.balance??0,billingHold:wallet.data?.billing_hold??false,creditMode:production?'live':'test'});
+ let manualPix=null;
+ if(process.env.K4K_MANUAL_PIX_SCHEMA_READY==='true'){
+  const purchase=await client.from('k4k_manual_pix_orders').select('id,plan_key,state,paid_at,period_end').eq('user_id',user.id).eq('credit_mode',production?'live':'test').in('state',['paid','disputed']).order('period_end',{ascending:false}).limit(1).maybeSingle();
+  if(purchase.error)return json({error:'UNAVAILABLE'},503);
+  if(purchase.data)manualPix={...purchase.data,renewalMode:'manual',renewalDue:new Date(purchase.data.period_end).getTime()<=Date.now()};
+ }
+ return json({manualPix,...accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}),creditBalance:wallet.data?.balance??0,billingHold:wallet.data?.billing_hold??false,creditMode:production?'live':'test'});
 }
