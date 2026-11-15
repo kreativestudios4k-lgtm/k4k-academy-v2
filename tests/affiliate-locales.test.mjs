@@ -5,7 +5,7 @@ import {studioDestination} from '../lib/customer-routes.mjs';
 import {readFileSync} from 'node:fs';
 test('worldwide affiliate languages include a complete acknowledgement for every supported option',()=>{
  assert.ok(countries.length>=249);assert.equal(new Set(countries).size,countries.length);
- for(const code of Object.keys(languages)){assert.equal(messages[code].length,2);assert.ok(messages[code][0].includes('K4K APP'));assert.ok(messages[code][1].includes('Instagram'))}
+ for(const code of Object.keys(languages)){assert.equal(messages[code].length,2);assert.ok(messages[code][0].includes('K4K APP'));assert.ok(messages[code][1].includes('Instagram')||messages[code][1].includes('إنستغرام'))}
  for(const [country,language] of Object.entries({BR:'pt',PT:'pt',AO:'pt',ES:'es',MX:'es',FR:'fr',DE:'de',IT:'it',IN:'hi',JP:'ja',CN:'zh',AE:'ar',GB:'en',US:'en',AU:'en'}))assert.equal(defaultLanguage(country),language);
  for(const c of countries)assert.ok(Object.hasOwn(languages,defaultLanguage(c)));
 });
