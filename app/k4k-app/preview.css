@@ -151,3 +151,8 @@
 .k4k-light .k4k-card,.k4k-light .k4k-account-panel{background:#141414;border-color:#333;box-shadow:none}
 .k4k-light input:not([type=checkbox]):not([type=range]):not([type=file]),.k4k-light select,.k4k-light textarea{color:#faf9f6;background:#181818;border-color:#444}
 @media(min-width:1100px){.k4k-light.k4k-studio-shell .k4k-light-nav a.active>span{background:#faf9f6;color:#080808}}
+
+.k4k-light .k4k-feature b{background:#faf9f6;color:#080808}
+.k4k-light .k4k-support-tile{background:#141414;border-color:#383838}
+.k4k-light .k4k-account-actions a:first-child,.k4k-light .k4k-workspace-actions a:first-child{border-radius:999px}
+.k4k-light .k4k-global-brand,.k4k-light .k4k-account-heading h1{font-weight:850;letter-spacing:-.045em}
