@@ -1,3 +1,4 @@
+import {sendWelcome} from '../../../lib/server/welcome-email.mjs';
 import {studioDestination} from '../../../lib/customer-routes.mjs';
 import {createServerClient} from '@supabase/ssr';
 import {NextResponse} from 'next/server';
@@ -17,7 +18,8 @@ export async function GET(request){
    setAll(cookies){cookies.forEach(({name,value,options})=>response.cookies.set(name,value,options))}
   }
  });
- const {error}=await supabase.auth.exchangeCodeForSession(code);
+ const {data,error}=await supabase.auth.exchangeCodeForSession(code);
  if(error)return NextResponse.redirect(failure);
+ try{await sendWelcome(data.user)}catch{console.error('K4K welcome delivery failed')}
  return response;
 }
