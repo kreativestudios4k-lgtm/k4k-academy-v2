@@ -9,7 +9,8 @@ const key='33333333-3333-4333-8333-333333333333';
 const fp='a'.repeat(64);
 const schemas=[
  '../supabase/migrations/20261116230000_k4k_multimodel_job_drafts.sql',
- '../supabase/migrations/20261116231000_k4k_multimodel_atomic_ledger.sql'
+ '../supabase/migrations/20261116231000_k4k_multimodel_atomic_ledger.sql',
+ '../supabase/migrations/20261116232000_k4k_multimodel_dispatch_claims.sql'
 ].map(p=>readFileSync(new URL(p,import.meta.url),'utf8'));
 async function setup(){
  const db=new PGlite();
@@ -63,7 +64,8 @@ test('rejects completion without provider identity and without expected output p
  const db=await setup();try{
  await asService(db);await db.query(reserve());
  await assert.rejects(db.query(finish('completed','video/mp4',owner+'/'+job+'.mp4')),/PROVIDER_NOT_RECORDED/);
- await db.query(`update public.k4k_multimodel_jobs set status='processing',provider_request_id='trusted-request-id' where id='${job}'`);
+ await db.query(`select public.k4k_multimodel_claim_dispatch('${owner}','${job}')`);
+ await db.query(`select public.k4k_multimodel_record_provider_request('${owner}','${job}','trusted-request-id')`);
  await assert.rejects(db.query(finish('completed','image/png',owner+'/'+job+'.png')),/INVALID_OUTPUT/);
  await assert.rejects(db.query(finish('completed','video/mp4',owner+'/wrong.mp4')),/INVALID_OUTPUT/);
  assert.equal((await db.query(finish('completed','video/mp4',owner+'/'+job+'.mp4'))).rows[0].result.status,'settled');
@@ -111,5 +113,19 @@ test('simultaneous reserve requests on one connection never double debit',async(
  assert.equal(results.filter(r=>r.rows[0].result.newly_reserved).length,1);
  assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,35);
  assert.equal((await db.query('select count(*)::int as n from public.k4k_multimodel_budget_allocations')).rows[0].n,1);
+ }finally{await db.close();}
+});
+
+test('claimed paid dispatch cannot refund even if the HTTP outcome is uncertain',async()=>{
+ const db=await setup();try{
+ await asService(db);
+ await db.query(reserve());
+ const claim=await db.query(`select public.k4k_multimodel_claim_dispatch('${owner}','${job}') as result`);
+ assert.equal(claim.rows[0].result.claimed,true);
+ await assert.rejects(db.query(finish('failed')),/PROVIDER_DISPATCH_REVIEW_REQUIRED/);
+ assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,35);
+ assert.equal((await db.query(`select status from public.k4k_multimodel_reservations where job_id='${job}'`)).rows[0].status,'reserved');
+ const repeat=await db.query(`select public.k4k_multimodel_claim_dispatch('${owner}','${job}') as result`);
+ assert.equal(repeat.rows[0].result.claimed,false);
  }finally{await db.close();}
 });
