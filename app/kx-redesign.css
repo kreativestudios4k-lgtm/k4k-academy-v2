@@ -289,7 +289,3 @@
 .kx-auth{--kx-ink:#030303;--kx-panel:#111111;--kx-paper:#fff;--kx-heat:#fff;--kx-teal:#fff;background:#030303;color:#fff}
 .kx-auth .k4k-auth-card{background:#111111;border-color:#303030}
 .kx-auth .k4k-auth-submit{background:#fff;color:#030303}
-
-/* Subtle reflected light, never a blue interface. */
-.kx-auth .k4k-auth-card{border-color:#424955;box-shadow:0 1px 0 #d8e6ff30,0 20px 80px #0009,0 0 35px #3262bd16}
-.kx-auth .k4k-auth-submit{box-shadow:0 5px 25px #709dff24}

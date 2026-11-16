@@ -21,5 +21,3 @@
 @media(max-width:700px){.k4k-profile-menu summary{padding:3px;gap:3px}.k4k-profile-avatar{width:27px;height:27px}.k4k-profile-popover{max-width:calc(100vw - 28px)}}
 
 .k4k-profile-popover{background:#111111;color:#fff}.k4k-profile-avatar{background:#fff;color:#030303}
-
-.k4k-profile-popover{border-color:#424955;box-shadow:0 20px 50px #000b,0 0 25px #4779d515}
