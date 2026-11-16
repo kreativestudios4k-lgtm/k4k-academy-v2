@@ -240,3 +240,5 @@
 .kc-three .kc-scroll-link{margin-top:22px}
 @media(max-width:760px){.kc-three .kc-brand-hero{padding:30px 16px 32px;min-height:calc(100svh - 64px)}.kc-three .kc-brand-hero h1{font-size:clamp(34px,9vw,60px)!important;margin:14px auto!important}.kc-three .kc-welcome-feature{width:min(164px,43vw);margin-top:14px}.kc-three .kc-welcome-feature video{border-radius:12px}.kc-three .kc-brand-hero p{margin:14px auto 16px;font-size:13px!important}.kc-three .kc-scroll-link{margin-top:18px}}
 @media(prefers-reduced-motion:reduce){.kc-three .kc-welcome-feature video{scroll-behavior:auto}}
+
+.kc-three .kc-welcome-player{position:relative}.kc-three .kc-welcome-sound{position:absolute;bottom:10px;right:8px;display:flex;align-items:center;gap:5px;padding:8px 10px;border:1px solid #ffffff55;border-radius:999px;background:#080808d9;color:#fff;font-size:11px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);min-height:36px}.kc-three .kc-welcome-sound:focus-visible{outline:2px solid #fff;outline-offset:3px}
