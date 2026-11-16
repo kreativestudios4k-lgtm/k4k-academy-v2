@@ -6,7 +6,7 @@ export async function POST(request){
  try{
   const {user,body,job,database}=await generationContext(request);
   const submit=createGenerationSubmitService({database,provider:createGenerationProvider(job),prepare:(draft,resolution)=>prepareGenerationInput(database,draft,resolution)});
-  const result=await submit({userId:user.id,job,quoteToken:body.quoteToken,requestKey:body.requestKey});
+  const result=await submit({userId:user.id,verifiedEmail:!!user.email_confirmed_at,job,quoteToken:body.quoteToken,requestKey:body.requestKey});
   return Response.json(result,{status:202,headers:{'Cache-Control':'no-store'}});
  }catch(error){return generationError(error)}
 }
