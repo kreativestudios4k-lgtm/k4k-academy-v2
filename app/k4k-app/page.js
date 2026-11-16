@@ -1,3 +1,3 @@
-import CinematicLaunch from './CinematicLaunch';
+import SingleFeedHome from './SingleFeedHome';
 export const metadata={title:{absolute:'K4K APP — Don’t follow the trend. Create it.'},description:'Create AI videos with K4K APP. Discover trending templates and choose your creator plan.',openGraph:{title:'K4K APP — Don’t follow the trend. Create it.',description:'Your imagination. Your characters. Your next viral video.',siteName:'K4K APP'},twitter:{card:'summary_large_image',title:'K4K APP — Create it.',description:'Discover K4K Originals, trending AI videos and your next creative studio.'}};
-export default function StudioHome(){return <CinematicLaunch/>;}
+export default function StudioHome(){return <SingleFeedHome/>;}
