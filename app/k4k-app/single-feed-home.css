@@ -142,3 +142,20 @@
  .ksh-catalogue-open>.ksh-hook-before{position:static;transform:none;width:auto;text-align:center}
 }
 @media(prefers-reduced-motion:reduce){.k4k-single-home .kc-abstract-motion i,.k4k-single-home .kc-abstract-logo{animation:none}}
+
+/* Reserve actual space for both editorial wings, including the control rail.
+   Smaller laptop/tablet widths retain desktop navigation with a compact hook. */
+@media(min-width:901px){
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-hook-before{width:clamp(90px,calc((100vw - var(--rail) - 100%)/2 - 42px),360px)}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-hook-after{width:clamp(85px,calc((100vw - var(--rail) - 100%)/2 - 100px),360px)}
+ .ksh-hook-before,.ksh-hook-after{overflow-wrap:anywhere}
+}
+@media(min-width:761px) and (max-width:900px){
+ .ksh-main:not(.ksh-catalogue-open){grid-template-rows:auto minmax(0,1fr) auto auto auto;gap:8px}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-hook{position:static;inset:auto;transform:none;width:auto;max-width:none;text-align:center;font-size:25px}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-hook-before{grid-area:1/1}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-media{grid-area:2/1}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-caption{grid-area:3/1}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-hook-after{grid-area:4/1;flex-direction:row;justify-content:center;align-items:center;font-size:23px;gap:6px}
+ .ksh-main:not(.ksh-catalogue-open)>.ksh-action{grid-area:5/1}
+}
