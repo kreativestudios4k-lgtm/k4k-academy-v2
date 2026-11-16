@@ -22,6 +22,7 @@ export default function AccountMenu({user,landing=false}){
  <Link href="/k4k-app/account" onClick={()=>{menu.current.open=false}}><UserRound size={17}/>{tr('My profile','Meu perfil','Mi perfil')}</Link>
  <Link href="/k4k-app/videos" onClick={()=>{menu.current.open=false}}><Film size={17}/>{tr('My library','Minha biblioteca','Mi biblioteca')}</Link>
  <Link href="/k4k-app/credits" onClick={()=>{menu.current.open=false}}><Coins size={17}/>{tr('Plans & credits','Planos e créditos','Planes y créditos')}</Link>
+ <Link href="/k4k-app/partners" onClick={()=>{menu.current.open=false}}><UserRound size={17}/>{tr('Affiliate dashboard','Painel de afiliados','Panel de afiliados')}</Link>
  <button type="button" className="k4k-profile-logout" onClick={logout} disabled={busy}><LogOut size={17}/>{busy?tr('Signing out…','Saindo…','Cerrando sesión…'):tr('Sign out','Sair','Cerrar sesión')}</button>
  {error&&<p role="alert">{error}</p>}
  </div></details>

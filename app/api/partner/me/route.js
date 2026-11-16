@@ -1,5 +1,6 @@
 import {createClient} from '@supabase/supabase-js';
 import {referralsEnabled} from '../../../../lib/server/referral-tracking.mjs';
+import {eligibleCreatorCoupon} from '../../../../lib/k4k-student-discount.mjs';
 import {PARTNER_TERMS,approvedPartner} from '../../../../lib/server/partner-policy.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
@@ -19,5 +20,5 @@ export async function GET(request){
  const {data,error:statsError}=await db.rpc('k4k_app_partner_stats',{p_partner:user.id});
  if(statsError||!data)return json({error:'UNAVAILABLE'},503);
  if(!data.active)return json({error:'PARTNER_NOT_ACTIVE'},403);
- return json({...data,terms:PARTNER_TERMS});
+ return json({...data,couponCode:eligibleCreatorCoupon(partner.code),terms:{...PARTNER_TERMS,commissionBps:partner.commission_bps}});
 }
