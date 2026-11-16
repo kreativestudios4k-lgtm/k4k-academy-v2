@@ -42,7 +42,7 @@ test('completed provider image flows through authenticated result, bounded downl
  const h=harness();
  const result=await h.reconcile({userId,jobId});
  assert.equal(result.status,'completed');
- assert.deepEqual(h.calls.map(c=>c.kind),['queue','queue','queue','media','ingest','settle']);
+ assert.deepEqual(h.calls.map(c=>c.kind),['queue','queue','queue','queue','media','ingest','settle']);
  assert.equal(h.calls.filter(c=>c.kind==='queue').every(c=>c.auth==='Key fixture-key'),true);
  assert.equal(h.calls.find(c=>c.kind==='media').redirect,'error');
  assert.equal(h.calls.at(-1).args.outputPath,userId+'/'+jobId+'.png');
