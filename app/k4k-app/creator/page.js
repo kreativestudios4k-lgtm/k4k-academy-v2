@@ -164,6 +164,7 @@ export default function Creator(){
  useEffect(()=>{setGenerationDraftId(null);setGenerationQuote(null);setGenerationMessage('');generationRequestKey.current=null;},[model,quality,prompt,characterTargets,video.file,character.file,extraImages,selectedPreset]);
  async function saveReference(){
   if(!character.file||uploading)return;
+  if(selectedPreset?.generationPaused){setUploadMessage(generationQuoteFeedback({blocker:'TEMPLATE_UNDER_REVIEW'},locale));return;}
   if(!video.file&&!selectedPreset){setUploadMessage('Choose a template or upload a reference video first.');return;}
   setUploadMessage('');setUploading(true);
   try{
