@@ -4,6 +4,8 @@ import Link from 'next/link';
 import {ArrowUpRight,Play,Pause,Volume2,VolumeX,Menu,X,Globe2} from 'lucide-react';
 import catalogue from './template-catalogue.json';
 import LaunchAuthDialog from './LaunchAuthDialog';
+import {useVerifiedAccount} from './useVerifiedAccount';
+import AccountMenu from './AccountMenu';
 import {useK4KLocale} from './locale';
 import {LAUNCH_MONTHLY_CREDITS,LAUNCH_FIRST_MONTH_CREDITS} from '../../lib/k4k-launch-offer.mjs';
 import {PLAN_PRICES,PLAN_CURRENCIES} from '../../lib/k4k-plan-prices.mjs';
@@ -41,6 +43,7 @@ export default function CinematicLaunch(){
  const feedRef=useRef(null);
  const [menuOpen,setMenuOpen]=useState(false);
  const [authOpen,setAuthOpen]=useState(false);
+ const {user,ready}=useVerifiedAccount();
  const [currency,setCurrency]=useState('GBP');
  const [billing,setBilling]=useState(null);
  useEffect(()=>{let active=true;fetch('/api/k4k-region',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(active&&PLAN_CURRENCIES.includes(data?.currency))setCurrency(data.currency)}).catch(()=>{});fetch('/api/billing/readiness',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(data=>{if(active)setBilling(data)}).catch(()=>{});return()=>{active=false}},[]);
@@ -49,8 +52,8 @@ export default function CinematicLaunch(){
  <header className="kc-header"><div className="kc-nav-inner">
   <Link href="/" className="kc-logo" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/><span className="kc-brand-lockup"><span className="kc-wordmark">K4K<span> APP</span></span><span className="kc-brand-byline">by KreativeStudios4K</span></span></Link>
   <nav className="kc-desktop-nav" aria-label="Main navigation"><a href="#showcase">{tr('Trending','Em alta','Tendencias')}</a><a href="#plans">{tr('Prices','Preços','Precios')}</a><Link href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link></nav>
-  <div className="kc-header-right"><label className="kc-language"><Globe2 size={15}/><select aria-label={tr('Language','Idioma','Idioma')} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label><button type="button" className="kc-login" onClick={()=>setAuthOpen(true)}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link className="kc-join" href="/k4k-app/register?plan=starter">{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}<ArrowUpRight size={15}/></Link><button className="kc-menu-toggle" type="button" aria-label={menuOpen?'Close menu':'Open menu'} aria-expanded={menuOpen} aria-controls="kc-mobile-nav" onClick={()=>setMenuOpen(v=>!v)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button></div>
- </div>{menuOpen&&<nav id="kc-mobile-nav" className="kc-mobile-nav" aria-label="Mobile navigation"><a href="#showcase" onClick={()=>setMenuOpen(false)}>{tr('Trending','Em alta','Tendencias')}</a><a href="#plans" onClick={()=>setMenuOpen(false)}>{tr('Prices','Preços','Precios')}</a><Link href="/affiliates" onClick={()=>setMenuOpen(false)}>{tr('Affiliates','Afiliados','Afiliados')}</Link><button type="button" onClick={()=>{setMenuOpen(false);setAuthOpen(true)}}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link href="/k4k-app/register?plan=starter" onClick={()=>setMenuOpen(false)}>{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}</Link></nav>}</header>
+  <div className="kc-header-right"><label className="kc-language"><Globe2 size={15}/><select aria-label={tr('Language','Idioma','Idioma')} value={locale} onChange={e=>changeLocale(e.target.value)}><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label>{user?<><Link className="kc-join" href="/k4k-app/creator">{tr('Open studio','Abrir estúdio','Abrir estudio')}<ArrowUpRight size={15}/></Link><AccountMenu user={user} landing/></>:<><button type="button" className="kc-login" onClick={()=>setAuthOpen(true)} disabled={!ready}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link className="kc-join" href="/k4k-app/register?plan=starter">{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}<ArrowUpRight size={15}/></Link></>}<button className="kc-menu-toggle" type="button" aria-label={menuOpen?'Close menu':'Open menu'} aria-expanded={menuOpen} aria-controls="kc-mobile-nav" onClick={()=>setMenuOpen(v=>!v)}>{menuOpen?<X size={22}/>:<Menu size={22}/>}</button></div>
+ </div>{menuOpen&&<nav id="kc-mobile-nav" className="kc-mobile-nav" aria-label="Mobile navigation"><a href="#showcase" onClick={()=>setMenuOpen(false)}>{tr('Trending','Em alta','Tendencias')}</a><a href="#plans" onClick={()=>setMenuOpen(false)}>{tr('Prices','Preços','Precios')}</a><Link href="/affiliates" onClick={()=>setMenuOpen(false)}>{tr('Affiliates','Afiliados','Afiliados')}</Link>{user?<><Link href="/k4k-app/creator" onClick={()=>setMenuOpen(false)}>{tr('Open studio','Abrir estúdio','Abrir estudio')}</Link><Link href="/k4k-app/account" onClick={()=>setMenuOpen(false)}>{tr('My profile','Meu perfil','Mi perfil')}</Link></>:<><button type="button" onClick={()=>{setMenuOpen(false);setAuthOpen(true)}} disabled={!ready}>{tr('Log in','Entrar','Iniciar sesión')}</button><Link href="/k4k-app/register?plan=starter" onClick={()=>setMenuOpen(false)}>{tr('Join K4K','Junte-se ao K4K','Únete a K4K')}</Link></>}</nav>}</header>
  <main>
  <section className="kc-hero kc-brand-hero" id="landing" aria-labelledby="kc-hero-title">
  <div className="kc-abstract-motion" aria-hidden="true"><i/><i/><i/></div>
@@ -59,7 +62,7 @@ export default function CinematicLaunch(){
  <div className="kc-kicker"><i/> BY KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
  <h1 id="kc-hero-title">{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}<br/>{tr("THE TREND.","A TENDÊNCIA.","LA TENDENCIA.")}<br/><em>{tr("CREATE IT.","CRIE A SUA.","CRÉALA.")}</em></h1>
  <p>{tr("The AI video creation studio for the next generation of creators.","O estúdio de criação de vídeos com IA para a próxima geração de criadores.","El estudio de creación de videos con IA para la próxima generación de creadores.")}</p>
- <div className="kc-hero-actions"><Link className="kc-join" href="/k4k-app/register?plan=starter">{tr("Start creating","Comece a criar","Empieza a crear")}<ArrowUpRight size={16}/></Link><a className="kc-hero-secondary" href="#showcase">{tr("Explore trending","Explore em alta","Explora tendencias")}</a></div>
+ <div className="kc-hero-actions"><Link className="kc-join" href={user?"/k4k-app/creator":"/k4k-app/register?plan=starter"}>{tr("Start creating","Comece a criar","Empieza a crear")}<ArrowUpRight size={16}/></Link><a className="kc-hero-secondary" href="#showcase">{tr("Explore trending","Explore em alta","Explora tendencias")}</a></div>
  <a className="kc-scroll-link" href="#showcase">{tr("SCROLL TO DISCOVER","ROLE PARA DESCOBRIR","DESLIZA PARA DESCUBRIR")} ↓</a>
  </div></section>
   <section className="kc-showcase" id="showcase"><div className="kc-showcase-head"><div><span>K4K ORIGINALS</span><h2>{tr('TRENDING NOW.','EM ALTA AGORA.','EN TENDENCIA.')}</h2></div><button type="button" onClick={()=>setPaused(p=>!p)} aria-label={paused?'Play previews':'Pause previews'}>{paused?<Play size={17}/>:<Pause size={17}/>} {paused?tr('Play','Reproduzir','Reproducir'):tr('Pause','Pausar','Pausar')}</button></div>

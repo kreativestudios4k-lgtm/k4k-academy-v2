@@ -156,3 +156,9 @@
 .k4k-light .k4k-support-tile{background:#141414;border-color:#383838}
 .k4k-light .k4k-account-actions a:first-child,.k4k-light .k4k-workspace-actions a:first-child{border-radius:999px}
 .k4k-light .k4k-global-brand,.k4k-light .k4k-account-heading h1{font-weight:850;letter-spacing:-.045em}
+
+.k4k-light .k4k-global-header{z-index:90;overflow:visible}
+.k4k-light .k4k-global-header>.k4k-customer-nav{overflow:visible}
+.k4k-light .k4k-global-header .k4k-profile-menu a{white-space:normal}
+.k4k-auth-existing{display:grid;gap:10px;margin-top:16px}.k4k-auth-existing p{margin:0;overflow-wrap:anywhere}
+.k4k-auth-existing .k4k-auth-submit,.k4k-auth-existing .k4k-auth-google{width:100%;justify-content:center}
