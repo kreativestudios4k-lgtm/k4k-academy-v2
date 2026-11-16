@@ -69,7 +69,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(feed,/<TemplateCreateSheet item=\{createItem\}/);
  const sheet=source('app/k4k-app/TemplateCreateSheet.js');
  assert.match(sheet,/role="dialog"/);
- assert.match(sheet,/disabled=\{!files.length\|\|!consent\|\|busy\|\|!supported\}/);
+ assert.match(sheet,/disabled=\{!complete\|\|!consent\|\|busy\|\|!supported\}/);
  assert.match(sheet,/\/api\/generation\/jobs\/quote/);
  assert.match(sheet,/\/api\/generation\/jobs\/submit/);
  assert.match(feed,/setTab/);
@@ -119,3 +119,12 @@ test('the shared monochrome foundation is loaded and applied across customer sur
 });
 
 test('single feed homepage retains K4K backdrop and real navigation',()=>{const s=source('app/k4k-app/SingleFeedHome.js');assert.match(s,/kc-abstract-motion/);assert.match(s,/Use this template/);assert.match(s,/href="\/affiliates"/);assert.match(s,/muted=\{muted\} loop playsInline/);assert.match(s,/TemplateCreateSheet item=\{create\}/);assert.match(s,/\/k4k-app\/credits/);});
+
+test('home uses native vertical snap reels and retains responsive desktop navigation',()=>{
+ const home=source('app/k4k-app/SingleFeedHome.js'),css=source('app/k4k-app/single-feed-home.css');
+ assert.match(home,/className="ksh-reels-scroll"/);
+ assert.match(home,/scrollFeed/);assert.match(home,/videoNodes/);
+ assert.match(css,/scroll-snap-type:y mandatory/);assert.match(css,/scroll-snap-align:start/);
+ assert.match(home,/ksh-desktop-rail/);assert.doesNotMatch(home,/className="ksh-sound"/);
+ assert.doesNotMatch(home,/aria-label=\{paused\?'Play video'/);
+});
