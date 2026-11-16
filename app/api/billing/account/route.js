@@ -38,7 +38,7 @@ export async function GET(request){
  let earlyFreeGeneration=null;
  if(production&&user.email_confirmed_at){
   const gift=await client.from('k4k_early_free_entitlements').select('status,attempts').eq('user_id',user.id).maybeSingle();
-  if(!gift.error&&gift.data)earlyFreeGeneration={status:gift.data.status,attempts:gift.data.attempts,maxSeconds:5};
+  if(!gift.error&&gift.data)earlyFreeGeneration={status:gift.data.status,attempts:gift.data.attempts,maxSeconds:15};
  }
  return json({earlyFreeGeneration,manualPix,...accountMembershipView({legacy:legacy.data,app:app.data,academyClaim,production}),creditBalance:wallet.data?.balance??0,billingHold:wallet.data?.billing_hold??false,creditMode:production?'live':'test'});
 }
