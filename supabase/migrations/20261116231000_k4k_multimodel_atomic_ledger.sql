@@ -11,6 +11,21 @@ create table if not exists public.k4k_multimodel_reservations(
  updated_at timestamptz not null default now(),
  unique(user_id,request_key)
 );
+-- Multimodel jobs cannot be inserted into the legacy allocation table:
+-- its job_id FK points exclusively to studio_generation_jobs.
+-- Keep separate FK-safe allocations, but count BOTH under the same lock.
+create table if not exists public.k4k_multimodel_budget_allocations(
+ job_id uuid primary key references public.k4k_multimodel_jobs(id) on delete restrict,
+ user_id uuid not null references auth.users(id) on delete restrict,
+ provider text not null default 'fal' check(provider='fal'),
+ quote_micros bigint not null check(quote_micros between 1 and 5000000),
+ created_at timestamptz not null default now()
+);
+create index if not exists k4k_multimodel_budget_allocations_created
+ on public.k4k_multimodel_budget_allocations(created_at);
+alter table public.k4k_multimodel_budget_allocations enable row level security;
+revoke all on public.k4k_multimodel_budget_allocations from public,anon,authenticated;
+grant select,insert on public.k4k_multimodel_budget_allocations to service_role;
 alter table public.k4k_multimodel_reservations enable row level security;
 revoke all on public.k4k_multimodel_reservations from public,anon,authenticated;
 grant select,insert,update on public.k4k_multimodel_reservations to service_role;
@@ -70,7 +85,11 @@ begin
  if v_active>=p_max_active then raise exception 'ACTIVE_JOB_LIMIT';end if;
  select coalesce(sum(quote_micros),0),
   coalesce(sum(quote_micros) filter(where created_at>=date_trunc('day',now() at time zone 'UTC') at time zone 'UTC'),0)
-  into v_total,v_day from public.k4k_generation_budget_allocations;
+  into v_total,v_day from (
+   select quote_micros,created_at from public.k4k_generation_budget_allocations
+   union all
+   select quote_micros,created_at from public.k4k_multimodel_budget_allocations
+  ) unified_allocations;
  if v_day+p_quote_micros>p_daily_budget_micros then raise exception 'PROVIDER_DAILY_BUDGET_BLOCKED';end if;
  if v_total+p_quote_micros>p_total_budget_micros then raise exception 'PROVIDER_TOTAL_BUDGET_BLOCKED';end if;
  -- Conditional debit is atomic: billing holds and short balances fail closed.
@@ -86,7 +105,7 @@ begin
  update public.k4k_multimodel_jobs set status='queued',updated_at=now()
   where id=p_job and user_id=p_user and status='draft';
  if not found then raise exception 'JOB_NOT_DRAFT';end if;
- insert into public.k4k_generation_budget_allocations(job_id,user_id,provider,quote_micros)
+ insert into public.k4k_multimodel_budget_allocations(job_id,user_id,provider,quote_micros)
   values(p_job,p_user,'fal',p_quote_micros);
  return jsonb_build_object('job_id',p_job,'status','reserved','newly_reserved',true,'credits',p_credits);
 end $$;
