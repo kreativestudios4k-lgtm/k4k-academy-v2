@@ -10,7 +10,7 @@ test('limits live models and affordable verified provider pricing',()=>{
  assert.equal(q.credits,10);assert.equal(q.quoteMicros,940000);
  const i=multimodelQuote({modelId:'nano-banana-21-t2i',params:{prompt:'An original landscape',resolution:'1K',aspect_ratio:'1:1'},env});
  assert.equal(i.credits,10);
- assert.throws(()=>multimodelQuote({modelId:'seedance-25-t2v',params:{prompt:'abc',duration:5,resolution:'720p',aspect_ratio:'9:16'},env}),/PROVIDER_QUOTE_REQUIRED/);
+ assert.throws(()=>multimodelQuote({modelId:'seedance-25-t2v',params:{prompt:'abc',duration:5,resolution:'720p',aspect_ratio:'9:16'},env}),/MODEL_DISABLED/);
  assert.throws(()=>multimodelQuote({modelId:'flux3-t2i',params:{prompt:'An image',resolution:'4k',aspect_ratio:'1:1'},env}),/MODEL_QUALITY_NOT_ENABLED/);
 });
 test('quote token binds owner, immutable parameters and charged credit amount',()=>{
