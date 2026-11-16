@@ -3,6 +3,7 @@ import {generationContext,prepareGenerationInput,generationError} from '../../..
 import {createGenerationProvider,generationProviderName,generationSigningSecret} from '../../../../../lib/server/generation-provider.mjs';
 import {generationCredits,draftFingerprint,quoteSigner} from '../../../../../lib/server/generation-quote.mjs';
 import {generationTemplateBlocker} from '../../../../../lib/server/generation-template-safety.mjs';
+import {generationRejectionHold} from '../../../../../lib/server/wan-generation-quality.mjs';
 import {generationBudgetPolicy} from '../../../../../lib/server/generation-submit-service.mjs';
 import {earlyFreeQuoteAllowed,EARLY_FREE_MAX_SECONDS,EARLY_FREE_MAX_USD} from '../../../../../lib/server/early-free-generation.mjs';
 export const runtime='nodejs';
@@ -12,6 +13,8 @@ export async function POST(request){
   if(job.status!=='draft')throw Error('JOB_NOT_DRAFT');
   const templateBlocker=generationTemplateBlocker(job);
   if(templateBlocker)return Response.json({jobId:job.id,generationEnabled:false,blocker:templateBlocker,chargedCredits:0,creditsReserved:0,quoteToken:null},{status:200,headers:{'Cache-Control':'no-store'}});
+  const historyBlocker=await generationRejectionHold(database,job);
+  if(historyBlocker)return Response.json({jobId:job.id,generationEnabled:false,blocker:historyBlocker,creditsReserved:0,chargedCredits:0,quoteToken:null},{headers:{'Cache-Control':'no-store'}});
   const providerName=generationProviderName(job);
   const resolution=body.resolution??'720p';
   const {input,sourceSeconds,referenceSeconds}=await prepareGenerationInput(database,job,resolution);
