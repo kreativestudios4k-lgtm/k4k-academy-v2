@@ -1,3 +1,5 @@
+import {createClient} from '@supabase/supabase-js';
+import {financeEnabled,reconcileAffiliateEvent} from '../../../../lib/server/affiliate-finance.mjs';
 import {scopeManualPixTestEvent} from '../../../../lib/server/manual-pix-webhook-scope.mjs';
 import {NextResponse} from 'next/server';
 import {verifyStripeSignature} from '../../../../lib/server/stripe-billing.mjs';
@@ -123,6 +125,9 @@ export async function POST(request) {
       const target=firstPaidAppSubscription(event);
       if(target)await ensureAppRenewalHold(target);
     }
+    // Affiliate accounting runs only after the existing entitlement transaction.
+    // A retry replays the idempotent payment handler and then the independent ledger.
+    if(production&&financeEnabled())await reconcileAffiliateEvent(event,{db:createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}})});
     return NextResponse.json({received: true, type: event.type, ...result}, {status: 200, headers: NO_STORE});
   } catch (error) {
     // Any failure returns 503 so Stripe retries the event later.

@@ -2,6 +2,7 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
+import AffiliateFinance from './AffiliateFinance';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 export default function PartnerDashboard(){
@@ -19,5 +20,6 @@ export default function PartnerDashboard(){
  <div className="k4k-account-summary">{[[tr('REFERRALS','INDICAÇÕES','REFERIDOS'),data.referred],[tr('PAID SIGNUPS','INSCRIÇÕES PAGAS','REGISTROS PAGADOS'),data.paid],[tr('ACTIVE SUBSCRIPTIONS','ASSINATURAS ATIVAS','SUSCRIPCIONES ACTIVAS'),data.activeSubscriptions]].map(([label,value])=><section className="k4k-account-panel" key={label}><span>{label}</span><strong className="k4k-account-balance">{value}</strong></section>)}</div>
  <section className="k4k-account-panel"><h2>{tr('Partnership terms','Condições da parceria','Condiciones de la colaboración')}</h2><p>{tr('Fixed monthly fee','Cachê mensal fixo','Honorarios mensuales fijos')}: R$ 0</p><p>{tr('No guaranteed free credits','Sem créditos gratuitos garantidos','Sin créditos gratuitos garantizados')}</p><p>{tr('Commission only: ','Somente comissão: ','Solo comisión: ')}{data.commissionBps/100}% {tr('of eligible collected subscription revenue. No exclusivity required.','da receita elegível recebida em assinaturas. Sem exigência de exclusividade.','de ingresos elegibles cobrados por suscripciones. Sin exclusividad.')}</p></section>
  <section className="k4k-account-panel"><h2>{tr('Commission agreement','Acordo de comissão','Acuerdo de comisión')} · {data.commissionBps/100}%</h2><p>{tr('Referral statistics are not a payable commission balance. Commission statements and payout reviews will follow your signed agreement.','Os dados de indicação não representam um saldo de comissão a receber. Os extratos e a revisão de pagamentos seguirão seu contrato assinado.','Las estadísticas no constituyen saldo de comisiones pagadero. Los extractos y revisiones seguirán el acuerdo firmado.')}</p></section>
+ <AffiliateFinance/>
  </>}</div></PreviewShell>;
 }
