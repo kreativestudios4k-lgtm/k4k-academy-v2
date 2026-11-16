@@ -37,7 +37,9 @@
       "audio": true,
       "mediaId": "e89e7dcd-6fd9-4523-a3ab-4cd0cc0680bf",
       "requiredImages": 2,
-      "characterCountReview": "Replacement-photo count confirmed by creator."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/f9YYTaB-Zkr2hCn40Abta_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-003",
@@ -49,7 +51,9 @@
       "audio": true,
       "mediaId": "d2b91625-63b9-4689-a863-6fcb4891269e",
       "requiredImages": 5,
-      "characterCountReview": "Minimum five replacement characters; exact count needs confirmation."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/lrSDQmxqmHIDpkmJxsC-5_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-004",
@@ -85,7 +89,9 @@
       "audio": true,
       "mediaId": "eaf0996f-ddee-42a5-b8e2-0e8428202ccc",
       "requiredImages": 1,
-      "characterCountReview": "Only one character is replaced; two men in suits stay unchanged."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/lJr2ZKlgN3gA9nsd1Ai1r_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-007",
@@ -109,7 +115,9 @@
       "audio": true,
       "mediaId": "8865c2a5-3ffa-47a5-8732-9738322693ea",
       "requiredImages": 2,
-      "characterCountReview": "Replacement-photo count confirmed by creator."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/8CUIKBGvdjW6hI8oXi9XU_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-009",
@@ -121,7 +129,9 @@
       "audio": true,
       "mediaId": "a36a40af-61ed-4445-87c5-71f8e8fb293e",
       "requiredImages": 2,
-      "characterCountReview": "Replacement-photo count confirmed by creator."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/u-9vgq_i8Bd-pOavGOB10_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-010",
@@ -133,7 +143,9 @@
       "audio": true,
       "mediaId": "efb4dfc3-be3a-4b60-98ab-1f0709ad3910",
       "requiredImages": 4,
-      "characterCountReview": "Replacement-photo count confirmed by creator."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/ooMGDBBzMffSTR4wAtQ-p_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-011",
@@ -145,7 +157,9 @@
       "audio": true,
       "mediaId": "3bdabaf1-ef04-41ae-a7a3-3aa6ef58b497",
       "requiredImages": 1,
-      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/J6X-Ml1RKl5m11w29sIFn_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-012",
@@ -193,7 +207,9 @@
       "audio": true,
       "mediaId": "1068fef2-baf2-4610-b868-4b99571d1694",
       "requiredImages": 1,
-      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a2/LUljjnqd37N8lfPq9tczo_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-016",
@@ -217,7 +233,9 @@
       "audio": true,
       "mediaId": "2e8146f8-a6e2-415b-87d1-b9d5906fa5d3",
       "requiredImages": 1,
-      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/SgvwbfFwT3J0UUOWWlbik_output.mp4",
+      "generationDurationSeconds": 14.8
     },
     {
       "id": "k4k-018",
@@ -229,7 +247,9 @@
       "audio": true,
       "mediaId": "d9490915-df2d-427c-9f6d-833f0cff7e5e",
       "requiredImages": 2,
-      "characterCountReview": "Provisional primary subject count from three sampled frames; verify the full clip before paid generation."
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference.",
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/r8IWRIRT1iNn4UAWHQ2RM_output.mp4",
+      "generationDurationSeconds": 14.8
     }
   ],
   "discoveryPreviews": [
@@ -259,7 +279,10 @@
       "title": "K4K Original 04",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29adb/vTgYxD0vx5Ce0kw_o6kG-_higgsfield-b5651126-aa51-4126-b253-36f102c2bcce.mp4",
       "durationSeconds": 22.1,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/5cv-ht7SSmy_LVBbYGpva_output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-1",
@@ -273,7 +296,10 @@
       "title": "Pitch Invasion",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29126/5r8gBlT-JHql5wTCLLaev_higgsfield-14d8e3a0-6564-4647-8011-e00fcf606eed.mp4",
       "durationSeconds": 24,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/98HQiLpZdDE1I9EQdUrXi_output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-3",
@@ -287,28 +313,40 @@
       "title": "Street Court",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29127/EazWlisHQZMbfyJ5Rwz6j_higgsfield-12f3f57f-6ec8-4563-bf3e-0707522c3284.mp4",
       "durationSeconds": 15,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6ab/qSDa5GH3xzKpikn0_Uz1m_output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-5",
       "title": "Night Football",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29127/Bvk63mKZJROdI4IInmVC-_higgsfield-5a956e2b-e691-4ca3-b51a-c763cecbbab4.mp4",
       "durationSeconds": 26,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/XW7I1kOqVxu79U1zxKGx__output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-6",
       "title": "Stadium Entrance",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29128/4xXofpIsFtJHbKNZ_WC3F_higgsfield-e4e73e76-c107-4639-b320-fff51e25b69a%281%29.mp4",
       "durationSeconds": 23,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/FE1gsKgnicJ-nIu0dR2rY_output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-7",
       "title": "Living Room Dance",
       "videoUrl": "https://v3b.fal.media/files/b/0ab29128/m76xZpIYoQtJ2yZJas2mH_higgsfield-f7abecea-0470-4aee-b819-20f4b2ca9c54.mp4",
       "durationSeconds": 29,
-      "previewOnly": true
+      "previewOnly": true,
+      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/MsPrsnmKurYDTxzkq0_Vo_output.mp4",
+      "generationDurationSeconds": 14.8,
+      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
     },
     {
       "id": "new-8",

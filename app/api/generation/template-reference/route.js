@@ -1,6 +1,7 @@
 import {generationEnvironmentAllowed} from '../../../../lib/server/generation-policy.mjs';
 import {randomUUID} from 'node:crypto';
 import {createClient} from '@supabase/supabase-js';
+import {generationReference} from '../../../../lib/template-generation.mjs';
 import catalogue from '../../../k4k-app/template-catalogue.json';
 import {mp4DurationSeconds} from '../../../../lib/server/mp4-duration.mjs';
 export const runtime='nodejs';
@@ -20,7 +21,9 @@ export async function POST(request){
   const preset=[...catalogue.trending,...catalogue.discoveryPreviews].find(item=>item.id===templateId);
   if(!preset)return json({error:'INVALID_TEMPLATE'},400);
   // Browser supplies only a catalogue ID, never a fetch URL or storage owner.
-  const source=new URL(preset.videoUrl);
+  const reference=generationReference(preset);
+  if(!reference.supported)throw Error('TEMPLATE_DURATION_INVALID');
+  const source=new URL(reference.url);
   if(source.protocol!=='https:'||!['d2ol7oe51mr4n9.cloudfront.net','v3b.fal.media'].includes(source.hostname))throw Error('TEMPLATE_UNAVAILABLE');
   const response=await fetch(source.href,{redirect:'error',cache:'no-store',signal:AbortSignal.timeout(20000)});
   if(!response.ok||!response.body)throw Error('TEMPLATE_UNAVAILABLE');
