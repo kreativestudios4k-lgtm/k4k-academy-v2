@@ -10,7 +10,7 @@ import './creative-home.css';
 
 const featured=[...new Map([...catalogue.trending,...catalogue.discoveryPreviews,...catalogue.topPerforming].filter(item=>item.videoUrl&&item.posterUrl).map(item=>[item.id,item])).values()];
 const models=[
- {name:'K4K Motion',tag:'PREMIUM · SWAP',detail:'Genjutsu-powered character replacement · API pilot',path:'/k4k-app/create',symbol:'motion'},
+ {name:'K4K Motion',tag:'PREMIUM · SWAP',detail:'Premium character replacement · preview access',path:'/k4k-app/create',symbol:'motion'},
  {name:'K4K Remix',tag:'WAN-POWERED · AVAILABLE',detail:'Reference-led video creation with your own characters',path:'/k4k-app/creator',symbol:'video'},
  {name:'Seedance 2.5',tag:'PREVIEW',detail:'Cinematic video and visual references',path:'/k4k-app/create',symbol:'video'},
  {name:'Kling 4.0',tag:'PREVIEW',detail:'Create from text, images and keyframes',path:'/k4k-app/create',symbol:'video'},
