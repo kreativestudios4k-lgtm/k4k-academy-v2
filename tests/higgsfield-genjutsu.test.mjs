@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,genjutsuInput,genjutsuEstimate,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu.mjs';
+import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,genjutsuInput,genjutsuEstimate,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu-motion.mjs';
 const v='https://assets.example.com/input.mp4',images=['https://assets.example.com/character1.jpg','https://assets.example.com/character2.png'];
 test('official endpoint and published second-based rates are preserved',()=>{
  assert.equal(GENJUTSU_MODEL_ID,'higgsfield/genjutsu/motion-transfer/v1.0');
