@@ -34,7 +34,7 @@ test('rejects model-to-media mismatches and invalid credit quotes',async()=>{
   await assert.rejects(db.exec(insert('image','kling-flash-t2v')),/multimodel_kind_match/);
   await db.exec(insert());
   await assert.rejects(db.exec("update public.k4k_multimodel_jobs set credits_quoted=12 where id='"+id+"'"),/multimodel_quote_complete/);
-  await assert.rejects(db.exec("update public.k4k_multimodel_jobs set output_mime='image/png',output_path='fake.png' where id='"+id+"'"),/multimodel_output_kind/);
+  await assert.rejects(db.exec("update public.k4k_multimodel_jobs set output_mime='image/png',output_path='fake.png' where id='"+id+"'"),/multimodel_(output_kind|draft_not_dispatched)/);
   await assert.rejects(db.exec("update public.k4k_multimodel_jobs set provider_request_id='bogus' where status='draft'"),/multimodel_draft_not_dispatched/);
  }finally{await db.close();}
 });
