@@ -10,8 +10,18 @@ test('profile IDs are stable, complete, unique and never derived from an email',
 test('auth controls use verified identity, immediate sign-out and safe return destinations',()=>{
  const src=p=>readFileSync(p,'utf8');const hook=src('app/k4k-app/useVerifiedAccount.js');
  assert.match(hook,/auth.getUser\(\)/);assert.match(hook,/event==='SIGNED_OUT'/);assert.match(hook,/signOut\(\{scope:'local'\}\)/);assert.match(hook,/window.location.replace\('\/'\)/);
+ assert.match(hook,/studioDestination\(next\)/);
  assert.match(src('app/k4k-app/CinematicLaunch.js'),/AccountMenu user=\{user\}/);
  assert.match(src('app/k4k-app/account/page.js'),/k4kProfileId\(user\?\.id\)/);
  assert.match(src('app/components/AcademyAuthForm.js'),/studioDestination\(requested\)/);
  assert.match(src('app/k4k-app/AccountStatus.js'),/studioDestination\(window.location.pathname\+window.location.search\)/);
+});
+
+test('account and wallet details are scoped to the currently verified user during switches',()=>{
+ const src=p=>readFileSync(p,'utf8');
+ assert.match(src('app/k4k-app/account/page.js'),/details.owner===user\?\.id/);
+ assert.match(src('app/k4k-app/account/page.js'),/data.session.user.id!==user.id/);
+ assert.match(src('app/k4k-app/AccountStatus.js'),/walletState.owner===user\?\.id/);
+ assert.match(src('app/k4k-app/useVerifiedAccount.js'),/s.user.id!==session\?\.user\?\.id/);
+ assert.match(src('app/components/AcademyAuthForm.js'),/switchAccount:true,next:/);
 });

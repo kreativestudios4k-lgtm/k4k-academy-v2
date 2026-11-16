@@ -14,19 +14,21 @@ export default function Account(){
  const {user,ready,error:accountError}=useVerifiedAccount();
  const [loading,setLoading]=useState(false),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[copied,setCopied]=useState(false);
  const profileId=k4kProfileId(user?.id);
- const [balance,setBalance]=useState(null),[jobs,setJobs]=useState([]),[membership,setMembership]=useState(null),[bonus,setBonus]=useState(null);
+ const [details,setDetails]=useState({owner:null,balance:null,jobs:[],membership:null,bonus:null});
+ const current=details.owner===user?.id?details:{balance:null,jobs:[],membership:null,bonus:null};
+ const {balance,jobs,membership,bonus}=current;
  useEffect(()=>{
-  let alive=true;setBalance(null);setJobs([]);setMembership(null);setBonus(null);
+  let alive=true;setDetails({owner:null,balance:null,jobs:[],membership:null,bonus:null});setCopied(false);
   if(!user?.id)return;
   const client=createClient();setLoading(true);setMessage('');
   Promise.all([
    client.from('studio_generation_jobs').select('id,status,model,created_at').eq('user_id',user.id).order('created_at',{ascending:false}).limit(6),
-   client.auth.getSession().then(({data})=>fetch('/api/billing/account',{headers:{Authorization:'Bearer '+data.session?.access_token},cache:'no-store'})).then(async response=>({data:response.ok?await response.json():null,error:!response.ok})),
+   client.auth.getSession().then(async ({data})=>{if(!data.session||data.session.user.id!==user.id)return {data:null,error:true};const response=await fetch('/api/billing/account',{headers:{Authorization:'Bearer '+data.session.access_token},cache:'no-store'});return {data:response.ok?await response.json():null,error:!response.ok}}),
    client.from('k4k_academy_migration_bonuses').select('status').eq('user_id',user.id).maybeSingle()
   ]).then(([history,plan,gift])=>{
    if(!alive)return;
    if(history.error||plan.error){setMessage('Some account details are unavailable. Please retry or contact support.');return;}
-   setBalance(plan.data?.creditBalance??0);setJobs(history.data||[]);setMembership(plan.data);if(!gift.error)setBonus(gift.data?.status||null);
+   setDetails({owner:user.id,balance:plan.data?.creditBalance??0,jobs:history.data||[],membership:plan.data,bonus:gift.error?null:gift.data?.status||null});
   }).catch(()=>{if(alive)setMessage('Unable to load account activity. Please retry.');}).finally(()=>{if(alive)setLoading(false)});
   return()=>{alive=false};
  },[user?.id]);

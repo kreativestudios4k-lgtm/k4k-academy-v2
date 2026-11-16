@@ -217,3 +217,5 @@
 .kc-three .kc-header{overflow:visible}
 .kc-three .kc-nav-inner{overflow:visible}
 @media(max-width:480px){.kc-three .kc-header-right .kc-join{font-size:11px;padding:9px 10px}.kc-three .kc-header-right .k4k-profile-menu summary{padding:3px}}
+
+@media(max-width:420px){.kc-three .kc-header-right .kc-studio-entry{display:none}}

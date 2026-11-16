@@ -282,3 +282,6 @@
 .kx-auth .k4k-auth-submit:hover{background:#ddd;color:#080808}
 .kx-auth .k4k-auth-card h1{font-family:Arial,Helvetica,sans-serif;font-weight:900;letter-spacing:-.05em}
 .kx-auth .kx-brand-mark{background:#141414;border-color:#555;box-shadow:none}
+
+.k4k-auth-existing{display:grid;gap:10px;margin-top:16px}.k4k-auth-existing p{margin:0;overflow-wrap:anywhere}
+.k4k-auth-existing .k4k-auth-submit,.k4k-auth-existing .k4k-auth-google{width:100%;justify-content:center}
