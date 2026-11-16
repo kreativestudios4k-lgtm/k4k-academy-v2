@@ -107,13 +107,13 @@ test('cinematic desktop navigation cannot cover authentication actions',()=>{
 test('the shared monochrome foundation is loaded and applied across customer surfaces',()=>{
  assert.match(source('app/layout.js'),/import '\.\/k4k-monochrome\.css'/);
  const theme=source('app/k4k-monochrome.css');
- for(const token of ['--k4k-bg:#080808','--k4k-panel:#141414','--k4k-fg:#faf9f6','--k4k-muted:#b5b5b5'])assert.ok(theme.includes(token),token);
+ for(const token of ['--k4k-bg:#030303','--k4k-panel:#111111','--k4k-fg:#ffffff','--k4k-muted:#b5b5b5'])assert.ok(theme.includes(token),token);
  for(const path of ['app/k4k-app/creator/creator.css','app/k4k-app/credits/credits.css','app/k4k-app/feed.css','app/k4k-app/video-library.css','app/k4k-app/template-sheet.css','app/kx-redesign.css','app/account-simple.css','app/course-v3.css','app/globals.css']){
   const css=source(path);
   assert.match(css,/#faf9f6/i,path+' uses warm white');
   assert.doesNotMatch(css,/#(?:c7ff36|caff39|d9ff3d)\b/i,path+' removes old neon branding');
  }
  assert.match(source('public/k4k-mark.svg'),/fill="#faf9f6"/i);
- assert.match(source('app/k4k-app/template-sheet.css'),/\.kts-sheet\{background:#141414;color:#faf9f6/);
+ assert.match(source('app/k4k-app/template-sheet.css'),/\.kts-sheet\{background:#111111;color:#faf9f6/);
  assert.match(source('app/affiliates/page.js'),/\.k4k-affiliate \.hero\{[^}]*min-height:0/);
 });

@@ -1,8 +1,8 @@
 /* K4K APP · shared design foundation. Media and semantic error/warning colours retain their meaning. */
-:root{--k4k-bg:#080808;--k4k-panel:#141414;--k4k-panel-raised:#202020;--k4k-fg:#faf9f6;--k4k-muted:#b5b5b5;--k4k-line:#383838;--k4k-accent:#faf9f6;--k4k-radius:16px;--k4k-font:Arial,Helvetica,sans-serif}
+:root{--k4k-bg:#030303;--k4k-panel:#111111;--k4k-panel-raised:#202020;--k4k-fg:#ffffff;--k4k-muted:#b5b5b5;--k4k-line:#383838;--k4k-accent:#ffffff;--k4k-radius:16px;--k4k-font:Arial,Helvetica,sans-serif}
 html{color-scheme:dark}
 body{background:var(--k4k-bg);color:var(--k4k-fg);font-family:var(--k4k-font)}
-::selection{background:#faf9f6;color:#080808}
+::selection{background:#faf9f6;color:#030303}
 :is(.kc-launch,.k4k-light,.k4k-register,.kx-auth,.kf,.k4k-template-workflow,.k4k-affiliate,.authpage,.legalPage,.k4k-classroom) :focus-visible{outline:2px solid #faf9f6;outline-offset:3px}
 :is(.k4k-light,.kf,.k4k-register,.kx-auth,.k4k-template-workflow,.k4k-affiliate) button:disabled{cursor:not-allowed}
 :is(.k4k-light,.kf,.k4k-register,.kx-auth,.k4k-template-workflow,.k4k-affiliate) input[type=checkbox],:is(.k4k-light,.kf,.k4k-register,.kx-auth,.k4k-template-workflow,.k4k-affiliate) input[type=range]{accent-color:#faf9f6}
@@ -11,8 +11,13 @@ body{background:var(--k4k-bg);color:var(--k4k-fg);font-family:var(--k4k-font)}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 /* Shared visual hierarchy, without altering the existing tool navigation. */
-.authpage{background:#080808;color:#faf9f6}
-.authpage>form,.authPremiumCard{background:#141414;border-color:#383838;border-radius:16px}
+.authpage{background:#030303;color:#faf9f6}
+.authpage>form,.authPremiumCard{background:#111111;border-color:#383838;border-radius:16px}
 .authpage button,.authpage .authEnter{border-radius:999px}
 .authpage input{background:#181818;color:#faf9f6;border-color:#444;border-radius:10px}
 .k4k-register,.kx-auth,.k4k-affiliate,.k4k-light{--k4k-radius:16px}
+
+/* Deep-black contrast refinement: keep media and semantic colours untouched. */
+body{background:#030303;color:#fff}
+:is(.kc-three,.k4k-light,.k4k-register,.kx-auth,.kf,.k4k-affiliate,.authpage,.legalPage,.k4k-classroom,.k4k-template-workflow){background-color:#030303;color:#fff}
+:is(.kc-three,.k4k-light,.k4k-register,.kx-auth,.kf,.k4k-affiliate,.authpage,.legalPage,.k4k-classroom) :is(h1,h2,h3){color:#fff}

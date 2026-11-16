@@ -8,7 +8,7 @@
 .kf:not(.kf-waitlist) .kf-tabs button[aria-pressed=true]:after{background:white;width:26px;height:3px}
 .kf:not(.kf-waitlist) .kf-scroll{height:calc(100% - 110px)}
 .kf:not(.kf-waitlist) .kf-slide{background:#101010;display:flex;flex-direction:column;justify-content:flex-end;padding:0 0 16px}
-.kf:not(.kf-waitlist) .kf-slide>video{position:relative;inset:auto;flex:1;min-height:0;height:auto;max-height:calc(100% - 170px);object-fit:contain;background:#080808}
+.kf:not(.kf-waitlist) .kf-slide>video{position:relative;inset:auto;flex:1;min-height:0;height:auto;max-height:calc(100% - 170px);object-fit:contain;background:#030303}
 .kf:not(.kf-waitlist) .kf-shade,.kf:not(.kf-waitlist) .kf-top-hook{display:none}
 .kf:not(.kf-waitlist) .kf-caption{position:relative;inset:auto;padding:12px 12px 0}
 .kf:not(.kf-waitlist) .kf-caption h2{font-size:26px;margin:7px 0;text-shadow:none}

@@ -39,5 +39,5 @@
 @media(prefers-reduced-motion:reduce){.kl-gallery .kl-state svg{animation:none!important}}
 
 .kl-gallery,.kl-library{--kl-lime:#faf9f6;color:#faf9f6}
-.kl-gallery,.kl-gallery-header{background:#080808}
-.kl-gallery-bottom button,.kl-gallery-header a{background:#faf9f6;color:#080808!important}
+.kl-gallery,.kl-gallery-header{background:#030303}
+.kl-gallery-bottom button,.kl-gallery-header a{background:#faf9f6;color:#030303!important}

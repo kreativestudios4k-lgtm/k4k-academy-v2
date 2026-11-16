@@ -1,5 +1,5 @@
 /* Public K4K registration uses the same monochrome visual identity as the studio. */
-.k4k-register{min-height:100dvh;background:radial-gradient(ellipse at 50% 0%,#424242 0%,#141414 42%,#090909 82%);color:#faf9f6;padding:55px 16px;font-family:Arial,Helvetica,sans-serif}
+.k4k-register{min-height:100dvh;background:radial-gradient(ellipse at 50% 0%,#424242 0%,#111111 42%,#090909 82%);color:#faf9f6;padding:55px 16px;font-family:Arial,Helvetica,sans-serif}
 .k4k-register *{box-sizing:border-box}
 .k4k-register-card{width:min(100%,480px);margin:3vh auto;padding:clamp(25px,5vw,38px);background:linear-gradient(150deg,#212121,#121212);border:1px solid #616161;border-radius:25px;box-shadow:0 24px 85px #0009,0 0 45px #faf9f610}
 .k4k-register-logo{display:inline-block;font-size:22px;font-weight:900;letter-spacing:-1px;color:#faf9f6;text-decoration:none;margin-bottom:23px}
@@ -39,7 +39,9 @@
 @media(max-width:860px){.k4k-register-layout{max-width:510px;grid-template-columns:1fr;gap:22px}.k4k-register-hero{padding:12px 0 0}.k4k-register-hero h2{font-size:clamp(48px,10vw,70px);margin:14px 0}.k4k-register-hero p{font-size:15px;margin-bottom:0}.k4k-register-hero-tags{margin-top:16px}.k4k-register-card{padding:28px 24px}}
 @media(max-width:520px){.k4k-register{padding:28px 16px}.k4k-register-hero h2{font-size:clamp(45px,12vw,64px)}.k4k-register-hero-tags span{font-size:9px;padding:8px 10px}.k4k-register-card{padding:25px 20px}}
 
-.k4k-register{background:#080808;color:#faf9f6;color-scheme:dark}
-.k4k-register-card{background:#141414;border-color:#383838;box-shadow:0 24px 85px #0009}
+.k4k-register{background:#030303;color:#faf9f6;color-scheme:dark}
+.k4k-register-card{background:#111111;border-color:#383838;box-shadow:0 24px 85px #0009}
 .k4k-register-card input{background:#181818;border-color:#444;color:#faf9f6}
-.k4k-register-card form button[type=submit],.k4k-register-card form button:not([type]){background:#faf9f6!important;color:#080808!important;border-radius:999px!important}
+.k4k-register-card form button[type=submit],.k4k-register-card form button:not([type]){background:#faf9f6!important;color:#030303!important;border-radius:999px!important}
+
+.k4k-register{background:#030303;color:#fff}.k4k-register-card{background:#111111;border-color:#303030}.k4k-register-card h1{color:#fff}.k4k-register-card form button[type=submit],.k4k-register-card form button:not([type]){background:#fff!important;color:#030303!important}

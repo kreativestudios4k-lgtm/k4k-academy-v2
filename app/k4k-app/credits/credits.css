@@ -44,5 +44,5 @@
 
 .k4k-plan-account-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 20px;background:#faf9f6;color:#111!important;font-weight:800;border-radius:12px;text-decoration:none;white-space:normal;text-align:center}.k4k-plan-account-cta:hover{filter:brightness(1.08)}
 
-.k4k-light .k4k-pricing-plan{background:#141414;border-color:#333;color:#faf9f6}
+.k4k-light .k4k-pricing-plan{background:#111111;border-color:#333;color:#faf9f6}
 .k4k-light .k4k-pricing-plan.selected{background:#1d1d1d;border-color:#faf9f6;box-shadow:0 0 0 1px #faf9f620}
