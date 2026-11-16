@@ -4,6 +4,7 @@ import Link from 'next/link';
 import {ArrowRight,ArrowUpRight,Images,Film,Layers,Upload,Plus,X,Copy,Check,ShieldCheck,Sparkles,SlidersHorizontal,Play,CheckCircle2,Clock3} from 'lucide-react';
 import {CREATION_MODELS,creationModels,creationModelGroups,creationBrief} from '../../../lib/creation-studio-catalog.mjs';
 import {useK4KLocale} from '../locale';
+import {createClient} from '../../../lib/supabase/client';
 import './create.css';
 const UI={en:{eyebrow:'K4K CREATIVE STUDIO',headline:'Create without limits.',subtitle:'Image and video workflows in one place. Choose a model, prepare your references and build your next idea.',images:'Images',videos:'Videos',models:'AI MODELS',settings:'CREATIVE CONTROLS',prompt:'Your prompt',placeholder:'Describe your scene, lighting, characters, movement and mood…',mode:'Workflow',resolution:'Quality',ratio:'Aspect ratio',duration:'Duration',reference:'Reference images',add:'Add references',preview:'Prepared references',copy:'Copy creative brief',copied:'Copied',active:'K4K Remix available',pilot:'API preview',pending:'Integration planned',open:'Open K4K Remix',ready:'Preview only — generation not connected',note:'No credits are charged on this page. Pending models cannot generate yet.',actions:'NEXT STEP',library:'My videos',explore:'Explore templates',title:'Your creation starts here',hint:'K4K Motion is premium character swapping. K4K Remix (Wan-powered) is the standard video generation tool.'},pt:{eyebrow:'K4K ESTÚDIO CRIATIVO',headline:'Crie sem limites.',subtitle:'Imagem e vídeo no mesmo lugar. Escolha um modelo, prepare suas referências e desenvolva sua ideia.',images:'Imagens',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CRIATIVOS',prompt:'Seu prompt',placeholder:'Descreva sua cena, iluminação, personagens, movimento e atmosfera…',mode:'Ferramenta',resolution:'Qualidade',ratio:'Proporção',duration:'Duração',reference:'Imagens de referência',add:'Adicionar referências',preview:'Referências preparadas',copy:'Copiar briefing',copied:'Copiado',active:'K4K Remix disponível',pilot:'Prévia da API',pending:'Integração planejada',open:'Abrir K4K Remix',ready:'Prévia — geração ainda não conectada',note:'Nenhum crédito é cobrado nesta página. Os novos modelos ainda não podem gerar.',actions:'PRÓXIMO PASSO',library:'Meus vídeos',explore:'Explorar templates',title:'Sua criação começa aqui',hint:'Escolha um modelo e prepare seu briefing. Use o K4K Remix enquanto conectamos os modelos premium.'},es:{eyebrow:'K4K ESTUDIO CREATIVO',headline:'Crea sin límites.',subtitle:'Imágenes y vídeo en un solo lugar. Elige un modelo y prepara tus referencias.',images:'Imágenes',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CREATIVOS',prompt:'Tu prompt',placeholder:'Describe tu escena, iluminación, personajes, movimiento y ambiente…',mode:'Flujo',resolution:'Calidad',ratio:'Formato',duration:'Duración',reference:'Imágenes de referencia',add:'Agregar referencias',preview:'Referencias preparadas',copy:'Copiar briefing',copied:'Copiado',active:'K4K Remix disponible',pilot:'Vista previa API',pending:'Integración pendiente',open:'Abrir K4K Remix',ready:'Vista previa — generación aún no conectada',note:'No se cobran créditos aquí. Los modelos pendientes aún no generan.',actions:'SIGUIENTE PASO',library:'Mis vídeos',explore:'Explorar plantillas',title:'Tu creación comienza aquí',hint:'Selecciona un modelo y prepara el briefing. Puedes seguir usando K4K Remix.'}};
 export default function CreativeStudio(){
@@ -12,6 +13,69 @@ export default function CreativeStudio(){
  const model=useMemo(()=>CREATION_MODELS.find(x=>x.id===id)||CREATION_MODELS[0],[id]);
  const [mode,setMode]=useState(model.modes[0]),[resolution,setResolution]=useState(model.resolution[0]),[aspect,setAspect]=useState(model.aspect[0]),[duration,setDuration]=useState(model.duration?.[0]||5);
  const [prompt,setPrompt]=useState(''),[files,setFiles]=useState([]),[copied,setCopied]=useState(false),[error,setError]=useState('');
+ const [liveModels,setLiveModels]=useState([]),[apiReady,setApiReady]=useState(false),[generating,setGenerating]=useState(false),[generation,setGeneration]=useState(null);
+ const productId={'kling_4_0_flash':'kling-flash-t2v','flux_3_image':'flux3-t2i','nano_banana_2':'nano-banana-21-t2i'};
+ const modelEnabled=liveModels.includes(model.id)&&!!productId[model.id];
+ useEffect(()=>{let alive=true;fetch('/api/multimodel',{cache:'no-store'}).then(r=>r.json()).then(data=>{if(alive){setLiveModels(data.enabled?data.models||[]:[]);setApiReady(true)}}).catch(()=>{if(alive)setApiReady(true)});return()=>{alive=false}},[]);
+ async function sessionToken(){const {data,error}=await createClient().auth.getSession();if(error||!data?.session?.access_token)throw Error('Please log in before generating.');return data.session.access_token}
+ async function apiCall(action,payload,token){const response=await fetch('/api/multimodel',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({action,...payload})});const data=await response.json();if(!response.ok)throw Error(data.error||'Generation unavailable');return data}
+ async function generate(){
+  if(generating||!modelEnabled)return;
+  setError('');setGeneration(null);
+  if(files.length){setError('This model currently supports text prompts only. Remove reference images before generating.');return}
+  if(!prompt.trim()){setError('Write a prompt before generating.');return}
+  setGenerating(true);
+  try{
+   const token=await sessionToken();
+   const parameters={prompt:prompt.trim(),aspect_ratio:aspect,resolution,...(model.kind==='video'?{duration}:{} )};
+   const quote=await apiCall('quote',{modelId:productId[model.id],parameters},token);
+   if(!quote.canSubmit){setError('You need '+quote.customerCredits+' credits. Available: '+quote.balance+'.');setGenerating(false);return}
+   if(!window.confirm('Generate with '+model.name+'? This will reserve '+quote.customerCredits+' K4K credits. Estimated provider cost: 
+ function chooseModel(next){setGeneration(null);setId(next.id);setMode(next.modes[0]);setResolution(next.resolution[0]);setAspect(next.aspect[0]);setDuration(next.duration?.[0]||5);setFiles(old=>old.slice(0,next.refs));setError('');}
+ function chooseKind(next){setKind(next);chooseModel(creationModels(next)[0]);}
+ async function copyBrief(){try{const brief=creationBrief(model,{mode,resolution,aspect,duration,prompt,references:files.length});await navigator.clipboard.writeText(brief);setCopied(true);setError('')}catch(e){setCopied(false);setError(e.message==='PROMPT_REQUIRED'?(locale==='pt'?'Adicione um prompt antes de copiar.':'Write a prompt before copying.'):'Clipboard is unavailable.')} }
+ function addFiles(list){const accepted=Array.from(list||[]).filter(f=>['image/jpeg','image/png','image/webp'].includes(f.type)&&f.size<=10*1024*1024);setFiles(old=>[...old,...accepted].slice(0,model.refs));setError(accepted.length<Array.from(list||[]).length?'Use JPG, PNG or WebP files up to 10 MB.':'')}
+ const [thumbnails,setThumbnails]=useState([]);useEffect(()=>{const urls=files.map(f=>URL.createObjectURL(f));setThumbnails(urls);return()=>urls.forEach(u=>URL.revokeObjectURL(u))},[files]);
+ return <main className="kcs-root">
+  <header className="kcs-nav"><Link className="kcs-brand" href="/k4k-app">K4K<span> APP</span></Link><nav><Link href="/k4k-app/motion">K4K Motion · Templates</Link><Link href="/k4k-app/videos">{t.library}</Link><Link href="/k4k-app/creator">K4K Remix <ArrowUpRight size={15}/></Link></nav></header>
+  <div className="kcs-shell">
+   <section className="kcs-hero"><div className="kcs-eyebrow"><Sparkles size={13}/>{t.eyebrow}</div><h1>{t.headline}</h1><p>{t.subtitle}</p><div className="kcs-segments" role="tablist" aria-label="Output type"><button role="tab" aria-selected={kind==='video'} className={kind==='video'?'selected':''} onClick={()=>chooseKind('video')}><Film size={18}/>{t.videos}</button><button role="tab" aria-selected={kind==='image'} className={kind==='image'?'selected':''} onClick={()=>chooseKind('image')}><Images size={18}/>{t.images}</button></div></section>
+   <div className="kcs-layout"><aside className="kcs-models"><div className="kcs-section-label"><Layers size={15}/>{t.models}<span>{creationModels(kind).filter(item=>!item.premium).length}</span></div><div className="kcs-model-grid">{creationModelGroups(kind).filter(group=>group.id!=='swap').map(group=><div className="kcs-model-group" key={group.id}><h3 style={{fontSize:11,color:"#bbb",letterSpacing:1.2,textTransform:"uppercase",margin:"16px 0 10px"}}>{group.title}</h3>{group.models.map(item=><button key={item.id} type="button" onClick={()=>chooseModel(item)} aria-pressed={id===item.id} className={'kcs-model '+(id===item.id?'current':'')}><span className="kcs-model-icon">{item.kind==='image'?<Images size={19}/>:<Film size={19}/>}</span><span className="kcs-model-info"><strong>{item.name}{item.premium?' · '+item.resolution[0]:''}</strong><small>{item.premium?'K4K Premium':item.provider}</small><em>{item.description}</em></span><span className={'kcs-indicator '+item.status} title={item.status==='active'?t.active:item.status==='api-pilot'?t.pilot:t.pending}/></button>)}</div>)}</div></aside>
+   <section className="kcs-compose"><div className="kcs-compose-top"><div className="kcs-section-label"><SlidersHorizontal size={15}/>{t.settings}</div><span className={'kcs-state '+(modelEnabled?'active':model.status)}>{modelEnabled||model.status==='active'?<CheckCircle2 size={14}/>:<Clock3 size={14}/>} {modelEnabled?'Generation available':model.status==='active'?t.active:model.status==='api-pilot'?t.pilot:t.pending}</span></div>
+    <h2>{model.name}</h2><p className="kcs-desc">{model.description}</p>{model.premium&&<div className="kcs-note" role="status"><ShieldCheck size={17}/><p><strong>K4K Motion · {model.resolution[0]}</strong> — Premium character swap is in preview. Generation and credit checkout are not yet available.</p></div>}
+    <div className="kcs-fields"><label>{t.mode}<select value={mode} onChange={e=>setMode(e.target.value)}>{model.modes.map(v=><option key={v}>{v}</option>)}</select></label><label>{t.resolution}<select value={resolution} onChange={e=>setResolution(e.target.value)}>{model.resolution.map(v=><option key={v}>{v}</option>)}</select></label><label>{t.ratio}<select value={aspect} onChange={e=>setAspect(e.target.value)}>{model.aspect.map(v=><option key={v}>{v}</option>)}</select></label>{model.duration&&<label>{t.duration}<select value={duration} onChange={e=>setDuration(Number(e.target.value))}>{Array.from({length:model.duration[1]-model.duration[0]+1},(_,i)=>model.duration[0]+i).map(n=><option value={n} key={n}>{n}s</option>)}</select></label>}</div>
+    <label className="kcs-prompt-label">{t.prompt}<textarea value={prompt} maxLength={10000} onChange={e=>{setPrompt(e.target.value);setCopied(false)}} placeholder={t.placeholder} rows={6}/></label>
+    <div className="kcs-reference-head"><strong>{t.reference}</strong><span>{files.length} / {model.refs}</span></div><div className="kcs-refs">{thumbnails.map((url,i)=><div key={url} className="kcs-thumb"><img alt={'Reference '+(i+1)} src={url}/><button aria-label={'Remove reference '+(i+1)} onClick={()=>setFiles(old=>old.filter((_,j)=>j!==i))}><X size={13}/></button></div>)}{model.refs>0&&files.length<model.refs&&<label className="kcs-add"><Plus size={21}/><span>{t.add}</span><input multiple accept="image/png,image/jpeg,image/webp" type="file" onChange={e=>{addFiles(e.target.files);e.target.value=''}}/></label>}</div>
+    <div className="kcs-note"><ShieldCheck size={17}/><p>{t.note} {model.kind==='video'&&model.status==='active'?'K4K Remix uses the existing Wan-powered video generator. Premium K4K Motion is a separate character swap pilot.':''}</p></div>
+    {error&&<p className="kcs-error" role="alert">{error}</p>}
+    {generation&&<div className="kcs-generation" role="status"><strong>Generation: {generation.status}</strong>{generation.url&&(generation.kind==='image'?<img src={generation.url} alt="Your generated image"/>:<video src={generation.url} controls playsInline/>)}{generation.url&&<a href={generation.url} target="_blank" rel="noreferrer">Open generated file <ArrowUpRight size={15}/></a>}{generation.status==='failed'&&<p>This generation failed. Reserved credits have been refunded.</p>}</div>}
+    <div className="kcs-actions"><button type="button" onClick={copyBrief} className="kcs-copy">{copied?<Check size={17}/>:<Copy size={17}/>} {copied?t.copied:t.copy}</button>{modelEnabled?<button className="kcs-launch" type="button" disabled={generating} onClick={generate}><Sparkles size={17}/>{generating?'Preparing quote…':'Generate with credits'}<ArrowRight size={17}/></button>:model.cta?<Link className="kcs-launch" href={model.cta}><Play size={17}/>{t.open}<ArrowRight size={17}/></Link>:<span className="kcs-disabled"><Clock3 size={17}/>{apiReady?t.ready:'Checking availability…'}</span>}</div>
+   </section></div>
+  </div>
+ </main>;
+}
++Number(quote.estimatedProviderUsd).toFixed(2)+'. Proceed?')){setGenerating(false);return}
+   await apiCall('submit',{jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey:crypto.randomUUID()},token);
+   setGeneration({jobId:quote.jobId,status:'processing',kind:model.kind});
+  }catch(e){setError(e.message||'Generation failed.')}finally{setGenerating(false)}
+ }
+ useEffect(()=>{
+  if(!generation?.jobId||!['queued','processing'].includes(generation.status))return;
+  let active=true;let timer;
+  const check=async()=>{
+   try{
+    const token=await sessionToken();
+    const r=await fetch('/api/multimodel?id='+encodeURIComponent(generation.jobId),{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+    const data=await r.json();
+    if(!active)return;
+    if(r.ok){setGeneration(prev=>prev?.jobId===generation.jobId?{...prev,status:data.status,url:data.url||prev.url}:prev);}
+    else setError(data.error||'Job status temporarily unavailable');
+   }catch(e){if(active)setError(e.message||'Unable to check status')}
+   if(active)timer=setTimeout(check,5000);
+  };
+  timer=setTimeout(check,4500);
+  return()=>{active=false;clearTimeout(timer)};
+ },[generation?.jobId,generation?.status]);
  function chooseModel(next){setId(next.id);setMode(next.modes[0]);setResolution(next.resolution[0]);setAspect(next.aspect[0]);setDuration(next.duration?.[0]||5);setFiles(old=>old.slice(0,next.refs));setError('');}
  function chooseKind(next){setKind(next);chooseModel(creationModels(next)[0]);}
  async function copyBrief(){try{const brief=creationBrief(model,{mode,resolution,aspect,duration,prompt,references:files.length});await navigator.clipboard.writeText(brief);setCopied(true);setError('')}catch(e){setCopied(false);setError(e.message==='PROMPT_REQUIRED'?(locale==='pt'?'Adicione um prompt antes de copiar.':'Write a prompt before copying.'):'Clipboard is unavailable.')} }

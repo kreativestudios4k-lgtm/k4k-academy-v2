@@ -14,7 +14,7 @@ export async function POST(request){
    const estimate=multimodelQuote({modelId:body.modelId,params:body.parameters});
    const {data:account,error:accountError}=await db.from('k4k_live_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
    if(accountError||!account)throw Error('UNAVAILABLE');
-   const {data:recent,error:recentError}=await db.from('k4k_multimodel_jobs').select('id',{count:'exact',head:true}).eq('user_id',user.id).gte('created_at',new Date(Date.now()-86400000).toISOString());
+   const {count:recent,error:recentError}=await db.from('k4k_multimodel_jobs').select('id',{count:'exact',head:true}).eq('user_id',user.id).gte('created_at',new Date(Date.now()-86400000).toISOString());
    if(recentError)throw Error('UNAVAILABLE');
    if((recent??0)>30)throw Error('PROVIDER_BUDGET_BLOCKED');
    const {data,error}=await db.from('k4k_multimodel_jobs').insert({
@@ -58,6 +58,7 @@ export async function POST(request){
 }
 export async function GET(request){
  try{
+  if(!new URL(request.url).searchParams.get('id'))return reply({enabled:multimodelLiveAllowed(),models:multimodelLiveAllowed()?['kling_4_0_flash','flux_3_image','nano_banana_2']:[]});
   checkEnabled();
   const {user,db}=await multimodelAuth(request);
   const id=new URL(request.url).searchParams.get('id');
