@@ -8,8 +8,9 @@ export async function GET(request){
  const code=searchParams.get('code');
  const isPasswordRecovery=searchParams.get('flow')==='password-recovery';
  const target=new URL(isPasswordRecovery?'/update-password':studioDestination(searchParams.get('next')),origin);
- const failure=new URL(isPasswordRecovery?'/reset-password?error=expired':'/login?error=oauth',origin);
- if(!isPasswordRecovery)failure.searchParams.set('next',target.pathname+target.search);
+ const affiliate=target.pathname==='/affiliates';
+ const failure=new URL(isPasswordRecovery?'/reset-password?error=expired':affiliate?'/affiliates?error=affiliate-verification':'/login?error=oauth',origin);
+ if(!isPasswordRecovery&&!affiliate)failure.searchParams.set('next',target.pathname+target.search);
  if(!code)return NextResponse.redirect(failure);
  let response=NextResponse.redirect(target);
  const supabase=createServerClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{
@@ -20,6 +21,6 @@ export async function GET(request){
  });
  const {data,error}=await supabase.auth.exchangeCodeForSession(code);
  if(error)return NextResponse.redirect(failure);
- try{await sendWelcome(data.user)}catch{console.error('K4K welcome delivery failed')}
+ try{if(!affiliate)await sendWelcome(data.user)}catch{console.error('K4K welcome delivery failed')}
  return response;
 }
