@@ -30,7 +30,28 @@ export default function CreativeStudio(){
    const parameters={prompt:prompt.trim(),aspect_ratio:aspect,resolution,...(model.kind==='video'?{duration}:{} )};
    const quote=await apiCall('quote',{modelId:productId[model.id],parameters},token);
    if(!quote.canSubmit){setError('You need '+quote.customerCredits+' credits. Available: '+quote.balance+'.');setGenerating(false);return}
-   if(!window.confirm('Generate with '+model.name+'? This will reserve '+quote.customerCredits+' K4K credits. Estimated provider cost: 
+   if(!window.confirm('Generate with '+model.name+'? This will reserve '+quote.customerCredits+' K4K credits. Estimated provider cost: $'+Number(quote.estimatedProviderUsd).toFixed(2)+'. Proceed?')){setGenerating(false);return}
+   await apiCall('submit',{jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey:crypto.randomUUID()},token);
+   setGeneration({jobId:quote.jobId,status:'processing',kind:model.kind});
+  }catch(e){setError(e.message||'Generation failed.')}finally{setGenerating(false)}
+ }
+ useEffect(()=>{
+  if(!generation?.jobId||!['queued','processing'].includes(generation.status))return;
+  let active=true;let timer;
+  const check=async()=>{
+   try{
+    const token=await sessionToken();
+    const r=await fetch('/api/multimodel?id='+encodeURIComponent(generation.jobId),{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+    const data=await r.json();
+    if(!active)return;
+    if(r.ok){setGeneration(prev=>prev?.jobId===generation.jobId?{...prev,status:data.status,url:data.url||prev.url}:prev);}
+    else setError(data.error||'Job status temporarily unavailable');
+   }catch(e){if(active)setError(e.message||'Unable to check status')}
+   if(active)timer=setTimeout(check,5000);
+  };
+  timer=setTimeout(check,4500);
+  return()=>{active=false;clearTimeout(timer)};
+ },[generation?.jobId,generation?.status]);
  function chooseModel(next){setGeneration(null);setId(next.id);setMode(next.modes[0]);setResolution(next.resolution[0]);setAspect(next.aspect[0]);setDuration(next.duration?.[0]||5);setFiles(old=>old.slice(0,next.refs));setError('');}
  function chooseKind(next){setKind(next);chooseModel(creationModels(next)[0]);}
  async function copyBrief(){try{const brief=creationBrief(model,{mode,resolution,aspect,duration,prompt,references:files.length});await navigator.clipboard.writeText(brief);setCopied(true);setError('')}catch(e){setCopied(false);setError(e.message==='PROMPT_REQUIRED'?(locale==='pt'?'Adicione um prompt antes de copiar.':'Write a prompt before copying.'):'Clipboard is unavailable.')} }
