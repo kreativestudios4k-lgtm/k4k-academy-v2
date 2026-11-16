@@ -5,7 +5,7 @@ No Higgsfield model is enabled for customers by this commit; no API generation o
 
 ## Configuration
 
-- Set a **server-only** `HF_API_KEY` to the **complete copied credential** from https://open.higgsfield.ai/api-keys (not prefixed with `Key `).
+- Set a **server-only** `HF_CREDENTIALS` (SDK convention) or `HF_API_KEY` (REST convention) to the **complete copied credential** from https://open.higgsfield.ai/api-keys (not prefixed with `Key `). Preview accepts the existing `HF_CREDENTIALS` secret without retrieving or copying its value.
 - The transport sends `Authorization: Key <complete credential>` to `https://api.higgsfield.ai`.
 - For an isolated **preview** developer pilot, set `K4K_HIGGSFIELD_API_PILOT=true`.
 - There is deliberately **no production enable switch** yet.
@@ -13,7 +13,7 @@ No Higgsfield model is enabled for customers by this commit; no API generation o
 
 ## Current state
 
-The official model catalog lists Higgsfield Genjutsu for motion-preserving character swaps. The *model-specific request JSON schema and model path* must be verified from https://open.higgsfield.ai/explore before any paid submit. The connected Higgsfield model-search interface did not return a Genjutsu model, and no `HF_API_KEY` exists in K4K Vercel variables at the time of preparation. This means neither commercial entitlement nor API access has been verified.
+The official model catalog lists Higgsfield Genjutsu for motion-preserving character swaps. The *model-specific request JSON schema and model path* must be verified from https://open.higgsfield.ai/explore before any paid submit. The connected Higgsfield model-search interface did not return a Genjutsu model, and no preview `HF_API_KEY` existed initially. An `HF_CREDENTIALS` preview secret and `HF_API_KEY` production secret were subsequently saved. Authentication and entitlement still require verification. This means neither commercial entitlement nor API access has been verified.
 
 The adapter supports server-side submit, status, cancellation, and signed image upload initialization. It does **not** expose a browser credential form or any public route, or persist returned request IDs. To make this a full model integration, use a server-owned key and add model-specific input validation, authenticated user/job attribution, quote and price checks, atomic credit reservation/refund, authenticated output collection and a signed upload route. Do not trust client-supplied request IDs or URLs and never re-submit an uncertain paid request.
 
