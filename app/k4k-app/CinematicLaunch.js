@@ -61,6 +61,7 @@ export default function CinematicLaunch(){
  <div className="kc-brand-hero-content">
  <div className="kc-kicker"><i/> BY KREATIVESTUDIOS4K / {tr('THE NEXT CHAPTER','O PRÓXIMO CAPÍTULO','EL PRÓXIMO CAPÍTULO')}</div>
  <h1 id="kc-hero-title">{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}<br/>{tr("THE TREND.","A TENDÊNCIA.","LA TENDENCIA.")}<br/><em>{tr("CREATE IT.","CRIE A SUA.","CRÉALA.")}</em></h1>
+ <div className="kc-welcome-feature"><div className="kc-welcome-label"><span aria-hidden="true"/> {tr('TRENDING NOW','EM ALTA','EN TENDENCIA')} <span> / K4K ORIGINAL</span></div><video src={videos[0]?.videoUrl} autoPlay={!paused} muted loop playsInline preload="metadata" aria-label={tr('Featured trending K4K video','Vídeo K4K em destaque','Vídeo K4K destacado')} ref={node=>{if(node){if(paused||authOpen)node.pause();else node.play().catch(()=>{})}}}/></div>
  <p>{tr("The AI video creation studio for the next generation of creators.","O estúdio de criação de vídeos com IA para a próxima geração de criadores.","El estudio de creación de videos con IA para la próxima generación de creadores.")}</p>
  <div className="kc-hero-actions"><Link className="kc-join" href={user?"/k4k-app/creator":"/k4k-app/register?plan=starter"}>{tr("Start creating","Comece a criar","Empieza a crear")}<ArrowUpRight size={16}/></Link><a className="kc-hero-secondary" href="#showcase">{tr("Explore trending","Explore em alta","Explora tendencias")}</a></div>
  <a className="kc-scroll-link" href="#showcase">{tr("SCROLL TO DISCOVER","ROLE PARA DESCOBRIR","DESLIZA PARA DESCUBRIR")} ↓</a>
