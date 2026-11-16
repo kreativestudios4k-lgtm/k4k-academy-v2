@@ -1,12 +1,14 @@
 'use client';
 
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,MessageCircle,X,HelpCircle} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
 import catalogue from '../k4k-app/template-catalogue.json';
 import {studioDestination} from '../../lib/customer-routes.mjs';
+import {useVerifiedAccount,signOutK4K} from '../k4k-app/useVerifiedAccount';
+import {profileName} from '../../lib/k4k-profile-id.mjs';
 const featuredClips=[...catalogue.trending,...catalogue.topPerforming].filter(item=>item.videoUrl).slice(0,3);
 const videoHooks=['TURN ONE PHOTO INTO A SCENE','YOUR IDEAS. NOW IN MOTION.','CREATE THE NEXT VIRAL MOMENT'];
 
@@ -22,6 +24,9 @@ function GoogleIcon(){
 
 export default function AcademyAuthForm({mode='login',sessionId=''}) {
  const registering=mode==='register';
+ const {user:existingUser,ready:sessionReady}=useVerifiedAccount();
+ const [switching,setSwitching]=useState(false);
+ const requestLock=useRef(false);
  const [email,setEmail]=useState('');
  const [name,setName]=useState('');
  const [password,setPassword]=useState('');
@@ -33,6 +38,8 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
  const [error,setError]=useState('');
  const [supportOpen,setSupportOpen]=useState(false);
 
+ async function switchAccount(){if(switching)return;setSwitching(true);setError('');try{await signOutK4K({switchAccount:true,next:new URLSearchParams(window.location.search).get('next')})}catch{setError('Unable to sign out. Please try again.');setSwitching(false)}}
+ function continueExisting(){const requested=new URLSearchParams(window.location.search).get('next');window.location.assign(existingUser?.user_metadata?.k4k_temp_password?'/update-password':studioDestination(requested))}
  const verifyCheckout=useCallback(async()=>{
   if(!registering||!sessionId)return;
   setLookup('loading');setError('');
@@ -53,7 +60,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
  useEffect(()=>{if(registering)return;const params=new URLSearchParams(window.location.search);if(params.get('error')==='oauth')setError('Sign-in could not be completed. If you used Google or an email confirmation link, return to the same K4K website and try again. You can also sign in with your email and password.');},[registering]);
 
  async function submit(event){
-  event.preventDefault();if(busy)return;
+  event.preventDefault();if(requestLock.current||(!registering&&!sessionReady))return;
   setError('');setMessage('');
   const address=email.trim().toLowerCase();
   if(!isEmail(address)){setError('Enter a valid email address.');return}
@@ -64,7 +71,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    if(password.length<8){setError('Your password must contain at least 8 characters.');return}
    if(password!==confirmation){setError('Passwords do not match.');return}
   }else if(!password){setError('Enter your password.');return}
-  setBusy(true);
+  requestLock.current=true;setBusy(true);
   try{
    const supabase=createClient();
    if(registering){
@@ -93,6 +100,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    }
    const {data,error:loginError}=await supabase.auth.signInWithPassword({email:address,password});
    if(loginError)throw loginError;
+   if(!data?.session||!data?.user)throw new Error('SESSION_NOT_CREATED');
   const requested=new URLSearchParams(window.location.search).get('next');
   const next=data?.user?.user_metadata?.k4k_temp_password?'/update-password':studioDestination(requested);
    window.location.assign(next);
@@ -109,19 +117,19 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
    }else{
     setError(reason.startsWith('Payment verification')?reason:'We could not complete this request. Please try again or contact support.');
    }
-  }finally{setBusy(false)}
+  }finally{requestLock.current=false;setBusy(false)}
  }
 
  async function google(){
-  if(busy)return;
-  setError('');setBusy(true);
+  if(requestLock.current||!sessionReady)return;
+  requestLock.current=true;setError('');setBusy(true);
   try{
    const supabase=createClient();
    const {error:oauthError}=await supabase.auth.signInWithOAuth({
     provider:'google',options:{redirectTo:window.location.origin+'/auth/callback?next='+encodeURIComponent(studioDestination(new URLSearchParams(window.location.search).get('next'))),queryParams:{prompt:'select_account'}}
    });
    if(oauthError)throw oauthError;
-  }catch{setError('Google login could not be started. Please use your email and password.');setBusy(false)}
+  }catch{setError('Google login could not be started. Please use your email and password.');requestLock.current=false;setBusy(false)}
  }
 
  return <main className="k4k-auth-page kx-auth">
@@ -161,7 +169,9 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
     {message&&<p className="k4k-auth-success" role="status"><CheckCircle2 size={17}/>{message}</p>}
     {error&&<p className="k4k-auth-error" role="alert">{error}</p>}
 
-    {(!registering||lookup==='verified')&&<form className="k4k-auth-form" onSubmit={submit}>
+    {!registering&&sessionReady&&existingUser&&<div className="k4k-auth-existing"><p>You are signed in as <strong>{profileName(existingUser)}</strong>.</p><p>{existingUser.email}</p><button type="button" className="k4k-auth-submit" onClick={continueExisting}>Continue to K4K <ArrowRight size={18}/></button><button type="button" className="k4k-auth-google" disabled={switching} onClick={switchAccount}>{switching?'Signing out…':'Sign out / use another account'}</button></div>}
+    {!registering&&!sessionReady&&<p role="status">Checking your account…</p>}
+    {(!registering&&sessionReady&&!existingUser||registering&&lookup==='verified')&&<form className="k4k-auth-form" onSubmit={submit}>
      {registering&&<>
       <label htmlFor="academy-full-name">Full name</label>
       <input id="academy-full-name" name="name" type="text" autoComplete="name" value={name} onChange={e=>setName(e.target.value)} required minLength={2} maxLength={90} placeholder="Your full name" disabled={busy}/>
@@ -181,7 +191,7 @@ export default function AcademyAuthForm({mode='login',sessionId=''}) {
      <button className="k4k-auth-submit" type="submit" disabled={busy}>{busy?'Please wait…':registering?'Create account':'Sign in'}<ArrowRight size={18}/></button>
     </form>}
 
-    {!registering&&<div className="k4k-auth-google-wrap">
+    {!registering&&sessionReady&&!existingUser&&<div className="k4k-auth-google-wrap">
      <div className="k4k-auth-divider"><span>or</span></div>
      <button className="k4k-auth-google" type="button" disabled={busy} onClick={google}><GoogleIcon/> Continue with Google</button>
     </div>}

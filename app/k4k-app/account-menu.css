@@ -1,0 +1,21 @@
+.k4k-profile-menu{position:relative;flex:0 0 auto;z-index:95;font:13px Arial,Helvetica,sans-serif;color:#faf9f6}
+.k4k-profile-menu summary{display:flex;align-items:center;gap:5px;cursor:pointer;list-style:none;border:1px solid #444;border-radius:999px;padding:4px 7px 4px 4px;min-height:36px;background:#181818}
+.k4k-profile-menu summary::-webkit-details-marker{display:none}
+.k4k-profile-avatar{width:30px;height:30px;border-radius:50%;background:#faf9f6;color:#080808;display:grid;place-items:center;font-size:11px;font-weight:850}
+.k4k-profile-popover{position:absolute;top:calc(100% + 12px);right:0;width:min(300px,calc(100vw - 28px));padding:10px;background:#141414;border:1px solid #444;border-radius:16px;box-shadow:0 16px 50px #000a;display:grid;gap:3px;text-align:left;white-space:normal}
+.k4k-profile-identity{display:grid;gap:6px;padding:12px;min-width:0;border-bottom:1px solid #333}
+.k4k-profile-identity strong,.k4k-profile-identity small{overflow-wrap:anywhere}
+.k4k-profile-identity small{color:#b5b5b5!important}
+.k4k-profile-id{display:grid;gap:6px;padding:12px;border-bottom:1px solid #333;min-width:0}
+.k4k-profile-id>span{color:#b5b5b5;font-size:10px;letter-spacing:1px}
+.k4k-profile-id code{color:#faf9f6;font:11px monospace;overflow-wrap:anywhere;user-select:all}
+.k4k-profile-popover>a,.k4k-profile-popover>button,.k4k-profile-id>button{display:flex;align-items:center;gap:10px;padding:11px 12px;text-align:left;border:0;background:none;color:#faf9f6!important;border-radius:9px;font:inherit;cursor:pointer}
+.k4k-profile-popover>a:hover,.k4k-profile-popover>button:hover,.k4k-profile-id>button:hover{background:#292929}
+.k4k-profile-popover .k4k-profile-logout{border-top:1px solid #333}
+.k4k-profile-popover>p{font-size:12px;color:#ffb4b4!important;padding:8px}
+.k4k-profile-id>button{padding:8px 0;color:#b5b5b5!important;font-size:11px}
+.k4k-profile-id-inline{margin:12px 0;display:grid;gap:6px;padding:11px;background:#1b1b1b;border:1px solid #383838;border-radius:10px}
+.k4k-profile-id-inline code{font:11px monospace;overflow-wrap:anywhere;color:#faf9f6;user-select:all}
+.k4k-profile-id-inline button{display:flex;align-items:center;gap:6px;background:none;border:0;padding:6px 0;color:#faf9f6;cursor:pointer;text-align:left;font:inherit;font-size:12px}
+.k4k-profile-id-inline small{font-size:10px;letter-spacing:1px}
+@media(max-width:700px){.k4k-profile-menu summary{padding:3px;gap:3px}.k4k-profile-avatar{width:27px;height:27px}.k4k-profile-popover{max-width:calc(100vw - 28px)}}
