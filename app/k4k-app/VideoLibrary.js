@@ -17,7 +17,8 @@ export default function VideoLibrary({embedded=false,onReuse,activeJobId=null,op
  const [downloadNotice,setDownloadNotice]=useState('');
  const [menuJob,setMenuJob]=useState(null),[deleteJob,setDeleteJob]=useState(null);
  const [urls,setUrls]=useState({}),[busy,setBusy]=useState(null),[selected,setSelected]=useState(null),[actionError,setActionError]=useState('');
- const confirmDialog=useRef(null);\n const dialog=useRef(null),accountId=useRef(null),authVersion=useRef(0),refreshLock=useRef(false),alive=useRef(true),pollCursor=useRef(0);
+ const confirmDialog=useRef(null);
+ const dialog=useRef(null),accountId=useRef(null),authVersion=useRef(0),refreshLock=useRef(false),alive=useRef(true),pollCursor=useRef(0);
  const refresh=useCallback(async()=>{
   if(refreshLock.current)return;
   refreshLock.current=true;
