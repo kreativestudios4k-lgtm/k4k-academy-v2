@@ -18,7 +18,7 @@ export default function EarlyFreeOffer({studio=false,compact=false,refreshKey=nu
   load();const visible=()=>{if(document.visibilityState==='visible')load()};document.addEventListener('visibilitychange',visible);
   const timer=setInterval(visible,30000);return()=>{alive=false;clearInterval(timer);document.removeEventListener('visibilitychange',visible)};
  },[user?.id,ready,refreshKey]);
- const offer=gift?.owner===user?.id?gift.offer:null;
+ const offer=gift&&user?.id&&gift.owner===user.id?gift.offer:null;
  if(!offer||offer.status!=='available')return null;
  return <section className={'k4k-free-offer'+(compact?' k4k-free-offer-compact':'')} aria-label={tr('Your free generation','Sua geração grátis','Tu generación gratis')}>
   <Sparkles size={compact?16:22} aria-hidden="true"/><div><strong>{tr('Your first free K4K video is ready','Seu vídeo grátis K4K está disponível','Tu video gratis de K4K está disponible')}</strong>{!compact&&<p>{studio?tr('Upload a 2–15 second MP4 and your character photos. Select Lite 720p, review your quote and confirm at 0 credits.','Envie um MP4 de 2–15 segundos e as fotos dos personagens. Selecione Lite 720p, confira o orçamento e confirme com 0 créditos.','Sube un MP4 de 2–15 segundos y tus fotos. Selecciona Lite 720p, revisa el coste y confirma con 0 créditos.'):tr('A gift for existing creators: one video up to 15 seconds, Lite 720p. No subscription required.','Um presente para criadores existentes: um vídeo de até 15 segundos, Lite 720p. Sem assinatura.','Un regalo para creadores existentes: un video de hasta 15 segundos, Lite 720p. Sin suscripción.')}</p>}</div>{!studio&&<Link href="/k4k-app/creator">{tr('Claim','Resgatar','Canjear')} ↗</Link>}</section>
