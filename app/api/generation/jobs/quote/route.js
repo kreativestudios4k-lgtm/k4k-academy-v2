@@ -2,6 +2,7 @@ import {generationEnvironmentAllowed,generationUserAllowed,generationProviderEna
 import {generationContext,prepareGenerationInput,generationError} from '../../../../../lib/server/generation-route-context.mjs';
 import {createGenerationProvider,generationProviderName,generationSigningSecret} from '../../../../../lib/server/generation-provider.mjs';
 import {generationCredits,draftFingerprint,quoteSigner} from '../../../../../lib/server/generation-quote.mjs';
+import {generationBudgetPolicy} from '../../../../../lib/server/generation-submit-service.mjs';
 import {earlyFreeQuoteAllowed,EARLY_FREE_MAX_SECONDS,EARLY_FREE_MAX_USD} from '../../../../../lib/server/early-free-generation.mjs';
 export const runtime='nodejs';
 export async function POST(request){
@@ -33,6 +34,8 @@ export async function POST(request){
   if(accountError)throw Error('UNAVAILABLE');
   const creditBalance=account?.balance??0;
   const accountBlocker=generationAccountBlocker({balance:freeGeneration?Math.max(creditBalance,credits??0):creditBalance,billingHold:account?.billing_hold,credits});
-  return Response.json({jobId:job.id,tier:job.model,resolution,provider:providerName,providerAuthenticated:estimate.providerAuthenticated??true,providerQuoteVerified:estimate.providerQuoteVerified,providerRateCardVerified:estimate.providerRateCardVerified,pricingMode:estimate.pricingMode,estimatedProviderUsd:usd,customerCredits:credits,chargedCredits:freeGeneration?0:credits,freeGeneration,creditBalance,quoteToken,expiresInSeconds:quoteToken?300:null,generationEnabled:generationEnabled&&testAuthorized&&budgetApproved&&!!quoteToken&&!accountBlocker,blocker:blocker||(!generationEnabled?'GENERATION_DISABLED':!testAuthorized?'TEST_GENERATION_NOT_AUTHORIZED':!budgetApproved?'PROVIDER_BUDGET_BLOCKED':accountBlocker),creditsReserved:0},{headers:{'Cache-Control':'no-store'}});
+  let capacityBlocker=null;
+  if(!blocker&&generationEnabled&&testAuthorized&&budgetApproved&&!accountBlocker){try{const b=generationBudgetPolicy(process.env,providerName,usd);const {data,error}=await database.rpc('k4k_generation_quote_capacity',{p_user:user.id,p_quote_micros:b.quoteMicros,p_daily_budget_micros:b.dailyBudgetMicros,p_total_budget_micros:b.totalBudgetMicros,p_max_active:b.maxActive,p_free:freeGeneration});if(error)throw Error('GENERATION_UNAVAILABLE');capacityBlocker=data??null;}catch(e){capacityBlocker=e.message==='GENERATION_BUDGET_GUARD_REQUIRED'?'GENERATION_BUDGET_GUARD_REQUIRED':'GENERATION_UNAVAILABLE';}}
+  return Response.json({jobId:job.id,tier:job.model,resolution,provider:providerName,providerAuthenticated:estimate.providerAuthenticated??true,providerQuoteVerified:estimate.providerQuoteVerified,providerRateCardVerified:estimate.providerRateCardVerified,pricingMode:estimate.pricingMode,estimatedProviderUsd:usd,customerCredits:credits,chargedCredits:freeGeneration?0:credits,freeGeneration,creditBalance,quoteToken,expiresInSeconds:quoteToken?300:null,generationEnabled:generationEnabled&&testAuthorized&&budgetApproved&&!!quoteToken&&!accountBlocker&&!capacityBlocker,blocker:blocker||capacityBlocker||(!generationEnabled?'GENERATION_DISABLED':!testAuthorized?'TEST_GENERATION_NOT_AUTHORIZED':!budgetApproved?'PROVIDER_BUDGET_BLOCKED':accountBlocker),creditsReserved:0},{headers:{'Cache-Control':'no-store'}});
  }catch(error){return generationError(error)}
 }

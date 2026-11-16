@@ -73,3 +73,5 @@ test('customer fal submission reserves once, passes trusted duration, and record
  const invalid=quoteSigner('secret').issue({provider:'higgsfield',userId:id,jobId:id,resolution:'720p',usd:0.7,credits:7,fingerprint:draftFingerprint(job,'720p')});
  await assert.rejects(submit({userId:id,job,quoteToken:invalid,requestKey:id}),/QUOTE_CHANGED/);
 });
+
+test('provider policy rejection is classified without exposing raw response',async()=>{let n=0;const rest=createFalWanRest({credentials:'key',env,fetchImpl:async()=>++n===1?ok({request_id:id,status:'COMPLETED'}):({ok:false,status:422,json:async()=>({detail:[{type:'content_policy_violation',msg:'private data'}]})})});assert.deepEqual(await rest.status(id),{request_id:id,status:'failed',failureCode:'CONTENT_POLICY_BLOCKED'});});
