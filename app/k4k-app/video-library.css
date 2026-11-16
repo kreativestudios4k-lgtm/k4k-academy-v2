@@ -41,3 +41,6 @@
 .kl-gallery,.kl-library{--kl-lime:#faf9f6;color:#faf9f6}
 .kl-gallery,.kl-gallery-header{background:#030303}
 .kl-gallery-bottom button,.kl-gallery-header a{background:#faf9f6;color:#030303!important}
+
+/* User-owned generated video deletion in both grid and embedded history */
+.kl-card{position:relative}.kl-card-menu{position:absolute;right:7px;top:7px;z-index:5}.kl-card-menu>button{border:1px solid #555;background:#111d;color:#fff;border-radius:50%;width:34px;height:34px;display:grid;place-items:center}.kl-menu-pop{z-index:9}.kl-menu-pop .kl-delete-action,.kl-dialog .kl-delete-action{color:#ffafa5!important;display:inline-flex;align-items:center;gap:7px}.kl-delete-dialog{max-width:min(420px,calc(100vw - 26px));border:1px solid #555;background:#191919;color:#fff;border-radius:15px;padding:24px}.kl-delete-dialog::backdrop{background:#000b}.kl-delete-confirm h2{font-size:22px;margin:12px 0}.kl-delete-confirm p{font-size:13px!important}.kl-delete-confirm>div{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap;margin-top:20px}.kl-delete-confirm button{border:1px solid #555;background:#282828;color:#fff;border-radius:8px;padding:12px;display:flex;gap:7px;align-items:center}
