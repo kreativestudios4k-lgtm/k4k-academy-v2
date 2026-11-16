@@ -20,3 +20,15 @@ test('affiliate login return is explicitly allowed without opening redirect dest
  assert.match(route,/VERCEL_ENV!==['"]production['"]/);
  const page=readFileSync('app/affiliates/page.js','utf8');assert.match(page,/Worldwide affiliate commission/);assert.doesNotMatch(page,/European affiliate commission/);assert.match(page,/<AffiliateForm\/>/);
 });
+
+test('affiliate application renders directly without a login or signup gate',()=>{
+ const form=readFileSync('app/affiliates/AffiliateForm.js','utf8');
+ assert.match(form,/<form onSubmit=\{submit\}>/);
+ assert.match(form,/signInWithOtp\(/);
+ assert.match(form,/\/auth\/callback\?next=%2Faffiliates/);
+ assert.doesNotMatch(form,/href="\/login|href="\/k4k-app\/register/);
+ assert.match(form,/readOnly=\{!!session\?\.signedIn\}/);
+ assert.match(form,/clearDraft\(\)/);
+ const callback=readFileSync('app/auth/callback/route.js','utf8');
+ assert.match(callback,/\/affiliates\?error=affiliate-verification/);
+});
