@@ -140,3 +140,6 @@
 .k4k-studio-shell .ks{--lime:#fff;color:#fff}
 .k4k-studio-shell .ks .ks-panel,.k4k-studio-shell .ks .ks-workspace{background:#111111;border-color:#303030}
 .k4k-studio-shell .ks .ks-generate{background:#fff;color:#030303}
+
+.k4k-studio-shell .ks .ks-generate:not(:disabled){box-shadow:0 4px 25px #739dff30}
+.k4k-studio-shell .ks .ks-panel{border-color:#353a42}
