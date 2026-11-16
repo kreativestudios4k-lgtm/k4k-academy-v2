@@ -4,6 +4,9 @@ import {assertBillingKey,assertTaxReady,assertLiveLaunchReady,billingMode,ownerL
 import {launchLimits,updateLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 import {prepareManualPixCardSwitch} from '../../../../lib/server/manual-pix-card-switch.mjs';
 import {manualPixEnabled,manualPixUserAllowed,manualPixPlan,assertManualPixSource,buildManualPixCheckout,manualPixHeaders,MANUAL_PIX_KIND} from '../../../../lib/server/manual-pix.mjs';
+import {creatorDiscountReferral,eligibleCreatorCoupon,publicCreatorCode,studentDiscountRequested} from '../../../../lib/k4k-student-discount.mjs';
+import {REFERRAL_COOKIE} from '../../../../lib/server/referral-tracking.mjs';
+import {manualPixAffiliateEnabled} from '../../../../lib/server/manual-pix.mjs';
 import {stripeCheckoutDestination} from '../../../../lib/stripe-checkout-destination.mjs';
 export const runtime='nodejs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
@@ -20,7 +23,11 @@ export async function POST(request){
   if(!manualPixUserAllowed(user.id))return json({error:'MANUAL_PIX_OWNER_TEST_ONLY'},403);
   let body;try{body=await request.json()}catch{return json({error:'INVALID_REQUEST'},400)}
   if(currencyForCountry(request.headers.get('x-vercel-ip-country'))!=='BRL'||body?.currency!=='BRL')return json({error:'MANUAL_PIX_BRAZIL_ONLY'},409);
-  if(body.discountCode)return json({error:'MANUAL_PIX_DISCOUNT_UNAVAILABLE'},409);
+  const requestedDiscount=studentDiscountRequested(body.discountCode),affiliateEnabled=manualPixAffiliateEnabled();
+  if(requestedDiscount&&!affiliateEnabled)return json({error:'MANUAL_PIX_DISCOUNT_UNAVAILABLE'},409);
+  const rawReferral=requestedDiscount?creatorDiscountReferral(body.discountCode):request.cookies?.get(REFERRAL_COOKIE)?.value;
+  const discountReferral=eligibleCreatorCoupon(rawReferral)?rawReferral:null;
+  if(requestedDiscount&&!discountReferral)return json({error:'INVALID_DISCOUNT_CODE'},400);
   assertBillingKey(secret);assertTaxReady();assertLiveLaunchReady(process.env,{userId:user.id,plan:body.plan});
   const liveMode=billingMode()==='live',plan=manualPixPlan(body.plan,{liveMode});
   const limits=liveMode?launchLimits():{seats:20,credits:1600};
@@ -45,9 +52,10 @@ export async function POST(request){
     releaseClaim:(c,s)=>updateLaunchCheckout(database,{claimId:c.id,userId:user.id,sessionId:s.id,outcome:'expired'}),
    });
   }
-  const order=await rpc('k4k_manual_pix_reserve',{p_user:user.id,p_mode:liveMode?'live':'test',p_plan:plan.key,p_price:plan.sourcePrice,p_product:product,p_max_seats:limits.seats,p_max_credits:limits.credits});
+  const reserveArgs={p_user:user.id,p_mode:liveMode?'live':'test',p_plan:plan.key,p_price:plan.sourcePrice,p_product:product,p_max_seats:limits.seats,p_max_credits:limits.credits};
+  const order=affiliateEnabled&&liveMode?await rpc('k4k_manual_pix_reserve_affiliate',{...reserveArgs,p_code:discountReferral,p_explicit:requestedDiscount}):await rpc('k4k_manual_pix_reserve',reserveArgs);
   function verify(session){
-   if(session.mode!=='payment'||session.livemode!==liveMode||session.client_reference_id!==user.id||session.metadata?.kind!==MANUAL_PIX_KIND||session.metadata?.order_id!==order.id||session.metadata?.user_id!==user.id||session.currency!=='brl'||session.subscription)throw Error('MANUAL_PIX_SESSION_INVALID');
+   if(session.mode!=='payment'||session.livemode!==liveMode||session.client_reference_id!==user.id||session.metadata?.kind!==MANUAL_PIX_KIND||session.metadata?.order_id!==order.id||session.metadata?.user_id!==user.id||session.currency!=='brl'||session.subscription||(order.affiliate_code&&(session.metadata?.k4k_referral_code!==order.affiliate_code||session.metadata?.k4k_discount_code!==publicCreatorCode(order.affiliate_code))))throw Error('MANUAL_PIX_SESSION_INVALID');
    return session;
   }
   if(order.stripe_session_id){
@@ -66,7 +74,7 @@ export async function POST(request){
   return json({url:stripeCheckoutDestination(session.url)});
  }catch(error){
   console.error('Manual Pix checkout failed',{code:/^[A-Z][A-Z0-9_]{1,79}$/.test(error.message||'')?error.message:'INTERNAL_ERROR'});
-  const conflicts=['BILLING_REVIEW_REQUIRED','MANUAL_PIX_PERIOD_ACTIVE','MANUAL_PIX_CHECKOUT_PENDING','EXISTING_SUBSCRIPTION_OR_CHECKOUT','MANUAL_PIX_PAYMENT_PENDING','LAUNCH_SOLD_OUT','LAUNCH_CREDIT_CAPACITY'];
+  const conflicts=['BILLING_REVIEW_REQUIRED','MANUAL_PIX_PERIOD_ACTIVE','MANUAL_PIX_CHECKOUT_PENDING','EXISTING_SUBSCRIPTION_OR_CHECKOUT','MANUAL_PIX_PAYMENT_PENDING','LAUNCH_SOLD_OUT','LAUNCH_CREDIT_CAPACITY','MANUAL_PIX_DISCOUNT_USED','MANUAL_PIX_DISCOUNT_UNAVAILABLE','INVALID_DISCOUNT_CODE'];
   const safe=[...conflicts,'MANUAL_PIX_DISABLED','MANUAL_PIX_ORDER_EXPIRED','MANUAL_PIX_PRICE_INVALID','CHECKOUT_FAILED','INVALID_PLAN','LIVE_CHECKOUT_DISABLED','OWNER_LIVE_PILOT_ONLY'];
   return json({error:safe.includes(error.message)?error.message:'MANUAL_PIX_UNAVAILABLE'},conflicts.includes(error.message)?409:503);
  }

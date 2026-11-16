@@ -1,5 +1,5 @@
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
-import {manualPixUserAllowed,manualPixLiveTestOnly,manualPixAvailability} from '../../../../lib/server/manual-pix.mjs';
+import {manualPixUserAllowed,manualPixLiveTestOnly,manualPixAvailability,manualPixAffiliateEnabled} from '../../../../lib/server/manual-pix.mjs';
 import {createClient} from '@supabase/supabase-js';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot,ownerLivePilotAllowed} from '../../../../lib/server/billing-policy.mjs';
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
@@ -23,5 +23,5 @@ export async function GET(request){
  const currency=currencyForCountry(request.headers.get('x-vercel-ip-country'));
  const manual=manualPixAvailability({userId,currency,checkoutReady:checkoutReady&&!pilot});
  if(manualPixLiveTestOnly())console.info('Manual Pix availability',{authenticated:Boolean(userId),currency,available:manual.manualPixReady,reason:manual.manualPixReason});
- return Response.json({currency,...manual,mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,pixReady:checkoutReady&&billingMode()==='live'&&!manualPixUserAllowed(userId)&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
+ return Response.json({currency,...manual,manualPixAffiliateDiscountReady:manual.manualPixReady&&manualPixAffiliateEnabled(),mode:billingMode(),checkoutReady,topupsReady,reason,ownerPilot:pilot&&checkoutReady,pixReady:checkoutReady&&billingMode()==='live'&&!manualPixUserAllowed(userId)&&brazilPixEnabled('BRL')},{headers:{'Cache-Control':'no-store'}});
 }
