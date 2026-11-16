@@ -37,7 +37,7 @@ test('dark background and input themes are present in the account workspace',()=
 test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/return <CinematicLaunch\/>/);
+ assert.match(homepage,/return <SingleFeedHome\/>/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.doesNotMatch(launch,/\d{2}\.\d{2}\.\d{4}|PLANNED RELEASE|COMING SOON/);
  assert.match(launch,/STARTING FROM ONLY/);
@@ -117,3 +117,5 @@ test('the shared monochrome foundation is loaded and applied across customer sur
  assert.match(source('app/k4k-app/template-sheet.css'),/\.kts-sheet\{background:#111111;color:#faf9f6/);
  assert.match(source('app/affiliates/page.js'),/\.k4k-affiliate \.hero\{[^}]*min-height:0/);
 });
+
+test('single feed homepage retains K4K backdrop and real navigation',()=>{const s=source('app/k4k-app/SingleFeedHome.js');assert.match(s,/kc-abstract-motion/);assert.match(s,/Use this template/);assert.match(s,/href="\/affiliates"/);assert.match(s,/muted=\{muted\} loop playsInline/);assert.match(s,/TemplateCreateSheet item=\{create\}/);assert.match(s,/\/k4k-app\/credits/);});
