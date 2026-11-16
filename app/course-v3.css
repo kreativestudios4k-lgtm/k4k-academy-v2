@@ -73,7 +73,7 @@
 .k4k-lesson-badges span{display:inline-flex;align-items:center;gap:7px}
 .k4k-lesson-photo{position:relative;border-radius:15px;overflow:hidden;min-height:clamp(330px,41vw,490px);border:1px solid #faf9f65b}
 .k4k-lesson-photo .k4k-course-reference{width:100%;height:100%;position:absolute;inset:0}
-.k4k-lesson-photo::after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#080808c9)}
+.k4k-lesson-photo::after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#030303c9)}
 .k4k-lesson-photo>span{position:absolute;z-index:2;bottom:22px;left:20px;color:#faf9f6;font-size:11px;font-weight:850;letter-spacing:.07em}
 .k4k-lesson-objective{border-left:4px solid #faf9f6;background:#1c1c1c;padding:22px 28px;border-radius:0 12px 12px 0;margin-bottom:37px}
 .k4k-lesson-objective>span{color:#faf9f6;font-size:10px;letter-spacing:.17em;font-weight:850}
@@ -95,7 +95,7 @@
 .k4k-lesson-copy-section>p{font-size:14px;color:#c2c2c2;line-height:1.75;max-width:760px}
 .k4k-lesson-prompt-panel{padding:clamp(16px,3vw,30px);margin-top:21px;border:1px solid #faf9f65d;background:#151515;border-radius:14px}
 .k4k-lesson-prompt-panel pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.9;color:#eaeaea;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
-.k4k-lesson-delivery{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;padding:30px;border:1px solid #faf9f656;border-radius:15px;background:linear-gradient(125deg,#202020,#141414)}
+.k4k-lesson-delivery{display:grid;grid-template-columns:1.2fr .8fr;gap:30px;padding:30px;border:1px solid #faf9f656;border-radius:15px;background:linear-gradient(125deg,#202020,#111111)}
 .k4k-lesson-delivery>div>svg{color:#faf9f6;margin-bottom:13px}
 .k4k-lesson-delivery h2{font-size:clamp(22px,2.8vw,36px);letter-spacing:-.05em;line-height:1.22;margin:15px 0 28px}
 .k4k-lesson-delivery ul{list-style:none;padding:0;margin:20px 0}
@@ -225,4 +225,4 @@
 .k4k-swap-step h3{font-size:29px}
 }
 
-.k4k-classroom{--k4k:#faf9f6;background:#080808;color:#faf9f6}
+.k4k-classroom{--k4k:#faf9f6;background:#030303;color:#faf9f6}

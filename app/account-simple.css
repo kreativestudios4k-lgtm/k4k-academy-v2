@@ -94,7 +94,7 @@
 .k4k-auth-verify a{color:#686868}
 .k4k-auth-page :is(a,button,input):focus-visible{outline:3px solid #888888;outline-offset:3px}
 
-.k4k-auth-page{background:#080808;color:#faf9f6;color-scheme:dark}
-.k4k-auth-card{background:#141414;border-color:#383838}
+.k4k-auth-page{background:#030303;color:#faf9f6;color-scheme:dark}
+.k4k-auth-card{background:#111111;border-color:#383838}
 .k4k-auth-card input{background:#181818;color:#faf9f6;border-color:#444}
-.k4k-auth-card .k4k-auth-submit{background:#faf9f6;color:#080808;border-radius:999px}
+.k4k-auth-card .k4k-auth-submit{background:#faf9f6;color:#030303;border-radius:999px}
