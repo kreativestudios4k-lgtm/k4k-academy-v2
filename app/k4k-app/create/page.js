@@ -16,7 +16,7 @@ export default function CreativeStudio(){
  const [liveModels,setLiveModels]=useState([]),[apiReady,setApiReady]=useState(false),[generating,setGenerating]=useState(false),[generation,setGeneration]=useState(null);
  const productId={'kling_4_0_flash':'kling-flash-t2v','flux_3_image':'flux3-t2i','nano_banana_2':'nano-banana-21-t2i'};
  const modelEnabled=liveModels.includes(model.id)&&!!productId[model.id];
- useEffect(()=>{let alive=true;fetch('/api/multimodel',{cache:'no-store'}).then(r=>r.json()).then(data=>{if(alive){setLiveModels(data.enabled?data.models||[]:[]);setApiReady(true)}}).catch(()=>{if(alive)setApiReady(true)});return()=>{alive=false}},[]);
+ useEffect(()=>{let alive=true;createClient().auth.getSession().then(({data})=>fetch('/api/multimodel',{cache:'no-store',headers:data?.session?.access_token?{Authorization:'Bearer '+data.session.access_token}:{}})).then(r=>r.json()).then(data=>{if(alive){setLiveModels(data.enabled?data.models||[]:[]);setApiReady(true)}}).catch(()=>{if(alive)setApiReady(true)});return()=>{alive=false}},[]);
  async function sessionToken(){const {data,error}=await createClient().auth.getSession();if(error||!data?.session?.access_token)throw Error('Please log in before generating.');return data.session.access_token}
  async function apiCall(action,payload,token){const response=await fetch('/api/multimodel',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({action,...payload})});const data=await response.json();if(!response.ok)throw Error(data.error||'Generation unavailable');return data}
  async function generate(){

@@ -1,5 +1,5 @@
 import {randomUUID} from 'node:crypto';
-import {multimodelLiveAllowed,multimodelQuote,multimodelAuth,signMultimodelQuote,verifyMultimodelQuote,findMultimodelJob,submitMultimodelRequest,pollMultimodelRequest,ingestMultimodelOutput,multimodelError} from '../../../lib/server/multimodel-live-service.mjs';
+import {multimodelLiveAllowed,multimodelUserAllowed,multimodelQuote,multimodelAuth,signMultimodelQuote,verifyMultimodelQuote,findMultimodelJob,submitMultimodelRequest,pollMultimodelRequest,ingestMultimodelOutput,multimodelError} from '../../../lib/server/multimodel-live-service.mjs';
 export const runtime='nodejs';
 const headers={'Cache-Control':'no-store'};
 const reply=(obj,status=200)=>Response.json(obj,{status,headers});
@@ -9,6 +9,7 @@ export async function POST(request){
  try{
   checkEnabled();
   const {user,db}=await multimodelAuth(request);
+  if(!multimodelUserAllowed(user.id))throw Error('GENERATION_DISABLED');
   let body;try{body=await request.json()}catch{throw Error('INVALID_PROVIDER_INPUT')}
   if(body.action==='quote'){
    const estimate=multimodelQuote({modelId:body.modelId,params:body.parameters});
@@ -58,9 +59,15 @@ export async function POST(request){
 }
 export async function GET(request){
  try{
-  if(!new URL(request.url).searchParams.get('id'))return reply({enabled:multimodelLiveAllowed(),models:multimodelLiveAllowed()?['kling_4_0_flash','flux_3_image','nano_banana_2']:[]});
+  if(!new URL(request.url).searchParams.get('id')){
+   if(!multimodelLiveAllowed())return reply({enabled:false,models:[]});
+   try{const {user}=await multimodelAuth(request);const allowed=multimodelUserAllowed(user.id);
+    return reply({enabled:allowed,models:allowed?['kling_4_0_flash','flux_3_image','nano_banana_2']:[]});
+   }catch{return reply({enabled:false,models:[]})}
+  }
   checkEnabled();
   const {user,db}=await multimodelAuth(request);
+  if(!multimodelUserAllowed(user.id))throw Error('GENERATION_DISABLED');
   const id=new URL(request.url).searchParams.get('id');
   const job=await findMultimodelJob(db,user.id,id);
   if(job.status==='completed'){
