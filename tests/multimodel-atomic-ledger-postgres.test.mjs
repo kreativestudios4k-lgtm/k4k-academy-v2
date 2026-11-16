@@ -47,7 +47,6 @@ test('reserve debits live wallet exactly once, including request-key retries',as
  assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,35);
  assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_budget_allocations')).rows[0].n,1);
  assert.equal((await db.query('select count(*)::integer as n from public.k4k_generation_budget_allocations')).rows[0].n,0);
- assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_budget_allocations')).rows[0].n,0);
  assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_reservations')).rows[0].n,1);
  }finally{await db.close();}
 });
