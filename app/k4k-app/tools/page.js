@@ -53,11 +53,12 @@ export default function ToolsIndex() {
         <Link href="/k4k-app" className="market-logo">K4K<span> APP</span></Link>
         <nav>
           <Link href="/k4k-app">Home</Link>
-          <Link href="/k4k-app/coming-soon">New features</Link>
+          <Link href="/k4k-app/create">Creative Studio</Link>
         </nav>
       </header>
 
       <section className="market-section">
+        <div style={{display:'flex',gap:16,alignItems:'center',flexWrap:'wrap',padding:'18px 22px',marginBottom:28,border:'1px solid #45454c',borderRadius:16,background:'#1c1d24'}}><div style={{flex:1,minWidth:220}}><strong style={{fontSize:18}}>New K4K Creative Studio</strong><p className="market-note">Browse image models, Seedance and Kling workflows alongside the existing K4K Motion generator.</p></div><Link className="market-use" style={{margin:0,padding:'15px 24px'}} href="/k4k-app/create">Explore Image & Video Studio →</Link></div>
         <div className="market-section-head">
           <div>
             <span className="market-kicker">AI TOOLS</span>
