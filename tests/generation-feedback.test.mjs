@@ -24,3 +24,5 @@ test('credit and billing blockers appear before offering generation, while reser
  assert.equal(generationAccountBlocker({balance:NaN,credits:14}),'INSUFFICIENT_CREDITS');
  assert.match(generationQuoteFeedback({blocker:'INSUFFICIENT_CREDITS',customerCredits:28,creditBalance:14}),/28 credits; your balance is 14/);
 });
+
+test('free and capacity blockers explain why no generation was submitted',()=>{assert.match(generationQuoteFeedback({blocker:'FREE_GENERATION_BUDGET_BLOCKED'},'pt'),/orçamento/);assert.match(generationQuoteFeedback({blocker:'ACTIVE_JOB_LIMIT'}),/current video/);assert.match(generationQuoteFeedback({blocker:'CONTENT_POLICY_BLOCKED'},'pt'),/segurança/);});

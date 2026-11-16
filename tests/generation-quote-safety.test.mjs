@@ -10,7 +10,12 @@ test('draft quote requires authenticated user and owned job',()=>{
  assert.match(context,/verifyStudioMedia\(/);
 });
 test('quote uses non-generating provider estimate without reserving customer credits',()=>{
- assert.doesNotMatch(route,/provider\.submit\(|\.reserve\(|k4k_generation_reserve_draft|\.rpc\(/);
+ assert.doesNotMatch(route,/provider\.submit\(|\.reserve\(|k4k_generation_reserve_draft|\.rpc\((?!'k4k_generation_quote_capacity',)/);
+ assert.match(route,/\.rpc\('k4k_generation_quote_capacity',/);
+ const capacity=readFileSync(new URL('../supabase/migrations/20261116163703_k4k_generation_quote_capacity.sql',import.meta.url),'utf8');
+ assert.match(capacity,/stable security invoker/);
+ assert.doesNotMatch(capacity,/\b(insert into|update public|delete from)\b/i);
+ assert.match(capacity,/to service_role/);
  assert.match(route,/\.estimate\(job\.model,input,/ );
  assert.match(route,/generationCredits\(usd\)/);
  assert.match(route,/quoteSigner/);
