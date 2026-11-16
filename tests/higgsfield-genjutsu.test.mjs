@@ -19,6 +19,7 @@ test('no paid request without preview pilot, approved rate and budget, independe
  const env={VERCEL_ENV:'preview',K4K_HIGGSFIELD_API_PILOT:'true',HF_API_KEY:'complete',K4K_HIGGSFIELD_RATE_CARD_APPROVED:'true'};
  const make=environment=>createGenjutsuProvider({env:environment,fetchImpl:async()=>{count++;return {ok:true,json:async()=>({request_id:'generated_123',status_url:'https://api.higgsfield.ai/requests/generated_123/status'})}}});
  const input={video_url:v,image_urls:images,resolution:'720p'};
+ const sdkEnv={...env,HF_API_KEY:undefined,HF_CREDENTIALS:'id:secret'};
  await assert.rejects(make(env).submit('pro',input,{enabled:false,sourceSeconds:10,maxUsd:5,quotedUsd:3.446}),/HIGGSFIELD_GENERATION_DISABLED/);
  await assert.rejects(make({...env,VERCEL_ENV:'production'}).submit('pro',input,{enabled:true,sourceSeconds:10,maxUsd:5,quotedUsd:3.446}),/HIGGSFIELD_GENERATION_DISABLED/);
  await assert.rejects(make(env).submit('pro',input,{enabled:true,sourceSeconds:15,maxUsd:5,quotedUsd:5.169}),/PROVIDER_BUDGET_BLOCKED/);
@@ -26,4 +27,6 @@ test('no paid request without preview pilot, approved rate and budget, independe
  assert.equal(count,0);
  assert.equal((await make(env).submit('pro',input,{enabled:true,sourceSeconds:10,maxUsd:5,quotedUsd:3.446})).request_id,'generated_123');
  assert.equal(count,1);
+ assert.equal((await make(sdkEnv).submit('pro',input,{enabled:true,sourceSeconds:10,maxUsd:5,quotedUsd:3.446})).request_id,'generated_123');
+ assert.equal(count,2);
 });

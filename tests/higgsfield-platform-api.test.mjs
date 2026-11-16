@@ -1,11 +1,14 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {createHiggsfieldPlatformApi,higgsfieldModelAccess} from '../lib/server/higgsfield-platform-api.mjs';
+import {createHiggsfieldPlatformApi,higgsfieldModelAccess,higgsfieldPreviewCredential} from '../lib/server/higgsfield-platform-api.mjs';
 const reply=data=>({ok:true,json:async()=>data});
 test('pilot is disabled by default and requires preview plus server key',()=>{
  assert.equal(higgsfieldModelAccess({}),false);
  assert.equal(higgsfieldModelAccess({VERCEL_ENV:'production',HF_API_KEY:'opaque',K4K_HIGGSFIELD_API_PILOT:'true'}),false);
  assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_API_KEY:'opaque',K4K_HIGGSFIELD_API_PILOT:'true'}),true);
+ assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret',K4K_HIGGSFIELD_API_PILOT:'true'}),true);
+ assert.equal(higgsfieldPreviewCredential({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret'}),'id:secret');
+ assert.equal(higgsfieldPreviewCredential({VERCEL_ENV:'production',HF_API_KEY:'prod_secret'}),null);
 });
 test('submit is opt-in, uses the exact copied key, fixed origin and verified model path',async()=>{
  const requests=[];const api=createHiggsfieldPlatformApi({credentials:'opaque-key',fetchImpl:async(url,init)=>{requests.push({url,init});return reply({request_id:'safe_123',status_url:'https://api.higgsfield.ai/requests/safe_123/status'})}});
