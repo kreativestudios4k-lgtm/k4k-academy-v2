@@ -166,3 +166,5 @@
 .k4k-light .k4k-global-header,.k4k-light.k4k-studio-shell .k4k-global-header,.k4k-light .k4k-light-nav{background:#090909;border-color:#252525}
 .k4k-light .k4k-card,.k4k-light .k4k-account-panel,.k4k-light .k4k-support-tile{background:#111111;border-color:#303030}
 .k4k-light .k4k-global-header .k4k-account-status,.k4k-light .k4k-lime{background:#fff;color:#030303!important}
+
+.k4k-light .k4k-account-panel{border-color:#343943;box-shadow:0 1px 0 #d8e6ff10}
