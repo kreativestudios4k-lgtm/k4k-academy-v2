@@ -19,7 +19,7 @@ async function setup(){
  insert into auth.users values('${owner}'),('${other}');
  create table public.k4k_live_credit_accounts(user_id uuid primary key,balance integer not null check(balance>=0),billing_hold boolean not null default false,updated_at timestamptz default now());
  create table public.studio_generation_jobs(id uuid primary key,user_id uuid not null,status text not null);
- create table public.k4k_generation_budget_allocations(job_id uuid primary key,user_id uuid not null,provider text not null,quote_micros bigint not null,created_at timestamptz default now());
+ create table public.k4k_generation_budget_allocations(job_id uuid primary key references public.studio_generation_jobs(id) on delete restrict,user_id uuid not null,provider text not null,quote_micros bigint not null,created_at timestamptz default now());
  insert into public.k4k_live_credit_accounts(user_id,balance) values('${owner}',40);
  grant usage on schema auth to service_role;grant execute on function auth.role() to service_role;
  grant usage on schema public to service_role;grant all on all tables in schema public to service_role;`);
@@ -44,7 +44,9 @@ test('reserve debits live wallet exactly once, including request-key retries',as
  const anotherKey=(await db.query(reserve('55555555-5555-4555-8555-555555555555'))).rows[0].result;
  assert.equal(anotherKey.newly_reserved,false);
  assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,35);
- assert.equal((await db.query('select count(*)::integer as n from public.k4k_generation_budget_allocations')).rows[0].n,1);
+ assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_budget_allocations')).rows[0].n,1);
+ assert.equal((await db.query('select count(*)::integer as n from public.k4k_generation_budget_allocations')).rows[0].n,0);
+ assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_budget_allocations')).rows[0].n,0);
  assert.equal((await db.query('select count(*)::integer as n from public.k4k_multimodel_reservations')).rows[0].n,1);
  }finally{await db.close();}
 });
@@ -89,5 +91,25 @@ test('anonymous/authenticated roles cannot call financial functions',async()=>{
  await assert.rejects(db.query(finish('failed')),/permission denied/);
  await db.exec('reset role');
  }
+ }finally{await db.close();}
+});
+
+test('new budget ledger includes legacy allocations and fails closed when budget exhausted',async()=>{
+ const db=await setup();try{
+ await db.exec(`insert into public.studio_generation_jobs(id,user_id,status) values('55555555-5555-4555-8555-555555555555','${owner}','completed');
+ insert into public.k4k_generation_budget_allocations(job_id,user_id,provider,quote_micros) values('55555555-5555-4555-8555-555555555555','${owner}','fal',900000);`);
+ await asService(db);
+ await assert.rejects(db.query(reserve().replace('100000000,200000000,1','1000000,200000000,1')),/PROVIDER_DAILY_BUDGET_BLOCKED/);
+ assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,40);
+ assert.equal((await db.query('select count(*)::int as n from public.k4k_multimodel_budget_allocations')).rows[0].n,0);
+ }finally{await db.close();}
+});
+test('simultaneous reserve requests on one connection never double debit',async()=>{
+ const db=await setup();try{
+ await asService(db);
+ const results=await Promise.all([db.query(reserve()),db.query(reserve()),db.query(reserve())]);
+ assert.equal(results.filter(r=>r.rows[0].result.newly_reserved).length,1);
+ assert.equal((await db.query(`select balance from public.k4k_live_credit_accounts where user_id='${owner}'`)).rows[0].balance,35);
+ assert.equal((await db.query('select count(*)::int as n from public.k4k_multimodel_budget_allocations')).rows[0].n,1);
  }finally{await db.close();}
 });
