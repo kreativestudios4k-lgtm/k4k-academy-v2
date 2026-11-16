@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import {createGenerationOutputDelivery} from '../lib/server/generation-output-delivery.mjs';
 const userId='11111111-1111-4111-8111-111111111111',jobId='22222222-2222-4222-8222-222222222222',path=userId+'/'+jobId+'.mp4';
 function setup({owner=userId,status='completed',outputPath=path,verified=true,enabled=true}={}){
- let signed=0;
+ let signed=0,signOptions;
  const jobStore={getOwnedJob:async()=>({id:jobId,user_id:owner,status,output_path:outputPath})};
- const storage={from:bucket=>{assert.equal(bucket,'studio-generations');return {createSignedUrl:async(p,ttl)=>{signed++;assert.equal(p,path);assert.equal(ttl,120);return {data:{signedUrl:'https://example.test/private?token=mock'},error:null}}}}};
+ const storage={from:bucket=>{assert.equal(bucket,'studio-generations');return {createSignedUrl:async(p,ttl,options)=>{signed++;signOptions=options;assert.equal(p,path);assert.equal(ttl,120);return {data:{signedUrl:'https://example.test/private?token=mock'},error:null}}}}};
  const delivery=createGenerationOutputDelivery({jobStore,storage,verifyOutput:async()=>verified,enabled});
- return {delivery,get signed(){return signed}};
+ return {delivery,get signed(){return signed},get signOptions(){return signOptions}};
 }
 test('completed owned MP4 receives a short-lived signed URL',async()=>{
  const s=setup();assert.deepEqual(await s.delivery.getSignedUrl({userId,jobId}),{url:'https://example.test/private?token=mock',expiresIn:120});assert.equal(s.signed,1);
@@ -20,3 +20,6 @@ test('other user, incomplete job or mismatched output cannot sign URLs',async()=
   const s=setup(options);await assert.rejects(s.delivery.getSignedUrl({userId,jobId}));assert.equal(s.signed,0);
  }
 });
+
+test('download uses a safe server-derived attachment name; playback stays inline',async()=>{const s=setup();await s.delivery.getSignedUrl({userId,jobId});assert.equal(s.signOptions,undefined);await s.delivery.getSignedUrl({userId,jobId,download:true});assert.deepEqual(s.signOptions,{download:'K4K-'+jobId+'.mp4'});});
+test('attachment requests cannot bypass ownership or output verification',async()=>{for(const options of [{owner:'33333333-3333-4333-8333-333333333333'},{verified:false},{status:'processing'}]){const s=setup(options);await assert.rejects(s.delivery.getSignedUrl({userId,jobId,download:true}));assert.equal(s.signed,0)}});
