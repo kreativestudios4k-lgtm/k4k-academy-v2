@@ -242,3 +242,33 @@
 @media(prefers-reduced-motion:reduce){.kc-three .kc-welcome-feature video{scroll-behavior:auto}}
 
 .kc-three .kc-welcome-player{position:relative}.kc-three .kc-welcome-sound{position:absolute;bottom:10px;right:8px;display:flex;align-items:center;gap:5px;padding:8px 10px;border:1px solid #ffffff55;border-radius:999px;background:#080808d9;color:#fff;font-size:11px;font-weight:700;cursor:pointer;backdrop-filter:blur(8px);min-height:36px}.kc-three .kc-welcome-sound:focus-visible{outline:2px solid #fff;outline-offset:3px}
+
+/* Portrait-first landing: editorial hook and phone preview on a wide screen;
+   the same hook sits above the immersive video on a small screen. */
+.kc-three .kc-brand-hero{min-height:calc(100svh - 76px);padding:clamp(30px,5vh,64px) clamp(20px,5vw,80px);text-align:left}
+.kc-three .kc-phone-hero-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0, .7fr);align-items:center;gap:clamp(28px,6vw,100px);max-width:1240px;width:100%;margin-inline:auto}
+.kc-three .kc-phone-hero-copy{min-width:0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.kc-three .kc-phone-hero-copy .kc-kicker{justify-content:flex-start;text-align:left}
+.kc-three .kc-phone-hero-copy h1{font-size:clamp(48px,6.2vw,100px)!important;line-height:.94!important;letter-spacing:-.07em!important;margin:22px 0!important;text-align:left;overflow-wrap:normal}
+.kc-three .kc-phone-hero-copy h1 em{color:#faf9f6!important}
+.kc-three .kc-phone-hero-copy p{max-width:440px;margin:10px 0 24px;text-align:left;line-height:1.55;color:#b5b5b5}
+.kc-three .kc-phone-hero-copy .kc-hero-actions{justify-content:flex-start}
+.kc-three .kc-phone-hero-copy .kc-scroll-link{margin-top:26px}
+.kc-three .kc-phone-hero-layout .kc-welcome-feature{width:min(100%,320px,calc((100svh - 160px)*.5625));margin:0 auto}
+.kc-three .kc-phone-hero-layout .kc-welcome-label{font-size:10px;margin-bottom:12px;letter-spacing:1.4px}
+.kc-three .kc-phone-hero-layout .kc-welcome-player{padding:7px;border:1px solid #575757;border-radius:34px;background:#101010;box-shadow:0 30px 80px #000b,0 0 50px #ffffff0b}
+.kc-three .kc-phone-hero-layout .kc-welcome-player video{aspect-ratio:9/16;width:100%;height:auto;border:0;border-radius:27px;object-fit:contain;box-shadow:none;background:#080808}
+.kc-three .kc-phone-hero-layout .kc-welcome-sound{bottom:17px;right:16px}
+@media(max-width:760px){
+ .kc-three .kc-brand-hero{min-height:0;padding:30px 18px 34px;text-align:center}
+ .kc-three .kc-phone-hero-layout{display:flex;flex-direction:column;gap:22px;align-items:center;max-width:460px}
+ .kc-three .kc-phone-hero-copy{align-items:center;width:100%}
+ .kc-three .kc-phone-hero-copy .kc-kicker{justify-content:center;text-align:center;font-size:9px}
+ .kc-three .kc-phone-hero-copy h1{font-size:clamp(35px,9vw,56px)!important;letter-spacing:-.055em!important;line-height:.98!important;margin:16px 0!important;text-align:center}
+ .kc-three .kc-phone-hero-copy p{font-size:13px!important;margin:0 0 16px;text-align:center}
+ .kc-three .kc-phone-hero-copy .kc-hero-actions{justify-content:center;gap:8px}
+ .kc-three .kc-phone-hero-copy .kc-scroll-link{display:none}
+ .kc-three .kc-phone-hero-layout .kc-welcome-feature{width:min(100%,320px,82vw)}
+ .kc-three .kc-phone-hero-layout .kc-welcome-player{padding:5px;border-radius:25px}
+ .kc-three .kc-phone-hero-layout .kc-welcome-player video{border-radius:20px}
+}
