@@ -2,7 +2,6 @@
 import {useEffect,useState} from 'react';
 import Link from 'next/link';
 import PreviewShell from '../PreviewShell';
-import {publicCreatorCode} from '../../../lib/k4k-student-discount.mjs';
 import {useK4KLocale} from '../locale';
 import {createClient} from '../../../lib/supabase/client';
 export default function PartnerDashboard(){
@@ -11,7 +10,7 @@ export default function PartnerDashboard(){
  const [data,setData]=useState(null),[status,setStatus]=useState('loading'),[copied,setCopied]=useState(false);
  useEffect(()=>{let active=true;async function load(){try{const {data:{session}}=await createClient().auth.getSession();if(!session){if(active)setStatus('login');return;}const response=await fetch('/api/partner/me',{headers:{Authorization:'Bearer '+session.access_token},cache:'no-store'});const result=await response.json();if(active){if(response.ok){setData(result);setStatus('ready')}else setStatus(response.status===401?'login':response.status===403?'inactive':'closed')}}catch{if(active)setStatus('closed')}}load();return()=>{active=false}},[]);
  const link=data?.code?'https://kreativestudios4k.com/r/'+data.code:'';
- const coupon=publicCreatorCode(data?.code);
+ const coupon=data?.couponCode||null;
  async function copy(value=link){try{await navigator.clipboard.writeText(value);setCopied(value)}catch{setCopied(false)}}
  return <PreviewShell active="Account"><div className="k4k-account-page" style={{maxWidth:960,margin:'0 auto',padding:24}}>
  <header className="k4k-account-heading"><span>K4K APP · {tr('CREATOR PARTNERS','PARCEIROS CRIADORES','SOCIOS CREADORES')}</span><h1>{tr('Create. Teach. Grow.','Crie. Ensine. Cresça.','Crea. Enseña. Crece.')}</h1><p>{tr('Your private partner dashboard.','Seu painel privado de parceiro.','Tu panel privado de socio.')}</p></header>

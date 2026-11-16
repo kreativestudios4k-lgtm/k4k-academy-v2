@@ -9,7 +9,7 @@ import {configureBrazilPixCheckout} from '../../../../lib/server/brazil-pix.mjs'
 import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
 
 import {findPartner} from '../../../../lib/server/partner-policy.mjs';
-import {studentCode,studentDiscountRequested,applyStudentDiscount,creatorDiscountReferral,publicCreatorCode,applyCreatorDiscount} from '../../../../lib/k4k-student-discount.mjs';
+import {studentCode,studentDiscountRequested,applyStudentDiscount,creatorDiscountReferral,eligibleCreatorCoupon,applyCreatorDiscount} from '../../../../lib/k4k-student-discount.mjs';
 export const runtime = 'nodejs';
 
 const NO_STORE = {'Cache-Control': 'no-store'};
@@ -85,7 +85,7 @@ export async function POST(request) {
       const database=createClient(url,serviceKey,{auth:{persistSession:false,autoRefreshToken:false}});
       const code=requestedDiscount?discountReferral:request.cookies?.get(REFERRAL_COOKIE)?.value;
       const partner=referralsEnabled()?await findPartner(database,code):null;
-      if(requestedDiscount&&(!partner||user.id===partner.user_id))return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
+      if(requestedDiscount&&(!partner||user.id===partner.user_id||!eligibleCreatorCoupon(discountReferral)))return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
       const referral=referralsEnabled()?await recordReferral(database,user.id,partner&&user.id!==partner.user_id?code:null):null;
       if(referral&&(!validReferralCode(referral)||!await findPartner(database,referral)))throw Error('REFERRAL_REVIEW_REQUIRED');
       if(requestedDiscount&&referral!==discountReferral)return json({error:'STUDENT_DISCOUNT_UNAVAILABLE'},409);
@@ -94,7 +94,7 @@ export async function POST(request) {
       form.set('automatic_tax[enabled]','true');form.set('tax_id_collection[enabled]','true');
       if(!ownerLivePilot())form.set('custom_text[submit][message]','Your first month is charged now. During our funded launch, subsequent renewal invoices are held until generation capacity is funded. No new monthly credits are added until a renewal is paid. Contact support for cancellation or billing help.');
       configureBrazilPixCheckout(form,expectedCurrency);
-      if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(publicCreatorCode(referral)){applyCreatorDiscount(form,referral);form.set('metadata[k4k_discount_code]',publicCreatorCode(referral));}}
+      if(referral){form.set('metadata[k4k_referral_code]',referral);form.set('subscription_data[metadata][k4k_referral_code]',referral);if(eligibleCreatorCoupon(referral)){applyCreatorDiscount(form,referral);form.set('metadata[k4k_discount_code]',eligibleCreatorCoupon(referral));form.set('subscription_data[metadata][k4k_discount_code]',eligibleCreatorCoupon(referral));}}
       if(ownerLivePilot())form.set('metadata[k4k_owner_live_pilot]','true');
       const destination=await openLaunchCheckout({database,claim,secret,form});
       return json({url:destination},200);
