@@ -7,6 +7,7 @@ import PreviewShell from '../PreviewShell';
 import EarlyFreeOffer from '../EarlyFreeOffer';
 import VideoLibrary from '../VideoLibrary';
 import CheckoutReturn from '../CheckoutReturn';
+import {generationReference} from '../../../lib/template-generation.mjs';
 import catalogue from '../template-catalogue.json';
 import {canConfirmGeneration,generationQuoteFeedback} from '../../../lib/generation-feedback.mjs';
 import {motionCreditPreview,maySubmitDisplayedQuote} from '../../../lib/generation-experience.mjs';
@@ -67,7 +68,7 @@ export default function Creator(){
    media.onloadedmetadata=()=>{clearTimeout(timer);apply(media.duration)};
    media.onerror=()=>{clearTimeout(timer);if(!stopped){setEstimateError('Unable to read this video. Try another MP4.');setEstimateReading(false)}};
    media.src=video.url;
-  }else if(selectedPreset){setEstimateReading(true);apply(selectedPreset.durationSeconds)}else setEstimateReading(false);
+  }else if(selectedPreset){setEstimateReading(true);apply(generationReference(selectedPreset).seconds)}else setEstimateReading(false);
   return()=>{stopped=true;clearTimeout(timer);if(media){media.onloadedmetadata=null;media.onerror=null;media.removeAttribute('src');media.load()}};
  },[video.file,video.url,selectedPreset,model]);
  const [quoteClock,setQuoteClock]=useState(Date.now);
@@ -226,7 +227,7 @@ export default function Creator(){
   }
   const tr=(en,br,esText)=>pt?br:es?esText:en;
   const referenceCount=extraImages.length+(character.file?1:0);
-  const previewUrl=video.url||selectedPreset?.videoUrl;
+  const previewUrl=video.url||generationReference(selectedPreset).url;
   const previewTitle=video.file?.name||selectedPreset?.title||tr('Your next scene starts here.','Sua próxima cena começa aqui.','Tu próxima escena empieza aquí.');
   return <PreviewShell active="Creator" studio>
    <CheckoutReturn/>
@@ -273,7 +274,7 @@ export default function Creator(){
      {workspaceView==='history'&&<VideoLibrary embedded onCreate={()=>{setWorkspaceView('library');window.scrollTo({top:0,behavior:'smooth'})}} activeJobId={libraryFocusId} optimisticJob={optimisticGeneration} onActiveJobStatus={onActiveJobStatus} onReuse={job=>{setModel('lite');setQuality('720p');setPrompt(job.prompt||'');setCharacterTargets(new Map());setPromptOpen(true);setWorkspaceView('library');setGenerationMessage(tr('Creative settings copied. Choose a reference video and character photos to create a new draft.','Configurações copiadas. Escolha um vídeo e fotos para criar um novo projeto.','Ajustes copiados. Elige un vídeo y fotos para crear un nuevo proyecto.'))}}/>}
      {workspaceView==='library'&&<>
      <header className="ks-new-hero"><span>K4K MOTION LIBRARY</span><h1>{tr('TURN ONE VIDEO INTO MANY','TRANSFORME UM VÍDEO EM MUITOS','CONVIERTE UN VÍDEO EN MUCHOS')}</h1><p>{tr('Remix motion with your own characters.','Recrie movimentos com seus personagens.','Recrea movimientos con tus personajes.')}</p></header>
-     <section className="ks-new-library"><div className="ks-new-filter"><strong>{tr('Motion Library','Biblioteca de movimentos','Biblioteca de movimiento')}</strong><input aria-label="Search motion templates" placeholder={tr('Search scenes…','Buscar cenas…','Buscar escenas…')} value={templateSearch} onChange={e=>setTemplateSearch(e.target.value)}/></div><div className="ks-new-grid">{catalogue.discoveryPreviews.filter(preset=>preset.title.toLowerCase().includes(templateSearch.toLowerCase())).map(preset=><article key={preset.id} className="ks-new-card"><video src={preset.videoUrl} muted playsInline preload="metadata" loop onClick={e=>{const v=e.currentTarget;v.muted=!v.muted;v.play().catch(()=>{})}}/><div><strong>{preset.title}</strong><small>{Math.round(preset.durationSeconds)}s</small></div><button type="button" className="ks-generate" onClick={()=>{setSelectedPreset(preset);video.setFile(null);setSavedReference(null);setDraftMessage('');setWorkspaceView('library');setMediaPicker(null);window.scrollTo({top:0,behavior:'smooth'})}}>{selectedPreset?.id===preset.id?'Selected':tr('Use motion','Usar movimento','Usar movimiento')}</button></article>)}</div><p className="ks-inline-note">{tr('Select a motion to use it. Videos over 15 seconds must be trimmed before generation.','Selecione um movimento. Vídeos acima de 15 segundos precisam ser cortados.','Selecciona un movimiento. Recorta los vídeos de más de 15 segundos.')}</p></section>
+     <section className="ks-new-library"><div className="ks-new-filter"><strong>{tr('Motion Library','Biblioteca de movimentos','Biblioteca de movimiento')}</strong><input aria-label="Search motion templates" placeholder={tr('Search scenes…','Buscar cenas…','Buscar escenas…')} value={templateSearch} onChange={e=>setTemplateSearch(e.target.value)}/></div><div className="ks-new-grid">{catalogue.discoveryPreviews.filter(preset=>preset.title.toLowerCase().includes(templateSearch.toLowerCase())).map(preset=><article key={preset.id} className="ks-new-card"><video src={preset.videoUrl} muted playsInline preload="metadata" loop onClick={e=>{const v=e.currentTarget;v.muted=!v.muted;v.play().catch(()=>{})}}/><div><strong>{preset.title}</strong><small>{Math.round(preset.durationSeconds)}s</small></div><button type="button" className="ks-generate" onClick={()=>{setSelectedPreset(preset);video.setFile(null);setSavedReference(null);setDraftMessage('');setWorkspaceView('library');setMediaPicker(null);window.scrollTo({top:0,behavior:'smooth'})}}>{selectedPreset?.id===preset.id?'Selected':tr('Use motion','Usar movimento','Usar movimiento')}</button></article>)}</div><p className="ks-inline-note">{tr('Select a motion to use its generation-ready reference. Uploaded videos must be 2–15 seconds.','Selecione um movimento para usar sua referência pronta. Vídeos enviados devem ter 2–15 segundos.','Selecciona un movimiento para usar su referencia lista. Los vídeos subidos deben durar entre 2 y 15 segundos.')}</p></section>
      <details className="ks-history"><summary><FolderOpen size={16}/>{tr('Saved drafts & activity','Projetos salvos e atividade','Proyectos guardados y actividad')}</summary><button type="button" onClick={loadHistory}>{tr('Refresh history','Atualizar histórico','Actualizar historial')}</button>{historyState&&<p role="status">{historyState}</p>}{history.map(job=><p key={job.id}><span>{job.model==='lite'?'Motion Lite':'Motion Pro'}</span><span>{job.status}</span></p>)}</details>
      <p className="ks-status-note">{tr('Preview workspace · generation availability and credit cost are checked before confirmation.','Estúdio em prévia · disponibilidade e custo verificados antes da confirmação.','Estudio en vista previa · disponibilidad y coste verificados antes de confirmar.')}</p>
      </>}
