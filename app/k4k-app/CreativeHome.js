@@ -37,14 +37,14 @@ export default function CreativeHome(){
          <Link href="/k4k-app/motion">K4K Motion</Link>
          <Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link>
        </nav>
-       <div className="khf-header-actions">
+       <div className="khf-header-actions" aria-label={tr("Account and creation","Conta e criação","Cuenta y creación")}>
          <label className="khf-locale"><Globe2 size={15}/><select value={locale} onChange={e=>changeLocale(e.target.value)} aria-label="Language"><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label>
-         {user?<AccountMenu user={user}/>:<Link className="khf-signin" href="/login?next=%2Fk4k-app%2Fcreate">{tr('Log in','Entrar','Iniciar sesión')}</Link>}
+         {user?<AccountMenu user={user}/>:<Link className="khf-signin" aria-label={tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} href="/login?next=%2Fk4k-app%2Fcreate">{tr('Log in','Entrar','Iniciar sesión')}</Link>}
          <Link className="khf-header-cta" href="/k4k-app/create">{tr('Start creating','Começar a criar','Empezar a crear')}<ArrowUpRight size={15}/></Link>
-         <button className="khf-menu-button" type="button" aria-label={menu?'Close menu':'Open menu'} aria-expanded={menu} onClick={()=>setMenu(v=>!v)}>{menu?<X size={20}/>:<Menu size={20}/>}</button>
+         <button className="khf-menu-button" type="button" aria-controls="khf-mobile-menu" aria-label={menu?'Close menu':'Open menu'} aria-expanded={menu} onClick={()=>setMenu(v=>!v)}>{menu?<X size={20}/>:<Menu size={20}/>}</button>
        </div>
      </div>
-     {menu&&<nav className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/k4k-app/create">{tr('Creative Studio','Estúdio criativo','Estudio creativo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion · Templates</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/explore">{tr('Explore templates','Explorar templates','Explorar plantillas')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">K4K Remix</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link></nav>}
+     {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/k4k-app/create">{tr('Creative Studio','Estúdio criativo','Estudio creativo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion · Templates</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/explore">{tr('Explore templates','Explorar templates','Explorar plantillas')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">K4K Remix</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
    </header>
    <main>
      <section className="khf-hero" aria-labelledby="khf-hero-title">
