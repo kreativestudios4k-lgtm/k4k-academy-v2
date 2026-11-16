@@ -15,7 +15,7 @@ test('Motion editor uses K4K uploaded catalogue, supported template check and ex
  assert.match(studio,/catalogue\.trending/);assert.match(studio,/catalogue\.discoveryPreviews/);
  assert.match(studio,/generationReference\(item\)\.supported/);
  assert.match(studio,/<TemplateCreateSheet item=\{sheet\}/);
- assert.match(studio,/Premium K4K Motion Lite, Pro and Ultra remain in API pilot/);
+ assert.match(studio,/K4K Motion Lite, Pro and Ultra are still in API pilot/);
  assert.match(studio,/\/k4k-app\/videos/);
  assert.match(studio,/\/k4k-app\/creator/);
 });
