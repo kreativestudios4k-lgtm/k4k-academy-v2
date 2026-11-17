@@ -26,6 +26,7 @@ export default function OwnerCreativeQA({model,mode,prompt,aspect}){
  if(!enabled||!supported)return null;
  async function check(jobId){
   const v=await qaRequest({action:'status',jobId});
+  setJobs(prev=>prev.map(j=>j.id===jobId?{...j,status:v.status==='completed'?'completed':['failed','review'].includes(v.status)?v.status:'submitted'}:j));
   if(v.status==='completed'){setOutput(v.url);setMessage('Completed. Output saved in your private K4K storage.')}
   else if(v.status==='failed'||v.status==='review')setMessage(v.status==='review'?'Provider submission needs manual review. Do not submit again.':'Provider generation failed. No customer credits were used.');
   else setMessage('Provider status: '+v.status);
