@@ -12,7 +12,7 @@ import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
 export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId=''}){
- const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
+ const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:'');
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
  const [previewOriginalId,setPreviewOriginalId]=useState(initialPreviewId||initialTemplateId||'');
@@ -41,9 +41,8 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  },[video,templateId]);
  async function verifyUploads(){
   if(actionLock.current)return;
-  actionLock.current=true;setBusy(true);setError('');setResult(null);
+  actionLock.current=true;setError('');setResult(null);
   try{
-   if(customer&&!consent)throw Error('Confirm permission to use the source video and character photos.');
    if(!castReady)throw Error(castError||'Add a photo to every character slot.');
    if(!source&&(!video||video.type!=='video/mp4'||video.size<12||video.size>50*1024*1024))throw Error('Choose an MP4 up to 50 MB.');
    if(images.length<1||images.length>8||images.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size<12||f.size>10*1024*1024))throw Error('Choose 1–8 JPG, PNG or WEBP images, up to 10 MB each.');
@@ -73,8 +72,10 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    }
    const response=await fetch('/api/higgsfield/customer-preview-media',{method:'POST',cache:'no-store',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({videoPath:saved.videoPath,referencePaths:saved.referencePaths,resolution})});
    const body=await response.json();if(!response.ok)throw Error('Media verification failed. Use a 4–30 second MP4 and valid images at least 240 × 240 pixels.');
+   if(!body.verifiedInputStorage)throw Error('Private file verification did not complete.');
    setResult(body);
-  }catch(e){setError(e.message||'Unable to verify media.')}finally{actionLock.current=false;setBusy(false)}
+   return {videoPath:saved.videoPath,referencePaths:[...saved.referencePaths]};
+  }catch(e){const safe=e instanceof Error?e:Error('Unable to verify media.');setError(safe.message);throw safe}finally{actionLock.current=false}
  }
  function selectSourceTemplate(id){
   setPreviewOriginalId(id);
@@ -115,7 +116,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    </section>}
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
-   <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. See the credit cost instantly before you generate. Files remain on this device until you choose Upload and verify; verification saves them privately without starting a generation.</p>
+   <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. See the credit cost instantly before you generate. Your files are checked privately when you select Generate. No credits are charged until you confirm the price.</p>
    {customer&&<div className="khm-source-selector"><label>Choose your source</label><button type="button" className="khm-source-trigger" onClick={()=>{setAssetsQuery('');setAssetsTab('presets');setAssetsOpen(true)}} disabled={busy}><span>{selectedTemplate?.title||'Upload my own video'}</span><span>Browse presets and uploads</span><ChevronDown size={18}/></button></div>}
    <div className="khm-motion-control-title"><small>REALITY MANIPULATION</small><h2>K4K <em>Motion</em></h2><p>Motion transfer · Character & object references</p></div>
    <div className="khm-video-stage" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
@@ -144,18 +145,18 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
      })}
     </div>
     <div className="khm-credit-summary" aria-live="polite">
-     <span>{result?.verifiedInputStorage?'Verified media · credit estimate':'Estimated cost before verification'}</span>
+     <span>Estimated credits · updated automatically</span>
      <strong>{credits!==null?credits+' credits':'Choose a source video to see credits'}</strong>
-     <small>{billableSeconds!==null?billableSeconds+' billed seconds · '+resolution+' · exact signed quote shown before payment':'Credit price depends on the video duration and selected resolution.'}</small>
+     <small>{billableSeconds!==null?billableSeconds+' billed seconds · '+resolution+' · final amount confirmed before charging':'Credit price depends on the video duration and selected resolution.'}</small>
     </div>
     {customer&&credits!==null&&!withinBudget&&<p role="status" style={{color:'#efc895',fontSize:13}}>This quality exceeds the current per-video provider limit. Choose a lower resolution or shorter video.</p>}
-    {customer&&<label className="khm-permission"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} disabled={busy}/> I have permission to use this video and every character photo.</label>}
-    <button type="button" className="khm-private-upload" onClick={verifyUploads} disabled={busy||(customer&&(!consent||!withinBudget))||!castReady||billableSeconds===null}>{busy?'Verifying files…':result?.verifiedInputStorage?'Files verified · Verify again':'Verify files privately · No credits charged'}</button>
     {error&&<p role="alert" style={{color:'#ffa9a9'}}>{error}</p>}
-    {result?.verifiedInputStorage&&<p role="status" style={{color:'#a1efa5',fontSize:13}}>Source video and character photos verified privately. Your exact credit charge will be confirmed before Generate.</p>}
-   </section>
-   <section className="khm-generate-panel" style={{...panel,marginTop:18}}>
-    <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt} media={castReady&&(!customer||consent)&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution} estimatedCredits={credits}/>
+    <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt}
+      onPrepareMedia={verifyUploads}
+      canGenerate={castReady&&billableSeconds!==null&&withinBudget}
+      selectionKey={JSON.stringify([templateId,video?.name,video?.size,video?.lastModified,images.map(f=>f?[f.name,f.size,f.lastModified]:null),targets,main,direction,resolution])}
+      media={null} resolution={resolution} estimatedCredits={credits}/>
+    <p className="khm-permission-note">By confirming generation, you confirm you have permission to use the source video and character photos.</p>
    </section>
   </div>
  {assetsOpen&&<div className="khm-assets-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAssetsOpen(false)}}><section className="khm-assets-dialog" role="dialog" aria-modal="true" aria-label="Choose motion reference video"><header><div><span>K4K MOTION · ASSETS</span><h2>Choose source video</h2></div><button aria-label="Close asset picker" type="button" onClick={()=>setAssetsOpen(false)}><X size={21}/></button></header><div className="khm-assets-tabs"><button type="button" className={assetsTab==='uploads'?'active':''} onClick={()=>setAssetsTab('uploads')}>Uploads</button><button type="button" className={assetsTab==='presets'?'active':''} onClick={()=>setAssetsTab('presets')}>Presets · {templates.length}</button></div>{assetsTab==='presets'&&<label className="khm-assets-search"><Search size={16}/><input placeholder="Find a motion template" aria-label="Search motion templates" value={assetsQuery} onChange={e=>setAssetsQuery(e.target.value)}/></label>}<div className="khm-assets-grid"><button type="button" className="khm-asset-upload" onClick={()=>selectSourceTemplate('')}><Upload size={28}/><strong>Use my own video</strong><small>4–30s MP4 · max 50 MB</small></button>{assetsTab==='presets'&&filteredAssets.map(t=><button type="button" className={'khm-asset-card'+(t.id===templateId?' active':'')} key={t.id} onClick={()=>selectSourceTemplate(t.id)}><span className="khm-asset-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span><Play size={14}/></span></span><strong>{t.title}</strong><small>{Math.ceil(generationReference(t).seconds)}s</small></button>)}</div><footer>Preset videos are only available where K4K has a verified reference. Selecting a preset never charges credits.</footer></section></div>}
