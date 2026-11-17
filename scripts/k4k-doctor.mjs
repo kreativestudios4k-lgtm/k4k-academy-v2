@@ -11,7 +11,7 @@ const catalogue=JSON.parse(read('app/k4k-app/template-catalogue.json'));
 const originals=catalogue.discoveryPreviews.filter(item=>item.k4kOriginal===true);
 ensure(originals.length===10,'Motion: expected ten K4K Originals');
 for(const item of originals){
- const ref=generationReference(item);
+ const ref=generationReference(item,{maxSeconds:30});
  ensure(ref.supported&&ref.seconds>=4&&ref.seconds<=30,'Motion: invalid 4–30s generation source: '+item.id);
  ensure(item.previewOnly!==true,'Motion: valid original blocked as preview-only: '+item.id);
  ensure(/^https:\/\/(?:v3b\.fal\.media|d2ol7oe51mr4n9\.cloudfront\.net)\//.test(ref.url||''),'Motion: unsupported source host: '+item.id);
