@@ -1,18 +1,27 @@
-# Higgsfield private media preview — 17 November 2026
+# Higgsfield customer integration — 17 November 2026
 
-The owner preview at `/k4k-app/higgsfield-preview` now offers **Upload and verify privately**. It saves the selected MP4 and 1–8 reference images into the existing private Studio buckets using the signed-in user's storage permissions. Completed uploads are reused when retrying verification or changing output resolution within the same selection.
+The owner-only preview at `/k4k-app/higgsfield-preview` connects private upload verification, provider reference transfer, signed customer quotes, atomic credit reservation, one-shot Genjutsu dispatch, status reconciliation, confirmed failure refunds, and private playback/downloads.
 
-`POST /api/higgsfield/customer-preview-media` first checks preview environment, same-origin requests and the authenticated owner. A preflight request allows the UI to check access before uploading. Verification uses the user's JWT and public Supabase key, preserving storage RLS; it never uses service-role privileges. It accepts only owned storage paths and resolution, never browser duration, prices, credit amounts or arbitrary URLs.
+`POST /api/higgsfield/customer-jobs` supports prepare, submit, status, list and download. It requires preview, a dedicated flag, same origin, verified non-anonymous JWT and the existing owner account. It rejects client billing amounts, identities, verification evidence and provider URLs.
 
-The existing media verifier checks file signatures, byte limits, image dimensions and MP4 movie-header duration. This is container metadata verification, not a complete video decode or proof of provider compatibility. The response gives an informational provider cost estimate using that duration. It does not issue a signed quote, persist a customer job, debit credits or dispatch a provider request. Production returns 404.
+Reference transfer downloads through the user's storage RLS, caches the exact verified bytes, and uploads those bytes to provider-issued signed S3 URLs with returned headers. API credentials go only to the fixed Higgsfield API host. SHA-256 receipts and duration are persisted in the server-only verified_media column. The additive migration was applied without changing balances.
 
-Read-only inspection confirmed both buckets are private, with 10 MiB image and 50 MiB MP4 limits, and authenticated insert/select policies restricted to the user's folder. No policies, balances or database records were changed.
+Preparing a quote does not debit or generate. Submit verifies the signed quote, provider configuration and budgets before atomic reservation. An irreversible SQL dispatch claim prevents duplicate paid requests. Network uncertainty never automatically resubmits. SQL permits refunds before a dispatch claim; after a claim it refuses refunds without authenticated terminal-failure evidence.
 
-Regression coverage includes cross-user paths, duplicate images, arbitrary URLs, client billing fields, malformed/out-of-range MP4s, environment/origin/auth restrictions, read-only preflight and propagation of the user JWT for RLS. Browser upload and real authenticated storage verification still require an owner session; automated tests use storage fixtures.
+Status authenticates to Higgsfield and binds the exact provider request. Output is validated, archived privately and settled once. Interrupted settlement can reuse existing private output only if all bytes match authenticated provider output. Failed/nsfw/canceled requests use the terminal-evidence refund RPC. The recent-job library resumes status checks and issues fresh private view/download links.
 
-## Remaining activation gates
+## Rate and limits
 
-- Bind verified content to immutable provider-accessible inputs and the durable draft before signing a customer quote. This endpoint's response must never be accepted as client-provided verification evidence.
-- Finish the customer-facing quote/reservation/dispatch/status flow using the staged ledger adapters.
-- Verify approved pricing and an actual provider charge, then run the bounded authenticated customer journey through completion/refund and download.
-- Keep paid customer Higgsfield dispatch disabled and PR #125 draft until these checks pass. Existing subscriptions and prices are unchanged.
+The official model and pricing pages were rechecked on 17 November 2026:
+https://open.higgsfield.ai/models/higgsfield/genjutsu/motion-transfer/v1.0/playground
+https://open.higgsfield.ai/pricing
+
+Current standard per-second rates: $0.1540 at 480p, $0.3446 at 720p, $0.8346 at 1080p, rounded up to whole source seconds. New quotes use these rates; historical QA records and subscriptions remain unchanged. At the existing $0.10 provider-cost-per-credit ratio, five billed 480p seconds estimate $0.77 / 8 credits. Actual provider billing has not been independently reconciled against a receipt.
+
+Branch-only configuration enables the authenticated owner, with a $1.60 job maximum, $20 daily and $200 cumulative shared-budget ceilings and one active job. No provider request is submitted until Generate is pressed on a signed quote. Production Higgsfield remains disabled.
+
+## Verification and remaining release gate
+
+Tests cover the orchestrated flow with mocked provider/storage and real PGlite ledger checks: duplicates, uncertainty, ownership, malicious upload destinations/headers, changed quotes, budgets and identical-output recovery. Full tests/build are required before publishing.
+
+Before public activation, verify an authenticated owner journey through actual reference upload, quote, debit, provider completion/failure, credit reconciliation and MP4 download. Media-header checks are not full codec decoding or a guarantee of provider acceptance. Do not claim this real journey or provider billing passed from mocks alone. Keep PR #125 draft until that evidence exists.

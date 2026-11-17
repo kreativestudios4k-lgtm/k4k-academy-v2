@@ -17,7 +17,7 @@ test('nameless single-person prompt, source and exactly one portrait',()=>{
 });
 test('5 billed seconds and $1.60 cap',()=>{
  const p=genjutsuEstimate({sourceSeconds:4.766667,resolution:'480p'});
- assert.equal(p.duration,5);assert.equal(p.usd,1.59);
+ assert.equal(p.duration,5);assert.equal(p.usd,0.77);
  assert.match(second,/sourceSeconds:4\.766667/);
  assert.match(second,/cost\.usd>1\.60/);
  assert.match(second,/cost\.usd!==1\.59/);

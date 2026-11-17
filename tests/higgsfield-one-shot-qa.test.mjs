@@ -6,7 +6,7 @@ const source=readFileSync(new URL('../app/api/higgsfield/first-paid-qa/route.js'
 const ui=readFileSync(new URL('../app/k4k-app/higgsfield-connection/page.js',import.meta.url),'utf8');
 test('cost is 4.13 second source rounded to 5 seconds at approved 480p rate',()=>{
  const price=genjutsuEstimate({sourceSeconds:4.133333,resolution:'480p'});
- assert.equal(price.duration,5);assert.equal(price.usd,1.59);
+ assert.equal(price.duration,5);assert.equal(price.usd,0.77);
  assert.match(source,/cost\.usd>1\.60/);
  assert.match(source,/cost\.usd!==1\.59/);
  assert.match(source,/sourceSeconds:4\.133333/);

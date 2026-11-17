@@ -34,7 +34,7 @@ test('verified queued quote gets irreversible single dispatch claim; replay does
  const adapter=createHiggsfieldCustomerDispatch({enabled:true,env,lookupJob:async()=>job,
   getVerifiedMedia:async()=>media,
   provider:{submit:async(tier,request,config)=>{
-   submit++;assert.equal(config.sourceSeconds,media.seconds);assert.equal(config.quotedUsd,1.59);
+   submit++;assert.equal(config.sourceSeconds,media.seconds);assert.equal(config.quotedUsd,0.77);
    assert.deepEqual(request,input);return {request_id:rid};
   }},
   database:{rpc:async(name,args)=>{

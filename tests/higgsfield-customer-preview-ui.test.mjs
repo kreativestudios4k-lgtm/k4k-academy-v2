@@ -11,7 +11,7 @@ test('customer quote preview requires authenticated owner and exact preview envi
 test('customer preview is estimate only with no signed quote, media upload, credits or dispatch',()=>{
  for(const marker of ["signedQuote:false","creditsReserved:false","providerDispatched:false","generationEnabled:false","verifiedVideoDuration:false"])assert.ok(api.includes(marker),marker);
  assert.doesNotMatch(api,/service.role|SUPABASE_SERVICE_ROLE_KEY|hf\.submit|\.upload\(|k4k_multimodel_reserve_live|customer_disptach/i);
- assert.match(page,/Generation locked · Preview/);
+ assert.match(page,/<CustomerGeneration/);
  assert.match(page,/Files remain on this device/);
  assert.match(page,/api\/higgsfield\/customer-preview-estimate/);
  assert.doesNotMatch(page,/onClick=\{.*generate|customer-credit-authorization/);

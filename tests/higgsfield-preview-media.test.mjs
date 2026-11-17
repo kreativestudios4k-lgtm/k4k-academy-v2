@@ -15,7 +15,7 @@ function client({bytes=video(),userId=owner}={}){
 }
 test('reads owned private bytes, uses MP4 duration and cannot authorize dispatch',async()=>{
  const c=client(),r=await inspectHiggsfieldPreviewMedia({client:c,userId:owner,body});
- assert.equal(r.sourceSeconds,4.77);assert.equal(r.billedSeconds,5);assert.equal(r.estimatedProviderUsd,1.59);
+ assert.equal(r.sourceSeconds,4.77);assert.equal(r.billedSeconds,5);assert.equal(r.estimatedProviderUsd,0.77);
  assert.equal(r.verifiedVideoDuration,true);assert.equal(r.verifiedInputStorage,true);
  for(const key of ['signedQuote','creditsReserved','providerDispatched','generationEnabled'])assert.equal(r[key],false);
  assert.equal(c.reads.length,2);

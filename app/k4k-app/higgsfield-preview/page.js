@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import CustomerGeneration from './customer-generation';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
 export default function HiggsfieldPreview(){
@@ -70,7 +71,7 @@ export default function HiggsfieldPreview(){
    <Link href="/k4k-app/higgsfield-connection" style={{color:'#a1efa5'}}>← K4K owner QA</Link>
    <p style={{color:'#a1efa5',letterSpacing:3,fontSize:12,marginTop:34}}>K4K MOTION · CUSTOMER FLOW PREVIEW</p>
    <h1 style={{fontSize:'clamp(31px,6vw,56px)',lineHeight:1.08,margin:'9px 0'}}>Don't follow the trend. Create it.</h1>
-   <p style={{color:'#adbdaf',maxWidth:730,lineHeight:1.6}}>Test the upcoming video-swap flow without spending API money or customer credits. Files remain on this device until you choose Upload and verify. Verification saves them privately and checks their contents without starting a generation.</p>
+   <p style={{color:'#adbdaf',maxWidth:730,lineHeight:1.6}}>Prepare your video swap and review the credit cost before generating. Files remain on this device until you choose Upload and verify. Verification saves them privately and checks their contents without starting a generation.</p>
    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
     <section style={panel}>
      <h2 style={{fontSize:20}}>01 · Source video</h2>
@@ -100,10 +101,7 @@ export default function HiggsfieldPreview(){
      </div>}
    </section>
    <section style={{...panel,marginTop:18}}>
-    <h2 style={{fontSize:20}}>04 · Generate</h2>
-    <p style={{color:'#b5c6b7'}}>Locked until verified uploads, signed customer quotes and an end-to-end billing test pass.</p>
-    <button type="button" disabled style={{padding:'13px 20px',border:0,borderRadius:10,background:'#a1efa5',color:'#142015',fontWeight:800,opacity:.4}}>Generation locked · Preview</button>
-    <p style={{fontSize:12,color:'#a2b5a4'}}>No new paid API call. No customer charges. Production unchanged.</p>
+    <CustomerGeneration media={result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution}/>
    </section>
   </div>
  </main>;

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {PGlite} from '@electric-sql/pglite';
-const migrations=['20261116230000_k4k_multimodel_job_drafts.sql','20261116231000_k4k_multimodel_atomic_ledger.sql','20261116232000_k4k_multimodel_dispatch_claims.sql','20261117093000_k4k_multimodel_higgsfield_ledger_support.sql'].map(f=>readFileSync(new URL('../supabase/migrations/'+f,import.meta.url),'utf8'));
+const migrations=['20261116230000_k4k_multimodel_job_drafts.sql','20261116231000_k4k_multimodel_atomic_ledger.sql','20261116232000_k4k_multimodel_dispatch_claims.sql','20261117093000_k4k_multimodel_higgsfield_ledger_support.sql','20261117103000_k4k_higgsfield_verified_media.sql'].map(f=>readFileSync(new URL('../supabase/migrations/'+f,import.meta.url),'utf8'));
 const user='11111111-1111-4111-8111-111111111111',job='22222222-2222-4222-8222-222222222222',key='33333333-3333-4333-8333-333333333333',fingerprint='a'.repeat(64);
 async function setup(){
  const db=new PGlite();

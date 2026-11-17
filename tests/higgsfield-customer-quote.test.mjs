@@ -10,15 +10,15 @@ const env={VERCEL_ENV:'preview',K4K_HIGGSFIELD_CUSTOMER_QUOTE_PREVIEW:'true',
  K4K_HIGGSFIELD_RATE_CARD_APPROVED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',
  K4K_PROVIDER_USD_PER_CREDIT:'0.10',K4K_GENERATION_MAX_USD:'2',
  K4K_GENERATION_QUOTE_SECRET:'a-long-secret-that-is-only-for-tests-and-not-production'};
-test('server-verified 4.77s at 480p bills 5 seconds $1.59 and 16 credits',()=>{
+test('server-verified 4.77s at 480p bills 5 seconds $0.77 and 8 credits',()=>{
  const q=prepareHiggsfieldCustomerQuote({job,userId,verifiedMedia,env});
- assert.equal(q.usd,1.59);
- assert.equal(q.quoteMicros,1590000);
+ assert.equal(q.usd,0.77);
+ assert.equal(q.quoteMicros,770000);
  assert.equal(q.duration,5);
- assert.equal(q.credits,16);
+ assert.equal(q.credits,8);
  assert.equal(q.dispatchEnabled,false);
  const check=verifyHiggsfieldCustomerQuote({job,userId,verifiedMedia,token:q.quoteToken,env});
- assert.equal(check.credits,16);
+ assert.equal(check.credits,8);
  assert.equal(check.fingerprint.length,64);
  assert.equal(check.dispatchEnabled,false);
 });
@@ -40,7 +40,7 @@ test('unverified source or arbitrary reference URL blocks quote issuance',()=>{
   assert.throws(()=>prepareHiggsfieldCustomerQuote({job:{...job,input:{...job.input,video_url}},userId,verifiedMedia,env}),/UNTRUSTED_REFERENCE_URL|INVALID_PROVIDER_INPUT/);
 });
 test('rate-card approval, preview flag, price config and cap all fail closed',()=>{
- for(const patch of [{VERCEL_ENV:'production'},{K4K_HIGGSFIELD_CUSTOMER_QUOTE_PREVIEW:'false'},{K4K_HIGGSFIELD_RATE_CARD_APPROVED:'false'},{K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'false'},{K4K_GENERATION_MAX_USD:'1'}])
+ for(const patch of [{VERCEL_ENV:'production'},{K4K_HIGGSFIELD_CUSTOMER_QUOTE_PREVIEW:'false'},{K4K_HIGGSFIELD_RATE_CARD_APPROVED:'false'},{K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'false'},{K4K_GENERATION_MAX_USD:'0.5'}])
   assert.throws(()=>prepareHiggsfieldCustomerQuote({job,userId,verifiedMedia,env:{...env,...patch}}));
 });
 test('quote expires after five minutes; future default dispatch remains disabled',()=>{
