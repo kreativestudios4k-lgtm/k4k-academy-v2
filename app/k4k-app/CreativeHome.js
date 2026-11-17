@@ -27,7 +27,7 @@ export default function CreativeHome(){
  const [backgroundIndex,setBackgroundIndex]=useState(0);
  return <div className="k4k-hf-home">
    <div className="khf-site-video-bg" aria-hidden="true">
-     {backgroundClips.length>0&&<video key={backgroundClips[backgroundIndex]?.id} className="khf-site-bg-video" src={backgroundClips[backgroundIndex]?.videoUrl} autoPlay muted playsInline preload="metadata" onEnded={()=>setBackgroundIndex(i=>(i+1)%backgroundClips.length)} onError={()=>setBackgroundIndex(i=>(i+1)%backgroundClips.length)}/>}
+     {backgroundClips.length>0&&backgroundIndex>=0&&<video key={backgroundClips[backgroundIndex]?.id} className="khf-site-bg-video" src={backgroundClips[backgroundIndex]?.videoUrl} autoPlay muted playsInline preload="metadata" onEnded={()=>setBackgroundIndex(i=>(i+1)%backgroundClips.length)} onError={()=>setBackgroundIndex(i=>i+1<backgroundClips.length?i+1:-1)}/>}
      <div className="khf-site-video-overlay"/>
    </div>
    <header className="khf-topbar">
