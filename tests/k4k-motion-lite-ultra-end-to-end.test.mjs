@@ -1,0 +1,45 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {genjutsuEstimate,genjutsuCustomerMaxUsd,GENJUTSU_LIGHT_MODEL_ID,GENJUTSU_MODEL_ID,storedMotionModel,storedMotionInput} from '../lib/server/higgsfield-genjutsu-motion.mjs';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const sourceVideo='https://d2ol7oe51mr4n9.cloudfront.net/u/input.mp4';
+const photo='https://d2ol7oe51mr4n9.cloudfront.net/u/reference.jpg';
+test('Lite and Ultra have independent priced official endpoints',()=>{
+ assert.equal(GENJUTSU_LIGHT_MODEL_ID,'higgsfield/genjutsu-light/motion-transfer/v1.0');
+ assert.equal(GENJUTSU_MODEL_ID,'higgsfield/genjutsu/motion-transfer/v1.0');
+ assert.equal(genjutsuEstimate({model:'lite',resolution:'720p',sourceSeconds:30}).duration,15);
+ assert.equal(genjutsuEstimate({model:'lite',resolution:'720p',sourceSeconds:30}).usd,2.2065);
+ assert.equal(genjutsuEstimate({model:'ultra',resolution:'720p',sourceSeconds:30}).duration,30);
+ assert.equal(genjutsuEstimate({model:'ultra',resolution:'720p',sourceSeconds:30}).usd,10.338);
+ assert.equal(genjutsuCustomerMaxUsd('1080p',{K4K_GENERATION_MAX_USD:'5'},'lite'),5);
+ assert.equal(genjutsuCustomerMaxUsd('1080p',{K4K_GENERATION_MAX_USD:'5'},'ultra'),2.1);
+});
+test('Stored model choice is server-only metadata and is stripped from provider payload',()=>{
+ const base={video_url:sourceVideo,image_urls:[photo],prompt:'Recreate motion',resolution:'480p'};
+ const lite={normalized_input:{...base,motionModel:'lite'}};
+ assert.equal(storedMotionModel(lite),'lite');
+ assert.deepEqual(storedMotionInput(lite),base);
+ const legacy={normalized_input:base};
+ assert.equal(storedMotionModel(legacy),'ultra');
+ assert.deepEqual(storedMotionInput(legacy),base);
+ assert.throws(()=>storedMotionInput({normalized_input:{...base,motionModel:'fake'}}),/INVALID_MOTION_MODEL/);
+ assert.throws(()=>storedMotionInput({normalized_input:{...base,disable_safety:true}}),/INVALID_PROVIDER_INPUT/);
+});
+test('customer Motion UI contains real Lite/Ultra selection and signed model identity',()=>{
+ const studio=read('app/k4k-app/higgsfield-preview/page.js');
+ const customer=read('app/k4k-app/higgsfield-preview/customer-generation.js');
+ const service=read('lib/server/higgsfield-customer-service.mjs');
+ const dispatch=read('lib/server/higgsfield-customer-dispatch.mjs');
+ const route=read('app/k4k-app/motion/page.js');
+ assert.match(studio,/K4K Motion Lite/);
+ assert.match(studio,/K4K Motion Ultra/);
+ assert.match(studio,/Lite uses only the first 15 seconds/);
+ assert.match(studio,/motionModel=\{motionModel\}/);
+ assert.match(studio,/onPrepareMedia=\{verifyUploads\}/);
+ assert.match(customer,/request\('prepare',\{jobId,\.\.\.verified,resolution,prompt,motionModel\}\)/);
+ assert.match(customer,/request\('submit'/);
+ assert.match(service,/normalized_input:\{\.\.\.transferred\.input,resolution:body\.resolution,prompt:body\.prompt\.trim\(\),motionModel\}/);
+ assert.match(dispatch,/provider\.submit\(motionModel,input/);
+ assert.match(route,/K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED/);
+});
