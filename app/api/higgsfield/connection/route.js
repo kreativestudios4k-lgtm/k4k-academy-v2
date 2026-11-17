@@ -25,7 +25,7 @@ export async function GET(request){
   const candidates=[
    ['pilot',process.env.K4K_HIGGSFIELD_API_PILOT],
    ['sdk',process.env.HF_CREDENTIALS]
-  ].filter(([,v])=>typeof v==='string'&&v.length>=12&&v!=='true'&&!/[\\s\\x00-\\x1f]/u.test(v));
+  ].filter(([,v])=>typeof v==='string'&&v.length>=12&&v!=='true'&&!/[\s\x00-\x1f]/u.test(v));
   if(!candidates.length)return respond({state:'not_configured',credentialVerified:false,paidGenerationEnabled:false},503);
   const attempts=[];
   for(const [source,credentials] of candidates){
