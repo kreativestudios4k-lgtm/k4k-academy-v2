@@ -12,7 +12,7 @@ test('K4K Motion is a dedicated motion editor, not the old Fluxfield swipe feed'
 });
 test('Motion editor uses K4K uploaded catalogue, supported template check and existing authenticated template creation flow',()=>{
  const studio=src('app/k4k-app/motion/MotionEditor.js');
- assert.match(studio,/catalogue\.trending/);assert.match(studio,/catalogue\.discoveryPreviews/);
+ assert.doesNotMatch(studio,/catalogue\.trending/);assert.match(studio,/catalogue\.discoveryPreviews/);
  assert.match(studio,/generationReference\(item\)\.supported/);
  assert.match(studio,/<TemplateCreateSheet item=\{sheet\}/);
  assert.match(studio,/Premium quality tiers are in API pilot/);

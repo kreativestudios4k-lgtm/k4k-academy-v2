@@ -11,10 +11,12 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId=''}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
+ const [previewOriginalId,setPreviewOriginalId]=useState(initialPreviewId||initialTemplateId||'');
+ const motionGallery=gallery.length?gallery:templates;
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
  const initialCast=templateCast(initialTemplate);
@@ -75,13 +77,15 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
   }catch(e){setError(e.message||'Unable to verify media.')}finally{actionLock.current=false;setBusy(false)}
  }
  function selectSourceTemplate(id){
+  setPreviewOriginalId(id);
   setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');setAssetsOpen(false);
   const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;
   setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);
  }
  const filteredAssets=templates.filter(t=>t.title.toLowerCase().includes(assetsQuery.toLowerCase().trim()));
- const libraryItems=templates.filter(t=>t.title.toLowerCase().includes(librarySearch.toLowerCase().trim())&&(libraryCategory==='all'||(libraryCategory==='short'?generationReference(t).seconds<=10:generationReference(t).seconds>10)));
- const featuredTemplate=selectedTemplate||libraryItems[0]||templates[0];
+ const libraryItems=motionGallery.filter(t=>t.title.toLowerCase().includes(librarySearch.toLowerCase().trim())&&(libraryCategory==='all'||(libraryCategory==='short'?t.durationSeconds<=10:t.durationSeconds>10)));
+ const featuredTemplate=motionGallery.find(t=>t.id===previewOriginalId)||selectedTemplate||libraryItems[0]||motionGallery[0];
+ const featuredUsable=!!featuredTemplate&&templates.some(t=>t.id===featuredTemplate.id);
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
@@ -91,11 +95,11 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
   <div className="khm-studio-layout">
    <nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>
    {customer&&<section id="motion-library" className="khm-motion-library" aria-label="K4K Motion Library">
-    <div className="khm-lib-top"><div className="khm-lib-tabs"><strong>◉ Motion Library</strong><Link href="/k4k-app/videos">History</Link></div><label className="khm-lib-search"><Search size={15}/><input aria-label="Search motion templates" placeholder="Search motions" value={librarySearch} onChange={e=>setLibrarySearch(e.target.value)}/></label></div>
+    <div className="khm-lib-top"><div className="khm-lib-tabs"><strong>◉ K4K Originals · Motion Library</strong><Link href="/k4k-app/videos">History</Link></div><label className="khm-lib-search"><Search size={15}/><input aria-label="Search motion templates" placeholder="Search motions" value={librarySearch} onChange={e=>setLibrarySearch(e.target.value)}/></label></div>
     <div className="khm-lib-categories" role="group" aria-label="Filter motions"><button className={libraryCategory==='all'?'active':''} onClick={()=>setLibraryCategory('all')}>All</button><button className={libraryCategory==='short'?'active':''} onClick={()=>setLibraryCategory('short')}>Short clips</button><button className={libraryCategory==='long'?'active':''} onClick={()=>setLibraryCategory('long')}>Longer scenes</button></div>
-    <div className="khm-lib-content"><div className="khm-lib-grid">{libraryItems.map(t=><button type="button" key={t.id} aria-pressed={t.id===templateId} className={'khm-lib-card'+(t.id===templateId?' active':'')} onClick={()=>{if(!busy)selectSourceTemplate(t.id)}} disabled={busy}><span className="khm-lib-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span className="khm-lib-play"><Play size={17}/></span><span className="khm-lib-length">{Math.ceil(generationReference(t).seconds)}s</span></span><span className="khm-lib-card-title">{t.title}</span></button>)}</div>{!libraryItems.length&&<p className="khm-lib-empty">No matching motion templates.</p>}
-    <aside className="khm-lib-feature"><div className="khm-lib-feature-media">{featuredTemplate&&<video key={featuredTemplate.id} src={generationReference(featuredTemplate).url} poster={featuredTemplate.posterUrl||undefined} autoPlay muted playsInline loop preload="metadata"/>}</div><div className="khm-lib-feature-info"><small>SELECTED MOTION</small><strong>{selectedTemplate?.title||'Choose a scene'}</strong><span>{selectedTemplate?'Ready to cast with your own character photos':'Choose a template or upload your own video'}</span><button type="button" onClick={()=>{document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}>Set up characters</button></div></aside></div>
-    <p className="khm-lib-foot">Templates are source footage. Your generated videos remain private in My Generations.</p>
+    <div className="khm-lib-content"><div className="khm-lib-grid">{libraryItems.map(t=><button type="button" key={t.id} aria-pressed={t.id===featuredTemplate?.id} className={'khm-lib-card'+(t.id===featuredTemplate?.id?' active':'')} onClick={()=>{if(busy)return;setPreviewOriginalId(t.id);if(templates.some(ready=>ready.id===t.id))selectSourceTemplate(t.id)}} disabled={busy}><span className="khm-lib-poster"><video src={t.videoUrl} muted playsInline preload="metadata" onLoadedMetadata={e=>{const v=e.currentTarget;if(Number.isFinite(v.duration)&&v.duration>0)v.currentTime=Math.min(0.15,v.duration/2)}}/><span className="khm-lib-play"><Play size={17}/></span><span className="khm-lib-length">{Math.ceil(t.durationSeconds)}s</span></span><span className="khm-lib-card-title">{t.title}</span><span className="khm-lib-card-status">{templates.some(ready=>ready.id===t.id)?'Use as source':'Preview only'}</span></button>)}</div>{!libraryItems.length&&<p className="khm-lib-empty">No K4K Originals match your search.</p>}
+    <aside className="khm-lib-feature"><div className="khm-lib-feature-media">{featuredTemplate&&<video key={featuredTemplate.id} src={featuredTemplate.videoUrl} autoPlay muted playsInline loop preload="metadata" controls/>}</div><div className="khm-lib-feature-info"><small>K4K ORIGINALS · {featuredUsable?'MOTION READY':'PREVIEW ONLY'}</small><strong>{featuredTemplate?.title||'Choose a scene'}</strong><span>{featuredUsable?'This reference is ready for character casting.':'This clip exceeds the supported preset duration. You can watch it here or upload your own source video in the editor.'}</span><button type="button" disabled={!featuredUsable} onClick={()=>{if(featuredTemplate){selectSourceTemplate(featuredTemplate.id);document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}}>{featuredUsable?'Use this motion':'Preview only'}</button></div></aside></div>
+    <p className="khm-lib-foot">K4K Originals only. Longer clips are preview-only; your generated videos stay private in My Generations.</p>
    </section>}
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>

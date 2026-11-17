@@ -22,7 +22,7 @@ test('Director Studio preselects only an eligible catalogue template',()=>{
  const page=read('app/k4k-app/motion/page.js');
  const studio=read('app/k4k-app/higgsfield-preview/page.js');
  const editor=read('app/k4k-app/motion/MotionEditor.js');
- assert.match(page,/\^k4k-\\d\{3\}\$/);
+ assert.match(page,/k4k-original-/);
  assert.match(page,/templates\.some\(t=>t\.id===requestedTemplate\)/);
  assert.match(page,/initialTemplateId=\{initialTemplateId\}/);
  assert.match(studio,/templates\.some\(t=>t\.id===initialTemplateId\)/);
