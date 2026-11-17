@@ -31,7 +31,7 @@ export async function POST(request){
   try{while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>50*1024*1024)throw Error('TEMPLATE_TOO_LARGE');chunks.push(value)}}catch(error){await reader.cancel().catch(()=>{});throw error}
   const bytes=new Uint8Array(total);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length}
   const durationSeconds=mp4DurationSeconds(bytes);
-  if(durationSeconds<2||durationSeconds>15)throw Error('TEMPLATE_DURATION_INVALID');
+  if(durationSeconds<2||durationSeconds>30)throw Error('TEMPLATE_DURATION_INVALID');
   const database=createClient(url,process.env.SUPABASE_SERVICE_ROLE_KEY,options);
   const videoPath=user.id+'/'+randomUUID()+'.mp4';
   const result=await database.storage.from('studio-videos').upload(videoPath,bytes,{contentType:'video/mp4',upsert:false});
