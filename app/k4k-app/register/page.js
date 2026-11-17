@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import './register.css';
+import '../auth-glass.css';
 import {createClient} from '../../../lib/supabase/client';
 import {validPlan,planDestination} from '../../../lib/customer-routes.mjs';
 export default function Register(){
