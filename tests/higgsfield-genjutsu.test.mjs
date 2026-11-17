@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,genjutsuInput,genjutsuEstimate,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu-motion.mjs';
+import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,genjutsuInput,genjutsuEstimate,genjutsuCustomerMaxUsd,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu-motion.mjs';
 const v='https://assets.example.com/input.mp4',images=['https://assets.example.com/character1.jpg','https://assets.example.com/character2.png'];
 test('official endpoint and published second-based rates are preserved',()=>{
  assert.equal(GENJUTSU_MODEL_ID,'higgsfield/genjutsu/motion-transfer/v1.0');
@@ -33,4 +33,16 @@ test('no paid request without preview pilot, approved rate and budget, independe
  assert.equal(count,2);
  await assert.rejects(make(env).submit('pro',input,{enabled:true,sourceSeconds:4,maxUsd:5,quotedUsd:2.724}),/PROVIDER_BUDGET_BLOCKED/);
  assert.equal(count,2);
+});
+
+test('30 second customer Motion works at 480p only within an approved funded $5 per-job guard',()=>{
+ const env={K4K_GENERATION_MAX_USD:'5',K4K_MOTION_720P_APPROVED:'true'};
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'480p'}).usd,4.62);
+ assert.equal(genjutsuCustomerMaxUsd('480p',env),5);
+ assert.ok(genjutsuEstimate({sourceSeconds:30,resolution:'480p'}).usd<=genjutsuCustomerMaxUsd('480p',env));
+ assert.equal(genjutsuCustomerMaxUsd('720p',env),4.5);
+ assert.ok(genjutsuEstimate({sourceSeconds:30,resolution:'720p'}).usd>genjutsuCustomerMaxUsd('720p',env));
+ assert.ok(genjutsuEstimate({sourceSeconds:30,resolution:'1080p'}).usd>genjutsuCustomerMaxUsd('1080p',env));
+ assert.throws(()=>genjutsuCustomerMaxUsd('480p',{K4K_GENERATION_MAX_USD:'5.01'}),/PROVIDER_BUDGET_BLOCKED/);
+ assert.equal(genjutsuCustomerMaxUsd('480p',{K4K_GENERATION_MAX_USD:'4.5'}),4.5);
 });
