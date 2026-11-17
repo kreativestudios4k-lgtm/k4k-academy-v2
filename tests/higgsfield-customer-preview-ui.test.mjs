@@ -12,7 +12,7 @@ test('customer preview is estimate only with no signed quote, media upload, cred
  for(const marker of ["signedQuote:false","creditsReserved:false","providerDispatched:false","generationEnabled:false","verifiedVideoDuration:false"])assert.ok(api.includes(marker),marker);
  assert.doesNotMatch(api,/service.role|SUPABASE_SERVICE_ROLE_KEY|hf\.submit|\.upload\(|k4k_multimodel_reserve_live|customer_disptach/i);
  assert.match(page,/<CustomerGeneration/);
- assert.match(page,/Files remain on this device/);
+ assert.match(page,/Your files are checked privately when you select Generate/);
  assert.match(page,/khm-credit-summary/);
  assert.match(page,/priceFor=quality/);
  assert.doesNotMatch(page,/Calculate estimated cost/);
