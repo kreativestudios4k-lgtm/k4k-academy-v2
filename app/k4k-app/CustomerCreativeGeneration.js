@@ -36,7 +36,7 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,ref
   {!quote?<button disabled={busy||referenceCount>0||prompt.trim().length<10} onClick={()=>attempt(async()=>{
    const q=await call({action:'quote',modelId:model.id,prompt,aspect});setQuote(q);setInfo('Quote ready. Review the credits before submitting.');
   })} style={{background:'#d6ff69',border:0,borderRadius:8,padding:'11px 15px',fontWeight:800,cursor:'pointer'}}>{busy?'Checking…':'Check credit cost'}</button>:
-   <div>{quote.tokenBillingUnverified&&<p role="alert" style={{fontSize:13,color:'#fbdc95'}}>Seedance owner pilot only. Provider billing uses tokens and the actual charge is unknown. This quote reserves K4K credits only. Do not treat this as a provider cost cap.</p>}<p style={{fontSize:14}}><strong>{quote.credits} credits</strong> · reservation for one generation. Price estimate: ${quote.quotedProviderUsd.toFixed(2)} provider budget · quote expires in five minutes.</p>
+   <div>{quote.tokenBillingUnverified&&<p role="alert" style={{fontSize:13,color:'#fbdc95'}}>Seedance owner pilot only. Provider billing uses tokens and the actual charge is unknown. This quote reserves K4K credits only. Do not treat this as a provider cost cap.</p>}<p style={{fontSize:14}}><strong>{quote.credits} credits</strong> · reservation for one generation. {quote.tokenBillingUnverified?'Unverified internal pilot benchmark':'Estimated provider budget'}: ${quote.quotedProviderUsd.toFixed(2)} · quote expires in five minutes.</p>
     <button disabled={busy} onClick={()=>attempt(async()=>{
      const requestKey=key.current||crypto.randomUUID();key.current=requestKey;
      const v=await call({action:'submit',jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey});
