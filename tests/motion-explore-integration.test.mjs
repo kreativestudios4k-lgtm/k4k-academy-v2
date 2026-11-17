@@ -2,10 +2,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
-test('old Explore address resolves to the same feed nested inside K4K Motion',()=>{
- assert.match(read('app/k4k-app/explore/page.js'),/redirect\('\/k4k-app\/motion\/explore'\)/);
- const page=read('app/k4k-app/motion/explore/page.js');
- assert.match(page,/MotionExploreGallery/);
+test('old Explore and Templates routes redirect visitors to the integrated Motion Library',()=>{
+ assert.ok(read('app/k4k-app/motion/explore/page.js').includes("redirect('/k4k-app/motion')"));
+ assert.ok(read('app/templates/page.js').includes("redirect('/k4k-app/motion')"));
+ const studio=read('app/k4k-app/higgsfield-preview/page.js');
+ assert.ok(studio.includes('khm-motion-library'));
 });
 test('Motion Explore preserves the video catalogue and links every eligible scene to Director Studio',()=>{
  const gallery=read('app/k4k-app/motion/MotionExploreGallery.js');
