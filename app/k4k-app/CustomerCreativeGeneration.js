@@ -9,13 +9,13 @@ async function call(body){
  if(!r.ok||json.error)throw Error(json.error||'Generation unavailable');
  return json;
 }
-export default function CustomerCreativeGeneration({model,mode,prompt,aspect,referenceCount=0}){
+export default function CustomerCreativeGeneration({model,mode,prompt,aspect,referenceCount=0,onModels}){
  const [access,setAccess]=useState({}),[quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[info,setInfo]=useState(''),[result,setResult]=useState(null);
  const lock=useRef(false),key=useRef(null);
  const enabled=access[model.id]===true&&(mode==='Text to video'||mode==='Text to image');
- useEffect(()=>{let alive=true;call({action:'models'}).then(v=>{if(alive)setAccess(Object.fromEntries(v.models.map(m=>[m.id,m.enabled]))) }).catch(()=>{if(alive)setAccess({})});call({action:'list'}).then(v=>{if(alive)setJobs(v.jobs||[])}).catch(()=>{});return()=>{alive=false}},[]);
+ useEffect(()=>{let alive=true;call({action:'models'}).then(v=>{if(alive){const availability=Object.fromEntries(v.models.map(m=>[m.id,m.enabled]));setAccess(availability);onModels?.(availability)}}).catch(()=>{if(alive){setAccess({});onModels?.({})}});call({action:'list'}).then(v=>{if(alive)setJobs(v.jobs||[])}).catch(()=>{});return()=>{alive=false}},[]);
  useEffect(()=>{setQuote(null);setResult(null);key.current=null;setInfo('')},[model.id,mode,prompt,aspect]);
- if(!enabled)return null;
+ if(!enabled)return <p style={{marginTop:12,fontSize:13,color:'#c9d0cb'}}>To generate with this model, <a href="/login" style={{textDecoration:'underline'}}>sign in</a> and select the text-only workflow. Models without public approval remain unavailable.</p>;
  async function attempt(fn){
   if(lock.current)return;lock.current=true;setBusy(true);
   try{await fn()}catch(e){setInfo(e.message)}finally{lock.current=false;setBusy(false)}
