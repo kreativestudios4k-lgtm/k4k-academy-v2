@@ -31,7 +31,7 @@ export default function PreviewShell({active,children,studio=true}){
  const labels=translations[locale]||{};
  return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')}>
   <header className="k4k-global-header">
-   <Link className="k4k-global-brand" href="/k4k-app/creator"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
+   <Link className="k4k-global-brand" href="/k4k-app" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
    {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app/explore">{labels.Explore||'Explore'}</Link><Link href="/k4k-app/creator" aria-current={active==='Creator'?'page':undefined}>{locale==='pt'?'Criar vídeo':locale==='es'?'Crear vídeo':'Create video'}</Link><Link href="/k4k-app/videos" aria-current={active==='Videos'?'page':undefined}>{locale==='pt'?'Minha biblioteca':locale==='es'?'Mi biblioteca':'My library'}</Link><Link href="/k4k-app/credits">{labels.Plans||'Plans'}</Link></nav>}
    <nav className="k4k-customer-nav" aria-label="Customer links"><LanguageSwitcher/><AccountStatus/></nav>
   </header>
