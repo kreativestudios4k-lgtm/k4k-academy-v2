@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,genjutsuInput,genjutsuEstimate,genjutsuCustomerMaxUsd,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu-motion.mjs';
+import {GENJUTSU_MODEL_ID,GENJUTSU_RATE_USD,GENJUTSU_LIGHT_MODEL_ID,GENJUTSU_LIGHT_RATE_USD,genjutsuInput,genjutsuEstimate,genjutsuCustomerMaxUsd,createGenjutsuProvider} from '../lib/server/higgsfield-genjutsu-motion.mjs';
 const v='https://assets.example.com/input.mp4',images=['https://assets.example.com/character1.jpg','https://assets.example.com/character2.png'];
 test('official endpoint and published second-based rates are preserved',()=>{
  assert.equal(GENJUTSU_MODEL_ID,'higgsfield/genjutsu/motion-transfer/v1.0');
@@ -45,4 +45,34 @@ test('30 second customer Motion works at 480p only within an approved funded $5 
  assert.ok(genjutsuEstimate({sourceSeconds:30,resolution:'1080p'}).usd>genjutsuCustomerMaxUsd('1080p',env));
  assert.throws(()=>genjutsuCustomerMaxUsd('480p',{K4K_GENERATION_MAX_USD:'5.01'}),/PROVIDER_BUDGET_BLOCKED/);
  assert.equal(genjutsuCustomerMaxUsd('480p',{K4K_GENERATION_MAX_USD:'4.5'}),4.5);
+});
+
+test('official Genjutsu Light endpoint bills at output-second rates and truncates 30-second source to 15',()=>{
+ assert.equal(GENJUTSU_LIGHT_MODEL_ID,'higgsfield/genjutsu-light/motion-transfer/v1.0');
+ assert.deepEqual(GENJUTSU_LIGHT_RATE_USD,{'480p':0.0739,'720p':0.1471,'1080p':0.2936});
+ assert.equal(genjutsuEstimate({sourceSeconds:4.77,resolution:'480p',model:'lite'}).usd,0.3695);
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'480p',model:'lite'}).usd,1.1085);
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'720p',model:'lite'}).usd,2.2065);
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'1080p',model:'lite'}).usd,4.404);
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'1080p',model:'lite'}).duration,15);
+ assert.equal(genjutsuEstimate({sourceSeconds:30,resolution:'480p',model:'ultra'}).duration,30);
+ const env={K4K_GENERATION_MAX_USD:'5'};
+ assert.equal(genjutsuCustomerMaxUsd('1080p',env,'lite'),5);
+ assert.equal(genjutsuCustomerMaxUsd('1080p',env,'ultra'),2.1);
+ assert.throws(()=>genjutsuEstimate({sourceSeconds:30,resolution:'720p',model:'unknown'}),/INVALID_MOTION_MODEL/);
+});
+test('provider submits Lite to Light REST endpoint only after separate rate approval, keeps Ultra unchanged',async()=>{
+ const env={VERCEL_ENV:'preview',K4K_HIGGSFIELD_GENERATION_PILOT_ENABLED:'true',HF_CREDENTIALS:'example-key:example-secret',K4K_HIGGSFIELD_RATE_CARD_APPROVED:'true',K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'true'};
+ const posts=[],fetchImpl=async(url,options)=>{posts.push({url,body:JSON.parse(options.body)});return {ok:true,json:async()=>({request_id:'light_request_001',status_url:'https://api.higgsfield.ai/requests/light_request_001/status'})}};
+ const input={video_url:v,image_urls:images,resolution:'480p'};
+ const lite=createGenjutsuProvider({env,fetchImpl});
+ const result=await lite.submit('lite',input,{enabled:true,sourceSeconds:30,maxUsd:5,quotedUsd:1.1085});
+ assert.equal(result.request_id,'light_request_001');
+ assert.equal(posts[0].url,'https://api.higgsfield.ai/higgsfield/genjutsu-light/motion-transfer/v1.0');
+ assert.deepEqual(posts[0].body,{video_url:v,image_urls:images,prompt:'',resolution:'480p'});
+ await lite.submit('ultra',input,{enabled:true,sourceSeconds:30,maxUsd:5,quotedUsd:4.62});
+ assert.equal(posts[1].url,'https://api.higgsfield.ai/higgsfield/genjutsu/motion-transfer/v1.0');
+ const denied=createGenjutsuProvider({env:{...env,K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'false'},fetchImpl});
+ await assert.rejects(denied.submit('lite',input,{enabled:true,sourceSeconds:30,maxUsd:5,quotedUsd:1.1085}),/PROVIDER_RATE_CARD_NOT_APPROVED/);
+ assert.equal(posts.length,2);
 });
