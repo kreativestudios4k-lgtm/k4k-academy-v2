@@ -20,8 +20,8 @@ export async function GET(request){
   const {data:{user}={},error}=await auth.auth.getUser(token);
   if(error||!user||user.is_anonymous)return respond({error:'UNAUTHENTICATED'},401);
   if(user.id!==ownerId)return respond({error:'NOT_AVAILABLE'},404);
-  const key=process.env.HF_CREDENTIALS||process.env.HF_API_KEY;
-  if(typeof key!=='string'||!key.trim())return respond({state:'not_configured'},503);
+  const key=process.env.HF_CREDENTIALS||process.env.K4K_HIGGSFIELD_API_PILOT||process.env.HF_API_KEY;
+  if(typeof key!=='string'||key.length<12||key==='true'||/[\s\x00-\x1f]/u.test(key))return respond({state:'not_configured'},503);
   const result=await createHiggsfieldCredentialProbe({credentials:key})();
   return respond({...result,paidGenerationEnabled:false});
  }catch{return respond({state:'unavailable',paidGenerationEnabled:false},503);}
