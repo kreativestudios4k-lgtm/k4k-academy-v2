@@ -22,7 +22,7 @@ test('private video and image output only from trusted fal CDN and signed privat
  assert.match(route,/studio-qa-images/);
  assert.match(route,/studio-generations/);
  assert.match(route,/createSignedUrl\(path,600\)/);
- assert.match(route,/OUTPUT_SIZE_UNVERIFIED/);
+ assert.match(route,/boundedCreativeDownload/);
  assert.doesNotMatch(route,/upsert:true/);
 });
 test('owner QA wallet is independent, atomic, bounded and never exposes authenticated table grants',()=>{
