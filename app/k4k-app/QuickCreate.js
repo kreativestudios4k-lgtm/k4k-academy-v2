@@ -7,8 +7,8 @@ import './quick-create.css';
 
 const choices={
  image:[
-  {label:'Nano Banana 2.1',description:'Create a new image',url:'/k4k-app/image?model=nano_banana_2_1'},
-  {label:'FLUX 3',description:'Create with FLUX',url:'/k4k-app/image?model=flux_3'}
+  {label:'Nano Banana 2.1',description:'Create a new image',url:'/k4k-app/image?model=nano_banana_2'},
+  {label:'FLUX 3',description:'Create with FLUX',url:'/k4k-app/image?model=flux_3_image'}
  ],
  video:[
   {label:'Kling 4.0',description:'Text to video',url:'/k4k-app/video?model=kling4_0'},
