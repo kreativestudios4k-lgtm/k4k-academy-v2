@@ -23,7 +23,8 @@ test('private media verification and signed final credit confirmation still gate
  assert.match(checkout,/request\('submit'/);
  assert.match(checkout,/quote\.credits/);
  assert.match(checkout,/exact confirmed charge/);
- assert.match(checkout,/Continue · estimated/);
+ assert.match(checkout,/busy\?'Preparing…':'Generate'/);
+ assert.match(checkout,/Confirm & Generate ·/);
  assert.doesNotMatch(checkout,/Prepare verified quote/);
 });
 test('completed jobs remain in Library only, not repeated inside the creation form',()=>{
