@@ -72,6 +72,6 @@ test('public Seedance has an independent kill switch, atomic UTC daily rate limi
  assert.match(route,/info.status==='FAILED'/);
  assert.match(route,/await refund\(db,userId,job\)/);
  assert.match(route,/model.providerBilling==='variable-tokens-public-beta'/);
- assert.match(client,/Seedance 2.5 Public Beta/);
+ assert.match(client,/Seedance 2.5 · Live text-to-video/);
  assert.match(client,/one submitted generation per account per UTC day/);
 });
