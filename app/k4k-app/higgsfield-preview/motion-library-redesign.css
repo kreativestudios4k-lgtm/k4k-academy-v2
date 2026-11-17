@@ -155,3 +155,14 @@
 .khm-root .khm-quality-panel .khm-permission-note{font-size:11px;color:#939396!important;line-height:1.5;margin-top:14px}
 .khm-root .khm-quality-panel>h2{margin-top:0}
 .khm-root .khm-quality-panel>section{max-width:100%}
+
+/* Two honest K4K Motion models — clearly differentiated, responsive and accessible. */
+.khm-root .khm-motion-model-choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}
+.khm-root .khm-motion-model-choices button{display:flex;flex-direction:column;align-items:flex-start;gap:8px;text-align:left;min-height:94px;width:100%;padding:16px;border:1px solid #45464a;border-radius:12px;background:#202124;color:#f4f4f6;cursor:pointer}
+.khm-root .khm-motion-model-choices button strong{font-size:15px;letter-spacing:-.02em}
+.khm-root .khm-motion-model-choices button small{font-size:11px;line-height:1.45;color:#afb0b7}
+.khm-root .khm-motion-model-choices button.selected{background:#292a2e;border:1px solid #efeff1;box-shadow:inset 0 0 0 1px #e8e8e9}
+.khm-root .khm-motion-model-choices button:hover{border-color:#b6b7ba}
+.khm-root .khm-motion-model-choices button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.khm-root .khm-model-length-note{font-size:12px;color:#d8d8dd;line-height:1.5;border-left:2px solid #eee;padding:8px 12px;background:#ffffff0a;margin:10px 0 16px}
+@media(max-width:650px){.khm-root .khm-motion-model-choices{grid-template-columns:1fr}.khm-root .khm-motion-model-choices button{min-height:75px;padding:13px}}
