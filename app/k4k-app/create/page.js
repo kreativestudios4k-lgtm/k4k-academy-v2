@@ -8,6 +8,7 @@ import OwnerCreativeQA from '../OwnerCreativeQA';
 import CustomerCreativeGeneration from '../CustomerCreativeGeneration';
 import {useK4KLocale} from '../locale';
 import './create.css';
+import './studio-generator.css';
 const UI={en:{eyebrow:'K4K CREATIVE STUDIO',headline:'Create what you imagine.',subtitle:'Choose Image or Video, select a model, and review the credit cost before creating. Advanced reference tools are shown only when supported.',images:'Images',videos:'Videos',models:'AI MODELS',settings:'CREATIVE CONTROLS',prompt:'Your prompt',placeholder:'Describe your scene, lighting, characters, movement and mood…',mode:'Workflow',resolution:'Quality',ratio:'Aspect ratio',duration:'Duration',reference:'Reference images',add:'Add references',preview:'Prepared references',copy:'Copy creative brief',copied:'Copied',active:'Wan 3 available',pilot:'API preview',pending:'Integration planned',open:'Open Wan 3',ready:'This workflow is not yet available',note:'No credits are charged on this page. Pending models cannot generate yet.',actions:'NEXT STEP',library:'My videos',explore:'Explore templates',title:'Your creation starts here',hint:'K4K Motion is premium character swapping. Wan 3 (Wan-powered) is the standard video generation tool.'},pt:{eyebrow:'K4K ESTÚDIO CRIATIVO',headline:'Crie sem limites.',subtitle:'Imagem e vídeo no mesmo lugar. Escolha um modelo, prepare suas referências e desenvolva sua ideia.',images:'Imagens',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CRIATIVOS',prompt:'Seu prompt',placeholder:'Descreva sua cena, iluminação, personagens, movimento e atmosfera…',mode:'Ferramenta',resolution:'Qualidade',ratio:'Proporção',duration:'Duração',reference:'Imagens de referência',add:'Adicionar referências',preview:'Referências preparadas',copy:'Copiar briefing',copied:'Copiado',active:'Wan 3 disponível',pilot:'Prévia da API',pending:'Integração planejada',open:'Abrir Wan 3',ready:'Prévia — geração ainda não conectada',note:'Nenhum crédito é cobrado nesta página. Os novos modelos ainda não podem gerar.',actions:'PRÓXIMO PASSO',library:'Meus vídeos',explore:'Explorar templates',title:'Sua criação começa aqui',hint:'Escolha um modelo e prepare seu briefing. Use o Wan 3 enquanto conectamos os modelos premium.'},es:{eyebrow:'K4K ESTUDIO CREATIVO',headline:'Crea sin límites.',subtitle:'Imágenes y vídeo en un solo lugar. Elige un modelo y prepara tus referencias.',images:'Imágenes',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CREATIVOS',prompt:'Tu prompt',placeholder:'Describe tu escena, iluminación, personajes, movimiento y ambiente…',mode:'Flujo',resolution:'Calidad',ratio:'Formato',duration:'Duración',reference:'Imágenes de referencia',add:'Agregar referencias',preview:'Referencias preparadas',copy:'Copiar briefing',copied:'Copiado',active:'Wan 3 disponible',pilot:'Vista previa API',pending:'Integración pendiente',open:'Abrir Wan 3',ready:'Vista previa — generación aún no conectada',note:'No se cobran créditos aquí. Los modelos pendientes aún no generan.',actions:'SIGUIENTE PASO',library:'Mis vídeos',explore:'Explorar plantillas',title:'Tu creación comienza aquí',hint:'Selecciona un modelo y prepara el briefing. Puedes seguir usando Wan 3.'}};
 export default function CreativeStudio(){
  const {locale}=useK4KLocale(),t=UI[locale]||UI.en;
@@ -48,7 +49,27 @@ export default function CreativeStudio(){
  function addFiles(list){const accepted=Array.from(list||[]).filter(f=>['image/jpeg','image/png','image/webp'].includes(f.type)&&f.size<=10*1024*1024);setFiles(old=>[...old,...accepted].slice(0,model.refs));setError(accepted.length<Array.from(list||[]).length?'Use JPG, PNG or WebP files up to 10 MB.':'')}
  const providerReadiness=creativeModelReadiness(model.id,mode);
  const [thumbnails,setThumbnails]=useState([]);useEffect(()=>{const urls=files.map(f=>URL.createObjectURL(f));setThumbnails(urls);return()=>urls.forEach(u=>URL.revokeObjectURL(u))},[files]);
- return <main className="kcs-root">
+ return <div className="kgen-shell">
+  <aside className="kgen-rail" aria-label="K4K Studio sections">
+   <Link className="kgen-rail-brand" href="/k4k-app/dashboard"><img src="/k4k-mark.svg" alt="" width="28" height="28"/><span>K4K <small>STUDIO</small></span></Link>
+   <Link className="kgen-new" href="/k4k-app/dashboard">+ New project</Link>
+   <span className="kgen-nav-label">WORKSPACE</span>
+   <nav className="kgen-rail-nav" aria-label="Generator navigation">
+    <Link href="/k4k-app/dashboard">Home</Link>
+    <Link href="/k4k-app/motion/explore">Explore</Link>
+    <Link href="/k4k-app/image" aria-current={kind==='image'?'page':undefined}><Images size={16}/> Image</Link>
+    <Link href="/k4k-app/video" aria-current={kind==='video'?'page':undefined}><Film size={16}/> Video</Link>
+    <Link href="/k4k-app/motion"><Layers size={16}/> K4K Motion</Link>
+   </nav>
+   <span className="kgen-nav-label">MY WORKSPACE</span>
+   <nav className="kgen-rail-nav" aria-label="Library and account">
+    <Link href="/k4k-app/videos">My generations</Link>
+    <Link href="/k4k-app/credits">Credits & plans</Link>
+    <Link href="/k4k-app/account">Account</Link>
+   </nav>
+  </aside>
+  <div className="kgen-main">
+  <main className="kcs-root">
   <header className="kcs-nav"><Link className="kcs-brand" href="/k4k-app"><img src="/k4k-mark.svg" width="29" height="29" alt=""/> K4K<span> APP</span></Link><nav aria-label="Creative Studio navigation"><Link href="/k4k-app/motion/explore">Explore templates</Link><Link href="/k4k-app/image" aria-current={kind==='image'?'page':undefined}>Image</Link><Link href="/k4k-app/video" aria-current={kind==='video'?'page':undefined}>Video</Link><Link href="/k4k-app/motion">K4K Motion</Link></nav><Link href="/k4k-app/videos" className="kcs-library-link">{t.library}<ArrowUpRight size={15}/></Link></header>
   <div className="kcs-shell">
    <section className="kcs-hero"><div className="kcs-eyebrow"><Sparkles size={13}/>{t.eyebrow}</div><h1>{t.headline}</h1><p>{t.subtitle}</p><div className="kcs-segments" role="tablist" aria-label="Output type"><button role="tab" aria-selected={kind==='video'} className={kind==='video'?'selected':''} onClick={()=>chooseKind('video')}><Film size={18}/>{t.videos}</button><button role="tab" aria-selected={kind==='image'} className={kind==='image'?'selected':''} onClick={()=>chooseKind('image')}><Images size={18}/>{t.images}</button></div></section>
@@ -70,5 +91,7 @@ export default function CreativeStudio(){
    </section></div>
   </div>
   {modelPickerOpen&&<div className="kcs-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setModelPickerOpen(false)}}><section className="kcs-model-dialog" role="dialog" aria-modal="true" aria-label="Choose creation model"><header><div><span>K4K APP · MODELS</span><h2>Select model</h2></div><button type="button" aria-label="Close model picker" onClick={()=>setModelPickerOpen(false)}><X size={21}/></button></header><div className="kcs-dialog-tabs" role="group" aria-label="Choose image or video">{['image','video'].map(k=><button key={k} type="button" aria-pressed={kind===k} onClick={()=>{chooseKind(k);setModelPickerOpen(true);setModelQuery('')}}>{k==='image'?<Images size={17}/>:<Film size={17}/>} {k==='image'?'Image':'Video'}</button>)}</div><label className="kcs-search-model"><Search size={19}/><input autoFocus value={modelQuery} onChange={e=>setModelQuery(e.target.value)} placeholder="Search available models" aria-label="Search models"/></label><div className="kcs-dialog-list">{visiblePickerModels.length?visiblePickerModels.map(item=><button type="button" key={item.id} className={'kcs-dialog-model'+(item.id===model.id?' active':'')} onClick={()=>chooseModel(item)}><span className="kcs-dialog-model-icon">{item.kind==='image'?<Images size={22}/>:<Film size={22}/>}</span><span><strong>{item.name}</strong><small>{item.description}</small></span>{item.id===model.id?<CheckCircle2 size={18}/>:<ArrowRight size={18}/>}</button>):<p>No models found.</p>}</div><footer>Models display only their verified K4K workflows. Generation requires a signed credit confirmation.</footer></section></div>}
- </main>;
+ </main>
+ </div>
+ </div>;
 }
