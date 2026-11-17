@@ -1,0 +1,48 @@
+name: K4K Quality Gate
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: k4k-quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-and-build:
+    name: Doctor / Regression tests / Next build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+      VERCEL_ENV: preview
+      K4K_LIVE_PAYMENTS_ENABLED: "false"
+      K4K_HIGGSFIELD_CUSTOMERS_ENABLED: "false"
+      K4K_ENABLE_PRODUCTION_GENERATION: "false"
+      K4K_OWNER_LIVE_PILOT_ENABLED: "false"
+      NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-public-placeholder-not-a-secret
+    steps:
+      - name: Checkout exact commit
+        uses: actions/checkout@v4
+      - name: Use Vercel-matched Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Validate app and simulate deployment
+        run: npm run build
+      - name: Summarize checks
+        if: always()
+        run: |
+          echo "## K4K release quality gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "Executed the K4K doctor, regression tests, credential-safe build gates and Next.js compilation on Node 24." >> "$GITHUB_STEP_SUMMARY"
+          echo "No real customer payments or provider generations were requested by this workflow." >> "$GITHUB_STEP_SUMMARY"
