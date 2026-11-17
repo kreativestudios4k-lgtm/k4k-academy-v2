@@ -20,10 +20,11 @@ grant select,insert,update on public.k4k_owner_creative_qa_jobs to service_role;
 create or replace function public.k4k_owner_creative_qa_reserve(
  p_owner uuid,p_key uuid,p_model text,p_endpoint text,p_hash text,p_micros bigint)
 returns jsonb language plpgsql security invoker set search_path='' as $fn$
-declare v public.k4k_owner_creative_qa_jobs%rowtype;
-declare v_today bigint;
-declare v_total bigint;
-declare v_count int;
+declare
+ v public.k4k_owner_creative_qa_jobs%rowtype;
+ v_today bigint;
+ v_total bigint;
+ v_count int;
 begin
  if current_user<>'service_role' then raise exception 'FORBIDDEN';end if;
  if p_owner is distinct from '0ef1af08-4df8-4858-967b-eac1a16f9f2c'::uuid
