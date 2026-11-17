@@ -13,7 +13,9 @@ test('customer preview is estimate only with no signed quote, media upload, cred
  assert.doesNotMatch(api,/service.role|SUPABASE_SERVICE_ROLE_KEY|hf\.submit|\.upload\(|k4k_multimodel_reserve_live|customer_disptach/i);
  assert.match(page,/<CustomerGeneration/);
  assert.match(page,/Files remain on this device/);
- assert.match(page,/api\/higgsfield\/customer-preview-estimate/);
+ assert.match(page,/khm-credit-summary/);
+ assert.match(page,/priceFor=quality/);
+ assert.doesNotMatch(page,/Calculate estimated cost/);
  assert.doesNotMatch(page,/onClick=\{.*generate|customer-credit-authorization/);
 });
 test('preview never accepts billing input or trusts a user-provided price',()=>{
