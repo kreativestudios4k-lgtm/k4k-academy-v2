@@ -58,7 +58,7 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
   <button type="button" style={button} disabled={busy||!media||!prompt.trim()} onClick={()=>action(async()=>{
    setQuote(null);const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
    const result=await request('prepare',{jobId,...media,resolution,prompt});setQuote({...result,selection});await refresh();
-  })}>{busy?'Preparing secure checkout…':estimatedCredits!==null?'Continue · estimated '+estimatedCredits+' credits':'Continue to confirm credits'}</button>
+  })}>{busy?'Preparing…':'Generate'}</button>
   {quote?.selection===selection&&<div style={{marginTop:18}}>
    <p role="status"><strong>{quote.credits} credits — exact confirmed charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
    <p style={{fontSize:13}}>{customer?'':`Provider estimate: $${quote.usd.toFixed(2)}. `}Quote expires in five minutes.</p>
@@ -66,7 +66,7 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
     const current=quote;setQuote(null);
     try{const result=await request('submit',{jobId:current.jobId,quoteToken:current.quoteToken,requestKey:requestKey.current});setActive(result.jobId);setMessage('Generation submitted. You can return here to check its progress.');if(customer)window.location.assign('/k4k-app/videos');}
     finally{await refresh();}
-   })}>{quote.dispatchEnabled?'Generate · '+quote.credits+' credits':'Generation locked · Preview'}</button>
+   })}>{quote.dispatchEnabled?'Confirm & Generate · '+quote.credits+' credits':'Generation locked · Preview'}</button>
   </div>}
   </>}
   {message&&<p role="status" style={{color:'#d8eecf'}}>{message}</p>}
