@@ -11,11 +11,11 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId=''}){
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId=''}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
- const [previewOriginalId,setPreviewOriginalId]=useState(initialTemplateId||'');
+ const [previewOriginalId,setPreviewOriginalId]=useState(initialPreviewId||initialTemplateId||'');
  const motionGallery=gallery.length?gallery:templates;
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
