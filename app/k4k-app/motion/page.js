@@ -8,7 +8,7 @@ export const dynamic='force-dynamic';
 export const metadata={title:'K4K Motion — Director Studio | K4K APP',description:'Choose a motion template or upload your video, assign your characters and generate with K4K Motion.'};
 export default async function MotionPage({searchParams}){
  const params=await searchParams;
- const requestedTemplate=typeof params?.template==='string'&&/^k4k-\d{3}$/.test(params.template)?params.template:'';
+ const requestedTemplate=typeof params?.template==='string'&&/^k4k-original-\d{2}$/.test(params.template)?params.template:'';
  if(!higgsfieldFlowEnabled())return <MotionEditor initialTemplateId={requestedTemplate}/>;
  const originals=catalogue.discoveryPreviews.filter(t=>t.k4kOriginal&&t.videoUrl);
  const templates=originals.filter(t=>{const r=generationReference(t);return r.supported&&r.seconds>=4&&!t.generationPaused&&!t.previewOnly;});
