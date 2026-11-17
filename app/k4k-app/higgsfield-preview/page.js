@@ -11,7 +11,7 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId=''}){
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId='',initialMotionModel='ultra',liteEnabled=false}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:'');
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
@@ -22,7 +22,8 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const initialCast=templateCast(initialTemplate);
  const initialSlots=initialCast.verified?initialCast.count:1;
  const source=selectedTemplate?generationReference(selectedTemplate,{maxSeconds:30}):null;
- const rates={'480p':0.154,'720p':0.3446,'1080p':0.8346};
+ const rates=motionModel==='lite'?{'480p':0.0739,'720p':0.1471,'1080p':0.2936}:{'480p':0.154,'720p':0.3446,'1080p':0.8346};
+ const [motionModel,setMotionModel]=useState(()=>initialMotionModel==='lite'&&liteEnabled?'lite':'ultra');
  const [video,setVideo]=useState(null),[images,setImages]=useState(()=>Array(initialSlots).fill(null)),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
  const [targets,setTargets]=useState(()=>Array(initialSlots).fill('')),[main,setMain]=useState(0),[direction,setDirection]=useState('');
  let prompt='',castError='';try{prompt=buildDirectorPrompt({targets,main,direction});}catch(e){castError=e.message;}
@@ -70,7 +71,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     const {error}=await client.storage.from('studio-references').upload(path,file,{contentType:file.type,upsert:false});
     if(error)throw Error('Photo upload failed. Please retry.');saved.referencePaths.push(path);
    }
-   const response=await fetch('/api/higgsfield/customer-preview-media',{method:'POST',cache:'no-store',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({videoPath:saved.videoPath,referencePaths:saved.referencePaths,resolution})});
+   const response=await fetch('/api/higgsfield/customer-preview-media',{method:'POST',cache:'no-store',headers:{...headers,'Content-Type':'application/json'},body:JSON.stringify({videoPath:saved.videoPath,referencePaths:saved.referencePaths,resolution,motionModel})});
    const body=await response.json();if(!response.ok)throw Error('Media verification failed. Use a 4–30 second MP4 and valid images at least 240 × 240 pixels.');
    if(!body.verifiedInputStorage)throw Error('Private file verification did not complete.');
    setResult(body);
@@ -87,11 +88,15 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const libraryItems=motionGallery.filter(t=>t.title.toLowerCase().includes(librarySearch.toLowerCase().trim())&&(libraryCategory==='all'||(libraryCategory==='short'?t.durationSeconds<=10:t.durationSeconds>10)));
  const featuredTemplate=motionGallery.find(t=>t.id===previewOriginalId)||selectedTemplate||libraryItems[0]||motionGallery[0];
  const featuredUsable=!!featuredTemplate&&templates.some(t=>t.id===featuredTemplate.id);
- const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
- const maxSecondsFor=quality=>Math.min(30,Math.max(0,Math.floor((qualityCaps?.[quality]??maxUsd)/rates[quality]+1e-9)));
+ const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.min(Math.ceil(seconds),motionModel==='lite'?15:30):null;
+ const currentCap=quality=>motionModel==='lite'?maxUsd:(qualityCaps?.[quality]??maxUsd);
+ const maxSecondsFor=quality=>{
+  const affordableSeconds=Math.max(0,Math.floor(currentCap(quality)/rates[quality]+1e-9));
+  return motionModel==='lite'&&affordableSeconds>=15?30:Math.min(motionModel==='lite'?15:30,affordableSeconds);
+ };
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
- const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=(qualityCaps?.[resolution]??maxUsd);
+ const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=currentCap(resolution)+1e-9;
 
  return <main className="khm-root">
   <div className="khm-studio-layout">
@@ -136,11 +141,16 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <p style={{color:'#a1efa5',fontSize:13}}>{castReady?'Cast ready · '+images.length+' numbered photos':castError||'Add a photo to every slot to continue.'}</p>
    </section>
    <section className="khm-quality-panel" style={{...panel,marginTop:18}}>
-    <h2 style={{fontSize:20}}>03 · Video quality</h2>
+    <h2 style={{fontSize:20}}>03 · Motion model & quality</h2>
+    <div className="khm-motion-model-choices" role="group" aria-label="Choose K4K Motion model">
+      {liteEnabled&&<button type="button" aria-pressed={motionModel==='lite'} className={motionModel==='lite'?'selected':''} disabled={busy} onClick={()=>{setMotionModel('lite');setResult(null);setError('')}}><strong>K4K Motion Lite</strong><small>First 15 seconds · source audio preserved · lower credit cost</small></button>}
+      <button type="button" aria-pressed={motionModel==='ultra'} className={motionModel==='ultra'?'selected':''} disabled={busy} onClick={()=>{setMotionModel('ultra');setResult(null);setError('')}}><strong>K4K Motion Ultra</strong><small>Full motion transfer · up to 30-second source · high-detail model</small></button>
+    </div>
+    {motionModel==='lite'&&<p className="khm-model-length-note" role="note">Lite uses only the first 15 seconds of a longer source video and preserves the original audio. A 30-second source produces up to 15 seconds, not 30.</p>
     <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Source videos: 4–30 seconds. Each quality shows its current maximum duration and instant credit estimate.</p>
     <div className="khm-quality-options" role="group" aria-label="Choose video quality">
      {['480p','720p','1080p'].map(q=>{
-      const cost=priceFor(q),maxQualitySeconds=maxSecondsFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
+      const cost=priceFor(q),maxQualitySeconds=maxSecondsFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=currentCap(q)+1e-9;
       const disabled=busy||(customer&&(maxQualitySeconds<4||(cost!==null&&!affordable)));
       return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{maxQualitySeconds<4?'Unavailable':cost===null?'Up to '+maxQualitySeconds+'s':affordable||!customer?cost+' credits':'Up to '+maxQualitySeconds+'s'}</span></button>
      })}
@@ -148,14 +158,15 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <div className="khm-credit-summary" aria-live="polite">
      <span>Estimated credits · updated automatically</span>
      <strong>{credits!==null?credits+' credits':'Choose a source video to see credits'}</strong>
-     <small>{billableSeconds!==null?billableSeconds+' billed seconds · '+resolution+' · final amount confirmed before charging':'Credit price depends on the video duration and selected resolution.'}</small>
+     <small>{billableSeconds!==null?billableSeconds+' billed output seconds · '+resolution+' · final amount confirmed before charging':'Credit price depends on the video duration and selected resolution.'}</small>
     </div>
     {customer&&credits!==null&&!withinBudget&&<p role="status" style={{color:'#efc895',fontSize:13}}>This quality exceeds the current per-video provider limit. Choose a lower resolution or shorter video.</p>}
     {error&&<p role="alert" style={{color:'#ffa9a9'}}>{error}</p>}
     <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt}
       onPrepareMedia={verifyUploads}
       canGenerate={castReady&&billableSeconds!==null&&withinBudget}
-      selectionKey={JSON.stringify([templateId,video?.name,video?.size,video?.lastModified,images.map(f=>f?[f.name,f.size,f.lastModified]:null),targets,main,direction,resolution])}
+      motionModel={motionModel}
+      selectionKey={JSON.stringify([motionModel,templateId,video?.name,video?.size,video?.lastModified,images.map(f=>f?[f.name,f.size,f.lastModified]:null),targets,main,direction,resolution])}
       media={null} resolution={resolution} estimatedCredits={credits}/>
     <p className="khm-permission-note">By confirming generation, you confirm you have permission to use the source video and character photos.</p>
    </section>
