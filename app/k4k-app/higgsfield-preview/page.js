@@ -9,7 +9,7 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
@@ -73,7 +73,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
- const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=maxUsd;
+ const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=(qualityCaps?.[resolution]??maxUsd);
 
  return <main className="khm-root">
   <div className="khm-studio-layout">
@@ -102,7 +102,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
     <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Your estimated credit cost updates automatically when you choose a quality or upload a video.</p>
     <div className="khm-quality-options" role="group" aria-label="Choose video quality">
      {['480p','720p','1080p'].map(q=>{
-      const cost=priceFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=maxUsd;
+      const cost=priceFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
       const disabled=busy||(customer&&cost!==null&&!affordable);
       return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{cost===null?'Choose video':affordable||!customer?cost+' credits':'Unavailable'}</span></button>
      })}
