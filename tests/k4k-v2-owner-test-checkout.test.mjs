@@ -39,7 +39,8 @@ test('unauthenticated owner QA shows same-origin preview login and verifies auth
  const routes=readFileSync(new URL('../lib/customer-routes.mjs',import.meta.url),'utf8');
  assert.match(client,/LOGIN='\/login\?next=%2Fk4k-app%2Fplans-preview%2Fqa'/);
  assert.match(client,/supabase\.auth\.getUser\(\)/);
- assert.match(client,/QA-AUTH-V2/);
+ assert.match(client,/QA-LEDGER-V2/);
+ assert.match(client,/api\/plans-v2\/status/);
  assert.match(client,/Sign in to K4K to continue/);
  assert.match(routes,/requested==='\/k4k-app\/plans-preview\/qa'/);
  assert.doesNotMatch(client,/Sign in with the authorised owner account first/);
