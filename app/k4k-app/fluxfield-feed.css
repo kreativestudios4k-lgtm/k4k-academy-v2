@@ -93,3 +93,9 @@
 .kf-split-right h2{font-size:clamp(22px,2.8vw,52px);overflow-wrap:anywhere;}
 .kf-split-right em{display:block;color:#faf9f6;font-style:normal;margin-top:10px;}
 }
+
+/* Explore lives inside K4K Motion. Keep original scroll-feed aesthetic while making the handoff clear. */
+.kf .kf-caption .kf-cta:is(a){display:flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;cursor:pointer}
+.kf .kf-caption .kf-preview-cast{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;margin-top:9px;min-height:37px;border:1px solid #ffffff90;border-radius:10px;background:#14191ac9;color:#fff;font-size:12px;font-weight:750;cursor:pointer}
+.kf .kf-caption .kf-preview-cast:hover{border-color:#d6ff69;color:#d6ff69}
+.kf .kf-caption .kf-cta:focus-visible,.kf .kf-caption .kf-preview-cast:focus-visible{outline:2px solid #d6ff69;outline-offset:3px}
