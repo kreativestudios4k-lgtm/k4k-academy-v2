@@ -125,3 +125,21 @@
 .khm-root .khm-lib-card.active .khm-lib-card-status{color:#f0f0f0}
 .khm-root .khm-lib-feature-info button:disabled{opacity:.5;cursor:not-allowed;background:#484848;color:#ddd;border-color:#484848}
 .khm-root .khm-lib-tabs strong{white-space:normal;line-height:1.35}
+
+/* Genjutsu-style CTA: preview and Recreate are independent accessible controls.
+   Preview-only footage cannot enter a paid generation workflow. */
+.khm-root .khm-lib-card{cursor:default}
+.khm-root .khm-lib-poster .khm-lib-play{appearance:none;border:1px solid #ffffff66;display:grid;place-items:center;cursor:pointer;color:#fff;z-index:2}
+.khm-root .khm-lib-poster .khm-lib-length{top:8px;bottom:auto;right:8px}
+.khm-root .khm-lib-poster .khm-lib-recreate{
+ appearance:none;position:absolute;left:12px;right:12px;bottom:12px;z-index:3;
+ border:1px solid #ffffffd9;border-radius:9px;background:#f5f5f6;color:#141414;
+ min-height:40px;font-size:12px;font-weight:800;letter-spacing:.015em;
+ display:flex;align-items:center;justify-content:center;cursor:pointer;
+ box-shadow:0 8px 22px #0007;transition:background .15s,transform .15s;
+}
+.khm-root .khm-lib-poster .khm-lib-recreate:hover{background:#dedee1;transform:translateY(-1px)}
+.khm-root .khm-lib-poster .khm-lib-recreate:focus-visible,
+.khm-root .khm-lib-poster .khm-lib-play:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.khm-root .khm-lib-poster .khm-lib-recreate:disabled{opacity:.5;cursor:not-allowed;transform:none}
+@media(max-width:760px){.khm-root .khm-lib-poster .khm-lib-recreate{min-height:36px;left:8px;right:8px;bottom:8px;font-size:11px}}
