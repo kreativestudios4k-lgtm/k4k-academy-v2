@@ -32,6 +32,16 @@ export default function CreativeStudio(){
   const fallback=requestedKind==='image'?'nano_banana_2':'seedance_2_5';
   const selected=requested||CREATION_MODELS.find(m=>m.id===fallback);
   if(selected){setKind(requestedKind);chooseModel(selected)}
+  if(params.get('from')==='dashboard'){
+   try{
+    const raw=sessionStorage.getItem('k4k-dashboard-draft');
+    sessionStorage.removeItem('k4k-dashboard-draft');
+    if(raw){
+     const draft=JSON.parse(raw);
+     if(draft&&draft.kind===requestedKind&&typeof draft.prompt==='string'&&draft.prompt.length<=10000&&Number.isFinite(draft.createdAt)&&Date.now()-draft.createdAt<10*60*1000)setPrompt(draft.prompt);
+    }
+   }catch{}
+  }
  },[]);
 
  async function copyBrief(){try{const brief=creationBrief(model,{mode,resolution,aspect,duration,prompt,references:files.length});await navigator.clipboard.writeText(brief);setCopied(true);setError('')}catch(e){setCopied(false);setError(e.message==='PROMPT_REQUIRED'?(locale==='pt'?'Adicione um prompt antes de copiar.':'Write a prompt before copying.'):'Clipboard is unavailable.')} }
