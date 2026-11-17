@@ -4,10 +4,10 @@ import {createHiggsfieldPlatformApi,higgsfieldModelAccess,higgsfieldPreviewCrede
 const reply=data=>({ok:true,json:async()=>data});
 test('pilot is disabled by default and requires preview plus server key',()=>{
  assert.equal(higgsfieldModelAccess({}),false);
- assert.equal(higgsfieldModelAccess({VERCEL_ENV:'production',HF_API_KEY:'opaque',K4K_HIGGSFIELD_API_PILOT:'true'}),false);
- assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_API_KEY:'opaque',K4K_HIGGSFIELD_API_PILOT:'true'}),true);
- assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret',K4K_HIGGSFIELD_API_PILOT:'true'}),true);
- assert.equal(higgsfieldPreviewCredential({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret'}),'id:secret');
+ assert.equal(higgsfieldModelAccess({VERCEL_ENV:'production',HF_API_KEY:'opaque-example-key-abc',K4K_HIGGSFIELD_GENERATION_PILOT_ENABLED:'true'}),false);
+ assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_API_KEY:'opaque-example-key-abc',K4K_HIGGSFIELD_GENERATION_PILOT_ENABLED:'true'}),true);
+ assert.equal(higgsfieldModelAccess({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret-value',K4K_HIGGSFIELD_GENERATION_PILOT_ENABLED:'true'}),true);
+ assert.equal(higgsfieldPreviewCredential({VERCEL_ENV:'preview',HF_CREDENTIALS:'id:secret-value'}),'id:secret-value');
  assert.equal(higgsfieldPreviewCredential({VERCEL_ENV:'production',HF_API_KEY:'prod_secret'}),null);
 });
 test('submit is opt-in, uses the exact copied key, fixed origin and verified model path',async()=>{
