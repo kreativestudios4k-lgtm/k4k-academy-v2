@@ -35,3 +35,13 @@ test('preview route is owner-bound and has no generation method',()=>{
  assert.match(text,/paidGenerationEnabled:false/);
  assert.doesNotMatch(text,/export\s+async\s+function\s+(POST|PUT|PATCH|DELETE)/);
 });
+
+test('owner credential diagnosis probes pilot and SDK independently, never exposes token values',()=>{
+ const route=readFileSync(new URL('../app/api/higgsfield/connection/route.js',import.meta.url),'utf8');
+ assert.match(route,/K4K_HIGGSFIELD_API_PILOT/);
+ assert.match(route,/HF_CREDENTIALS/);
+ assert.match(route,/for\(const \[source,credentials\] of candidates\)/);
+ assert.match(route,/credentialVerified:result\.credentialVerified===true/);
+ assert.match(route,/paidGenerationEnabled:false/);
+ assert.doesNotMatch(route,/process\.env\.HF_API_KEY/);
+});
