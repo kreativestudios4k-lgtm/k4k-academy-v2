@@ -16,6 +16,8 @@ test('new customer models are default denied, independent from owner-only QA and
   assert.equal(creativeCustomerRelease(base,id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  }
  assert.equal(creativeCustomerRelease(base,'seedance_2_5','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true'},'kling4_0','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true',K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease(base,'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),true);
  assert.throws(()=>creativeCustomerQuote('seedance_2_5',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/CREATIVE_MODEL_NOT_LIVE/);
@@ -27,7 +29,7 @@ test('per-model quote worst-case reservations are bounded and pricing must be ap
  assert.throws(()=>creativeCustomerQuote('nano_banana_2',{...base,K4K_GENERATION_MAX_USD:'0.5'},'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/PROVIDER_BUDGET_BLOCKED/);
 });
 test('customer route authenticates and verifies origin; wallet changes are exclusively transactional RPC',()=>{
- for(const value of ['auth.getUser(token)','email_confirmed_at',"req.headers.get('origin')","createMultimodelLedger","k4k_multimodel_claim_dispatch","k4k_multimodel_record_provider_request","k4k_multimodel_refund_confirmed_provider_failure","k4k_multimodel_jobs","QUOTE_SIGNING_UNAVAILABLE","SUBMISSION_UNCERTAIN_DO_NOT_RETRY","boundedCreativeDownload"])assert.ok(route.includes(value),value);
+ for(const value of ['K4K_CREATIVE_QUOTE_SECRET','auth.getUser(token)','email_confirmed_at',"req.headers.get('origin')","createMultimodelLedger","k4k_multimodel_claim_dispatch","k4k_multimodel_record_provider_request","k4k_multimodel_refund_confirmed_provider_failure","k4k_multimodel_jobs","QUOTE_SIGNING_UNAVAILABLE","SUBMISSION_UNCERTAIN_DO_NOT_RETRY","boundedCreativeDownload"])assert.ok(route.includes(value),value);
  assert.doesNotMatch(route,/k4k_live_credit_accounts'\)\.update/);
  assert.doesNotMatch(route,/SUPABASE_SERVICE_ROLE_KEY.*NEXT_PUBLIC_/);
 });
