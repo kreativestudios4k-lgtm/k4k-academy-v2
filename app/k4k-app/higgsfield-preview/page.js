@@ -21,7 +21,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
  const initialCast=templateCast(initialTemplate);
  const initialSlots=initialCast.verified?initialCast.count:1;
- const source=selectedTemplate?generationReference(selectedTemplate):null;
+ const source=selectedTemplate?generationReference(selectedTemplate,{maxSeconds:30}):null;
  const rates={'480p':0.154,'720p':0.3446,'1080p':0.8346};
  const [video,setVideo]=useState(null),[images,setImages]=useState(()=>Array(initialSlots).fill(null)),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
  const [targets,setTargets]=useState(()=>Array(initialSlots).fill('')),[main,setMain]=useState(0),[direction,setDirection]=useState('');
@@ -88,6 +88,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const featuredTemplate=motionGallery.find(t=>t.id===previewOriginalId)||selectedTemplate||libraryItems[0]||motionGallery[0];
  const featuredUsable=!!featuredTemplate&&templates.some(t=>t.id===featuredTemplate.id);
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
+ const maxSecondsFor=quality=>Math.min(30,Math.max(0,Math.floor((qualityCaps?.[quality]??maxUsd)/rates[quality]+1e-9)));
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
  const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=(qualityCaps?.[resolution]??maxUsd);
@@ -112,7 +113,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
       </article>
      })}</div>{!libraryItems.length&&<p className="khm-lib-empty">No K4K Originals match your search.</p>}
     <aside className="khm-lib-feature"><div className="khm-lib-feature-media">{featuredTemplate&&<video key={featuredTemplate.id} src={featuredTemplate.videoUrl} autoPlay muted playsInline loop preload="metadata" controls/>}</div><div className="khm-lib-feature-info"><small>K4K ORIGINALS · {featuredUsable?'MOTION READY':'PREVIEW ONLY'}</small><strong>{featuredTemplate?.title||'Choose a scene'}</strong><span>{featuredUsable?'This reference is ready for character casting.':'This clip exceeds the supported preset duration. You can watch it here or upload your own source video in the editor.'}</span><button type="button" disabled={!featuredUsable} onClick={()=>{if(featuredTemplate){selectSourceTemplate(featuredTemplate.id);document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}}>{featuredUsable?'Recreate':'Preview only'}</button></div></aside></div>
-    <p className="khm-lib-foot">K4K Originals only. Longer clips are preview-only; your generated videos stay private in My Generations.</p>
+    <p className="khm-lib-foot">K4K Originals support 4–30 second sources. Available qualities depend on the signed credit quote and safety budget; finished videos stay private in My Generations.</p>
    </section>}
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
@@ -136,12 +137,12 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    </section>
    <section className="khm-quality-panel" style={{...panel,marginTop:18}}>
     <h2 style={{fontSize:20}}>03 · Video quality</h2>
-    <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Your estimated credit cost updates automatically when you choose a quality or upload a video.</p>
+    <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Source videos: 4–30 seconds. Each quality shows its current maximum duration and instant credit estimate.</p>
     <div className="khm-quality-options" role="group" aria-label="Choose video quality">
      {['480p','720p','1080p'].map(q=>{
-      const cost=priceFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
-      const disabled=busy||(customer&&cost!==null&&!affordable);
-      return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{cost===null?'Choose video':affordable||!customer?cost+' credits':'Unavailable'}</span></button>
+      const cost=priceFor(q),maxQualitySeconds=maxSecondsFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
+      const disabled=busy||(customer&&(maxQualitySeconds<4||(cost!==null&&!affordable)));
+      return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{maxQualitySeconds<4?'Unavailable':cost===null?'Up to '+maxQualitySeconds+'s':affordable||!customer?cost+' credits':'Up to '+maxQualitySeconds+'s'}</span></button>
      })}
     </div>
     <div className="khm-credit-summary" aria-live="polite">
@@ -159,6 +160,6 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <p className="khm-permission-note">By confirming generation, you confirm you have permission to use the source video and character photos.</p>
    </section>
   </div>
- {assetsOpen&&<div className="khm-assets-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAssetsOpen(false)}}><section className="khm-assets-dialog" role="dialog" aria-modal="true" aria-label="Choose motion reference video"><header><div><span>K4K MOTION · ASSETS</span><h2>Choose source video</h2></div><button aria-label="Close asset picker" type="button" onClick={()=>setAssetsOpen(false)}><X size={21}/></button></header><div className="khm-assets-tabs"><button type="button" className={assetsTab==='uploads'?'active':''} onClick={()=>setAssetsTab('uploads')}>Uploads</button><button type="button" className={assetsTab==='presets'?'active':''} onClick={()=>setAssetsTab('presets')}>Presets · {templates.length}</button></div>{assetsTab==='presets'&&<label className="khm-assets-search"><Search size={16}/><input placeholder="Find a motion template" aria-label="Search motion templates" value={assetsQuery} onChange={e=>setAssetsQuery(e.target.value)}/></label>}<div className="khm-assets-grid"><button type="button" className="khm-asset-upload" onClick={()=>selectSourceTemplate('')}><Upload size={28}/><strong>Use my own video</strong><small>4–30s MP4 · max 50 MB</small></button>{assetsTab==='presets'&&filteredAssets.map(t=><button type="button" className={'khm-asset-card'+(t.id===templateId?' active':'')} key={t.id} onClick={()=>selectSourceTemplate(t.id)}><span className="khm-asset-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span><Play size={14}/></span></span><strong>{t.title}</strong><small>{Math.ceil(generationReference(t).seconds)}s</small></button>)}</div><footer>Preset videos are only available where K4K has a verified reference. Selecting a preset never charges credits.</footer></section></div>}
+ {assetsOpen&&<div className="khm-assets-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAssetsOpen(false)}}><section className="khm-assets-dialog" role="dialog" aria-modal="true" aria-label="Choose motion reference video"><header><div><span>K4K MOTION · ASSETS</span><h2>Choose source video</h2></div><button aria-label="Close asset picker" type="button" onClick={()=>setAssetsOpen(false)}><X size={21}/></button></header><div className="khm-assets-tabs"><button type="button" className={assetsTab==='uploads'?'active':''} onClick={()=>setAssetsTab('uploads')}>Uploads</button><button type="button" className={assetsTab==='presets'?'active':''} onClick={()=>setAssetsTab('presets')}>Presets · {templates.length}</button></div>{assetsTab==='presets'&&<label className="khm-assets-search"><Search size={16}/><input placeholder="Find a motion template" aria-label="Search motion templates" value={assetsQuery} onChange={e=>setAssetsQuery(e.target.value)}/></label>}<div className="khm-assets-grid"><button type="button" className="khm-asset-upload" onClick={()=>selectSourceTemplate('')}><Upload size={28}/><strong>Use my own video</strong><small>4–30s MP4 · max 50 MB</small></button>{assetsTab==='presets'&&filteredAssets.map(t=><button type="button" className={'khm-asset-card'+(t.id===templateId?' active':'')} key={t.id} onClick={()=>selectSourceTemplate(t.id)}><span className="khm-asset-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span><Play size={14}/></span></span><strong>{t.title}</strong><small>{Math.ceil(generationReference(t,{maxSeconds:30}).seconds)}s</small></button>)}</div><footer>Preset videos are only available where K4K has a verified reference. Selecting a preset never charges credits.</footer></section></div>}
  </main>;
 }

@@ -21,7 +21,8 @@ export async function POST(request){
   const preset=[...catalogue.trending,...catalogue.discoveryPreviews].find(item=>item.id===templateId);
   if(!preset)return json({error:'INVALID_TEMPLATE'},400);
   // Browser supplies only a catalogue ID, never a fetch URL or storage owner.
-  const reference=generationReference(preset);
+  const original=preset.k4kOriginal===true;
+  const reference=generationReference(preset,{maxSeconds:original?30:15});
   if(!reference.supported)throw Error('TEMPLATE_DURATION_INVALID');
   const source=new URL(reference.url);
   if(source.protocol!=='https:'||!['d2ol7oe51mr4n9.cloudfront.net','v3b.fal.media'].includes(source.hostname))throw Error('TEMPLATE_UNAVAILABLE');
@@ -31,7 +32,7 @@ export async function POST(request){
   try{while(true){const {done,value}=await reader.read();if(done)break;total+=value.length;if(total>50*1024*1024)throw Error('TEMPLATE_TOO_LARGE');chunks.push(value)}}catch(error){await reader.cancel().catch(()=>{});throw error}
   const bytes=new Uint8Array(total);let offset=0;for(const chunk of chunks){bytes.set(chunk,offset);offset+=chunk.length}
   const durationSeconds=mp4DurationSeconds(bytes);
-  if(durationSeconds<2||durationSeconds>15)throw Error('TEMPLATE_DURATION_INVALID');
+  if(durationSeconds<(original?4:2)||durationSeconds>(original?30:15))throw Error('TEMPLATE_DURATION_INVALID');
   const database=createClient(url,process.env.SUPABASE_SERVICE_ROLE_KEY,options);
   const videoPath=user.id+'/'+randomUUID()+'.mp4';
   const result=await database.storage.from('studio-videos').upload(videoPath,bytes,{contentType:'video/mp4',upsert:false});
