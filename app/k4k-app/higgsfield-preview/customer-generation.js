@@ -78,7 +78,7 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
   {!jobs.length&&<p style={{color:"#adbdaf"}}>Your generated Motion videos will appear here.</p>}
   <button type="button" style={button} disabled={busy} onClick={()=>action(refresh)}>Refresh library</button>
   {jobs.map(job=><div key={job.jobId} style={{padding:'16px 0',borderBottom:'1px solid #334b37',display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}}>
-   <span>{new Date(job.createdAt).toLocaleString()} · {job.status} · {job.credits} credits</span>
+   <span>{new Date(job.createdAt).toLocaleString()} · K4K Motion {job.motionModel==='lite'?'Lite':'Ultra'} · {job.status} · {job.credits} credits</span>
    {['processing','queued'].includes(job.status)&&<button style={button} disabled={busy} onClick={()=>action(()=>check(job.jobId))}>Refresh status</button>}
    {job.status==='completed'&&<>
     <button style={button} disabled={busy} onClick={()=>action(async()=>setOutput(await request('download',{jobId:job.jobId,download:false})))}>Play</button>
