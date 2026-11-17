@@ -10,6 +10,7 @@ export default function OwnerPlanQATool(){
  const [auth,setAuth]=useState({state:'checking',user:null});
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
  const [qaLedger,setQaLedger]=useState(null);
+ const [advancing,setAdvancing]=useState(false),[advanceMessage,setAdvanceMessage]=useState('');
  useEffect(()=>{
   let active=true;
   const supabase=createClient();
@@ -42,6 +43,24 @@ export default function OwnerPlanQATool(){
   }
   void load();return()=>{active=false};
  },[auth.state,auth.user?.id]);
+ async function advanceRenewal(){
+  if(advancing||auth.state!=='signed-in')return;
+  if(!window.confirm('Advance ONLY the separate Stripe TEST clock for one Starter monthly renewal? This may create a sandbox invoice, but cannot charge real money.'))return;
+  setAdvancing(true);setAdvanceMessage('');
+  try{
+   const {data:{session}}=await createClient().auth.getSession();
+   if(!session?.access_token)throw Error('Sign in to this preview again.');
+   const response=await fetch('/api/plans-v2/advance-test-clock',{
+    method:'POST',cache:'no-store',
+    headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},
+    body:JSON.stringify({confirmation:'ADVANCE_TEST_CLOCK_ONCE'})
+   });
+   const result=await response.json().catch(()=>({}));
+   if(!response.ok)throw Error(result.error||'TEST_CLOCK_UNAVAILABLE');
+   setAdvanceMessage(result.alreadyAdvanced?'Clock already advanced. Check Stripe renewal invoice and refresh QA balance.':('Stripe test clock '+result.clockStatus+'. Refresh after the test renewal invoice is paid.'));
+  }catch(error){setAdvanceMessage(error?.message||'TEST_CLOCK_UNAVAILABLE')}
+  finally{setAdvancing(false)}
+ }
  async function run(){
   if(busy||auth.state!=='signed-in')return;
   setBusy(true);setError('');
@@ -80,6 +99,12 @@ export default function OwnerPlanQATool(){
     {Object.values(K4K_V2_PLANS).map(p=><option key={p.key} value={p.key}>{p.name} — £{(p.gbpMinor/100).toFixed(2)}, {p.credits} credits</option>)}
    </select></label>
    <button type="button" disabled={busy} onClick={run} style={{cursor:busy?'wait':'pointer',width:'100%',background:'#a3ff9b',color:'#132014',padding:14,border:0,borderRadius:12,fontWeight:850,marginTop:16}}>{busy?'Opening test checkout…':'Open Stripe TEST checkout'}</button>
+   <div style={{marginTop:20,padding:15,border:'1px solid #455845',borderRadius:12}}>
+    <strong>Starter renewal simulation — test clock</strong>
+    <p style={{fontSize:13,color:'#bdc9bd'}}>One-time advance of the separate test-clock subscription only. It may generate a Stripe TEST invoice. It does not affect the old subscription or live billing.</p>
+    <button type="button" disabled={advancing} onClick={advanceRenewal} style={{padding:12,width:'100%',borderRadius:10,border:'1px solid #a3ff9b',background:'transparent',color:'#a3ff9b',fontWeight:700}}>{advancing?'Advancing sandbox clock…':'Advance Starter test clock once'}</button>
+    {advanceMessage&&<p role="status">{advanceMessage}</p>}
+   </div>
   </>}
   {error&&<p role="alert" style={{color:'#ffb4b4'}}>{error}</p>}
  </section>;
