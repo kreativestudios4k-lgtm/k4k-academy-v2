@@ -5,7 +5,7 @@ import {creativeCustomerQuote,creativeCustomerRelease,CUSTOMER_CREATIVE_MODELS} 
 const route=readFileSync(new URL('../app/api/creative/customer/route.js',import.meta.url),'utf8');
 const client=readFileSync(new URL('../app/k4k-app/CustomerCreativeGeneration.js',import.meta.url),'utf8');
 const migration=readFileSync(new URL('../supabase/migrations/20261117140000_customer_creative_models_images.sql',import.meta.url),'utf8');
-const base={VERCEL_ENV:'production',K4K_CREATIVE_CUSTOMER_ENABLED:'true',K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'true',K4K_ENABLE_PRODUCTION_GENERATION:'true',K4K_PROVIDER_USE_APPROVED:'true',K4K_LIVE_CREDIT_ISOLATION_READY:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'kling4_0,nano_banana_2,flux_3_image,seedance_2_5',K4K_GENERATION_MAX_USD:'2.10'};
+const base={VERCEL_ENV:'production',K4K_CREATIVE_CUSTOMER_ENABLED:'true',K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'true',K4K_ENABLE_PRODUCTION_GENERATION:'true',K4K_PROVIDER_USE_APPROVED:'true',K4K_LIVE_CREDIT_ISOLATION_READY:'true',K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'kling4_0,nano_banana_2,flux_3_image,seedance_2_5',K4K_GENERATION_MAX_USD:'2.10'};
 test('new customer models are default denied, independent from owner-only QA and Motion',()=>{
  for(const id of Object.keys(CUSTOMER_CREATIVE_MODELS).filter(id=>id!=='seedance_2_5')){
   assert.equal(creativeCustomerRelease({},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
@@ -22,7 +22,14 @@ test('new customer models are default denied, independent from owner-only QA and
  assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true'},'kling4_0','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true',K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease(base,'kling4_0','11111111-1111-4111-8111-111111111111'),false);
- assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true'},'kling4_0','11111111-1111-4111-8111-111111111111'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true'},'nano_banana_2','11111111-1111-4111-8111-111111111111'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true'},'flux_3_image','11111111-1111-4111-8111-111111111111'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_OWNER_PILOT_APPROVED:'true'},'seedance_2_5','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_OWNER_PILOT_APPROVED:'true'},'seedance_2_5','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'seedance_2_5'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.throws(()=>creativeCustomerQuote('seedance_2_5',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/CREATIVE_MODEL_NOT_LIVE/);
 });
 test('per-model quote worst-case reservations are bounded and pricing must be approved',()=>{
