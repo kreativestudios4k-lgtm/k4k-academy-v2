@@ -126,3 +126,8 @@
  .k4k-hf-home .khf-model-grid{grid-template-columns:minmax(0,1fr)}
  .k4k-hf-home .khf-hero-copy h1{font-size:37px}
 }
+
+/* Keep the K4K APP wordmark comfortably visible at the top of the landing header. */
+.k4k-hf-home .khf-topbar .khf-brand{transform:translateY(-5px);flex-shrink:0;overflow:visible;line-height:1.15}
+.k4k-hf-home .khf-topbar .khf-brand img{display:block;object-fit:contain;flex-shrink:0}
+@media(max-width:620px){.k4k-hf-home .khf-topbar .khf-brand{transform:translateY(-4px)}}
