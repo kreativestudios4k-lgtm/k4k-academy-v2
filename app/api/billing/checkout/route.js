@@ -1,6 +1,6 @@
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice} from '../../../../lib/server/stripe-billing.mjs';
+import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice, validStripeCheckoutUrl} from '../../../../lib/server/stripe-billing.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
 
 export const runtime = 'nodejs';
@@ -95,5 +95,9 @@ export async function POST(request) {
   }
 
   const session = await res.json();
+  if (!validStripeCheckoutUrl(session?.url)) {
+    console.error('Stripe test checkout returned an invalid redirect URL');
+    return json({error: 'INVALID_CHECKOUT_URL'}, 502);
+  }
   return json({url: session.url}, 200);
 }
