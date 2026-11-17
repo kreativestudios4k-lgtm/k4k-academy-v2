@@ -9,7 +9,7 @@ const rid='01a1e884-0fb7-70e0-bf45-b42cfd747410';
 const host='https://d2ol7oe51mr4n9.cloudfront.net/user_x/';
 const input={video_url:host+'source.mp4',image_urls:[host+'photo.jpg'],resolution:'480p',prompt:'Replace foreground actor only'};
 const media={verified:true,userId,jobId:id,contentType:'video/mp4',seconds:4.766667};
-const env={VERCEL_ENV:'preview',K4K_HIGGSFIELD_CUSTOMER_QUOTE_PREVIEW:'true',
+const env={K4K_HIGGSFIELD_GENERATION_PILOT_ENABLED:'true',VERCEL_ENV:'preview',K4K_HIGGSFIELD_CUSTOMER_QUOTE_PREVIEW:'true',
  K4K_HIGGSFIELD_CUSTOMER_DISPATCH_PREVIEW:'true',K4K_HIGGSFIELD_RATE_CARD_APPROVED:'true',
  K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_PROVIDER_USD_PER_CREDIT:'0.10',
  K4K_GENERATION_MAX_USD:'2',K4K_GENERATION_QUOTE_SECRET:'test-secret-only-for-quote-verify-0123456789'};

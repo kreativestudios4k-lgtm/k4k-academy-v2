@@ -1,3 +1,4 @@
+import {higgsfieldPublicEnabled,higgsfieldUserAllowed} from '../../../../lib/server/higgsfield-release-policy.mjs';
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {genjutsuEstimate} from '../../../../lib/server/higgsfield-genjutsu-motion.mjs';
@@ -6,7 +7,7 @@ export const dynamic='force-dynamic';
 const OWNER='0ef1af08-4df8-4858-967b-eac1a16f9f2c';
 const reply=(body,status=200)=>NextResponse.json(body,{status,headers:{'Cache-Control':'private, no-store','Vary':'Authorization','X-Content-Type-Options':'nosniff'}});
 export async function POST(request){
- if(process.env.VERCEL_ENV!=='preview')return reply({error:'NOT_AVAILABLE'},404);
+ if(process.env.VERCEL_ENV!=='preview'&&!higgsfieldPublicEnabled(process.env))return reply({error:'NOT_AVAILABLE'},404);
  if(request.headers.get('origin')!==new URL(request.url).origin)return reply({error:'INVALID_ORIGIN'},403);
  const token=request.headers.get('authorization')?.match(/^Bearer (\S+)$/i)?.[1];
  if(!token)return reply({error:'UNAUTHENTICATED'},401);
@@ -14,7 +15,7 @@ export async function POST(request){
  if(!url||!anon)return reply({error:'AUTH_NOT_CONFIGURED'},503);
  const auth=createClient(url,anon,{auth:{persistSession:false,autoRefreshToken:false}});
  const {data:{user}={},error}=await auth.auth.getUser(token);
- if(error||!user||user.is_anonymous||user.id!==OWNER)return reply({error:'NOT_AVAILABLE'},404);
+ if(error||!user||user.is_anonymous||!higgsfieldUserAllowed(user,process.env))return reply({error:'NOT_AVAILABLE'},404);
  let body;try{body=await request.json()}catch{return reply({error:'INVALID_REQUEST'},400)}
  if(!body||Array.isArray(body)||Object.keys(body).some(k=>!['seconds','resolution','imageCount'].includes(k)))
   return reply({error:'INVALID_REQUEST'},400);

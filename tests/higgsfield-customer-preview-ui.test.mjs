@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 const api=readFileSync(new URL('../app/api/higgsfield/customer-preview-estimate/route.js',import.meta.url),'utf8');
 const page=readFileSync(new URL('../app/k4k-app/higgsfield-preview/page.js',import.meta.url),'utf8');
 test('customer quote preview requires authenticated owner and exact preview environment',()=>{
- for(const marker of ["VERCEL_ENV!=='preview'","auth.auth.getUser(token)","user.id!==OWNER","request.headers.get('origin')","genjutsuEstimate"])assert.ok(api.includes(marker),marker);
+ for(const marker of ["VERCEL_ENV!=='preview'","auth.auth.getUser(token)","higgsfieldUserAllowed(user,process.env)","request.headers.get('origin')","genjutsuEstimate"])assert.ok(api.includes(marker),marker);
  assert.match(api,/sourceSeconds:body.seconds/);
  assert.match(api,/imageCount<1\|\|body.imageCount>8/);
 });

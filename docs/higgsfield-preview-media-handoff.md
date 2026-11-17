@@ -25,3 +25,13 @@ Branch-only configuration enables the authenticated owner, with a $1.60 job maxi
 Tests cover the orchestrated flow with mocked provider/storage and real PGlite ledger checks: duplicates, uncertainty, ownership, malicious upload destinations/headers, changed quotes, budgets and identical-output recovery. Full tests/build are required before publishing.
 
 Before public activation, verify an authenticated owner journey through actual reference upload, quote, debit, provider completion/failure, credit reconciliation and MP4 download. Media-header checks are not full codec decoding or a guarantee of provider acceptance. Do not claim this real journey or provider billing passed from mocks alone. Keep PR #125 draft until that evidence exists.
+
+## Completed real owner test and customer release
+
+On 17 November at 10:35 UTC, job `8ce1eac1-3947-4125-bd7c-ff627a354b7c` completed. Read-only database verification found one dispatch claim, one reservation settled for 8 credits, a matching provider request ID and an MP4 in the private `studio-generations` bucket. Owner balance changed from 44 to 36. The owner confirmed both character quality and mobile download. The $0.77 remains the published estimate, not an independently reconciled provider invoice.
+
+The main `/k4k-app/motion` page uses director slots, template selection or custom upload and signed quotes. `/k4k-app/videos` includes the Motion job library, resumes status polling and provides private playback/download. Existing Wan videos and subscriptions remain available.
+
+Production is independently gated by `K4K_HIGGSFIELD_CUSTOMERS_ENABLED` plus the existing generation, provider-use and credit-isolation gates. `K4K_HIGGSFIELD_DISPATCH_ENABLED` can stop new submissions while preserving existing-job reconciliation. Production uses its own HF_API_KEY (or HF_CREDENTIALS) and a dedicated K4K_HIGGSFIELD_QUOTE_SECRET. A production build probe validates the credential without generating. Existing shared budget ceilings and credit pricing are preserved. Poor balance, billing hold, changed quote, foreign account and anonymous access remain blocked. Five recent quotes per ten minutes trigger a preparation throttle.
+
+Public activation requires a successful production build audit and verified deployment. A passing preview build alone does not establish that production is active.
