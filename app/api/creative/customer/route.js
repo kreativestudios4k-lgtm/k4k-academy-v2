@@ -133,6 +133,8 @@ export async function POST(req){
   if(job.status==='processing'||job.status==='completed'||job.status==='failed')return response({jobId:job.id,status:job.status});
   if(!['draft','queued'].includes(job.status))throw Error('INVALID_JOB_STATE');
   if(new Date(job.quote_expires_at).getTime()<=Date.now()+25000)throw Error('QUOTE_EXPIRED');
+  // Fail BEFORE atomically reserving credits or claiming an irreversible dispatch.
+  if(typeof process.env.FAL_KEY!=='string'||!process.env.FAL_KEY.trim())throw Error('PROVIDER_CREDENTIALS_MISSING');
   const b=budget(process.env);
   const ledger=createMultimodelLedger({client:db,enabled:true});
   await ledger.reserve({userId:user.id,jobId:job.id,requestKey:body.requestKey,inputFingerprint:job.input_fingerprint,quoteMicros:job.quoted_usd_micros,credits:job.credits_quoted,...b});
