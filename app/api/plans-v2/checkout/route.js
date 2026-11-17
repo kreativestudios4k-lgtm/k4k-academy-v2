@@ -1,3 +1,4 @@
+import {createHash} from 'node:crypto';
 import {NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
 import {K4K_V2_PLANS,v2PreviewAllowed} from '../../../../lib/k4k-plan-v2.mjs';
@@ -35,13 +36,16 @@ export async function POST(request){
  if(host.protocol!=='https:'||!/^kreativestudios4k-site-[a-z0-9-]+\.vercel\.app$/.test(host.hostname))
   return respond({error:'PREVIEW_ORIGIN_REQUIRED'},403);
  const form=buildCheckoutForm({priceId:plan.priceId,userId:user.id,origin:host.origin,plan:plan.key,currency:'GBP'});
+ form.set('success_url',host.origin+'/k4k-app/plans-preview/qa?checkout=success&session_id={CHECKOUT_SESSION_ID}');
+ form.set('cancel_url',host.origin+'/k4k-app/plans-preview/qa?checkout=cancelled');
  form.set('automatic_tax[enabled]','true');
  form.set('tax_id_collection[enabled]','true');
  form.set('metadata[k4k_catalog_version]','creator_2026_v2');
  form.set('subscription_data[metadata][k4k_catalog_version]','creator_2026_v2');
  form.set('client_reference_id',user.id);
  let response;try{response=await fetch('https://api.stripe.com/v1/checkout/sessions',{
-  method:'POST',headers:{Authorization:'Bearer '+secret,'Content-Type':'application/x-www-form-urlencoded'},
+  method:'POST',headers:{Authorization:'Bearer '+secret,'Content-Type':'application/x-www-form-urlencoded',
+   'Idempotency-Key':'k4k-v2-'+createHash('sha256').update('creator_2026_v2:'+user.id+':'+plan.key).digest('hex').slice(0,42)},
   body:form.toString(),cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000)
  })}catch{return respond({error:'TEST_STRIPE_UNAVAILABLE'},502)}
  if(!response.ok)return respond({error:'TEST_CHECKOUT_FAILED'},502);
