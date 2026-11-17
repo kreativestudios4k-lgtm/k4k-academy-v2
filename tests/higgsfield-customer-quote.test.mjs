@@ -71,5 +71,9 @@ test('explicit 720p approval allows a 13-second video at 45 credits but not 14 s
  const job1080={...job,input:{...job.input,resolution:'1080p'}};
  assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job1080,userId,verifiedMedia:{...video13,seconds:5},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
  const job480={...job,input:{...job.input,resolution:'480p'}};
- assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:14},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
+ const at14=prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:14},env:approved});
+ assert.equal(at14.credits,22);
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:30},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
+ const at30=prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:30},env:{...approved,K4K_GENERATION_MAX_USD:'5'}});
+ assert.equal(at30.credits,47);
 });
