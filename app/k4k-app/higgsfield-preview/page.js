@@ -86,7 +86,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
  }
  return <main style={{background:'#080f0b',color:'#f1f7f0',minHeight:'100vh',padding:'40px 18px'}}>
   <div style={{maxWidth:1020,margin:'auto'}}>
-   <Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} style={{color:'#a1efa5'}}>{customer?'← K4K APP':'← K4K owner QA'}</Link> <Link href="/k4k-app/videos" style={{color:'#a1efa5',float:'right'}}>My Generations →</Link>
+   <Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} style={{color:'#a1efa5'}}>{customer?'← K4K APP':'← K4K owner QA'}</Link> <Link href="/k4k-app/videos" style={{color:'#a1efa5',float:'right'}}>My Generations →</Link> {customer&&<Link href="/login" style={{color:"#a1efa5",marginLeft:20}}>Sign in</Link>}
    <p style={{color:'#a1efa5',letterSpacing:3,fontSize:12,marginTop:34}}>{customer?'K4K MOTION · DIRECTOR STUDIO':'K4K MOTION · CUSTOMER FLOW PREVIEW'}</p>
    <h1 style={{fontSize:'clamp(31px,6vw,56px)',lineHeight:1.08,margin:'9px 0'}}>Don't follow the trend. Create it.</h1>
    <p style={{color:'#adbdaf',maxWidth:730,lineHeight:1.6}}>Prepare your video swap and review the credit cost before generating. Files remain on this device until you choose Upload and verify. Verification saves them privately and checks their contents without starting a generation.</p>
@@ -96,7 +96,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
      <h2 style={{fontSize:20}}>01 · Source video</h2>
      <p style={{color:'#aebbaf',fontSize:13}}>Choose a 4–30 second MP4, up to 50 MB.</p>
      {source?<><h3>{selectedTemplate.title}</h3><video src={source.url} controls playsInline style={{width:"100%",maxHeight:420,borderRadius:12}}/><p>Confirm the number of people you want to replace below.</p></>:<input type="file" disabled={busy} accept="video/mp4" onChange={e=>{uploaded.current=null;setSeconds(null);setVideo(e.target.files?.[0]||null);setResult(null);setError('')}} style={{maxWidth:'100%',padding:22,border:'1px dashed #5b7e60',borderRadius:12}}/>}
-     <p style={{color:'#a1efa5',fontSize:13}}>{seconds?'Duration on device: '+seconds.toFixed(2)+'s':'No duration detected'}</p>
+     <p style={{color:'#a1efa5',fontSize:13}}>{seconds?(source?'Template duration: ':'Duration on device: ')+seconds.toFixed(2)+'s':'No duration detected'}</p>
      <LocalMedia file={video} video/>
     </section>
    </div>
@@ -117,7 +117,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
     <button type="button" onClick={verifyUploads} disabled={busy||(customer&&(!consent||Math.ceil(seconds||4)*rates[resolution]>maxUsd))} style={{margin:'18px 0 0 12px',border:'1px solid #a1efa5',borderRadius:10,padding:'13px 18px',fontWeight:800,background:'transparent',color:'#a1efa5'}}>{busy?'Working…':'Upload and verify privately'}</button>
     {error&&<p role="alert" style={{color:'#ffa9a9'}}>{error}</p>}
     {result&&<div role="status" style={{borderTop:'1px solid #425946',marginTop:20,paddingTop:18}}>
-      <p style={{fontSize:13,color:'#acbfad'}}>{customer?'Verified credit estimate · ':'Published provider rate estimate · '}{result.billedSeconds} billed seconds · {result.resolution}</p>
+      <p style={{fontSize:13,color:'#acbfad'}}>{customer?(result.verifiedVideoDuration?'Verified credit estimate · ':'Estimated credits · '):'Published provider rate estimate · '}{result.billedSeconds} billed seconds · {result.resolution}</p>
       <strong style={{fontSize:36,color:'#a1efa5'}}>{customer?Math.ceil(Number(result.estimatedProviderUsd)/usdPerCredit)+' credits':'$'+Number(result.estimatedProviderUsd).toFixed(2)}</strong>
       <p style={{fontSize:13,color:'#bbc8ba'}}>{result.verifiedVideoDuration?'Private files checked. Duration read from the uploaded MP4.':'Estimate uses device-reported duration; files have not been verified.'} No credits charged. {customer?'Review the final quote below before generating.':'This is not a signed customer quote or verified provider charge.'}</p>
      </div>}
