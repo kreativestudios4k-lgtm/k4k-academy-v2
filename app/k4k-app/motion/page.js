@@ -13,5 +13,6 @@ export default async function MotionPage({searchParams}){
  const originals=catalogue.discoveryPreviews.filter(t=>t.k4kOriginal&&t.videoUrl);
  const templates=originals.filter(t=>{const r=generationReference(t);return r.supported&&r.seconds>=4&&!t.generationPaused&&!t.previewOnly;});
  const initialTemplateId=templates.some(t=>t.id===requestedTemplate)?requestedTemplate:'';
- return <MotionStudio customer initialTemplateId={initialTemplateId} templates={templates} gallery={originals} maxUsd={Number(process.env.K4K_GENERATION_MAX_USD)||1.60} qualityCaps={{'480p':genjutsuCustomerMaxUsd('480p'),'720p':genjutsuCustomerMaxUsd('720p'),'1080p':genjutsuCustomerMaxUsd('1080p')}} usdPerCredit={Number(process.env.K4K_PROVIDER_USD_PER_CREDIT)||0.10}/>;
+ const initialPreviewId=originals.some(t=>t.id===requestedTemplate)?requestedTemplate:'';
+ return <MotionStudio customer initialTemplateId={initialTemplateId} templates={templates} gallery={originals} initialPreviewId={initialPreviewId} maxUsd={Number(process.env.K4K_GENERATION_MAX_USD)||1.60} qualityCaps={{'480p':genjutsuCustomerMaxUsd('480p'),'720p':genjutsuCustomerMaxUsd('720p'),'1080p':genjutsuCustomerMaxUsd('1080p')}} usdPerCredit={Number(process.env.K4K_PROVIDER_USD_PER_CREDIT)||0.10}/>;
 }
