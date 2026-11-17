@@ -8,7 +8,9 @@ import {useVerifiedAccount} from './useVerifiedAccount';
 import AccountMenu from './AccountMenu';
 import './creative-home.css';
 
-const featured=[...new Map([...catalogue.trending,...catalogue.discoveryPreviews,...catalogue.topPerforming].filter(item=>item.videoUrl&&item.posterUrl).map(item=>[item.id,item])).values()];
+// Showcase only K4K's curated original previews, not the legacy trending/celebrity templates.
+// Original MP4 entries do not require separate poster images.
+const featured=catalogue.discoveryPreviews.filter(item=>item.videoUrl);
 const models=[
  {name:'K4K Motion',tag:'TEMPLATES · CHARACTER SWAP',detail:'Use our uploaded video references as templates',path:'/k4k-app/motion',symbol:'motion'},
  {name:'K4K Remix',tag:'WAN-POWERED · AVAILABLE',detail:'Reference-led video creation with your own characters',path:'/k4k-app/creator',symbol:'video'},
@@ -63,7 +65,7 @@ export default function CreativeHome(){
              <div className="khf-display-top"><span className="khf-live"><span/> K4K ORIGINAL</span><button type="button" onClick={()=>setSound(v=>!v)}>{sound?tr('Sound on','Som ligado','Sonido activo'):tr('Sound off','Sem som','Sin sonido')}</button></div>
              <div className="khf-display-bottom"><div><small>{tr('CREATOR SHOWCASE','VITRINE CRIATIVA','MUESTRA CREATIVA')}</small><strong>{first?.title||'K4K Motion'}</strong></div><div className="khf-feature-step">{String(heroIndex+1).padStart(2,'0')} / {String(videoCount).padStart(2,'0')}</div></div>
            </div>
-           <div className="khf-thumb-strip" aria-label={tr('Featured videos','Vídeos em destaque','Vídeos destacados')}>{featured.slice(0,4).map((entry,i)=><button type="button" className={heroIndex===i?'khf-thumb selected':'khf-thumb'} aria-label={'Preview '+entry.title} onClick={()=>setHeroIndex(i)} key={entry.id}><img loading="lazy" src={entry.posterUrl} alt=""/>{heroIndex===i&&<span><Play size={13}/></span>}</button>)}</div>
+           <div className="khf-thumb-strip" aria-label={tr('Featured videos','Vídeos em destaque','Vídeos destacados')}>{featured.slice(0,4).map((entry,i)=><button type="button" className={heroIndex===i?'khf-thumb selected':'khf-thumb'} aria-label={'Preview '+entry.title} onClick={()=>setHeroIndex(i)} key={entry.id}><video src={entry.videoUrl} poster={entry.posterUrl||undefined} muted playsInline preload="metadata" aria-hidden="true" onLoadedMetadata={e=>{e.currentTarget.currentTime=0.1}}/>{heroIndex===i&&<span><Play size={13}/></span>}</button>)}</div>
            <div className="khf-floating-note"><Sparkles size={18}/><span>{tr('Your idea. Your characters.','Sua ideia. Seus personagens.','Tu idea. Tus personajes.')}</span></div>
          </div>
        </div>
@@ -78,7 +80,7 @@ export default function CreativeHome(){
      </section>
      <section className="khf-section khf-discover" id="discover">
        <div className="khf-section-heading"><div><span className="khf-overline">{tr('MADE TO BE REIMAGINED','FEITO PARA RECRIAR','HECHO PARA RECREAR')}</span><h2>{tr('Discover the projects.','Explore os projetos.','Descubre los proyectos.')}<br/><em>{tr('Create your own version.','Crie a sua versão.','Crea tu propia versión.')}</em></h2></div><Link className="khf-viewall" href="/k4k-app/motion">{tr('Explore all templates','Ver todos os templates','Ver todas las plantillas')}<ArrowUpRight size={18}/></Link></div>
-       <div className="khf-project-grid">{featured.slice(0,8).map((entry,i)=><Link href={'/k4k-app/motion#'+encodeURIComponent(entry.id)} className="khf-project" key={entry.id}><div className="khf-project-media"><img src={entry.posterUrl} alt={entry.title} loading="lazy"/><span className="khf-project-play"><Play size={17}/></span><span className="khf-project-length">{Math.round(entry.durationSeconds)}s</span></div><div className="khf-project-caption"><div><strong>{entry.title}</strong><small>{entry.requiredImages||1} {tr('reference images','imagens de referência','imágenes de referencia')}</small></div><ArrowUpRight size={19}/></div></Link>)}</div>
+       <div className="khf-project-grid">{featured.slice(0,8).map((entry,i)=><Link href="/k4k-app/explore" className="khf-project" key={entry.id}><div className="khf-project-media"><video src={entry.videoUrl} poster={entry.posterUrl||undefined} muted playsInline preload="metadata" aria-label={entry.title} onLoadedMetadata={e=>{e.currentTarget.currentTime=0.1}} onMouseEnter={e=>e.currentTarget.play().catch(()=>{})} onMouseLeave={e=>{e.currentTarget.pause();e.currentTarget.currentTime=0.1}}/><span className="khf-project-play"><Play size={17}/></span><span className="khf-project-length">{Math.round(entry.durationSeconds)}s</span></div><div className="khf-project-caption"><div><strong>{entry.title}</strong><small>{entry.requiredImages||1} {tr('reference images','imagens de referência','imágenes de referencia')}</small></div><ArrowUpRight size={19}/></div></Link>)}</div>
      </section>
      <section className="khf-model-section">
        <div className="khf-section khf-model-inner"><div className="khf-section-heading"><div><span className="khf-overline">{tr('ONE WORKSPACE. MORE POSSIBILITIES.','UM ESTÚDIO. MAIS POSSIBILIDADES.','UN ESTUDIO. MÁS POSIBILIDADES.')}</span><h2>{tr('Explore our AI studio.','Explore nosso estúdio de IA.','Explora nuestro estudio IA.')}</h2></div><Link className="khf-viewall" href="/k4k-app/create">{tr('View all tools','Ver ferramentas','Ver herramientas')}<ArrowUpRight size={18}/></Link></div>
