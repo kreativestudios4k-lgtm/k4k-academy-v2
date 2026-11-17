@@ -29,5 +29,5 @@ test('Director Studio preselects only an eligible catalogue template',()=>{
 });
 test('original billing and media verification handlers are untouched by feed integration',()=>{
  const studio=read('app/k4k-app/higgsfield-preview/page.js');
- for(const value of ['customer-preview-media','customer-preview-estimate','CustomerGeneration','verifyUploads'])assert.ok(studio.includes(value),value);
+ for(const value of ['customer-preview-media','CustomerGeneration','verifyUploads','priceFor'])assert.ok(studio.includes(value),value);
 });

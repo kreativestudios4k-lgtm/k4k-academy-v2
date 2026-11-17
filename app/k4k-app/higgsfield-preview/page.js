@@ -70,30 +70,17 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
    setResult(body);
   }catch(e){setError(e.message||'Unable to verify media.')}finally{actionLock.current=false;setBusy(false)}
  }
- async function estimate(){
-  if(actionLock.current)return;
-  setError('');setResult(null);
-  if(!castReady){setError(castError||'Add a photo to every character slot.');return;}
-  if((!source&&!video)||!seconds||seconds<4||seconds>30){setError('Choose an MP4 from 4 to 30 seconds.');return}
-  if(images.length<1||images.length>8||!images.every(f=>['image/jpeg','image/png','image/webp'].includes(f.type))){setError('Select 1–8 JPG, PNG or WEBP character photos.');return}
-  actionLock.current=true;setBusy(true);
-  try{
-   const {data:{session}}=await createClient().auth.getSession();
-   if(!session?.access_token)throw Error('Please sign in first.');
-   const response=await fetch('/api/higgsfield/customer-preview-estimate',{
-    method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},
-    body:JSON.stringify({seconds,resolution,imageCount:images.length})
-   });
-   const body=await response.json();if(!response.ok)throw Error(body.error||'ESTIMATE_UNAVAILABLE');
-   setResult(body);
-  }catch(e){setError(e.message||'ESTIMATE_UNAVAILABLE')}finally{actionLock.current=false;setBusy(false)}
- }
+ const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
+ const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
+ const credits=priceFor(resolution);
+ const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=maxUsd;
+
  return <main className="khm-root">
   <div className="khm-studio-layout">
    <nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/motion/explore">Explore templates</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/motion/explore">Explore templates</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
-   <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. Preview the credit cost before you generate. Files remain on this device until you choose Upload and verify; verification saves them privately without starting a generation.</p>
+   <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. See the credit cost instantly before you generate. Files remain on this device until you choose Upload and verify; verification saves them privately without starting a generation.</p>
    {customer&&<label className="khm-source-selector" style={{display:'block',marginTop:24}}>Choose your source<select aria-label="Source template" disabled={busy} value={templateId} onChange={e=>{const id=e.target.value;setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);}} style={{display:'block',width:'100%',padding:14,marginTop:10,borderRadius:10,background:'#111b16',color:'white',border:'1px solid #415b47'}}><option value="">Upload my own video</option>{templates.map(t=><option key={t.id} value={t.id}>{t.title} · {Math.ceil(generationReference(t).seconds)}s</option>)}</select></label>}
    <div className="khm-video-stage" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
     <section className="khm-video-panel" style={panel}>
@@ -111,23 +98,28 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
     <p style={{color:'#a1efa5',fontSize:13}}>{castReady?'Cast ready · '+images.length+' numbered photos':castError||'Add a photo to every slot to continue.'}</p>
    </section>
    <section className="khm-quality-panel" style={{...panel,marginTop:18}}>
-    <h2 style={{fontSize:20}}>03 · Quality and credits</h2>
-    <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
-     {['480p','720p','1080p'].map(q=><button key={q} type="button" disabled={busy||(customer&&Math.ceil(seconds||4)*rates[q]>maxUsd)} onClick={()=>{setResolution(q);setResult(null)}} style={{borderRadius:10,border:'1px solid #658768',padding:'12px 18px',background:q===resolution?'#a1efa5':'transparent',color:q===resolution?'#0c1b0f':'#ecf7eb',fontWeight:800}}>{q}</button>)}
+    <h2 style={{fontSize:20}}>03 · Video quality</h2>
+    <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Your estimated credit cost updates automatically when you choose a quality or upload a video.</p>
+    <div className="khm-quality-options" role="group" aria-label="Choose video quality">
+     {['480p','720p','1080p'].map(q=>{
+      const cost=priceFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=maxUsd;
+      const disabled=busy||(customer&&cost!==null&&!affordable);
+      return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{cost===null?'Choose video':affordable||!customer?cost+' credits':'Unavailable'}</span></button>
+     })}
     </div>
-    {customer&&<p style={{color:'#adbdaf',fontSize:13}}>Estimated {Math.ceil(Math.ceil(seconds||4)*rates[resolution]/usdPerCredit)} credits · Current limit: {Math.min(30,Math.floor(maxUsd/rates[resolution]))} seconds at {resolution}. Unavailable qualities exceed the current spending limit.</p>}
-    {customer&&<label style={{display:'block',marginTop:16}}><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} disabled={busy}/> I have permission to use this video and every character photo.</label>}
-    <button type="button" onClick={estimate} disabled={busy} style={{marginTop:18,border:0,borderRadius:10,padding:'13px 18px',fontWeight:800,background:'#a1efa5',color:'#102016'}}>{busy?'Calculating…':'Calculate estimated cost'}</button>
-    <button type="button" onClick={verifyUploads} disabled={busy||(customer&&(!consent||Math.ceil(seconds||4)*rates[resolution]>maxUsd))} style={{margin:'18px 0 0 12px',border:'1px solid #a1efa5',borderRadius:10,padding:'13px 18px',fontWeight:800,background:'transparent',color:'#a1efa5'}}>{busy?'Working…':'Upload and verify privately'}</button>
+    <div className="khm-credit-summary" aria-live="polite">
+     <span>{result?.verifiedInputStorage?'Verified media · credit estimate':'Estimated cost before verification'}</span>
+     <strong>{credits!==null?credits+' credits':'Choose a source video to see credits'}</strong>
+     <small>{billableSeconds!==null?billableSeconds+' billed seconds · '+resolution+' · exact signed quote shown before payment':'Credit price depends on the video duration and selected resolution.'}</small>
+    </div>
+    {customer&&credits!==null&&!withinBudget&&<p role="status" style={{color:'#efc895',fontSize:13}}>This quality exceeds the current per-video provider limit. Choose a lower resolution or shorter video.</p>}
+    {customer&&<label className="khm-permission"><input type="checkbox" checked={consent} onChange={e=>setConsent(e.target.checked)} disabled={busy}/> I have permission to use this video and every character photo.</label>}
+    <button type="button" className="khm-private-upload" onClick={verifyUploads} disabled={busy||(customer&&(!consent||!withinBudget))||!castReady||billableSeconds===null}>{busy?'Verifying files…':result?.verifiedInputStorage?'Files verified · Verify again':'Verify files privately · No credits charged'}</button>
     {error&&<p role="alert" style={{color:'#ffa9a9'}}>{error}</p>}
-    {result&&<div role="status" style={{borderTop:'1px solid #425946',marginTop:20,paddingTop:18}}>
-      <p style={{fontSize:13,color:'#acbfad'}}>{customer?(result.verifiedVideoDuration?'Verified credit estimate · ':'Estimated credits · '):'Published provider rate estimate · '}{result.billedSeconds} billed seconds · {result.resolution}</p>
-      <strong style={{fontSize:36,color:'#a1efa5'}}>{customer?Math.ceil(Number(result.estimatedProviderUsd)/usdPerCredit)+' credits':'$'+Number(result.estimatedProviderUsd).toFixed(2)}</strong>
-      <p style={{fontSize:13,color:'#bbc8ba'}}>{result.verifiedVideoDuration?'Private files checked. Duration read from the uploaded MP4.':'Estimate uses device-reported duration; files have not been verified.'} No credits charged. {customer?'Review the final quote below before generating.':'This is not a signed customer quote or verified provider charge.'}</p>
-     </div>}
+    {result?.verifiedInputStorage&&<p role="status" style={{color:'#a1efa5',fontSize:13}}>Source video and character photos verified privately. Your exact credit charge will be confirmed before Generate.</p>}
    </section>
    <section className="khm-generate-panel" style={{...panel,marginTop:18}}>
-    <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt} media={castReady&&(!customer||consent)&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution}/>
+    <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt} media={castReady&&(!customer||consent)&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution} estimatedCredits={credits}/>
    </section>
   </div>
  </main>;
