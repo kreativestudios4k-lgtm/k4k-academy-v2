@@ -10,13 +10,19 @@ const shell=read('app/k4k-app/PreviewShell.js');
 const homeCss=read('app/k4k-app/creative-home.css');
 const studioCss=read('app/k4k-app/create/create.css');
 const catalog=read('lib/creation-studio-catalog.mjs');
-test('every official K4K section is a distinct route, not an inert duplicate',()=>{
- for(const p of ['/k4k-app/motion/explore','/k4k-app/image','/k4k-app/video','/k4k-app/motion'])for(const source of [home,studio,motion,shell,gallery])assert.ok(source.includes(p),p);
+test('official creative routes keep tools distinct while separate template pages redirect to Motion',()=>{
+ for(const route of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion'])assert.ok(home.includes(route),route);
+ for(const route of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion'])assert.ok(motion.includes(route),route);
+ assert.doesNotMatch(home,/href="\\/k4k-app\\/motion\\/explore"/);
+ assert.doesNotMatch(motion,/href="\\/k4k-app\\/motion\\/explore"/);
+ assert.match(read('app/k4k-app/motion/explore/page.js'),/redirect\\('\\/k4k-app\\/motion'\\)/);
+ assert.match(read('app/templates/page.js'),/redirect\\('\\/k4k-app\\/motion'\\)/);
+ assert.match(motion,/khm-motion-library/);
  const image=read('app/k4k-app/image/page.js'),video=read('app/k4k-app/video/page.js');
  assert.match(image,/kind=image&model=/);assert.match(video,/kind=video&model=/);
- assert.match(image,/\['nano_banana_2','flux_3_image'\]/);
- assert.match(video,/\['seedance_2_5','kling4_0','wan-prime'\]/);
- assert.match(studio,/new URLSearchParams\(window.location.search\)/);
+ assert.match(image,/\\['nano_banana_2','flux_3_image'\\]/);
+ assert.match(video,/\\['seedance_2_5','kling4_0','wan-prime'\\]/);
+ assert.match(studio,/new URLSearchParams\\(window.location.search\\)/);
 });
 test('hero typography and cards adapt to desktop tablet and mobile viewports',()=>{
  assert.match(homeCss,/\.k4k-hf-home \.khf-hero-copy h1\{white-space:normal/);
