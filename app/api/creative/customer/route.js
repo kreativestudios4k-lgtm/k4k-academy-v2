@@ -108,7 +108,7 @@ export async function POST(req){
   const {data:account,error:accountError}=await db.from('k4k_live_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
   if(accountError)throw Error('UNAVAILABLE');if(!account||account.billing_hold||account.balance<credits)throw Error(account?.billing_hold?'BILLING_REVIEW_REQUIRED':'INSUFFICIENT_CREDITS');
   const jobId=randomUUID(),fingerprint=hash(['creative-customer-v1',user.id,jobId,body.modelId,model.endpoint,prompt,aspect,model.quoteUsdMicros,credits]);
-  const signing=process.env.K4K_GENERATION_QUOTE_SECRET;
+  const signing=process.env.K4K_CREATIVE_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
   const signer=quoteSigner(signing),token=signer.issue({provider:'fal',userId:user.id,jobId,modelId:body.modelId,usdMicros:model.quoteUsdMicros,credits,fingerprint});
   const signedQuote=signer.verify(token);
@@ -124,7 +124,7 @@ export async function POST(req){
   if(!uuid.test(body.requestKey||''))throw Error('INVALID_INPUT');
   const job=await owned(db,user.id,body.jobId),model=byModel.get(job.model);
   if(!creativeCustomerRelease(process.env,model.id,user.id))throw Error('CREATIVE_MODEL_NOT_LIVE');
-  const signing=process.env.K4K_GENERATION_QUOTE_SECRET;
+  const signing=process.env.K4K_CREATIVE_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
   const signed=quoteSigner(signing).verify(body.quoteToken);
   if(signed.jobId!==job.id||signed.userId!==user.id||signed.modelId!==model.id||
