@@ -46,9 +46,10 @@ export default function HiggsfieldConnectionPage(){
    <p>Paid production generation: Disabled pending integration verification</p>
    {result.authenticated&&<div style={{marginTop:20,paddingTop:18,borderTop:'1px solid #597059'}}>
     <h2 style={{fontSize:20,fontWeight:800}}>Owner-only first paid Genjutsu QA</h2>
-    <p style={{fontSize:14}}>Video: 4.13 seconds (billed as 5) · 480p · estimated $1.59. The uploaded footballer and presenter reference photos are included. This is one irreversible sandbox API submission attempt, not a customer generation.</p>
+    <p style={{fontSize:14}}>First QA attempt: 4.13-second source, 480p, estimated $1.59. Provider returned failed. The source video was a phone/dog/search montage but the prompt specified a two-person TV interview. This mismatch has been confirmed; the provider's technical failure reason is still unknown.</p>
+    <p style={{fontSize:14,color:'#ffb9b9'}}>Paid retry disabled. A new test requires a scene-matched reference video, revised prompt and fresh cost approval.</p>
     <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:14}}>
-     <button disabled={testBusy} type="button" onClick={()=>qaRequest('POST')} style={{background:'#a3ff9b',border:0,color:'#142414',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Run one paid $1.59 test</button>
+     <button disabled type="button" style={{background:'#506052',border:0,color:'#e0e8df',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Previous paid test closed</button>
      <button disabled={testBusy} type="button" onClick={()=>qaRequest('GET')} style={{background:'transparent',border:'1px solid #a3ff9b',color:'#a3ff9b',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Check generation status</button>
     </div>
     {testResult&&<div role="status" style={{marginTop:14,padding:12,border:'1px solid #466046',borderRadius:10}}>
