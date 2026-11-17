@@ -17,7 +17,7 @@ const translations={
  pt:{Explore:'Explorar',Projects:'Projetos',Library:'Biblioteca',Create:'Criar',Plans:'Planos',Account:'Conta'},
  es:{Explore:'Explorar',Projects:'Proyectos',Library:'Biblioteca',Create:'Crear',Plans:'Planes',Account:'Cuenta'}
 };
-export default function PreviewShell({active,children,studio=true}){
+export default function PreviewShell({active,children,studio=true,dashboard=false}){
  const {locale}=useK4KLocale();
  const [supportOpen,setSupportOpen]=useState(false);
  const [question,setQuestion]=useState(''),[messages,setMessages]=useState([]);
@@ -29,7 +29,7 @@ export default function PreviewShell({active,children,studio=true}){
  setMessages(old=>[...old,{q,answer}]);setQuestion('');
  }
  const labels=translations[locale]||{};
- return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')}>
+ return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')+(dashboard?' k4k-dashboard-shell':'')}>
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
    {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app/motion/explore" aria-current={active==='Home'?'page':undefined}>{labels.Explore||'Explore'}</Link><Link href="/k4k-app/image">{locale==='pt'?'Imagem':locale==='es'?'Imagen':'Image'}</Link><Link href="/k4k-app/video" aria-current={active==='Creator'?'page':undefined}>{locale==='pt'?'Vídeo':locale==='es'?'Vídeo':'Video'}</Link><Link href="/k4k-app/motion">K4K Motion</Link></nav>}
