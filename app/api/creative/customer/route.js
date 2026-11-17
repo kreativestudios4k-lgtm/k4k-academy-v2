@@ -171,7 +171,7 @@ export async function POST(req){
  }
  if(body.action==='download')return response(await signed(db,user.id,body.jobId,body.download));
  if(body.action==='list'){
-  const {data,error}=await db.from('k4k_multimodel_jobs').select('id,model,status,media_kind,credits_quoted,created_at').eq('user_id',user.id).eq('provider','fal').in('model',[...byModel.keys()]).order('created_at',{ascending:false}).limit(20);
+  const {data,error}=await db.from('k4k_multimodel_jobs').select('id,model,status,media_kind,credits_quoted,created_at').eq('user_id',user.id).eq('provider','fal').in('model',[...byModel.keys()]).neq('status','draft').order('created_at',{ascending:false}).limit(20);
   if(error)throw Error('UNAVAILABLE');
   return response({jobs:data});
  }

@@ -6,7 +6,7 @@ test('navigation preserves verified Wan creation, pricing, model discovery, real
 const shell=readFileSync(new URL('../app/k4k-app/PreviewShell.js',import.meta.url),'utf8');
 const catalogue=JSON.parse(readFileSync(new URL('../app/k4k-app/template-catalogue.json',import.meta.url),'utf8'));
 test('homepage showcases originals without requiring poster images and without resurfacing legacy people-focused trending clips',()=>{assert.match(home,/const featured=catalogue\.discoveryPreviews\.filter\(item=>item\.videoUrl\)/);assert.ok(catalogue.discoveryPreviews.some(item=>item.videoUrl&&!item.posterUrl));assert.doesNotMatch(home,/const featured=\[\.\.\.new Map\(\[\.\.\.catalogue\.trending/);assert.match(home,/src=\{entry\.videoUrl\}/);assert.match(css,/\.khf-project-media img,\.khf-project-media video/)});
-test('K4K studio brand navigates home instead of video generation',()=>{assert.match(shell,/<Link className="k4k-global-brand" href="\/k4k-app"/);assert.doesNotMatch(shell,/<Link className="k4k-global-brand" href="\/k4k-app\/creator"/)});
+test('K4K studio brand navigates home instead of video generation',()=>{assert.match(shell,/<Link className="k4k-global-brand" href="\/"/);assert.doesNotMatch(shell,/<Link className="k4k-global-brand" href="\/k4k-app\/creator"/)});
 
 const motion=readFileSync(new URL('../app/k4k-app/higgsfield-preview/page.js',import.meta.url),'utf8');
 const motionCss=readFileSync(new URL('../app/k4k-app/higgsfield-preview/motion-wide.css',import.meta.url),'utf8');
