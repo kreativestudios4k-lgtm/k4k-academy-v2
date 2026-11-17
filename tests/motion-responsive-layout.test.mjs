@@ -5,7 +5,7 @@ const css=readFileSync(new URL('../app/k4k-app/higgsfield-preview/motion-wide.cs
 const page=readFileSync(new URL('../app/k4k-app/higgsfield-preview/page.js',import.meta.url),'utf8');
 test('Motion Studio avoids horizontal desktop overflow on small laptops and zoomed browsers',()=>{
  assert.match(css,/\.khm-studio-layout\{[^}]*width:100%;[^}]*grid-template-columns:minmax\(0,1\.15fr\) minmax\(0,\.85fr\)/);
- assert.match(css,/@media\(max-width:1180px\)\{[^}]*grid-template-columns:minmax\(0,1fr\)/);
+ assert.match(css,/@media\(max-width:1180px\)\{[\s\S]*?\.khm-studio-layout\{grid-template-columns:minmax\(0,1fr\)/);
  assert.match(css,/\.khm-root\{[^}]*overflow-x:clip/);
  assert.match(css,/\.khm-studio-layout>\*\{min-width:0;max-width:100%\}/);
  assert.match(css,/\.khm-title\{[^}]*max-width:100%/);
