@@ -10,7 +10,7 @@ export default async function MotionPage({searchParams}){
  const params=await searchParams;
  const requestedTemplate=typeof params?.template==='string'&&/^k4k-original-\d{2}$/.test(params.template)?params.template:'';
  const liteEnabled=process.env.K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED==='true';
- const initialMotionModel=liteEnabled&&params?.model==='lite'?'lite':'ultra';
+ const initialMotionModel=liteEnabled&&params?.model!=='ultra'?'lite':'ultra';
  if(!higgsfieldFlowEnabled())return <MotionEditor initialTemplateId={requestedTemplate}/>;
  const originals=catalogue.discoveryPreviews.filter(t=>t.k4kOriginal&&t.videoUrl);
  const templates=originals.filter(t=>{const r=generationReference(t,{maxSeconds:30});return r.supported&&r.seconds>=4&&!t.generationPaused&&!t.previewOnly;});
