@@ -125,6 +125,7 @@ export default function HiggsfieldConnectionPage(){
  }
  return <main style={{maxWidth:660,margin:'64px auto',padding:24}}>
   <h1 style={{fontSize:28,fontWeight:800,marginBottom:8}}>Higgsfield API connection — K4K QA</h1>
+  <p><a href="/k4k-app/higgsfield-preview" style={{color:'#a3ff9b',fontWeight:800}}>Open new K4K Motion customer preview →</a></p>
   <p style={{color:'#bac6ba',lineHeight:1.7}}>Owner-only, preview-only. This read-only test makes no paid generation request. An authenticated API credential does not verify funded balance, model access, credit settlement, or customer readiness.</p>
   <button disabled={working} type="button" onClick={testConnection} style={{marginTop:20,border:0,borderRadius:12,background:'#a3ff9b',color:'#142414',padding:'14px 22px',fontWeight:800,cursor:'pointer'}}>{working?'Checking…':'Test Higgsfield developer API'}</button>
   {result&&<section role="status" style={{marginTop:20,padding:18,border:'1px solid #597059',borderRadius:12}}>
