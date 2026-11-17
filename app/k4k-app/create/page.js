@@ -4,7 +4,6 @@ import Link from 'next/link';
 import {ArrowRight,ArrowUpRight,Images,Film,Layers,Upload,Plus,X,Copy,Check,ShieldCheck,Sparkles,SlidersHorizontal,Play,CheckCircle2,Clock3,Search,ChevronDown,ImagePlus} from 'lucide-react';
 import {CREATION_MODELS,creationModels,creationModelGroups,creationBrief} from '../../../lib/creation-studio-catalog.mjs';
 import {creativeModelReadiness} from '../../../lib/creative-provider-readiness.mjs';
-import OwnerCreativeQA from '../OwnerCreativeQA';
 import CustomerCreativeGeneration from '../CustomerCreativeGeneration';
 import {useK4KLocale} from '../locale';
 import './create.css';
@@ -40,7 +39,7 @@ export default function CreativeStudio(){
  const providerReadiness=creativeModelReadiness(model.id,mode);
  const [thumbnails,setThumbnails]=useState([]);useEffect(()=>{const urls=files.map(f=>URL.createObjectURL(f));setThumbnails(urls);return()=>urls.forEach(u=>URL.revokeObjectURL(u))},[files]);
  return <main className="kcs-root">
-  <header className="kcs-nav"><Link className="kcs-brand" href="/k4k-app"><img src="/k4k-mark.svg" width="29" height="29" alt=""/> K4K<span> APP</span></Link><nav aria-label="Creative Studio navigation"><Link href="/k4k-app/dashboard">Dashboard</Link><Link href="/k4k-app/image" aria-current={kind==='image'?'page':undefined}>Image</Link><Link href="/k4k-app/video" aria-current={kind==='video'?'page':undefined}>Video</Link><Link href="/k4k-app/motion">K4K Motion</Link></nav><Link href="/k4k-app/videos" className="kcs-library-link">{t.library}<ArrowUpRight size={15}/></Link></header>
+  <header className="kcs-nav"><Link className="kcs-brand" href="/k4k-app"><img src="/k4k-mark.svg" width="29" height="29" alt=""/> K4K<span> APP</span></Link><div className="kcs-main-links" role="navigation" aria-label="Creative Studio navigation"><Link href="/k4k-app/dashboard">Dashboard</Link><Link href="/k4k-app/image" aria-current={kind==='image'?'page':undefined}>Image</Link><Link href="/k4k-app/video" aria-current={kind==='video'?'page':undefined}>Video</Link><Link href="/k4k-app/motion">K4K Motion</Link></div><Link href="/k4k-app/videos" className="kcs-library-link">{t.library}<ArrowUpRight size={15}/></Link></header>
   <div className="k4k-dashboard-frame"><StudioSidebar active={kind}/><div className="k4k-dashboard-main">
   <div className="kcs-shell">
    <section className="kcs-hero"><div className="kcs-eyebrow"><Sparkles size={13}/>{t.eyebrow}</div><h1>{t.headline}</h1><p>{t.subtitle}</p><div className="kcs-segments" role="tablist" aria-label="Output type"><button role="tab" aria-selected={kind==='video'} className={kind==='video'?'selected':''} onClick={()=>chooseKind('video')}><Film size={18}/>{t.videos}</button><button role="tab" aria-selected={kind==='image'} className={kind==='image'?'selected':''} onClick={()=>chooseKind('image')}><Images size={18}/>{t.images}</button></div></section>
@@ -60,7 +59,7 @@ export default function CreativeStudio(){
     {model.refs>0&&<><div className="kcs-reference-head"><strong>{t.reference}</strong><span>{files.length} / {model.refs}</span></div><div className="kcs-refs">{thumbnails.map((url,i)=><div key={url} className="kcs-thumb"><img alt={'Reference '+(i+1)} src={url}/><button aria-label={'Remove reference '+(i+1)} onClick={()=>setFiles(old=>old.filter((_,j)=>j!==i))}><X size={13}/></button></div>)}{files.length<model.refs&&<label className="kcs-add"><Plus size={21}/><span>{t.add}</span><input multiple accept="image/png,image/jpeg,image/webp" type="file" onChange={e=>{addFiles(e.target.files);e.target.value=''}}/></label>}</div></>}
     {model.status==='provider-verified'&&<div className="kcs-note" role="status"><ShieldCheck size={17}/><p><strong>{selectedLive?'Ready to create':'Workflow availability'}</strong> — {selectedLive?'Choose your prompt and review the exact credit price before generating. Your finished work is saved privately.':'This specific workflow is not yet enabled for customer generation. Choose an available model or workflow; no credits are charged for selecting a tool.'}</p></div>}
     {model.refs===0&&<div className="kcs-input-info"><ImagePlus size={18}/><p>Text prompt only for this model. Image reference uploads and edits will appear here only when the selected API supports them.</p></div>}
-    {model.status==='provider-verified'&&<OwnerCreativeQA model={model} mode={mode} prompt={prompt} aspect={aspect}/>}
+    
     {model.status==='provider-verified'&&<CustomerCreativeGeneration model={model} mode={mode} prompt={prompt} aspect={aspect} referenceCount={files.length} onModels={setCustomerModels}/>}
     <div className="kcs-note"><ShieldCheck size={17}/><p>{selectedLive?'Credits are only reserved after you confirm a signed generation quote.':t.note} {model.kind==='video'&&model.status==='active'?'Wan 3 uses the existing Wan-powered video generator. Premium K4K Motion is a separate character swap pilot.':''}</p></div>
     {error&&<p className="kcs-error" role="alert">{error}</p>}
