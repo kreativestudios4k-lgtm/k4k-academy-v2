@@ -37,7 +37,12 @@ test('dark background and input themes are present in the account workspace',()=
 test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  const feed=source('app/k4k-app/MobileTemplateFeed.js');
  const homepage=source('app/k4k-app/page.js');
- assert.match(homepage,/return <CreativeHome\/>/);
+ assert.match(homepage,/return <LandingRebuild\/>/);
+ const landing=source('app/k4k-app/LandingRebuild.js');
+ assert.match(landing,/kr-title-scene/);
+ assert.match(landing,/href="\/signup"/);
+ assert.match(landing,/href="\/login"/);
+ assert.match(landing,/HERO_VIDEO_SRC/);
  const newHome=source('app/k4k-app/CreativeHome.js');
  assert.match(newHome,/DON’T FOLLOW/);
  assert.match(newHome,/\/k4k-app\/image/);assert.match(newHome,/\/k4k-app\/video/);assert.match(newHome,/\/k4k-app\/motion/);
