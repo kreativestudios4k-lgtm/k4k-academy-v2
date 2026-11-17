@@ -27,6 +27,9 @@ test('new customer models are default denied, independent from owner-only QA and
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true'},'nano_banana_2','11111111-1111-4111-8111-111111111111'),true);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true'},'flux_3_image','11111111-1111-4111-8111-111111111111'),true);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_OWNER_PILOT_APPROVED:'true'},'seedance_2_5','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_PUBLIC_ENABLED:'true'},'seedance_2_5','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_PUBLIC_ENABLED:'true',K4K_SEEDANCE_PUBLIC_PRICE_APPROVED:'true'},'seedance_2_5','11111111-1111-4111-8111-111111111111'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_PUBLIC_ENABLED:'true',K4K_SEEDANCE_PUBLIC_PRICE_APPROVED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'false'},'seedance_2_5','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_SEEDANCE_OWNER_PILOT_APPROVED:'true'},'seedance_2_5','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'seedance_2_5'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false',K4K_CREATIVE_PUBLIC_LEDGER_APPROVED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
@@ -38,7 +41,7 @@ test('per-model quote worst-case reservations are bounded and pricing must be ap
  assert.equal(creativeCustomerQuote('flux_3_image',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c').quoteUsdMicros,300000);
  const seedance=creativeCustomerQuote('seedance_2_5',{...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_SEEDANCE_OWNER_PILOT_APPROVED:'true'},'0ef1af08-4df8-4858-967b-eac1a16f9f2c');
  assert.equal(seedance.quoteUsdMicros,2000000);
- assert.equal(seedance.providerBilling,'variable-tokens-owner-pilot');
+ assert.equal(seedance.providerBilling,'variable-tokens-public-beta');
  assert.deepEqual(seedance.input('Test cinematic motion','9:16'),{prompt:'Test cinematic motion',aspect_ratio:'9:16',duration:'5',resolution:'480p',generate_audio:false,draft:false});
  assert.throws(()=>creativeCustomerQuote('nano_banana_2',{...base,K4K_GENERATION_MAX_USD:'0.5'},'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/PROVIDER_BUDGET_BLOCKED/);
 });
@@ -57,4 +60,18 @@ test('owner-scoped completed jobs use private signed downloads and image-specifi
 });
 test('UI shows signed quote, explicit customer credit confirmation and refuses reference assets not used by model',()=>{
  for(const value of ['Check credit cost','Confirm and generate','referenceCount>0','action:\x27quote\x27','action:\x27submit\x27','action:\x27status\x27','action:\x27download\x27'])assert.ok(client.includes(value),value);
+});
+
+test('public Seedance has an independent kill switch, atomic UTC daily rate limit and authenticated FAILED refund',()=>{
+ const daily=readFileSync(new URL('../supabase/migrations/20261117170000_seedance_public_daily_limit.sql',import.meta.url),'utf8');
+ assert.match(daily,/create unique index if not exists k4k_seedance_daily_paid_once/);
+ assert.match(daily,/date_trunc\('day',created_at at time zone 'UTC'\)/);
+ assert.match(daily,/model='seedance-25-t2v'/);
+ assert.match(daily,/status in \('queued','processing','completed','failed'\)/);
+ assert.match(route,/SEEDANCE_DAILY_LIMIT/);
+ assert.match(route,/info.status==='FAILED'/);
+ assert.match(route,/await refund\(db,userId,job\)/);
+ assert.match(route,/model.providerBilling==='variable-tokens-public-beta'/);
+ assert.match(client,/Seedance 2.5 Public Beta/);
+ assert.match(client,/one submitted generation per account per UTC day/);
 });
