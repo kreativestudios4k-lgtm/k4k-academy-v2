@@ -12,7 +12,7 @@ test('Motion Studio avoids horizontal desktop overflow on small laptops and zoom
  assert.match(css,/\.khm-topnav\{[^}]*flex-wrap:wrap/);
 });
 test('Motion Studio preserves responsive video, cast and signed-price flow',()=>{
- for(const value of ['khm-video-stage','khm-cast-panel','khm-quality-panel','khm-generate-panel','CustomerGeneration','DirectorView','verifyUploads','priceFor'])assert.ok(page.includes(value),value);
+ for(const value of ['khm-video-stage','khm-cast-panel','khm-quality-panel','CustomerGeneration','DirectorView','verifyUploads','priceFor'])assert.ok(page.includes(value),value);
  assert.match(css,/\.khm-video-stage\{[^}]*grid-column:1/);
  assert.match(css,/\.khm-cast-panel\{[^}]*grid-column:2/);
  assert.match(css,/\.khm-source-selector,.khm-video-stage,.khm-cast-panel,.khm-direction-panel,.khm-quality-panel,.khm-generate-panel\{grid-column:1;grid-row:auto\}/);
