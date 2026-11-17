@@ -22,5 +22,7 @@ test('public customer credit and subscription tables are never touched by test r
  assert.doesNotMatch(source,/studio_credit_accounts|k4k_credit_grants|memberships|stripe|customer_wallet|k4k_multimodel_claim_dispatch/);
  assert.match(ui,/window\.confirm\(/);
  assert.match(ui,/Check generation status/);
- assert.match(ui,/Run one paid \$1\.59 test/);
+ assert.match(ui,/Previous paid test closed/);
+ assert.match(source,/FIRST_PAID_TEST_CLOSED=true/);
+ assert.match(source,/SOURCE_PROMPT_MISMATCH/);
 });
