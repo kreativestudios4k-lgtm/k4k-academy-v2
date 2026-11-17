@@ -12,10 +12,13 @@ const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,pad
 export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const selectedTemplate=templates.find(t=>t.id===templateId);
+ const initialTemplate=templates.find(t=>t.id===initialTemplateId);
+ const initialCast=templateCast(initialTemplate);
+ const initialSlots=initialCast.verified?initialCast.count:1;
  const source=selectedTemplate?generationReference(selectedTemplate):null;
  const rates={'480p':0.154,'720p':0.3446,'1080p':0.8346};
- const [video,setVideo]=useState(null),[images,setImages]=useState([null]),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
- const [targets,setTargets]=useState(['']),[main,setMain]=useState(0),[direction,setDirection]=useState('');
+ const [video,setVideo]=useState(null),[images,setImages]=useState(()=>Array(initialSlots).fill(null)),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
+ const [targets,setTargets]=useState(()=>Array(initialSlots).fill('')),[main,setMain]=useState(0),[direction,setDirection]=useState('');
  let prompt='',castError='';try{prompt=buildDirectorPrompt({targets,main,direction});}catch(e){castError=e.message;}
  const castReady=!!prompt&&images.length===targets.length&&images.every(Boolean);
  const actionLock=useRef(false),uploaded=useRef(null);
