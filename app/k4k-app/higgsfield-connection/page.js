@@ -6,6 +6,7 @@ export default function HiggsfieldConnectionPage(){
  const [working,setWorking]=useState(false),[result,setResult]=useState(null);
  const [testBusy,setTestBusy]=useState(false),[testResult,setTestResult]=useState(null);
  const [secondBusy,setSecondBusy]=useState(false),[secondResult,setSecondResult]=useState(null);
+ const [fileBusy,setFileBusy]=useState(false),[fileCheck,setFileCheck]=useState(null);
  async function qaRequest(method){
   if(testBusy)return;
   if(method==='POST'&&!window.confirm('Submit ONE paid Higgsfield Genjutsu test? 4.13-second source billed as 5 seconds, 480p, estimated $1.59. No automatic retry.'))return;
@@ -22,6 +23,17 @@ export default function HiggsfieldConnectionPage(){
    setTestResult({...payload,httpStatus:response.status});
   }catch(error){setTestResult({error:error?.message||'NETWORK_UNAVAILABLE'})}
   finally{setTestBusy(false)}
+ }
+ async function verifyOutput(){
+  if(fileBusy)return;setFileBusy(true);setFileCheck(null);
+  try{
+   const {data:{session}}=await createClient().auth.getSession();
+   if(!session?.access_token)throw Error('SIGN_IN_REQUIRED');
+   const response=await fetch('/api/higgsfield/second-output-check',{cache:'no-store',headers:{Authorization:'Bearer '+session.access_token}});
+   const body=await response.json().catch(()=>({error:'INVALID_RESPONSE'}));
+   setFileCheck({...body,httpStatus:response.status});
+  }catch(error){setFileCheck({error:error?.message||'NETWORK_UNAVAILABLE'})}
+  finally{setFileBusy(false)}
  }
  async function secondRequest(method){
   if(secondBusy)return;
@@ -98,6 +110,8 @@ export default function HiggsfieldConnectionPage(){
      {secondResult.providerErrorCode&&<p>Provider error: {secondResult.providerErrorCode}</p>}
      {secondResult.providerErrorMessage&&<p>Failure reason: {secondResult.providerErrorMessage}</p>}
      {secondResult.videoUrl&&<a href={secondResult.videoUrl} target="_blank" rel="noreferrer" style={{color:'#a3ff9b'}}>View generated test video</a>}
+     {secondResult.state==='completed'&&<button type="button" onClick={verifyOutput} disabled={fileBusy} style={{display:'block',marginTop:12,border:'1px solid #a3ff9b',background:'transparent',color:'#a3ff9b',padding:'10px 14px',borderRadius:10}}>{fileBusy?'Checking file…':'Verify output MP4 file'}</button>}
+     {fileCheck&&<p>Output file check: {fileCheck.error||fileCheck.reason||(fileCheck.outputAvailable&&fileCheck.mp4HeaderValid?'MP4 header valid':'Not verified')}. K4K Library download: {fileCheck.downloadInK4KLibrary===false?'Not connected':'Not verified'}.</p>}
     </div>}
    </section>}
    {result.state==='sign_in_required'&&<a href={LOGIN} style={{color:'#a3ff9b'}}>Sign in on this preview</a>}
