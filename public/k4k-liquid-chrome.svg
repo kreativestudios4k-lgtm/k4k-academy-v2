@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="900" viewBox="0 0 900 900" fill="none">
+<defs>
+ <radialGradient id="halo" cx="0" cy="0" r="1" gradientTransform="translate(448 440) rotate(90) scale(354)"><stop stop-color="#fcfcff" stop-opacity=".23"/><stop offset=".48" stop-color="#bcbcc3" stop-opacity=".15"/><stop offset="1" stop-color="#050509" stop-opacity="0"/></radialGradient>
+ <linearGradient id="liquidA" x1="130" y1="210" x2="744" y2="684" gradientUnits="userSpaceOnUse"><stop stop-color="#07080c"/><stop offset=".08" stop-color="#34363d"/><stop offset=".16" stop-color="#fcfcff"/><stop offset=".24" stop-color="#767985"/><stop offset=".39" stop-color="#090a11"/><stop offset=".53" stop-color="#f2f3f5"/><stop offset=".63" stop-color="#555861"/><stop offset=".73" stop-color="#111219"/><stop offset=".88" stop-color="#c8cbd0"/><stop offset="1" stop-color="#090a10"/></linearGradient>
+ <linearGradient id="liquidB" x1="730" y1="170" x2="170" y2="760" gradientUnits="userSpaceOnUse"><stop stop-color="#f7f7fc"/><stop offset=".1" stop-color="#272932"/><stop offset=".19" stop-color="#bfc0cc"/><stop offset=".31" stop-color="#0e1019"/><stop offset=".42" stop-color="#e8ebf1"/><stop offset=".56" stop-color="#33353f"/><stop offset=".68" stop-color="#fafaff"/><stop offset=".77" stop-color="#0a0a11"/><stop offset=".91" stop-color="#c4c7d3"/><stop offset="1" stop-color="#090a11"/></linearGradient>
+ <linearGradient id="liquidC" x1="120" y1="630" x2="680" y2="265" gradientUnits="userSpaceOnUse"><stop stop-color="#0b0b11"/><stop offset=".13" stop-color="#d7d9e4"/><stop offset=".24" stop-color="#24252d"/><stop offset=".39" stop-color="#f3f3fc"/><stop offset=".52" stop-color="#1b1d26"/><stop offset=".62" stop-color="#b4b7c6"/><stop offset=".78" stop-color="#07070c"/><stop offset=".89" stop-color="#d3d5df"/><stop offset="1" stop-color="#12131a"/></linearGradient>
+ <linearGradient id="edge" x1="160" y1="200" x2="730" y2="700" gradientUnits="userSpaceOnUse"><stop stop-color="#e0e2f7"/><stop offset=".48" stop-color="#535663"/><stop offset="1" stop-color="#fff"/></linearGradient>
+ <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="11" dy="24" stdDeviation="17" flood-color="#000" flood-opacity=".75"/></filter>
+ <filter id="soft"><feGaussianBlur stdDeviation="20"/></filter>
+ <filter id="glint"><feGaussianBlur stdDeviation="2"/></filter>
+</defs>
+<ellipse cx="454" cy="449" rx="345" ry="335" fill="url(#halo)"/>
+<ellipse cx="478" cy="696" rx="245" ry="38" fill="#000" opacity=".55" filter="url(#soft)"/>
+<g filter="url(#shadow)" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M202 495C125 364 209 240 340 230c113-9 124 155 211 187 86 32 183-49 178-145-5-106-143-145-239-86" stroke="#02030a" stroke-width="102"/>
+ <path d="M202 495C125 364 209 240 340 230c113-9 124 155 211 187 86 32 183-49 178-145-5-106-143-145-239-86" stroke="url(#liquidA)" stroke-width="82"/>
+ <path d="M496 184c-120-21-220 57-211 182 9 131 200 146 277 250 94 127-97 202-215 121-90-63-99-162-173-214" stroke="#05050b" stroke-width="116"/>
+ <path d="M496 184c-120-21-220 57-211 182 9 131 200 146 277 250 94 127-97 202-215 121-90-63-99-162-173-214" stroke="url(#liquidB)" stroke-width="88"/>
+ <path d="M236 314c117-109 224-45 324 9 118 64 166 200 58 269-98 63-187-60-278-30-117 38-93 159 8 184" stroke="#05060b" stroke-width="119"/>
+ <path d="M236 314c117-109 224-45 324 9 118 64 166 200 58 269-98 63-187-60-278-30-117 38-93 159 8 184" stroke="url(#liquidC)" stroke-width="90"/>
+ <path d="M271 611c-99-86-87-200 7-269 115-85 228-2 305 12 123 23 153-99 93-171" stroke="#06050b" stroke-width="111"/>
+ <path d="M271 611c-99-86-87-200 7-269 115-85 228-2 305 12 123 23 153-99 93-171" stroke="url(#liquidA)" stroke-width="84"/>
+</g>
+<g stroke="url(#edge)" opacity=".69" stroke-linecap="round">
+ <path d="M203 494C128 367 216 247 338 242" stroke-width="6"/>
+ <path d="M495 194c-110-17-206 54-198 173" stroke-width="7"/>
+ <path d="M237 303c114-104 211-39 312 19" stroke-width="5"/>
+ <path d="M279 615c-94-78-78-185 8-258" stroke-width="4"/>
+ <path d="M346 741c118 85 292 19 214-115" stroke-width="5"/>
+</g>
+<path d="M608 238c33-10 56-1 68 19" stroke="white" stroke-opacity=".82" stroke-width="8" stroke-linecap="round" filter="url(#glint)"/>
+</svg>
