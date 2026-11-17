@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useRef,useState} from 'react';
+import {useState} from 'react';
 import Link from 'next/link';
 import {ArrowRight,ArrowUpRight,Play,Film,Images,Sparkles,Clapperboard,Layers3,Menu,X,Globe2,CheckCircle2,ChevronRight,MoveUpRight} from 'lucide-react';
 import catalogue from './template-catalogue.json';
@@ -22,11 +22,7 @@ export default function CreativeHome(){
  const {locale,changeLocale}=useK4KLocale();
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
  const {user}=useVerifiedAccount();
- const [menu,setMenu]=useState(false),[heroIndex,setHeroIndex]=useState(0),[sound,setSound]=useState(false);
- const heroRef=useRef(null);
- const first=featured[heroIndex]||featured[0];
- useEffect(()=>{const video=heroRef.current;if(!video)return;video.muted=!sound;video.play().catch(()=>{});},[heroIndex,sound]);
- const videoCount=featured.length;
+ const [menu,setMenu]=useState(false);
  return <div className="k4k-hf-home">
    <header className="khf-topbar">
      <div className="khf-nav-inner">
@@ -50,25 +46,30 @@ export default function CreativeHome(){
      {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/">{tr('Home','Início','Inicio')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/image">{tr('Image','Imagem','Imagen')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/video">{tr('Video','Vídeo','Vídeo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">Wan 3</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link onClick={()=>setMenu(false)} className="khf-mobile-signup" href="/k4k-app/register">{tr('Sign up','Criar conta','Registrarse')} <ArrowRight size={16}/></Link>}{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
    </header>
    <main>
-     <section className="khf-hero" aria-labelledby="khf-hero-title">
-       <div className="khf-hero-inner">
-         <div className="khf-hero-copy">
-           <span className="khf-eyebrow"><span className="khf-dot"/> K4K CREATIVE STUDIO <span className="khf-eyebrow-line"/></span>
-           <h1 id="khf-hero-title">{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}<br/><em>{tr("THE TREND.","A TENDÊNCIA.","LA TENDENCIA.")}</em><br/>{tr("CREATE IT.","CRIE A SUA.","CRÉALA.")}</h1>
-           <p>{tr('Transform ideas, images and reference videos into your next creative project. One studio, multiple AI models, your direction.','Transforme ideias, imagens e vídeos de referência no seu próximo projeto. Um estúdio, vários modelos de IA e a sua direção.','Convierte ideas, imágenes y vídeos de referencia en tu próximo proyecto. Un estudio, varios modelos de IA y tu dirección.')}</p>
-           <div className="khf-hero-buttons"><Link className="khf-primary" href="/k4k-app/video">{tr('Create a video','Criar um vídeo','Crear un vídeo')}<ArrowUpRight size={18}/></Link><Link className="khf-secondary" href="#discover"><Play size={17}/>{tr('Explore creations','Explorar criações','Explorar creaciones')}</Link></div>
-           <div className="khf-trust"><span><CheckCircle2 size={15}/>{tr('Image & video tools','Ferramentas de imagem e vídeo','Herramientas de imagen y vídeo')}</span><span><CheckCircle2 size={15}/>{tr('Real creator templates','Templates reais de criadores','Plantillas reales')}</span></div>
+     <section className="khf-hero khf-reference-hero" aria-labelledby="khf-hero-title">
+       <div className="khf-reference-frame">
+         <div className="khf-reference-atmosphere" aria-hidden="true"><img src="/k4k-liquid-chrome.svg" alt="" loading="eager"/></div>
+         <div className="khf-reference-shimmer" aria-hidden="true"/>
+         <div className="khf-reference-sideyear" aria-hidden="true">K4K · 2026</div>
+         <div className="khf-reference-headline">
+           <span className="khf-reference-eyebrow">{tr('THE NEXT ERA OF CREATION','A NOVA ERA DA CRIAÇÃO','LA NUEVA ERA DE CREACIÓN')}</span>
+           <h1 id="khf-hero-title">K4K <span>APP</span></h1>
          </div>
-         <div className="khf-hero-visual">
-           <div className="khf-glow" aria-hidden="true"/>
-           <div className="khf-display-main">
-             {first&&<video ref={heroRef} key={first.id} src={first.videoUrl} poster={first.posterUrl} muted={!sound} autoPlay loop playsInline preload="metadata" aria-label={first.title}/>}
-             <div className="khf-display-top"><span className="khf-live"><span/> K4K ORIGINAL</span><button type="button" onClick={()=>setSound(v=>!v)}>{sound?tr('Sound on','Som ligado','Sonido activo'):tr('Sound off','Sem som','Sin sonido')}</button></div>
-             <div className="khf-display-bottom"><div><small>{tr('CREATOR SHOWCASE','VITRINE CRIATIVA','MUESTRA CREATIVA')}</small><strong>{first?.title||'K4K Motion'}</strong></div><div className="khf-feature-step">{String(heroIndex+1).padStart(2,'0')} / {String(videoCount).padStart(2,'0')}</div></div>
-           </div>
-           <div className="khf-thumb-strip" aria-label={tr('Featured videos','Vídeos em destaque','Vídeos destacados')}>{featured.slice(0,4).map((entry,i)=><button type="button" className={heroIndex===i?'khf-thumb selected':'khf-thumb'} aria-label={'Preview '+entry.title} onClick={()=>setHeroIndex(i)} key={entry.id}><video src={entry.videoUrl} poster={entry.posterUrl||undefined} muted playsInline preload="metadata" aria-hidden="true" onLoadedMetadata={e=>{e.currentTarget.currentTime=0.1}}/>{heroIndex===i&&<span><Play size={13}/></span>}</button>)}</div>
-           <div className="khf-floating-note"><Sparkles size={18}/><span>{tr('Your idea. Your characters.','Sua ideia. Seus personagens.','Tu idea. Tus personajes.')}</span></div>
+         <div className="khf-reference-sculpture" aria-hidden="true"><img src="/k4k-liquid-chrome.svg" alt=""/></div>
+         <div className="khf-reference-socials" aria-label={tr('Social links','Redes sociais','Redes sociales')}>
+           <a href="https://www.instagram.com/kreativestudios4k/" target="_blank" rel="noopener noreferrer" aria-label="K4K on Instagram">IG</a>
+           <a href="https://www.tiktok.com/@kreativestudios4k" target="_blank" rel="noopener noreferrer" aria-label="K4K on TikTok">TT</a>
          </div>
+         <div className="khf-reference-about">
+           <span className="khf-reference-label"><i/>{tr('ABOUT K4K APP','SOBRE K4K APP','SOBRE K4K APP')}</span>
+           <p>{tr('DON’T FOLLOW THE TREND. CREATE IT.','NÃO SIGA A TENDÊNCIA. CRIE A SUA.','NO SIGAS LA TENDENCIA. CRÉALA.')}</p>
+           <small>{tr('Your ideas. Your characters. Your next viral creation.','Suas ideias. Seus personagens. Sua próxima criação viral.','Tus ideas. Tus personajes. Tu próxima creación viral.')}</small>
+         </div>
+         <div className="khf-reference-bottomright">
+           <Link className="khf-reference-watch" href="#discover">{tr('Explore K4K Originals','Explorar K4K Originals','Explorar K4K Originals')} <span><Play size={15} fill="currentColor"/></span></Link>
+           <Link className="khf-reference-start" href="/k4k-app/motion">{tr('Start creating','Comece a criar','Empieza a crear')} <ArrowUpRight size={16}/></Link>
+         </div>
+         <div className="khf-reference-bottomtag" aria-hidden="true">IMAGE / VIDEO / K4K MOTION</div>
        </div>
      </section>
      <section className="khf-toolband" aria-label={tr('Creation shortcuts','Acesso rápido','Accesos rápidos')}>
