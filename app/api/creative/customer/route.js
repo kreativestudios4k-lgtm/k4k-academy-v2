@@ -100,6 +100,12 @@ export async function POST(req){
   const prompt=typeof body.prompt==='string'?body.prompt.trim():'';
   const aspect=['9:16','16:9','1:1'].includes(body.aspect)?body.aspect:null;
   if(!aspect||prompt.length<10||prompt.length>1200)throw Error('INVALID_INPUT');
+  if(body.modelId==='seedance_2_5'){
+   // One real token-priced pilot only until the provider's actual charge is reconciled.
+   const {count:priorSeedance,error:seedanceCheck}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v');
+   if(seedanceCheck)throw Error('UNAVAILABLE');
+   if(priorSeedance>0)throw Error('SEEDANCE_PILOT_LIMIT');
+  }
   assertResponsiblePrompt(prompt);
   const {count,error:limitError}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('provider','fal').eq('status','draft').gte('created_at',new Date(Date.now()-600000).toISOString());
   if(limitError)throw Error('UNAVAILABLE');if(count>=5)throw Error('TOO_MANY_QUOTES');
@@ -162,7 +168,7 @@ export async function POST(req){
  }
  return response({error:'INVALID_ACTION'},400);
  }catch(e){
-  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE']);
+  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','SEEDANCE_PILOT_LIMIT','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE']);
   const code=allowed.has(e.message)?e.message:'GENERATION_UNAVAILABLE';
   return response({error:code,reviewRequired:/REVIEW|UNCERTAIN/.test(code)},['INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','TOO_MANY_QUOTES'].includes(code)?409:code==='CREATIVE_MODEL_NOT_LIVE'?503:code==='JOB_NOT_FOUND'?404:code==='INVALID_INPUT'?400:code==='CONTENT_POLICY_BLOCKED'?422:code==='SUBMISSION_UNCERTAIN_DO_NOT_RETRY'?202:503);
  }
