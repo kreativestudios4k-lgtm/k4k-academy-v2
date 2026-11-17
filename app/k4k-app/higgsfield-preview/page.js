@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import CustomerGeneration from './customer-generation';
+import './motion-wide.css';
 import DirectorView,{LocalMedia} from './director-view';
 import {generationReference} from '../../../lib/template-generation.mjs';
 import {templateCast} from '../../../lib/template-cast.mjs';
@@ -84,15 +85,15 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
    setResult(body);
   }catch(e){setError(e.message||'ESTIMATE_UNAVAILABLE')}finally{actionLock.current=false;setBusy(false)}
  }
- return <main style={{background:'#080f0b',color:'#f1f7f0',minHeight:'100vh',padding:'40px 18px'}}>
-  <div style={{maxWidth:1020,margin:'auto'}}>
-   <Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} style={{color:'#a1efa5'}}>{customer?'← K4K APP':'← K4K owner QA'}</Link> <Link href="/k4k-app/videos" style={{color:'#a1efa5',float:'right'}}>My Generations →</Link> {customer&&<Link href="/login" style={{color:"#a1efa5",marginLeft:20}}>Sign in</Link>}
-   <p style={{color:'#a1efa5',letterSpacing:3,fontSize:12,marginTop:34}}>{customer?'K4K MOTION · DIRECTOR STUDIO':'K4K MOTION · CUSTOMER FLOW PREVIEW'}</p>
-   <h1 style={{fontSize:'clamp(31px,6vw,56px)',lineHeight:1.08,margin:'9px 0'}}>Don't follow the trend. Create it.</h1>
-   <p style={{color:'#adbdaf',maxWidth:730,lineHeight:1.6}}>Prepare your video swap and review the credit cost before generating. Files remain on this device until you choose Upload and verify. Verification saves them privately and checks their contents without starting a generation.</p>
-   {customer&&<label style={{display:'block',marginTop:24}}>Choose your source<select aria-label="Source template" disabled={busy} value={templateId} onChange={e=>{const id=e.target.value;setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);}} style={{display:'block',width:'100%',padding:14,marginTop:10,borderRadius:10,background:'#111b16',color:'white',border:'1px solid #415b47'}}><option value="">Upload my own video</option>{templates.map(t=><option key={t.id} value={t.id}>{t.title} · {Math.ceil(generationReference(t).seconds)}s</option>)}</select></label>}
-   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
-    <section style={panel}>
+ return <main className="khm-root">
+  <div className="khm-studio-layout">
+   <nav className="khm-topnav"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> K4K APP</Link><span>K4K MOTION <b>·</b> CREATE</span><div><Link href="/k4k-app">Home</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></nav>
+   <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
+   <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
+   <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. Preview the credit cost before you generate.</p>
+   {customer&&<label className="khm-source-selector" style={{display:'block',marginTop:24}}>Choose your source<select aria-label="Source template" disabled={busy} value={templateId} onChange={e=>{const id=e.target.value;setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);}} style={{display:'block',width:'100%',padding:14,marginTop:10,borderRadius:10,background:'#111b16',color:'white',border:'1px solid #415b47'}}><option value="">Upload my own video</option>{templates.map(t=><option key={t.id} value={t.id}>{t.title} · {Math.ceil(generationReference(t).seconds)}s</option>)}</select></label>}
+   <div className="khm-video-stage" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
+    <section className="khm-video-panel" style={panel}>
      <h2 style={{fontSize:20}}>01 · Source video</h2>
      <p style={{color:'#aebbaf',fontSize:13}}>Choose a 4–30 second MP4, up to 50 MB.</p>
      {source?<><h3>{selectedTemplate.title}</h3><video src={source.url} controls playsInline style={{width:"100%",maxHeight:420,borderRadius:12}}/><p>Confirm the number of people you want to replace below.</p></>:<input type="file" disabled={busy} accept="video/mp4" onChange={e=>{uploaded.current=null;setSeconds(null);setVideo(e.target.files?.[0]||null);setResult(null);setError('')}} style={{maxWidth:'100%',padding:22,border:'1px dashed #5b7e60',borderRadius:12}}/>}
@@ -100,13 +101,13 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
      <LocalMedia file={video} video/>
     </section>
    </div>
-   <DirectorView images={images} targets={targets} main={main} disabled={busy} onChange={(nextImages,nextTargets,nextMain)=>{if(nextImages!==images){uploaded.current=null;setResult(null);}setImages(nextImages);setTargets(nextTargets);setMain(nextMain);setError('');}}/>
-   <section style={{...panel,marginTop:18}}>
+   <div className="khm-cast-panel"><DirectorView images={images} targets={targets} main={main} disabled={busy} onChange={(nextImages,nextTargets,nextMain)=>{if(nextImages!==images){uploaded.current=null;setResult(null);}setImages(nextImages);setTargets(nextTargets);setMain(nextMain);setError('');}}/></div>
+   <section className="khm-direction-panel" style={{...panel,marginTop:18}}>
     <label htmlFor="extra-direction">Extra direction (optional)</label>
     <textarea id="extra-direction" value={direction} maxLength={500} rows={2} onChange={e=>setDirection(e.target.value)} style={{display:'block',boxSizing:'border-box',width:'100%',marginTop:12,padding:12,borderRadius:10,background:'#080f0b',color:'white',border:'1px solid #415b47'}} placeholder="Add a mood or other creative instruction"/>
     <p style={{color:'#a1efa5',fontSize:13}}>{castReady?'Cast ready · '+images.length+' numbered photos':castError||'Add a photo to every slot to continue.'}</p>
    </section>
-   <section style={{...panel,marginTop:18}}>
+   <section className="khm-quality-panel" style={{...panel,marginTop:18}}>
     <h2 style={{fontSize:20}}>03 · Quality and credits</h2>
     <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
      {['480p','720p','1080p'].map(q=><button key={q} type="button" disabled={busy||(customer&&Math.ceil(seconds||4)*rates[q]>maxUsd)} onClick={()=>{setResolution(q);setResult(null)}} style={{borderRadius:10,border:'1px solid #658768',padding:'12px 18px',background:q===resolution?'#a1efa5':'transparent',color:q===resolution?'#0c1b0f':'#ecf7eb',fontWeight:800}}>{q}</button>)}
@@ -122,7 +123,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
       <p style={{fontSize:13,color:'#bbc8ba'}}>{result.verifiedVideoDuration?'Private files checked. Duration read from the uploaded MP4.':'Estimate uses device-reported duration; files have not been verified.'} No credits charged. {customer?'Review the final quote below before generating.':'This is not a signed customer quote or verified provider charge.'}</p>
      </div>}
    </section>
-   <section style={{...panel,marginTop:18}}>
+   <section className="khm-generate-panel" style={{...panel,marginTop:18}}>
     <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt} media={castReady&&(!customer||consent)&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution}/>
    </section>
   </div>
