@@ -10,13 +10,13 @@ async function request(action,input={}){
  const response=await fetch('/api/higgsfield/customer-jobs',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action,...input})});
  const body=await response.json();if(!response.ok)throw Error(messages[body.error]||body.error||'Unable to complete this request.');return body;
 }
-export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey=''}){
+export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey='',motionModel='ultra'}){
  const [quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[output,setOutput]=useState(null),[active,setActive]=useState(null);
  useEffect(()=>{onBusyChange?.(busy);},[busy,onBusyChange]);
  const lock=useRef(false),requestKey=useRef(null),account=useRef(undefined);
  const mediaKey=JSON.stringify(media);
- const selection=JSON.stringify([selectionKey||mediaKey,resolution,prompt]);
- useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt,selectionKey]);
+ const selection=JSON.stringify([selectionKey||mediaKey,resolution,prompt,motionModel]);
+ useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt,selectionKey,motionModel]);
  async function refresh(){const rows=await request('list');setJobs(rows);return rows;}
  useEffect(()=>{
   let alive=true;
@@ -59,10 +59,10 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
    const verified=onPrepareMedia?await onPrepareMedia():media;
    if(!verified?.videoPath||!Array.isArray(verified.referencePaths)||verified.referencePaths.length<1)throw Error('Choose a source and character photos to generate.');
    const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
-   const result=await request('prepare',{jobId,...verified,resolution,prompt});setQuote({...result,selection});await refresh();
+   const result=await request('prepare',{jobId,...verified,resolution,prompt,motionModel});setQuote({...result,selection});await refresh();
   })}>{busy?'Checking files…':'Generate · '+(Number.isInteger(estimatedCredits)?estimatedCredits+' estimated credits':'review credits')}</button>
   {quote?.selection===selection&&<div style={{marginTop:18}}>
-   <p role="status"><strong>{quote.credits} credits — exact confirmed charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
+   <p role="status"><strong>{quote.credits} credits — exact {quote.motionModel==='lite'?'K4K Motion Lite':'K4K Motion Ultra'} charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
    <p style={{fontSize:13}}>{customer?'':`Provider estimate: $${quote.usd.toFixed(2)}. `}Quote expires in five minutes.</p>
    <button type="button" disabled={busy||!quote.dispatchEnabled} style={{...button,opacity:quote.dispatchEnabled?1:.5}} onClick={()=>action(async()=>{
     const current=quote;setQuote(null);
