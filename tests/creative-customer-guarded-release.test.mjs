@@ -8,21 +8,23 @@ const migration=readFileSync(new URL('../supabase/migrations/20261117140000_cust
 const base={VERCEL_ENV:'production',K4K_CREATIVE_CUSTOMER_ENABLED:'true',K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'true',K4K_ENABLE_PRODUCTION_GENERATION:'true',K4K_PROVIDER_USE_APPROVED:'true',K4K_LIVE_CREDIT_ISOLATION_READY:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'kling4_0,nano_banana_2,flux_3_image',K4K_GENERATION_MAX_USD:'2.10'};
 test('new customer models are default denied, independent from owner-only QA and Motion',()=>{
  for(const id of Object.keys(CUSTOMER_CREATIVE_MODELS)){
-  assert.equal(creativeCustomerRelease({},id),false);
-  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_ENABLED:'false'},id),false);
-  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'false'},id),false);
-  assert.equal(creativeCustomerRelease({...base,VERCEL_ENV:'preview'},id),false);
-  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_MODELS:''},id),false);
-  assert.equal(creativeCustomerRelease(base,id),true);
+  assert.equal(creativeCustomerRelease({},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_ENABLED:'false'},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'false'},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+  assert.equal(creativeCustomerRelease({...base,VERCEL_ENV:'preview'},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_MODELS:''},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+  assert.equal(creativeCustomerRelease(base,id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  }
- assert.equal(creativeCustomerRelease(base,'seedance_2_5'),false);
- assert.throws(()=>creativeCustomerQuote('seedance_2_5',base),/CREATIVE_MODEL_NOT_LIVE/);
+ assert.equal(creativeCustomerRelease(base,'seedance_2_5','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
+ assert.equal(creativeCustomerRelease(base,'kling4_0','11111111-1111-4111-8111-111111111111'),false);
+ assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),true);
+ assert.throws(()=>creativeCustomerQuote('seedance_2_5',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/CREATIVE_MODEL_NOT_LIVE/);
 });
 test('per-model quote worst-case reservations are bounded and pricing must be approved',()=>{
- assert.equal(creativeCustomerQuote('kling4_0',base).quoteUsdMicros,1200000);
- assert.equal(creativeCustomerQuote('nano_banana_2',base).quoteUsdMicros,1500000);
- assert.equal(creativeCustomerQuote('flux_3_image',base).quoteUsdMicros,300000);
- assert.throws(()=>creativeCustomerQuote('nano_banana_2',{...base,K4K_GENERATION_MAX_USD:'0.5'}),/PROVIDER_BUDGET_BLOCKED/);
+ assert.equal(creativeCustomerQuote('kling4_0',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c').quoteUsdMicros,1200000);
+ assert.equal(creativeCustomerQuote('nano_banana_2',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c').quoteUsdMicros,1500000);
+ assert.equal(creativeCustomerQuote('flux_3_image',base,'0ef1af08-4df8-4858-967b-eac1a16f9f2c').quoteUsdMicros,300000);
+ assert.throws(()=>creativeCustomerQuote('nano_banana_2',{...base,K4K_GENERATION_MAX_USD:'0.5'},'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),/PROVIDER_BUDGET_BLOCKED/);
 });
 test('customer route authenticates and verifies origin; wallet changes are exclusively transactional RPC',()=>{
  for(const value of ['auth.getUser(token)','email_confirmed_at',"req.headers.get('origin')","createMultimodelLedger","k4k_multimodel_claim_dispatch","k4k_multimodel_record_provider_request","k4k_multimodel_refund_confirmed_provider_failure","k4k_multimodel_jobs","QUOTE_SIGNING_UNAVAILABLE","SUBMISSION_UNCERTAIN_DO_NOT_RETRY","boundedCreativeDownload"])assert.ok(route.includes(value),value);
