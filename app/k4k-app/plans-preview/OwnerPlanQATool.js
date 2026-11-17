@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
-import {createClient} from '../../../../lib/supabase/client';
-import {K4K_V2_PLANS} from '../../../../lib/k4k-plan-v2.mjs';
+import {createClient} from '../../../lib/supabase/client';
+import {K4K_V2_PLANS} from '../../../lib/k4k-plan-v2.mjs';
 export default function OwnerPlanQATool(){
  const [plan,setPlan]=useState('starter'),[busy,setBusy]=useState(false),[error,setError]=useState('');
  async function run(){
