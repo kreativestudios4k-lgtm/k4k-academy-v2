@@ -5,7 +5,8 @@ test('Header login points to real auth route and remains clickable on tablet/mob
  assert.match(home,/<Link className="khf-signin" aria-label=\{tr\("Log in to K4K"/);
  assert.match(home,/href="\/login\?next=%2Fk4k-app%2Fcreate"/);
  assert.match(home,/className="khf-mobile-login"/);
- assert.match(css,/@media\(max-width:1460px\)/);
+ assert.match(home,/className="khf-mobile-signup"/);
+ assert.match(css,/@media\(max-width:1180px\)/);
  assert.match(css,/\.khf-desktop-links\{display:none\}/);
  assert.match(css,/\.khf-signin\{display:inline-flex/);
  assert.match(css,/\.khf-header-actions\{gap:6px\}/);
