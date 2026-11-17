@@ -1,0 +1,72 @@
+/* K4K Studio generator shell — dashboard-inspired, style-only overlay. Existing model and billing components remain operational. */
+.kgen-shell{display:flex;min-height:100svh;background:#090909;color:#f8f8f8;--kgen-line:#ffffff1e;--kgen-panel:#151515;font-family:Arial,Helvetica,sans-serif}
+.kgen-shell *{box-sizing:border-box}
+.kgen-rail{width:218px;flex:0 0 218px;position:sticky;top:0;height:100svh;padding:23px 13px;background:#101010;border-right:1px solid var(--kgen-line);display:flex;flex-direction:column;gap:8px;z-index:40}
+.kgen-rail a{text-decoration:none;color:#a3a3a3}
+.kgen-rail-brand{display:flex;align-items:center;gap:10px;margin-bottom:26px;padding:0 8px;color:#fff!important;font-size:15px;font-weight:900;letter-spacing:-.03em}
+.kgen-rail-brand span{white-space:nowrap}.kgen-rail-brand small{font-size:9px;letter-spacing:.09em;font-weight:600}
+.kgen-new{display:flex;align-items:center;justify-content:center;background:#f8f8f8!important;color:#111!important;border-radius:9px;padding:12px;font-size:12px;font-weight:800;margin-bottom:22px}
+.kgen-nav-label{color:#707070;font-size:9px;letter-spacing:.14em;font-weight:900;padding:15px 10px 5px}
+.kgen-rail .kgen-rail-nav{position:static!important;inset:auto!important;height:auto!important;width:auto!important;min-height:0!important;padding:0!important;margin:0!important;border:0!important;z-index:auto!important;display:flex!important;flex-direction:column;align-items:stretch!important;justify-content:flex-start!important;gap:4px!important}
+.kgen-rail-nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:8px;min-height:38px;font-size:12px;font-weight:700}
+.kgen-rail-nav a[aria-current=page]{color:white;background:#303030;border:1px solid #ffffff24}
+.kgen-rail-nav a:hover{background:#232323;color:#fff}
+.kgen-main{min-width:0;flex:1;background:radial-gradient(ellipse at 65% 0%,#201a18 0%,#111 28%,#090909 72%)}
+.kgen-main .kcs-root{background:transparent!important;color:#fff;--kcs-accent:#fff;min-height:100svh;font-size:14px}
+.kgen-main .kcs-nav{height:60px!important;min-height:60px!important;padding:0 30px!important;border-bottom:1px solid var(--kgen-line);background:#0d0d0d!important;display:flex;justify-content:space-between;position:relative;gap:20px}
+.kgen-main .kcs-brand{font-size:15px!important}.kgen-main .kcs-brand span{color:#fff!important}
+.kgen-main .kcs-nav nav{position:static!important;inset:auto!important;display:flex!important;align-items:center;justify-content:flex-start;gap:23px;height:auto!important;min-height:0!important;width:auto!important;padding:0!important;margin:0!important;border:0!important;z-index:auto!important;flex:1}
+.kgen-main .kcs-nav nav a{color:#aaa!important;font-size:12px;min-height:43px}
+.kgen-main .kcs-nav nav a[aria-current=page],.kgen-main .kcs-nav nav a:hover{border-color:#fff!important;color:#fff!important}
+.kgen-main .kcs-library-link{border:1px solid #ffffff2a!important;background:#191919;padding:9px 13px;border-radius:8px;font-size:11px}
+.kgen-main .kcs-shell{max-width:1420px;padding:28px clamp(18px,3vw,44px) 65px}
+.kgen-main .kcs-hero{background:radial-gradient(ellipse at 80% 12%,#4e342a7a 0%,#28201d 26%,#161616 64%,#111 100%)!important;border:1px solid #ffffff25;border-radius:16px;padding:35px 40px;margin-bottom:24px}
+.kgen-main .kcs-hero h1{font-size:clamp(34px,4vw,54px);letter-spacing:-.065em;color:#fff;line-height:1.04}
+.kgen-main .kcs-hero p{font-size:13px;max-width:650px;color:#aaa}
+.kgen-main .kcs-eyebrow{color:#dfdfdf!important;letter-spacing:.15em}
+.kgen-main .kcs-segments{background:#111;border:1px solid #ffffff27;border-radius:10px;display:inline-flex;overflow:hidden}
+.kgen-main .kcs-segments button{font-size:12px;color:#b3b3b3;border-radius:7px;min-height:40px}
+.kgen-main .kcs-segments button.selected{background:#f5f5f5!important;color:#111!important}
+.kgen-main .kcs-workspace-heading{margin:20px 0}
+.kgen-main .kcs-workspace-heading>div>span{color:#bcbcbc!important;font-size:10px}
+.kgen-main .kcs-workspace-heading h2{font-size:25px}
+.kgen-main .kcs-model-picker-trigger{background:#1a1a1a!important;border-color:#ffffff38!important;border-radius:10px}
+.kgen-main .kcs-model-picker-trigger:hover{border-color:#fff!important}
+.kgen-main .kcs-layout{display:grid;grid-template-columns:minmax(220px,.72fr) minmax(0,1.42fr);gap:18px}
+.kgen-main .kcs-models,.kgen-main .kcs-compose{background:linear-gradient(150deg,#191919,#121212)!important;border:1px solid #ffffff1f!important;border-radius:14px;padding:25px}
+.kgen-main .kcs-model-grid{display:flex;flex-direction:column;gap:9px}
+.kgen-main .kcs-model-group>h3{color:#999!important}
+.kgen-main .kcs-model{background:#1e1e1e;border:1px solid #ffffff21;border-radius:10px;min-height:70px;padding:12px}
+.kgen-main .kcs-model.current{background:#302b29!important;border-color:#dedede!important;box-shadow:inset 0 0 0 1px #ffffff20!important}
+.kgen-main .kcs-model-icon{background:#303030;border-radius:9px}
+.kgen-main .kcs-model-info strong{font-size:13px}.kgen-main .kcs-model-info small,.kgen-main .kcs-model-info em{color:#909090;font-size:11px}
+.kgen-main .kcs-section-label,.kgen-main .kcs-prompt-title{color:#ececec;font-size:11px;letter-spacing:.09em}
+.kgen-main .kcs-compose h2{font-size:27px}
+.kgen-main .kcs-desc{color:#969696}
+.kgen-main .kcs-state{background:#282828;color:#ddd!important}
+.kgen-main .kcs-flow-steps span{border-color:#ffffff29;color:#aaa}
+.kgen-main .kcs-flow-steps .is-current{border-color:#f3f3f3;color:#fff!important}
+.kgen-main .kcs-fields label,.kgen-main .kcs-prompt-label{color:#d8d8d8}
+.kgen-main .kcs-fields select,.kgen-main .kcs-prompt-label textarea{background:#111!important;border:1px solid #ffffff35!important;border-radius:10px;color:#f7f7f7;font-size:13px}
+.kgen-main .kcs-prompt-label textarea{min-height:165px}
+.kgen-main .kcs-add,.kgen-main .kcs-thumb{background:#171717;border-color:#ffffff4a;color:#dadada}
+.kgen-main .kcs-note,.kgen-main .kcs-input-info{background:#202020;border-color:#ffffff2c;color:#c4c4c4}
+.kgen-main .kcs-copy{background:#262626;border-color:#ffffff36}
+.kgen-main .kcs-launch{background:#fff!important;color:#111!important}
+.kgen-main .kcs-generation-panel{background:#1b1b1b!important;border:1px solid #ffffff48!important;border-radius:14px;padding:22px}
+.kgen-main .kcs-generation-heading span:first-child{color:#f7f7f7!important}
+.kgen-main .kcs-generation-dot{background:#f4f4f4;box-shadow:0 0 10px #ffffff44}
+.kgen-main .kcs-generation-panel>p{color:#aaa}
+.kgen-main .kcs-generate-primary{background:#fafafa!important;color:#0c0c0c!important;border-radius:9px}
+.kgen-main .kcs-generate-primary:hover:not(:disabled){background:#ddd!important}
+.kgen-main .kcs-job-status{background:#262626;border-color:#ffffff3a}
+.kgen-main .kcs-library-action{color:#fff!important}
+.kgen-main .kcs-root :focus-visible{outline-color:#fff!important}
+.kgen-main .kcs-model-dialog{background:#171717;border-color:#ffffff3d}
+.kgen-main .kcs-dialog-tabs button[aria-pressed=true]{background:#fff;color:#111;border-color:#fff}
+.kgen-main .kcs-dialog-model.active,.kgen-main .kcs-dialog-model:hover{border-color:#fff;background:#2c2c2c}
+.kgen-main .kcs-dialog-model-icon{background:#353535;color:#fff}
+.kgen-main .kcs-dialog-model>svg{color:#fff}
+@media(max-width:1190px){.kgen-rail{width:180px;flex-basis:180px}.kgen-main .kcs-layout{grid-template-columns:minmax(200px,.75fr) minmax(0,1.25fr)}.kgen-main .kcs-shell{padding:20px}.kgen-main .kcs-models,.kgen-main .kcs-compose{padding:20px}}
+@media(max-width:940px){.kgen-rail{display:none}.kgen-main .kcs-layout{grid-template-columns:1fr}.kgen-main .kcs-model-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.kgen-main .kcs-shell{padding:22px}}
+@media(max-width:650px){.kgen-main .kcs-nav{height:auto!important;min-height:65px!important;flex-wrap:wrap;padding:12px 16px!important;gap:10px!important}.kgen-main .kcs-nav nav{order:3;flex-basis:100%;overflow:auto;gap:20px!important}.kgen-main .kcs-nav nav a{font-size:11px}.kgen-main .kcs-shell{padding:17px 13px 65px}.kgen-main .kcs-hero{padding:26px 22px}.kgen-main .kcs-hero h1{font-size:38px}.kgen-main .kcs-layout{grid-template-columns:minmax(0,1fr)}.kgen-main .kcs-model-grid{grid-template-columns:1fr}.kgen-main .kcs-models,.kgen-main .kcs-compose{padding:17px}.kgen-main .kcs-generation-panel{padding:16px}.kgen-main .kcs-workspace-heading{flex-wrap:wrap}}
