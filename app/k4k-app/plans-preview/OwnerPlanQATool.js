@@ -9,6 +9,7 @@ export default function OwnerPlanQATool(){
  const [plan,setPlan]=useState('starter');
  const [auth,setAuth]=useState({state:'checking',user:null});
  const [busy,setBusy]=useState(false),[error,setError]=useState('');
+ const [qaLedger,setQaLedger]=useState(null);
  useEffect(()=>{
   let active=true;
   const supabase=createClient();
@@ -27,6 +28,20 @@ export default function OwnerPlanQATool(){
   document.addEventListener('visibilitychange',visible);
   return()=>{active=false;subscription.data.subscription.unsubscribe();window.removeEventListener('pageshow',check);document.removeEventListener('visibilitychange',visible)};
  },[]);
+ useEffect(()=>{
+  if(auth.state!=='signed-in'){setQaLedger(null);return;}
+  let active=true;
+  async function load(){
+   try{
+    const {data:{session}}=await createClient().auth.getSession();
+    if(!active||!session?.access_token)return;
+    const response=await fetch('/api/plans-v2/status',{cache:'no-store',headers:{Authorization:'Bearer '+session.access_token}});
+    const result=await response.json();
+    if(active)setQaLedger(response.ok&&result.testMode===true?result:null);
+   }catch{if(active)setQaLedger(null)}
+  }
+  void load();return()=>{active=false};
+ },[auth.state,auth.user?.id]);
  async function run(){
   if(busy||auth.state!=='signed-in')return;
   setBusy(true);setError('');
@@ -51,7 +66,7 @@ export default function OwnerPlanQATool(){
  }
  return <section style={{margin:'50px auto 0',maxWidth:620,border:'1px solid #617460',background:'#19241c',padding:24,borderRadius:18}}>
   <h2 style={{fontSize:21,margin:'0 0 12px'}}>Owner-only Stripe sandbox test</h2>
-  <p style={{fontSize:13,lineHeight:1.7,color:'#bdc9bd'}}>Stripe TEST mode only. No real charges and no changes to live subscriptions. Sign in on this same preview domain before testing. Build: QA-AUTH-V2.</p>
+  <p style={{fontSize:13,lineHeight:1.7,color:'#bdc9bd'}}>Stripe TEST mode only. No real charges and no changes to live subscriptions. QA credits are held separately from existing customer balances. Build: QA-LEDGER-V2.</p>
   {auth.state==='checking'&&<p role="status">Checking your sign-in securely…</p>}
   {auth.state==='signed-out'&&<div role="status" style={{border:'1px solid #768c73',borderRadius:12,padding:18,background:'#243529'}}>
    <p style={{margin:'0 0 12px'}}>You're not signed in on this preview website.</p>
@@ -60,6 +75,7 @@ export default function OwnerPlanQATool(){
   {auth.state==='unavailable'&&<p role="alert">We couldn't verify a session. Reload this preview page, then sign in if required.</p>}
   {auth.state==='signed-in'&&<>
    <p role="status" style={{fontSize:13,color:'#a3ff9b'}}>Signed in as {auth.user.email||'K4K member'}. Server-side owner verification is still required.</p>
+   {qaLedger&&<p role="status" style={{padding:15,border:'1px solid #3e6546',borderRadius:12,background:'#12351b',color:'#a3ff9b',fontWeight:800}}>Isolated QA credits: {qaLedger.balance.toLocaleString('en-GB')} · Paid invoices: {qaLedger.grants.length}</p>}
    <label style={{display:'grid',gap:7,fontSize:13,fontWeight:700}}>Plan to test<select value={plan} onChange={e=>setPlan(e.target.value)} style={{background:'#121a14',color:'#fff',padding:13,border:'1px solid #455845',borderRadius:10}}>
     {Object.values(K4K_V2_PLANS).map(p=><option key={p.key} value={p.key}>{p.name} — £{(p.gbpMinor/100).toFixed(2)}, {p.credits} credits</option>)}
    </select></label>
