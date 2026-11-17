@@ -69,3 +69,28 @@ test('HTTP boundary rejects production, foreign origins/users, unknown fields an
  assert.equal((await handler(req({action:'cancel'}))).status,400);
  assert.equal((await handler(req({action:'list'}))).status,200);assert.equal(calls,1);
 });
+
+test('Lite follows production customer reserve and exactly-once provider dispatch with saved model tier',async()=>{
+ let submittedTier='',submittedPayload;
+ const f=fixture({
+  env:{K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'true',K4K_GENERATION_MAX_USD:'5'},
+  transfer:async({userId,jobId,beforeTransfer})=>{
+   await beforeTransfer(30);
+   return {input:{video_url:'https://d2ol7oe51mr4n9.cloudfront.net/input.mp4',image_urls:['https://d2ol7oe51mr4n9.cloudfront.net/ref.png']},verifiedMedia:{userId,jobId,verified:true,contentType:'video/mp4',seconds:30}};
+  },
+  provider:{ready:true,submit:async(tier,payload)=>{submittedTier=tier;submittedPayload=payload;return {request_id:'lite_request_01'};},status:async()=>({request_id:'lite_request_01',status:'queued'})}
+ });
+ const quote=await f.service.prepare(owner,{...input,motionModel:'lite'});
+ assert.equal(quote.motionModel,'lite');
+ assert.equal(quote.duration,15);
+ assert.equal(quote.credits,12);
+ assert.equal(f.jobs.get(id).normalized_input.motionModel,'lite');
+ const sent=await f.service.submit(owner,{jobId:id,quoteToken:quote.quoteToken,requestKey:other});
+ assert.equal(sent.status,'processing');
+ assert.equal(submittedTier,'lite');
+ assert.deepEqual(Object.keys(submittedPayload).sort(),['image_urls','prompt','resolution','video_url']);
+ assert.equal(f.balance(),28);
+ await f.service.submit(owner,{jobId:id,quoteToken:quote.quoteToken,requestKey:other});
+ assert.equal(submittedTier,'lite');
+ assert.equal(f.events.filter(e=>e==='claim').length,1);
+});
