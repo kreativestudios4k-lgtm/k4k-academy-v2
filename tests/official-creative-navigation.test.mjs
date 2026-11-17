@@ -10,7 +10,7 @@ const homeCss=read('app/k4k-app/creative-home.css');
 const studioCss=read('app/k4k-app/create/create.css');
 const catalog=read('lib/creation-studio-catalog.mjs');
 test('every official K4K section is a distinct route, not an inert duplicate',()=>{
- for(const p of ['/k4k-app/explore','/k4k-app/image','/k4k-app/video','/k4k-app/motion'])for(const source of [home,studio,motion,shell])assert.ok(source.includes(p),p);
+ for(const p of ['/k4k-app/motion/explore','/k4k-app/image','/k4k-app/video','/k4k-app/motion'])for(const source of [home,studio,motion,shell])assert.ok(source.includes(p),p);
  const image=read('app/k4k-app/image/page.js'),video=read('app/k4k-app/video/page.js');
  assert.match(image,/kind=image&model=/);assert.match(video,/kind=video&model=/);
  assert.match(image,/\['nano_banana_2','flux_3_image'\]/);
