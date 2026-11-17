@@ -18,7 +18,9 @@ test('provider test uses only four small hardcoded text generation recipes and t
 });
 test('private video and image output only from trusted fal CDN and signed private Supabase storage',()=>{
  assert.match(route,/hostname\.endsWith\('\.fal\.media'\)/);
- assert.match(route,/storage\.from\('studio-generations'\)\.upload/);
+ assert.match(route,/outputBucket\(job\.model_key\)\)\.upload/);
+ assert.match(route,/studio-qa-images/);
+ assert.match(route,/studio-generations/);
  assert.match(route,/createSignedUrl\(path,600\)/);
  assert.match(route,/OUTPUT_SIZE_UNVERIFIED/);
  assert.doesNotMatch(route,/upsert:true/);
