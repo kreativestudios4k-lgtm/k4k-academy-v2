@@ -56,6 +56,10 @@ export default function HiggsfieldConnectionPage(){
      {testResult.requestId&&<p>Request ID: {testResult.requestId}</p>}
      {testResult.estimatedCostUsd&&<p>Estimated API cost: ${testResult.estimatedCostUsd}</p>}
      {testResult.noRetry&&<p>No automatic retry will occur. Please check the provider request before attempting anything else.</p>}
+     {testResult.providerStatus&&<p>Provider status: {testResult.providerStatus}</p>}
+     {testResult.providerErrorCode&&<p>Provider error: {testResult.providerErrorCode}</p>}
+     {testResult.providerErrorMessage&&<p>Failure reason: {testResult.providerErrorMessage}</p>}
+     {testResult.diagnostic==='NO_DETAIL_RETURNED'&&<p>Higgsfield did not return a detailed failure reason. No retry has been performed.</p>}
      {testResult.videoUrl&&<a href={testResult.videoUrl} target="_blank" rel="noreferrer" style={{color:'#a3ff9b'}}>View generated test video</a>}
     </div>}
    </div>}
