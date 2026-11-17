@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHmac} from 'node:crypto';
 import {PLAN_PRICES, PLAN_CURRENCIES} from '../lib/k4k-plan-prices.mjs';
-import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice, verifyStripeSignature} from '../lib/server/stripe-billing.mjs';
+import {assertTestModeKey, buildCheckoutForm, previewDeploymentOrigin, resolvePrice, verifyStripeSignature, validStripeCheckoutUrl} from '../lib/server/stripe-billing.mjs';
 
 const SECRET = 'whsec_test_secret';
 const PAYLOAD = '{"id":"evt_1","type":"invoice.paid"}';
@@ -87,4 +87,14 @@ test('checkout form carries the mode, price, user and plan, and never an amount'
   assert.equal(form.get('line_items[0][quantity]'), '1');
   assert.equal(form.get('subscription_data[metadata][plan_key]'), 'starter');
   assert.equal(form.has('line_items[0][price_data][unit_amount]'), false);
+});
+
+test('only real Stripe-hosted Checkout redirect URLs pass the redirect guard', () => {
+  assert.equal(validStripeCheckoutUrl('https://checkout.stripe.com/c/pay/cs_test_example'), true);
+  for (const value of [null, undefined, '', '/c/pay/cs_test_example', 'http://checkout.stripe.com/c/pay/cs_test_example',
+    'https://checkout.stripe.com.evil.example/c/pay/abc', 'https://checkout.stripe.com@evil.example/c/pay/abc',
+    'https://evil.example/c/pay/abc', 'javascript:alert(1)', 'https://checkout.stripe.com/other',
+    'https://checkout.stripe.com:444/c/pay/abc', 'https://checkout.stripe.com/c/pay/abc#fragment']) {
+    assert.equal(validStripeCheckoutUrl(value), false, String(value));
+  }
 });
