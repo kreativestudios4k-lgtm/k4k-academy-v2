@@ -28,7 +28,7 @@ test('hero typography and cards adapt to desktop tablet and mobile viewports',()
  assert.match(homeCss,/@media\(max-width:900px\)/);
  assert.match(homeCss,/@media\(max-width:620px\)/);
  assert.match(homeCss,/\.khf-model-grid\{grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
- assert.match(studioCss,/\.kcs-nav nav a\[aria-current=page\]/);
+ assert.match(studioCss,/\.kcs-nav \.kcs-main-links a\[aria-current=page\]/);
  assert.match(studioCss,/\.kcs-fields\{grid-template-columns:minmax\(0,1fr\)\}/);
 });
 test('official customer models show genuinely supported, charged outputs only',()=>{
