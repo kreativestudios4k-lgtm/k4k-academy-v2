@@ -22,19 +22,23 @@ export async function GET(request){
   if(user.id!==ownerId)return respond({error:'NOT_AVAILABLE'},404);
   // Probe distinct preview credentials independently. Do not expose tokens,
   // compare them to browser data or silently substitute a live production key.
-  const candidates=[
+  const sources=[
    ['pilot',process.env.K4K_HIGGSFIELD_API_PILOT],
    ['sdk',process.env.HF_CREDENTIALS]
-  ].filter(([,v])=>typeof v==='string'&&v.length>=12&&v!=='true'&&!/[\s\x00-\x1f]/u.test(v));
-  if(!candidates.length)return respond({state:'not_configured',credentialVerified:false,paidGenerationEnabled:false},503);
+  ];
   const attempts=[];
-  for(const [source,credentials] of candidates){
+  for(const [source,credentials] of sources){
+   if(typeof credentials!=='string'||!credentials.length){
+    attempts.push({source,state:'not_configured',credentialVerified:false});continue;
+   }
+   if(credentials.length<12||credentials==='true'||credentials==='false'||/[\s\x00-\x1f]/u.test(credentials)){
+    attempts.push({source,state:'invalid_format',credentialVerified:false});continue;
+   }
    const result=await createHiggsfieldCredentialProbe({credentials})();
    attempts.push({source,state:result.state,credentialVerified:result.credentialVerified===true});
   }
   const accepted=attempts.find(a=>a.credentialVerified);
-  if(accepted)return respond({state:'authenticated',credentialVerified:true,source:accepted.source,attempts,paidGenerationEnabled:false});
-  const state=attempts.some(a=>a.state==='rejected')?'rejected':attempts[0].state;
-  return respond({state,credentialVerified:false,attempts,paidGenerationEnabled:false},200);
+  const state=accepted?'authenticated':attempts.every(a=>a.state==='not_configured')?'not_configured':'unverified';
+  return respond({state,credentialVerified:!!accepted,source:accepted?.source??null,attempts,paidGenerationEnabled:false},200);
  }catch{return respond({state:'unavailable',paidGenerationEnabled:false},503);}
 }
