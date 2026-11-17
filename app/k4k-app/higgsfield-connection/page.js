@@ -12,7 +12,7 @@ export default function HiggsfieldConnectionPage(){
    if(error||!session?.access_token){setResult({state:'sign_in_required'});return;}
    const response=await fetch('/api/higgsfield/connection',{method:'GET',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token}});
    const payload=await response.json().catch(()=>({}));
-   setResult({state:payload.state||payload.error||'unknown',authenticated:payload.credentialVerified===true,paidGenerationEnabled:false});
+   setResult({state:payload.state||payload.error||'unknown',authenticated:payload.credentialVerified===true,attempts:Array.isArray(payload.attempts)?payload.attempts:[],paidGenerationEnabled:false});
   }catch{setResult({state:'network_unavailable'});}
   finally{setWorking(false);}
  }
@@ -23,6 +23,8 @@ export default function HiggsfieldConnectionPage(){
   {result&&<section role="status" style={{marginTop:20,padding:18,border:'1px solid #597059',borderRadius:12}}>
    <p style={{fontWeight:800}}>Connection status: {result.state.replace(/_/g,' ')}</p>
    <p>Credential verified: {result.authenticated?'Yes (read-only endpoint)':'Not yet'}</p>
+   {result.attempts?.length>0&&<ul style={{paddingLeft:20}}>{result.attempts.map(a=><li key={a.source}>{a.source==='pilot'?'K4K preview API credential':'Higgsfield SDK credential'}: {String(a.state).replace(/_/g,' ')}</li>)}</ul>}
+   {result.state==='rejected'&&<p style={{color:'#ffb9b9'}}>A configured developer API credential was rejected (HTTP 401). Replace or rotate the API credential through your Higgsfield API console, then update the corresponding server-side Vercel preview secret. Your Higgsfield creator subscription is separate from this API.</p>}
    <p>Paid production generation: Disabled pending integration verification</p>
    {result.state==='sign_in_required'&&<a href={LOGIN} style={{color:'#a3ff9b'}}>Sign in on this preview</a>}
   </section>}
