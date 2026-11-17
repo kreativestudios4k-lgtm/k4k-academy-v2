@@ -17,3 +17,15 @@ test('Motion Studio preserves responsive video, cast and signed-price flow',()=>
  assert.match(css,/\.khm-cast-panel\{[^}]*grid-column:2/);
  assert.match(css,/\.khm-source-selector,.khm-video-stage,.khm-cast-panel,.khm-direction-panel,.khm-quality-panel,.khm-generate-panel\{grid-column:1;grid-row:auto\}/);
 });
+
+test('mobile Motion Director Studio uses compact navigation and phone-size typography',()=>{
+ assert.match(page,/<details className="khm-mobile-menu">/);
+ assert.match(page,/<summary aria-label="Open K4K Motion menu">/);
+ assert.match(page,/className="khm-desktop-links"/);
+ assert.match(css,/@media\(max-width:620px\)\{/);
+ assert.match(css,/\.khm-topnav>\.khm-nav-context,\.khm-topnav>\.khm-desktop-links\{display:none\}/);
+ assert.match(css,/\.khm-mobile-menu\{display:block/);
+ assert.match(css,/\.khm-title\{grid-column:1;[^}]*font-size:clamp\(29px,8vw,40px\)!important/);
+ assert.match(css,/\.khm-video-panel input\[type=file\]\{display:block;width:100%/);
+ assert.match(css,/@media\(max-width:360px\)/);
+});
