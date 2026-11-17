@@ -5,16 +5,17 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 test('old Explore address resolves to the same feed nested inside K4K Motion',()=>{
  assert.match(read('app/k4k-app/explore/page.js'),/redirect\('\/k4k-app\/motion\/explore'\)/);
  const page=read('app/k4k-app/motion/explore/page.js');
- assert.match(page,/MobileTemplateFeed motionIntegrated/);
+ assert.match(page,/MotionExploreGallery/);
 });
-test('feed preserves original preview and connects a supported template by ID',()=>{
- const feed=read('app/k4k-app/MobileTemplateFeed.js');
- assert.match(feed,/catalogue\.discoveryPreviews/);
- assert.match(feed,/<TemplateCreateSheet item=\{createItem\}/);
- assert.match(feed,/generationReference\(item\)\.supported/);
- assert.match(feed,/\/k4k-app\/motion\?template=/);
- assert.match(feed,/encodeURIComponent\(item\.id\)/);
- assert.match(feed,/Preview character setup/);
+test('Motion Explore preserves the video catalogue and links every eligible scene to Director Studio',()=>{
+ const gallery=read('app/k4k-app/motion/MotionExploreGallery.js');
+ assert.match(gallery,/catalogue\.discoveryPreviews/);
+ assert.match(gallery,/catalogue\.trending/);
+ assert.match(gallery,/generationReference\(t\)/);
+ assert.match(gallery,/\/k4k-app\/motion\?template=/);
+ assert.match(gallery,/encodeURIComponent\(current\.id\)/);
+ assert.match(gallery,/Motion Transfer/);
+ assert.doesNotMatch(gallery,/fluxfield-feed\.css/);
 });
 test('Director Studio preselects only an eligible catalogue template',()=>{
  const page=read('app/k4k-app/motion/page.js');
