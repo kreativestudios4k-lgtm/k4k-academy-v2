@@ -41,7 +41,8 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,ref
      const requestKey=key.current||crypto.randomUUID();key.current=requestKey;
      const v=await call({action:'submit',jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey});
      setJobs(j=>[{id:quote.jobId,model:model.id,status:v.status,media_kind:model.kind,credits_quoted:quote.credits},...j.filter(x=>x.id!==quote.jobId)]);
-     setQuote(null);setInfo('Generation submitted. Use refresh to check its result.');
+     setQuote(null);setInfo('Generation submitted. Opening your generations…');
+     window.location.assign('/k4k-app/videos#creative-generations');
     })} className="kcs-generate-primary">{busy?'Submitting…':'Confirm & Generate · '+quote.credits+' credits'}</button>
     <button onClick={()=>{setQuote(null);key.current=null}} style={{marginLeft:10,padding:'11px 15px',borderRadius:8}}>Cancel</button>
    </div>}
