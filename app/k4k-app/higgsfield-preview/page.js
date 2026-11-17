@@ -2,10 +2,15 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import CustomerGeneration from './customer-generation';
+import DirectorView,{LocalMedia} from './director-view';
+import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
 export default function HiggsfieldPreview(){
- const [video,setVideo]=useState(null),[images,setImages]=useState([]),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
+ const [video,setVideo]=useState(null),[images,setImages]=useState([null]),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
+ const [targets,setTargets]=useState(['']),[main,setMain]=useState(0),[direction,setDirection]=useState('');
+ let prompt='',castError='';try{prompt=buildDirectorPrompt({targets,main,direction});}catch(e){castError=e.message;}
+ const castReady=!!prompt&&images.length===targets.length&&images.every(Boolean);
  const actionLock=useRef(false),uploaded=useRef(null);
  const [result,setResult]=useState(null),[error,setError]=useState(''),[busy,setBusy]=useState(false);
  useEffect(()=>{
@@ -22,6 +27,7 @@ export default function HiggsfieldPreview(){
   if(actionLock.current)return;
   actionLock.current=true;setBusy(true);setError('');setResult(null);
   try{
+   if(!castReady)throw Error(castError||'Add a photo to every character slot.');
    if(!video||video.type!=='video/mp4'||video.size<12||video.size>50*1024*1024)throw Error('Choose an MP4 up to 50 MB.');
    if(images.length<1||images.length>8||images.some(f=>!['image/jpeg','image/png','image/webp'].includes(f.type)||f.size<12||f.size>10*1024*1024))throw Error('Choose 1–8 JPG, PNG or WEBP images, up to 10 MB each.');
    const client=createClient();
@@ -52,6 +58,7 @@ export default function HiggsfieldPreview(){
  async function estimate(){
   if(actionLock.current)return;
   setError('');setResult(null);
+  if(!castReady){setError(castError||'Add a photo to every character slot.');return;}
   if(!video||!seconds||seconds<4||seconds>30){setError('Choose an MP4 from 4 to 30 seconds.');return}
   if(images.length<1||images.length>8||!images.every(f=>['image/jpeg','image/png','image/webp'].includes(f.type))){setError('Select 1–8 JPG, PNG or WEBP character photos.');return}
   actionLock.current=true;setBusy(true);
@@ -78,14 +85,15 @@ export default function HiggsfieldPreview(){
      <p style={{color:'#aebbaf',fontSize:13}}>Choose a 4–30 second MP4, up to 50 MB.</p>
      <input type="file" disabled={busy} accept="video/mp4" onChange={e=>{uploaded.current=null;setSeconds(null);setVideo(e.target.files?.[0]||null);setResult(null);setError('')}} style={{maxWidth:'100%',padding:22,border:'1px dashed #5b7e60',borderRadius:12}}/>
      <p style={{color:'#a1efa5',fontSize:13}}>{seconds?'Duration on device: '+seconds.toFixed(2)+'s':'No duration detected'}</p>
-    </section>
-    <section style={panel}>
-     <h2 style={{fontSize:20}}>02 · Reference characters</h2>
-     <p style={{color:'#aebbaf',fontSize:13}}>Choose 1–8 photos, at least 240 × 240 pixels and up to 10 MB each.</p>
-     <input type="file" disabled={busy} accept="image/jpeg,image/png,image/webp" multiple onChange={e=>{uploaded.current=null;setImages(Array.from(e.target.files||[]));setResult(null);setError('')}} style={{maxWidth:'100%',padding:22,border:'1px dashed #5b7e60',borderRadius:12}}/>
-     <p style={{color:'#a1efa5',fontSize:13}}>{images.length+' photo(s) selected'}</p>
+     <LocalMedia file={video} video/>
     </section>
    </div>
+   <DirectorView images={images} targets={targets} main={main} disabled={busy} onChange={(nextImages,nextTargets,nextMain)=>{if(nextImages!==images){uploaded.current=null;setResult(null);}setImages(nextImages);setTargets(nextTargets);setMain(nextMain);setError('');}}/>
+   <section style={{...panel,marginTop:18}}>
+    <label htmlFor="extra-direction">Extra direction (optional)</label>
+    <textarea id="extra-direction" value={direction} maxLength={500} rows={2} onChange={e=>setDirection(e.target.value)} style={{display:'block',boxSizing:'border-box',width:'100%',marginTop:12,padding:12,borderRadius:10,background:'#080f0b',color:'white',border:'1px solid #415b47'}} placeholder="Add a mood or other creative instruction"/>
+    <p style={{color:'#a1efa5',fontSize:13}}>{castReady?'Cast ready · '+images.length+' numbered photos':castError||'Add a photo to every slot to continue.'}</p>
+   </section>
    <section style={{...panel,marginTop:18}}>
     <h2 style={{fontSize:20}}>03 · Quality and price estimate</h2>
     <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
@@ -101,7 +109,7 @@ export default function HiggsfieldPreview(){
      </div>}
    </section>
    <section style={{...panel,marginTop:18}}>
-    <CustomerGeneration media={result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution}/>
+    <CustomerGeneration prompt={prompt} media={castReady&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution}/>
    </section>
   </div>
  </main>;

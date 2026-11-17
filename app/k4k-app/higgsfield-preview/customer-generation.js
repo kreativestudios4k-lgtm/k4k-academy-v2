@@ -9,8 +9,7 @@ async function request(action,input={}){
  const response=await fetch('/api/higgsfield/customer-jobs',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action,...input})});
  const body=await response.json();if(!response.ok)throw Error(messages[body.error]||body.error||'Unable to complete this request.');return body;
 }
-export default function CustomerGeneration({media,resolution}){
- const [prompt,setPrompt]=useState('Replace the main character with the person in the reference photo. Preserve the original camera movement, scene, timing and actions.');
+export default function CustomerGeneration({media,resolution,prompt}){
  const [quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[output,setOutput]=useState(null),[active,setActive]=useState(null);
  const lock=useRef(false),requestKey=useRef(null),account=useRef(undefined);
  const mediaKey=JSON.stringify(media);
@@ -50,8 +49,8 @@ export default function CustomerGeneration({media,resolution}){
  },[active]);
  return <>
   <h2 style={{fontSize:20}}>04 · Generate with K4K Motion</h2>
-  <label htmlFor="motion-prompt">Describe your character swap</label>
-  <textarea id="motion-prompt" value={prompt} maxLength={6000} disabled={busy} onChange={e=>setPrompt(e.target.value)} rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',margin:'10px 0',padding:12,background:'#080f0b',color:'#fff',border:'1px solid #658768',borderRadius:10}}/>
+  <label htmlFor="motion-prompt">Automatic character prompt</label>
+  <textarea id="motion-prompt" value={prompt} readOnly rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',margin:'10px 0',padding:12,background:'#080f0b',color:'#fff',border:'1px solid #658768',borderRadius:10}}/>
   <p style={{fontSize:13,color:'#b5c6b7'}}>Upload and verify your files first. Preparing a quote sends the verified references to the generation provider. Credits are charged only when you press Generate.</p>
   <button type="button" style={button} disabled={busy||!media||!prompt.trim()} onClick={()=>action(async()=>{
    setQuote(null);const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
