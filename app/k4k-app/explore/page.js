@@ -1,3 +1,2 @@
-import MobileTemplateFeed from '../MobileTemplateFeed';
-export const metadata={title:'Explore video templates | K4K APP'};
-export default function Explore(){return <MobileTemplateFeed/>;}
+import {redirect} from 'next/navigation';
+export default function Explore(){redirect('/k4k-app/motion/explore')}
