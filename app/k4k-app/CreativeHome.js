@@ -11,6 +11,7 @@ import './creative-home.css';
 // Showcase only K4K's curated original previews, not the legacy trending/celebrity templates.
 // Original MP4 entries do not require separate poster images.
 const featured=catalogue.discoveryPreviews.filter(item=>item.videoUrl);
+const backgroundClips=featured.slice(0,3);
 const models=[
  {name:'K4K Motion',tag:'FEATURED · LIVE MOTION STUDIO',detail:'Swap characters in a real scene with your reference video',path:'/k4k-app/motion',symbol:'motion'},
  {name:'Wan 3',tag:'WAN-POWERED · AVAILABLE',detail:'Reference-led video creation with your own characters',path:'/k4k-app/creator',symbol:'video'},
@@ -23,7 +24,12 @@ export default function CreativeHome(){
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
  const {user}=useVerifiedAccount();
  const [menu,setMenu]=useState(false);
+ const [backgroundIndex,setBackgroundIndex]=useState(0);
  return <div className="k4k-hf-home">
+   <div className="khf-site-video-bg" aria-hidden="true">
+     {backgroundClips.length>0&&backgroundIndex>=0&&<video key={backgroundClips[backgroundIndex]?.id} className="khf-site-bg-video" src={backgroundClips[backgroundIndex]?.videoUrl} autoPlay muted playsInline preload="metadata" onEnded={()=>setBackgroundIndex(i=>(i+1)%backgroundClips.length)} onError={()=>setBackgroundIndex(i=>i+1<backgroundClips.length?i+1:-1)}/>}
+     <div className="khf-site-video-overlay"/>
+   </div>
    <header className="khf-topbar">
      <div className="khf-nav-inner">
        <Link className="khf-brand" href="/" aria-label="K4K APP Home"><img src="/k4k-mark.svg" width="36" height="36" alt=""/><strong>K4K<span> APP</span></strong></Link>
@@ -48,14 +54,12 @@ export default function CreativeHome(){
    <main>
      <section className="khf-hero khf-reference-hero" aria-labelledby="khf-hero-title">
        <div className="khf-reference-frame">
-         <div className="khf-reference-atmosphere" aria-hidden="true"><img src="/k4k-liquid-chrome.svg" alt="" loading="eager"/></div>
          <div className="khf-reference-shimmer" aria-hidden="true"/>
          <div className="khf-reference-sideyear" aria-hidden="true">K4K · 2026</div>
          <div className="khf-reference-headline">
            <span className="khf-reference-eyebrow">{tr('THE NEXT ERA OF CREATION','A NOVA ERA DA CRIAÇÃO','LA NUEVA ERA DE CREACIÓN')}</span>
            <h1 id="khf-hero-title">K4K <span>APP</span></h1>
          </div>
-         <div className="khf-reference-sculpture" aria-hidden="true"><img src="/k4k-liquid-chrome.svg" alt=""/></div>
          <div className="khf-reference-socials" aria-label={tr('Social links','Redes sociais','Redes sociales')}>
            <a href="https://www.instagram.com/kreativestudios4k/" target="_blank" rel="noopener noreferrer" aria-label="K4K on Instagram">IG</a>
            <a href="https://www.tiktok.com/@kreativestudios4k" target="_blank" rel="noopener noreferrer" aria-label="K4K on TikTok">TT</a>
