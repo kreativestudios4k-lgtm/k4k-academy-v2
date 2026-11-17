@@ -31,12 +31,12 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,ref
  }
  return <section className="kcs-note" style={{display:'block',marginTop:18,padding:19,border:'1px solid #c9e88a',borderRadius:14}}>
   <strong style={{fontSize:17}}>Generate with {model.name}</strong>
-  <p style={{fontSize:13,lineHeight:1.6}}>Production customer generation · one 5-second 720p video or one 1K image. Your exact credit reservation is displayed before confirmation. Provider costs can vary; fixed model quote is priced conservatively. Failed provider jobs are refunded when confirmed.</p>
+  <p style={{fontSize:13,lineHeight:1.6}}>{model.id==='seedance_2_5'?'Owner-only Seedance test · 5-second 480p silent video. fal.ai charges per 1,000 generated tokens; the actual provider cost is not yet reconciled. Your displayed K4K credit reservation is a pilot test amount, not a verified provider charge.':'Production generation · one 5-second 720p video or one 1K image. Your credit reservation appears before confirmation. Provider costs may vary.'} Failed provider jobs receive refunds only after authenticated confirmation.</p>
   {referenceCount>0&&<p style={{fontSize:13}}>This live text-generation workflow does not use uploaded reference images. Remove the reference images before proceeding; image editing and reference-to-video remain locked.</p>}
   {!quote?<button disabled={busy||referenceCount>0||prompt.trim().length<10} onClick={()=>attempt(async()=>{
    const q=await call({action:'quote',modelId:model.id,prompt,aspect});setQuote(q);setInfo('Quote ready. Review the credits before submitting.');
   })} style={{background:'#d6ff69',border:0,borderRadius:8,padding:'11px 15px',fontWeight:800,cursor:'pointer'}}>{busy?'Checking…':'Check credit cost'}</button>:
-   <div><p style={{fontSize:14}}><strong>{quote.credits} credits</strong> · reservation for one generation. Price estimate: ${quote.quotedProviderUsd.toFixed(2)} provider budget · quote expires in five minutes.</p>
+   <div>{quote.tokenBillingUnverified&&<p role="alert" style={{fontSize:13,color:'#fbdc95'}}>Seedance owner pilot only. Provider billing uses tokens and the actual charge is unknown. This quote reserves K4K credits only. Do not treat this as a provider cost cap.</p>}<p style={{fontSize:14}}><strong>{quote.credits} credits</strong> · reservation for one generation. Price estimate: ${quote.quotedProviderUsd.toFixed(2)} provider budget · quote expires in five minutes.</p>
     <button disabled={busy} onClick={()=>attempt(async()=>{
      const requestKey=key.current||crypto.randomUUID();key.current=requestKey;
      const v=await call({action:'submit',jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey});
