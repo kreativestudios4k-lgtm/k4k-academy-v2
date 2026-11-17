@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../../lib/supabase/client';
-const button={padding:'12px 18px',border:'1px solid #a1efa5',borderRadius:10,background:'#a1efa5',color:'#142015',fontWeight:800,cursor:'pointer'};
+const button={padding:'12px 18px',border:'1px solid #f2f2f2',borderRadius:10,background:'#f2f2f2',color:'#101012',fontWeight:800,cursor:'pointer'};
 const messages={TOO_MANY_QUOTES:'Too many quotes. Please wait ten minutes before preparing another.',NOT_AVAILABLE:'K4K Motion is not available for this account yet.',INSUFFICIENT_CREDITS:'Your balance is too low for this video.',PROVIDER_BUDGET_BLOCKED:'This quality or duration exceeds the current per-video spending limit. Try a shorter video or lower resolution.',QUOTE_EXPIRED:'Your quote expired. Prepare a new quote.',PROVIDER_SUBMISSION_UNCERTAIN:'Submission needs review. Do not submit another video; use Refresh status.',DRAFT_ALREADY_EXISTS:'This draft already exists. Check your recent jobs before preparing another.',HIGGSFIELD_CUSTOMER_DISPATCH_DISABLED:'Generation is not enabled for this preview yet.',HIGGSFIELD_UNAVAILABLE:'The connection is temporarily unavailable. Your existing jobs are saved.'};
 async function request(action,input={}){
  const {data:{session}}=await createClient().auth.getSession();
@@ -71,9 +71,9 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
    })}>{quote.dispatchEnabled?'Confirm & Generate · '+quote.credits+' credits':'Generation locked · Preview'}</button>
   </div>}
   </>}
-  {message&&<p role="status" style={{color:'#d8eecf'}}>{message}</p>}
+  {message&&<p role="status" style={{color:'#ededed'}}>{message}</p>}
   {output&&<video controls playsInline src={output.url} style={{maxWidth:'100%',maxHeight:500,marginTop:20}}/>}
-  {libraryOnly?<h3 style={{marginTop:28}}>Your K4K Motion videos</h3>:<Link href="/k4k-app/videos" style={{display:'inline-block',color:'#d6ff69',fontWeight:800,marginTop:18}}>View my generations in Library →</Link>}
+  {libraryOnly?<h3 style={{marginTop:28}}>Your K4K Motion videos</h3>:<Link href="/k4k-app/videos" style={{display:'inline-block',color:'#f4f4f5',fontWeight:800,marginTop:18}}>View my generations in Library →</Link>}
   {libraryOnly&&<>
   {!jobs.length&&<p style={{color:"#adbdaf"}}>Your generated Motion videos will appear here.</p>}
   <button type="button" style={button} disabled={busy} onClick={()=>action(refresh)}>Refresh library</button>
