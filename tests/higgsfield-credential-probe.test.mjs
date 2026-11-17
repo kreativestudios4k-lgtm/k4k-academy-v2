@@ -40,7 +40,9 @@ test('owner credential diagnosis probes pilot and SDK independently, never expos
  const route=readFileSync(new URL('../app/api/higgsfield/connection/route.js',import.meta.url),'utf8');
  assert.match(route,/K4K_HIGGSFIELD_API_PILOT/);
  assert.match(route,/HF_CREDENTIALS/);
- assert.match(route,/for\(const \[source,credentials\] of candidates\)/);
+ assert.match(route,/for\(const \[source,credentials\] of sources\)/);
+ assert.match(route,/state:'invalid_format'/);
+ assert.match(route,/state:'not_configured'/);
  assert.match(route,/credentialVerified:result\.credentialVerified===true/);
  assert.match(route,/paidGenerationEnabled:false/);
  assert.doesNotMatch(route,/process\.env\.HF_API_KEY/);
