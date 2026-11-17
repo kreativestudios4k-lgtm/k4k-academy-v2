@@ -11,10 +11,10 @@ import './motion-editor.css';
 const unique=[...new Map([...catalogue.trending,...catalogue.discoveryPreviews,...catalogue.topPerforming].filter(item=>item.videoUrl&&item.posterUrl).map(item=>[item.id,item])).values()];
 const allTemplates=unique.map((item,index)=>({...item,index,ready:generationReference(item).supported&&!item.generationPaused}));
 const trimTerm=s=>s.trim().toLocaleLowerCase();
-export default function MotionEditor(){
+export default function MotionEditor({initialTemplateId=''}){
  const {locale}=useK4KLocale();
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
- const [selected,setSelected]=useState(allTemplates[0]?.id||null);
+ const [selected,setSelected]=useState(allTemplates.some(t=>t.id===initialTemplateId)?initialTemplateId:allTemplates[0]?.id||null);
  const [sheet,setSheet]=useState(null);
  const [mode,setMode]=useState('motion');
  const [filter,setFilter]=useState('all');
