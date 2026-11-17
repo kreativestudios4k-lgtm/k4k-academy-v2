@@ -45,8 +45,9 @@ async function ownedJob(db,owner,id){
  const {data,error}=await db.from('k4k_owner_creative_qa_jobs').select(publicFields+',endpoint').eq('id',id).eq('owner_id',owner).maybeSingle();
  if(error||!data)throw Error('JOB_NOT_FOUND');return data;
 }
-async function signedOutput(db,path){
- const {data,error}=await db.storage.from('studio-generations').createSignedUrl(path,600);
+const outputBucket=model=>['seedance_2_5','kling4_0'].includes(model)?'studio-generations':'studio-qa-images';
+async function signedOutput(db,path,model){
+ const {data,error}=await db.storage.from(outputBucket(model)).createSignedUrl(path,600);
  if(error||!data?.signedUrl)throw Error('PRIVATE_SIGNING_FAILED');return data.signedUrl;
 }
 function trustedOutput(url){let u;try{u=new URL(url)}catch{throw Error('UNTRUSTED_OUTPUT')}if(u.protocol!=='https:'||!(u.hostname==='fal.media'||u.hostname.endsWith('.fal.media')))throw Error('UNTRUSTED_OUTPUT');return u.href}
@@ -61,7 +62,7 @@ async function archiveOutput(db,owner,job,result){
  if(!Number.isSafeInteger(size)||size<12||size>limit)throw Error('OUTPUT_SIZE_UNVERIFIED');
  const buffer=Buffer.from(await res.arrayBuffer());if(buffer.length!==size)throw Error('OUTPUT_SIZE_MISMATCH');
  const path=owner+'/owner-qa/'+job.id+(video?'.mp4':job.model_key==='flux_3_image'?'.jpg':'.png');
- const {error}=await db.storage.from('studio-generations').upload(path,buffer,{contentType,upsert:false});
+ const {error}=await db.storage.from(outputBucket(job.model_key)).upload(path,buffer,{contentType,upsert:false});
  if(error&&!/already exists|duplicate/i.test(error.message||''))throw Error('PRIVATE_STORE_FAILED');
  const {error:updateError}=await db.from('k4k_owner_creative_qa_jobs').update({output_path:path,status:'completed',updated_at:new Date().toISOString()}).eq('id',job.id).eq('owner_id',owner).eq('status','submitted');
  if(updateError)throw Error('OUTPUT_RECORD_FAILED');
@@ -105,14 +106,14 @@ export async function POST(request){
  if(input.action==='status'){
   try{
    const job=await ownedJob(db,owner,input.jobId);
-   if(job.output_path)return respond({jobId:job.id,status:'completed',url:await signedOutput(db,job.output_path),creditsCharged:0});
+   if(job.output_path)return respond({jobId:job.id,status:'completed',url:await signedOutput(db,job.output_path,job.model_key),creditsCharged:0});
    if(job.status!=='submitted')return respond({jobId:job.id,status:job.status,error:job.error_code});
    const provider=await falFetch(queueUrl(job.endpoint,job.provider_request_id,'/status'));
    if(provider.status!=='COMPLETED')return respond({jobId:job.id,status:provider.status,creditsCharged:0});
    if(provider.error){await db.from('k4k_owner_creative_qa_jobs').update({status:'failed',error_code:'PROVIDER_FAILURE',updated_at:new Date().toISOString()}).eq('id',job.id).eq('owner_id',owner).eq('status','submitted');return respond({jobId:job.id,status:'failed'})}
    const result=await falFetch(queueUrl(job.endpoint,job.provider_request_id));
    const path=await archiveOutput(db,owner,job,result);
-   return respond({jobId:job.id,status:'completed',url:await signedOutput(db,path),creditsCharged:0});
+   return respond({jobId:job.id,status:'completed',url:await signedOutput(db,path,job.model_key),creditsCharged:0});
   }catch(e){return respond({error:['BAD_JOB','JOB_NOT_FOUND'].includes(e.message)?e.message:'STATUS_UNAVAILABLE'},e.message==='JOB_NOT_FOUND'?404:503)}
  }
  return respond({error:'UNKNOWN_ACTION'},400);
