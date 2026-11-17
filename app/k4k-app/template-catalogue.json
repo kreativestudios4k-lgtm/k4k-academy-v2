@@ -280,7 +280,6 @@
       "durationSeconds": 26.04,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 1,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -290,7 +289,6 @@
       "durationSeconds": 16.03,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 3,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -300,7 +298,6 @@
       "durationSeconds": 8.04,
       "k4kOriginal": true,
       "previewOnly": false,
-      "requiredImages": 1,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -310,7 +307,6 @@
       "durationSeconds": 10.05,
       "k4kOriginal": true,
       "previewOnly": false,
-      "requiredImages": 4,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -320,7 +316,6 @@
       "durationSeconds": 14.72,
       "k4kOriginal": true,
       "previewOnly": false,
-      "requiredImages": 1,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -330,7 +325,6 @@
       "durationSeconds": 22.1,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 2,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -340,7 +334,6 @@
       "durationSeconds": 28.93,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 1,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -350,7 +343,6 @@
       "durationSeconds": 15.17,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 2,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -360,7 +352,6 @@
       "durationSeconds": 11.05,
       "k4kOriginal": true,
       "previewOnly": false,
-      "requiredImages": 2,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -370,7 +361,6 @@
       "durationSeconds": 23.63,
       "k4kOriginal": true,
       "previewOnly": true,
-      "requiredImages": 2,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     }
   ]
