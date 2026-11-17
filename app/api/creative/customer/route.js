@@ -1,6 +1,6 @@
 // Production customer creative generation: signed quotes, atomic live-credit reservations,
-// irreversible one-shot dispatch, authenticated provider reconciliation and owner-only media URLs.
-// Each model is independently gated; Seedance is explicitly owner-only until token billing reconciles.
+// irreversible one-shot dispatch, authenticated provider reconciliation and private per-user media URLs.
+// Each model is independently gated; public Seedance has an additional paid-daily budget guard.
 import {createClient} from '@supabase/supabase-js';
 import {randomUUID,createHash} from 'node:crypto';
 import {quoteSigner,generationCredits} from '../../../../lib/server/generation-quote.mjs';
@@ -56,6 +56,7 @@ async function state(db,userId,job){
  const info=await fal(base+'/status');
  if(info.request_id&&info.request_id!==job.provider_request_id)throw Error('PROVIDER_RESPONSE_INVALID');
  if(['IN_QUEUE','IN_PROGRESS'].includes(info.status))return {jobId:job.id,status:'processing'};
+ if(info.status==='FAILED'){await refund(db,userId,job);return {jobId:job.id,status:'failed',refunded:true}}
  if(info.status!=='COMPLETED')throw Error('PROVIDER_STATUS_UNVERIFIED');
  let result;
  if(info.error||info.error_type){await refund(db,userId,job);return {jobId:job.id,status:'failed',refunded:true}}
@@ -101,10 +102,12 @@ export async function POST(req){
   const aspect=['9:16','16:9','1:1'].includes(body.aspect)?body.aspect:null;
   if(!aspect||prompt.length<10||prompt.length>1200)throw Error('INVALID_INPUT');
   if(body.modelId==='seedance_2_5'){
-   // One real token-priced pilot only until the provider's actual charge is reconciled.
-   const {count:priorSeedance,error:seedanceCheck}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').neq('status','draft');
+   // One paid Seedance request per account per UTC day. SQL unique index is the
+   // authoritative concurrency barrier at credit-reservation transition.
+   const today=new Date().toISOString().slice(0,10)+'T00:00:00.000Z';
+   const {count,error:seedanceCheck}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').gte('created_at',today).in('status',['queued','processing','completed','failed']);
    if(seedanceCheck)throw Error('UNAVAILABLE');
-   if(priorSeedance>0)throw Error('SEEDANCE_PILOT_LIMIT');
+   if(count>0)throw Error('SEEDANCE_DAILY_LIMIT');
   }
   assertResponsiblePrompt(prompt);
   const {count,error:limitError}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('provider','fal').eq('status','draft').gte('created_at',new Date(Date.now()-600000).toISOString());
@@ -124,16 +127,17 @@ export async function POST(req){
    quoted_usd_micros:model.quoteUsdMicros,credits_quoted:credits,quote_expires_at:new Date(signedQuote.expiresAt).toISOString()
   });
   if(error)throw Error('JOB_CREATION_FAILED');
-  return response({jobId,modelId:body.modelId,credits,quotedProviderUsd:model.quoteUsdMicros/1e6,quoteToken:token,expiresAt:signedQuote.expiresAt,estimateOnly:true,providerChargeMayVary:true,...(model.providerBilling==='variable-tokens-owner-pilot'?{tokenBillingUnverified:true,ownerPilotOnly:true,providerBillingUnit:'1000 tokens',providerUnitRateUsd:0.0214}:{})});
+  return response({jobId,modelId:body.modelId,credits,quotedProviderUsd:model.quoteUsdMicros/1e6,quoteToken:token,expiresAt:signedQuote.expiresAt,estimateOnly:true,providerChargeMayVary:true,...(model.providerBilling==='variable-tokens-public-beta'?{tokenBillingUnverified:true,publicBeta:true,providerBillingUnit:'1000 tokens',providerUnitRateUsd:0.0214,usageLimit:'1 per UTC day',fixedCustomerPriceCredits:credits}:{})});
  }
  if(body.action==='submit'){
   if(!uuid.test(body.requestKey||''))throw Error('INVALID_INPUT');
   const job=await owned(db,user.id,body.jobId),model=byModel.get(job.model);
   if(!creativeCustomerRelease(process.env,model.id,user.id))throw Error('CREATIVE_MODEL_NOT_LIVE');
   if(model.id==='seedance_2_5'&&job.status==='draft'){
-   const {count,error}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').neq('id',job.id).neq('status','draft');
+   const today=new Date().toISOString().slice(0,10)+'T00:00:00.000Z';
+   const {count,error}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').neq('id',job.id).gte('created_at',today).in('status',['queued','processing','completed','failed']);
    if(error)throw Error('UNAVAILABLE');
-   if(count>0)throw Error('SEEDANCE_PILOT_LIMIT');
+   if(count>0)throw Error('SEEDANCE_DAILY_LIMIT');
   }
   const signing=process.env.K4K_CREATIVE_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
@@ -173,8 +177,8 @@ export async function POST(req){
  }
  return response({error:'INVALID_ACTION'},400);
  }catch(e){
-  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','SEEDANCE_PILOT_LIMIT','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE']);
+  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','SEEDANCE_DAILY_LIMIT','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE']);
   const code=allowed.has(e.message)?e.message:'GENERATION_UNAVAILABLE';
-  return response({error:code,reviewRequired:/REVIEW|UNCERTAIN/.test(code)},['INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','TOO_MANY_QUOTES'].includes(code)?409:code==='CREATIVE_MODEL_NOT_LIVE'?503:code==='JOB_NOT_FOUND'?404:code==='INVALID_INPUT'?400:code==='CONTENT_POLICY_BLOCKED'?422:code==='SUBMISSION_UNCERTAIN_DO_NOT_RETRY'?202:503);
+  return response({error:code,reviewRequired:/REVIEW|UNCERTAIN/.test(code)},['INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','TOO_MANY_QUOTES','SEEDANCE_DAILY_LIMIT'].includes(code)?409:code==='CREATIVE_MODEL_NOT_LIVE'?503:code==='JOB_NOT_FOUND'?404:code==='INVALID_INPUT'?400:code==='CONTENT_POLICY_BLOCKED'?422:code==='SUBMISSION_UNCERTAIN_DO_NOT_RETRY'?202:503);
  }
 }
