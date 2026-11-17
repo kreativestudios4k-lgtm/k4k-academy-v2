@@ -35,7 +35,7 @@ export default function PlansPreview(){
    </section>
    <section style={{borderTop:'1px solid #344139',marginTop:52,paddingTop:27,color:'#a3afa5',fontSize:13,lineHeight:1.7}}>
     <strong style={{color:'#fff'}}>Existing members are protected.</strong> Current subscribers keep their original Stripe price and monthly credit allowance unless they explicitly opt in to a future migration. This page takes no payments and does not alter your subscription. Model generation costs are quoted individually after verified provider pricing; high-cost generations are unavailable until the budget ledger supports them.
-    <p>GBP prices are tax-inclusive where tax applies. New subscriptions and other currencies are not open here. Current provider risk budget: maximum ${K4K_PROVIDER_COST_POLICY.maxProviderUsdPerJob} per job until further verification.</p>
+    <p>GBP prices are tax-inclusive where tax applies. New subscriptions and other currencies are not open here. Current provider risk budget: maximum USD {K4K_PROVIDER_COST_POLICY.maxProviderUsdPerJob} per job until further verification.</p>
    </section>
   </div>
  </main>;
