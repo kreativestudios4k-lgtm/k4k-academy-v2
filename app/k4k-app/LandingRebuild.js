@@ -30,7 +30,7 @@ export default function LandingRebuild(){
      <button className="kr-menu-toggle" type="button" aria-label={mobileOpen?'Close menu':'Open menu'} aria-expanded={mobileOpen} aria-controls="kr-mobile-nav" onClick={()=>setMobileOpen(v=>!v)}>{mobileOpen?<X size={22}/>:<Menu size={22}/>}</button>
     </div>
    </header>
-   {mobileOpen&&<nav id="kr-mobile-nav" className="kr-mobile-nav" aria-label="Mobile navigation">{nav.map(item=><Link key={item.href} href={item.href} onClick={()=>setMobileOpen(false)}>{item.text}<ArrowUpRight size={16}/></Link>)}</nav>}
+   {mobileOpen&&<nav id="kr-mobile-nav" className="kr-mobile-nav" data-open="" aria-label="Mobile navigation">{nav.map(item=><Link key={item.href} href={item.href} onClick={()=>setMobileOpen(false)}>{item.text}<ArrowUpRight size={16}/></Link>)}</nav>}
    <main>
     <section className="kr-hero" aria-labelledby="kr-hero-title">
      <div className="kr-hero-topline"><span>2026 / KREATIVE STUDIOS 4K</span><span>{tr('CREATE WHAT’S NEXT','CRIE O PRÓXIMO','CREA LO QUE SIGUE')}</span></div>
