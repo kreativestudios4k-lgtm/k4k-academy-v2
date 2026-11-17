@@ -1,6 +1,6 @@
 // Production customer creative generation: signed quotes, atomic live-credit reservations,
 // irreversible one-shot dispatch, authenticated provider reconciliation and owner-only media URLs.
-// A model must be separately enabled and priced; Seedance remains closed until token billing reconciles.
+// Each model is independently gated; Seedance is explicitly owner-only until token billing reconciles.
 import {createClient} from '@supabase/supabase-js';
 import {randomUUID,createHash} from 'node:crypto';
 import {quoteSigner,generationCredits} from '../../../../lib/server/generation-quote.mjs';
@@ -118,7 +118,7 @@ export async function POST(req){
    quoted_usd_micros:model.quoteUsdMicros,credits_quoted:credits,quote_expires_at:new Date(signedQuote.expiresAt).toISOString()
   });
   if(error)throw Error('JOB_CREATION_FAILED');
-  return response({jobId,modelId:body.modelId,credits,quotedProviderUsd:model.quoteUsdMicros/1e6,quoteToken:token,expiresAt:signedQuote.expiresAt,estimateOnly:true,providerChargeMayVary:true});
+  return response({jobId,modelId:body.modelId,credits,quotedProviderUsd:model.quoteUsdMicros/1e6,quoteToken:token,expiresAt:signedQuote.expiresAt,estimateOnly:true,providerChargeMayVary:true,...(model.providerBilling==='variable-tokens-owner-pilot'?{tokenBillingUnverified:true,ownerPilotOnly:true,providerBillingUnit:'1000 tokens',providerUnitRateUsd:0.0214}:{})});
  }
  if(body.action==='submit'){
   if(!uuid.test(body.requestKey||''))throw Error('INVALID_INPUT');
