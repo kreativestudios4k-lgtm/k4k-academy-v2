@@ -1,3 +1,3 @@
-import CreativeHome from './CreativeHome';
+import LandingRebuild from './LandingRebuild';
 export const metadata={title:{absolute:'K4K APP — Don’t follow the trend. Create it.'},description:'Create AI videos and images with K4K APP. Explore K4K Motion, Wan video tools, creator templates and the K4K Creative Studio.',openGraph:{title:'K4K APP — Don’t follow the trend. Create it.',description:'Your imagination. Your characters. Your next viral video.',siteName:'K4K APP'},twitter:{card:'summary_large_image',title:'K4K APP — Create it.',description:'Explore image and video AI models, original templates and the K4K Creative Studio.'}};
-export default function StudioHome(){return <CreativeHome/>;}
+export default function StudioHome(){return <LandingRebuild/>;}
