@@ -33,3 +33,12 @@ test('all four plan keys have distinct test price IDs',()=>{
  assert.equal(ids.length,4);assert.equal(new Set(ids).size,4);
  ids.forEach(id=>assert.match(id,/^price_/));
 });
+
+test('unauthenticated owner QA redirects to a fixed local preview login return',()=>{
+ const client=readFileSync(new URL('../app/k4k-app/plans-preview/OwnerPlanQATool.js',import.meta.url),'utf8');
+ const routes=readFileSync(new URL('../lib/customer-routes.mjs',import.meta.url),'utf8');
+ assert.match(client,/window\.location\.assign\('\/login\?next='/);
+ assert.match(client,/encodeURIComponent\('\/k4k-app\/plans-preview\/qa'\)/);
+ assert.match(routes,/requested==='\/k4k-app\/plans-preview\/qa'/);
+ assert.doesNotMatch(client,/Sign in with the authorised owner account first/);
+});
