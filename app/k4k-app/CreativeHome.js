@@ -12,8 +12,8 @@ import './creative-home.css';
 // Original MP4 entries do not require separate poster images.
 const featured=catalogue.discoveryPreviews.filter(item=>item.videoUrl);
 const models=[
- {name:'K4K Motion',tag:'TEMPLATES · CHARACTER SWAP',detail:'Use our uploaded video references as templates',path:'/k4k-app/motion',symbol:'motion'},
- {name:'K4K Remix',tag:'WAN-POWERED · AVAILABLE',detail:'Reference-led video creation with your own characters',path:'/k4k-app/creator',symbol:'video'},
+ {name:'K4K Motion',tag:'FEATURED · LIVE MOTION STUDIO',detail:'Swap characters in a real scene with your reference video',path:'/k4k-app/motion',symbol:'motion'},
+ {name:'Wan 3',tag:'WAN-POWERED · AVAILABLE',detail:'Reference-led video creation with your own characters',path:'/k4k-app/creator',symbol:'video'},
  {name:'Seedance 2.5',tag:'PREVIEW',detail:'Cinematic video and visual references',path:'/k4k-app/create',symbol:'video'},
  {name:'Kling 4.0',tag:'PREVIEW',detail:'Create from text, images and keyframes',path:'/k4k-app/create',symbol:'video'},
  {name:'Image Studio',tag:'PREVIEW',detail:'Images and visual edits, in one studio',path:'/k4k-app/create',symbol:'image'}
@@ -35,18 +35,18 @@ export default function CreativeHome(){
          <Link href="/k4k-app/explore">{tr('Explore','Explorar','Explorar')}</Link>
          <Link href="/k4k-app/create">{tr('Image','Imagem','Imagen')}</Link>
          <Link href="/k4k-app/create">{tr('Video','Vídeo','Vídeo')}</Link>
-         <Link href="/k4k-app/creator">K4K Remix</Link>
          <Link href="/k4k-app/motion">K4K Motion</Link>
+         <Link href="/k4k-app/creator">Wan 3</Link>
          <Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link>
        </nav>
        <div className="khf-header-actions" aria-label={tr("Account and creation","Conta e criação","Cuenta y creación")}>
          <label className="khf-locale"><Globe2 size={15}/><select value={locale} onChange={e=>changeLocale(e.target.value)} aria-label="Language"><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label>
          {user?<AccountMenu user={user}/>:<Link className="khf-signin" aria-label={tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} href="/login?next=%2Fk4k-app%2Fcreate">{tr('Log in','Entrar','Iniciar sesión')}</Link>}
-         <Link className="khf-header-cta" href="/k4k-app/create">{tr('Start creating','Começar a criar','Empezar a crear')}<ArrowUpRight size={15}/></Link>
+         <Link className="khf-header-cta" href="/k4k-app/motion">{tr('K4K Motion','K4K Motion','K4K Motion')}<ArrowUpRight size={15}/></Link>
          <button className="khf-menu-button" type="button" aria-controls="khf-mobile-menu" aria-label={menu?'Close menu':'Open menu'} aria-expanded={menu} onClick={()=>setMenu(v=>!v)}>{menu?<X size={20}/>:<Menu size={20}/>}</button>
        </div>
      </div>
-     {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/k4k-app/create">{tr('Creative Studio','Estúdio criativo','Estudio creativo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion · Templates</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/explore">{tr('Explore templates','Explorar templates','Explorar plantillas')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">K4K Remix</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
+     {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/k4k-app/create">{tr('Creative Studio','Estúdio criativo','Estudio creativo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion · Templates</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/explore">{tr('Explore templates','Explorar templates','Explorar plantillas')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">Wan 3</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
    </header>
    <main>
      <section className="khf-hero" aria-labelledby="khf-hero-title">
@@ -55,7 +55,7 @@ export default function CreativeHome(){
            <span className="khf-eyebrow"><span className="khf-dot"/> K4K CREATIVE STUDIO <span className="khf-eyebrow-line"/></span>
            <h1 id="khf-hero-title">{tr("DON’T FOLLOW","NÃO SIGA","NO SIGAS")}<br/><em>{tr("THE TREND.","A TENDÊNCIA.","LA TENDENCIA.")}</em><br/>{tr("CREATE IT.","CRIE A SUA.","CRÉALA.")}</h1>
            <p>{tr('Transform ideas, images and reference videos into your next creative project. One studio, multiple AI models, your direction.','Transforme ideias, imagens e vídeos de referência no seu próximo projeto. Um estúdio, vários modelos de IA e a sua direção.','Convierte ideas, imágenes y vídeos de referencia en tu próximo proyecto. Un estudio, varios modelos de IA y tu dirección.')}</p>
-           <div className="khf-hero-buttons"><Link className="khf-primary" href="/k4k-app/create">{tr('Start creating','Começar a criar','Empieza a crear')}<ArrowUpRight size={18}/></Link><Link className="khf-secondary" href="#discover"><Play size={17}/>{tr('Explore creations','Explorar criações','Explorar creaciones')}</Link></div>
+           <div className="khf-hero-buttons"><Link className="khf-primary" href="/k4k-app/motion">{tr('Create with K4K Motion','Criar com K4K Motion','Crear con K4K Motion')}<ArrowUpRight size={18}/></Link><Link className="khf-secondary" href="#discover"><Play size={17}/>{tr('Explore creations','Explorar criações','Explorar creaciones')}</Link></div>
            <div className="khf-trust"><span><CheckCircle2 size={15}/>{tr('Image & video tools','Ferramentas de imagem e vídeo','Herramientas de imagen y vídeo')}</span><span><CheckCircle2 size={15}/>{tr('Real creator templates','Templates reais de criadores','Plantillas reales')}</span></div>
          </div>
          <div className="khf-hero-visual">
@@ -75,7 +75,7 @@ export default function CreativeHome(){
          <div className="khf-toolband-heading"><span>{tr('WHAT WILL YOU CREATE?','O QUE VAI CRIAR?','¿QUÉ VAS A CREAR?')}</span><strong>{tr('Your next project starts here.','Seu próximo projeto começa aqui.','Tu próximo proyecto comienza aquí.')}</strong></div>
          <Link href="/k4k-app/create"><Images size={25}/><div><strong>{tr('Create image','Criar imagem','Crear imagen')}</strong><small>{tr('Generate & edit','Gerar e editar','Generar y editar')}</small></div><ArrowUpRight size={19}/></Link>
          <Link href="/k4k-app/create"><Film size={25}/><div><strong>{tr('Create video','Criar vídeo','Crear vídeo')}</strong><small>{tr('Explore video models','Explorar modelos','Explorar modelos')}</small></div><ArrowUpRight size={19}/></Link>
-         <Link href="/k4k-app/creator"><Layers3 size={25}/><div><strong>K4K Remix</strong><small>{tr('Wan-powered video production','Produção de vídeo com Wan','Vídeo con tecnología Wan')}</small></div><ArrowUpRight size={19}/></Link>
+         <Link href="/k4k-app/creator"><Layers3 size={25}/><div><strong>Wan 3</strong><small>{tr('Wan-powered video production','Produção de vídeo com Wan','Vídeo con tecnología Wan')}</small></div><ArrowUpRight size={19}/></Link>
        </div>
      </section>
      <section className="khf-section khf-discover" id="discover">
@@ -85,10 +85,10 @@ export default function CreativeHome(){
      <section className="khf-model-section">
        <div className="khf-section khf-model-inner"><div className="khf-section-heading"><div><span className="khf-overline">{tr('ONE WORKSPACE. MORE POSSIBILITIES.','UM ESTÚDIO. MAIS POSSIBILIDADES.','UN ESTUDIO. MÁS POSIBILIDADES.')}</span><h2>{tr('Explore our AI studio.','Explore nosso estúdio de IA.','Explora nuestro estudio IA.')}</h2></div><Link className="khf-viewall" href="/k4k-app/create">{tr('View all tools','Ver ferramentas','Ver herramientas')}<ArrowUpRight size={18}/></Link></div>
        <div className="khf-model-grid">{models.map((m,i)=><Link className={'khf-model-card khf-model-'+i} href={m.path} key={m.name}><div className="khf-model-over"><span>{m.tag}</span><ArrowUpRight size={18}/></div><div className="khf-model-visual">{m.symbol==='image'?<Images size={50}/>:m.symbol==='motion'?<Clapperboard size={50}/>:<Film size={50}/>}<i/><i/><i/></div><div className="khf-model-text"><strong>{m.name}</strong><small>{m.detail}</small></div></Link>)}</div>
-       <p className="khf-availability">{tr('K4K Remix (Wan-powered) uses our existing generation flow. K4K Motion reference templates are separate from generated customer videos. Premium generation and other new models remain preview-only until verified.','K4K Remix usa a geração atual via Wan. K4K Motion premium e os novos modelos ainda estão em prévia.','K4K Remix usa el generador Wan existente. K4K Motion premium y otros modelos siguen en vista previa.')}</p>
+       <p className="khf-availability">{tr('Wan 3 uses our existing Wan-powered generation flow. K4K Motion reference templates are separate from generated customer videos. Premium generation and other new models remain preview-only until verified.','Wan 3 usa a geração atual via Wan. K4K Motion premium e os novos modelos ainda estão em prévia.','Wan 3 usa el generador Wan existente. K4K Motion premium y otros modelos siguen en vista previa.')}</p>
        </div>
      </section>
-     <section className="khf-section khf-last"><span className="khf-overline">K4K APP · KREATIVE STUDIOS 4K</span><h2>{tr('Your next viral idea','Sua próxima ideia viral','Tu próxima idea viral')}<br/><em>{tr('starts with you.','começa com você.','empieza contigo.')}</em></h2><p>{tr('Make something people haven’t seen before.','Crie algo que ninguém viu antes.','Crea algo que nadie haya visto antes.')}</p><Link className="khf-primary" href="/k4k-app/create">{tr('Enter Creative Studio','Entrar no Estúdio Criativo','Entrar al Estudio Creativo')}<ArrowRight size={20}/></Link></section>
+     <section className="khf-section khf-last"><span className="khf-overline">K4K APP · KREATIVE STUDIOS 4K</span><h2>{tr('Your next viral idea','Sua próxima ideia viral','Tu próxima idea viral')}<br/><em>{tr('starts with you.','começa com você.','empieza contigo.')}</em></h2><p>{tr('Make something people haven’t seen before.','Crie algo que ninguém viu antes.','Crea algo que nadie haya visto antes.')}</p><Link className="khf-primary" href="/k4k-app/motion">{tr('Enter Creative Studio','Entrar no Estúdio Criativo','Entrar al Estudio Creativo')}<ArrowRight size={20}/></Link></section>
    </main>
    <footer className="khf-footer"><Link href="/k4k-app" className="khf-brand"><img src="/k4k-mark.svg" width="28" height="28" alt=""/><strong>K4K APP</strong></Link><span>© K4K APP · KREATIVE STUDIOS 4K</span><div><Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link><Link href="/privacy">{tr('Privacy','Privacidade','Privacidad')}</Link><Link href="/k4k-app/support">{tr('Support','Suporte','Soporte')}</Link></div></footer>
  </div>
