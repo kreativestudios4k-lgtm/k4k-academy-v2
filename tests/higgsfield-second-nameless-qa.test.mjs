@@ -32,6 +32,6 @@ test('separate unique ledger claim and owner-only preview submission',()=>{
  assert.match(second,/PROVIDER_SUBMISSION_UNCERTAIN/);
  assert.match(second,/RUN_SECOND_5_SECOND_480P_TEST/);
  assert.doesNotMatch(second,/studio_credit_accounts|stripe_secret|sk_live_/);
- assert.match(ui,/Run one new \$1\.59 test/);
+ assert.match(ui,/Second paid test completed/);
  assert.match(ui,/second-paid-qa/);
 });
