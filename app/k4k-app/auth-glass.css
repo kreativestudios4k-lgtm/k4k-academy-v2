@@ -1,0 +1,72 @@
+/* K4K glass authentication visual treatment. Presentation only; all auth flows remain unchanged. */
+.k4k-auth-page.kx-auth,.k4k-register{
+ --auth-white:#fcfcfc;--auth-line:rgba(255,255,255,.3);--auth-panel:rgba(21,21,23,.58);
+ background:radial-gradient(ellipse 48% 39% at 16% 79%,rgba(245,245,245,.14),transparent 75%),radial-gradient(ellipse 44% 54% at 83% 18%,rgba(177,177,177,.17),transparent 72%),radial-gradient(ellipse 55% 43% at 54% 55%,rgba(80,80,80,.24),transparent 78%),#030303!important;
+ color:var(--auth-white)!important;position:relative;isolation:isolate;overflow:hidden;
+}
+.k4k-auth-page.kx-auth:before,.k4k-register:before{content:"";position:fixed;inset:-26%;pointer-events:none;z-index:-1;opacity:.48;
+ background:conic-gradient(from 35deg at 50% 50%,transparent 0deg,rgba(255,255,255,.08) 26deg,transparent 55deg,rgba(255,255,255,.25) 77deg,transparent 105deg,rgba(180,180,180,.09) 170deg,transparent 210deg,rgba(255,255,255,.12) 290deg,transparent 345deg);
+ filter:blur(70px);transform:rotate(-18deg);animation:k4k-auth-ambient 26s ease-in-out infinite alternate;
+}
+.k4k-auth-page.kx-auth:after,.k4k-register:after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(135deg,transparent 17%,rgba(255,255,255,.035) 43%,transparent 65%),linear-gradient(155deg,#0007,transparent 42%,#0005);}
+@keyframes k4k-auth-ambient{to{transform:rotate(15deg) scale(1.08)}}
+/* Sign in: centered glass panel rather than the legacy two-column marketing layout. */
+.k4k-auth-page.kx-auth .k4k-auth-header{height:82px;padding-inline:clamp(20px,5vw,80px);border:0;position:relative;z-index:2}
+.k4k-auth-page.kx-auth .k4k-auth-brand{display:inline-flex;align-items:center;gap:11px;color:#fff!important}
+.k4k-auth-page.kx-auth .k4k-auth-brand .kx-brand-name{font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:850;letter-spacing:-.045em;color:#fff}
+.k4k-auth-page.kx-auth .k4k-auth-brand small{border-left:0;color:#ddd;font-weight:500;letter-spacing:0;margin-left:2px;padding:0;font-size:16px}
+.k4k-auth-page.kx-auth .k4k-auth-back{color:#dedede}
+.k4k-auth-page.kx-auth .kx-auth-grid{display:flex;justify-content:center;align-items:center;max-width:100%;width:min(100% - 32px,580px);margin:clamp(16px,4vh,40px) auto 65px;gap:0}
+.k4k-auth-page.kx-auth .kx-stage{display:none!important}
+.k4k-auth-page.kx-auth .k4k-auth-card,.k4k-register .k4k-register-card{
+ width:100%;max-width:510px;padding:clamp(30px,5vw,55px);border:1px solid rgba(255,255,255,.29);
+ border-radius:28px;background:linear-gradient(132deg,rgba(255,255,255,.11),rgba(28,28,30,.52) 40%,rgba(25,25,27,.68) 85%);
+ box-shadow:0 32px 110px #000a,inset 1px 1px 0 rgba(255,255,255,.12);
+ -webkit-backdrop-filter:blur(34px) saturate(120%);backdrop-filter:blur(34px) saturate(120%);color:#fff;
+}
+.k4k-auth-page.kx-auth .k4k-auth-icon{display:none}
+.k4k-auth-page.kx-auth .k4k-auth-step,.k4k-register .k4k-register-eyebrow{letter-spacing:.2em;color:#dadada;font-size:10px;font-weight:800}
+.k4k-auth-page.kx-auth .k4k-auth-card h1,.k4k-register .k4k-register-card h1{font-family:Arial,Helvetica,sans-serif;color:#fff;font-size:clamp(39px,5vw,56px);font-weight:800;letter-spacing:-.065em;line-height:1.05;margin:13px 0 8px}
+.k4k-auth-page.kx-auth .k4k-auth-subtitle,.k4k-register .k4k-register-card>p{color:#d1d1d1;line-height:1.6;font-size:14px}
+.k4k-auth-page.kx-auth .k4k-auth-form{gap:11px}
+.k4k-auth-page.kx-auth .k4k-auth-form label,.k4k-register .k4k-register-card label{color:#f5f5f5;font-weight:700;font-size:12px;letter-spacing:0;text-transform:none}
+.k4k-auth-page.kx-auth .k4k-auth-form input,.k4k-register .k4k-register-card input{
+ width:100%;height:54px;min-height:54px;background:rgba(8,8,10,.32)!important;color:#fff!important;border:1px solid rgba(255,255,255,.4)!important;
+ border-radius:15px!important;padding:0 16px!important;font-size:15px!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+}
+.k4k-auth-page.kx-auth .k4k-auth-form input::placeholder,.k4k-register .k4k-register-card input::placeholder{color:#a8a8a8}
+.k4k-auth-page.kx-auth .k4k-auth-form input:focus,.k4k-register .k4k-register-card input:focus{outline:2px solid #fff;outline-offset:2px;border-color:#fff!important}
+.k4k-auth-page.kx-auth .k4k-auth-form input:read-only{background:#303030!important}
+.k4k-auth-page.kx-auth .k4k-auth-password input{padding-right:55px!important}
+.k4k-auth-page.kx-auth .k4k-auth-password button{height:54px;color:#f0f0f0}
+.k4k-auth-page.kx-auth .k4k-auth-label-row a,.k4k-auth-page.kx-auth .k4k-auth-footer a,.k4k-register .k4k-register-card a{color:#fff}
+.k4k-auth-page.kx-auth .k4k-auth-submit,.k4k-register .k4k-register-card form button{
+ border-radius:15px!important;min-height:54px;background:#fafafa!important;color:#070707!important;
+ font-weight:850!important;font-family:Arial,Helvetica,sans-serif!important;font-size:14px!important;
+ box-shadow:0 9px 35px #ffffff17;justify-content:center;
+}
+.k4k-auth-page.kx-auth .k4k-auth-submit:hover,.k4k-register .k4k-register-card form button:hover{background:#e5e5e5!important}
+.k4k-auth-page.kx-auth .k4k-auth-google{border-radius:15px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.45);color:#fff}
+.k4k-auth-page.kx-auth .k4k-auth-google:hover{background:rgba(255,255,255,.08);border-color:#fff}
+.k4k-auth-page.kx-auth .k4k-auth-footer,.k4k-register .k4k-register-existing{color:#ddd;font-size:13px}
+.k4k-auth-page.kx-auth .k4k-auth-divider{color:#ccc}
+.k4k-auth-page.kx-auth .k4k-auth-password button:focus-visible,.k4k-auth-page.kx-auth button:focus-visible,.k4k-register button:focus-visible{outline:2px solid #fff;outline-offset:3px}
+/* Sign up: same centered glass composition; preserve original Supabase signup handler. */
+.k4k-register{display:flex;justify-content:center;align-items:center;min-height:100svh;padding:45px 20px}
+.k4k-register .k4k-register-layout{display:flex;justify-content:center;align-items:center;width:min(100%,550px);max-width:550px;gap:0}
+.k4k-register .k4k-register-hero{display:none}
+.k4k-register .k4k-register-card{margin:0;max-width:510px}
+.k4k-register .k4k-register-logo{color:white;font-weight:900;font-size:20px;letter-spacing:-.04em}
+.k4k-register .k4k-register-card form{gap:10px!important}
+.k4k-register .k4k-register-card button[type="button"]{background:rgba(255,255,255,.09)!important;color:#fff!important;border:1px solid #ffffff66!important;border-radius:15px!important;box-shadow:none}
+.k4k-register .k4k-register-card input{padding:0 16px!important}
+.k4k-register .k4k-register-disclaimer{color:#bcbcbc!important}
+.k4k-register .k4k-register-card .k4k-register-legal a{color:#dfdfdf}
+@media(max-width:600px){
+ .k4k-auth-page.kx-auth .k4k-auth-header{height:70px;padding-inline:19px}
+ .k4k-auth-page.kx-auth .kx-auth-grid{width:calc(100% - 28px);margin:26px auto 42px}
+ .k4k-auth-page.kx-auth .k4k-auth-card,.k4k-register .k4k-register-card{padding:27px 22px;border-radius:22px}
+ .k4k-register{padding:25px 14px}
+ .k4k-auth-page.kx-auth .k4k-auth-card h1,.k4k-register .k4k-register-card h1{font-size:38px}
+}
+@media(prefers-reduced-motion:reduce){.k4k-auth-page.kx-auth:before,.k4k-register:before{animation:none}}

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import {ArrowRight,CheckCircle2,Eye,EyeOff,Lock,Mail,RefreshCw,MessageCircle,X,HelpCircle} from 'lucide-react';
 import {createClient} from '../../lib/supabase/client';
 import '../kx-redesign.css';
+import '../k4k-app/auth-glass.css';
 import catalogue from '../k4k-app/template-catalogue.json';
 import {studioDestination} from '../../lib/customer-routes.mjs';
 import {useVerifiedAccount,signOutK4K} from '../k4k-app/useVerifiedAccount';

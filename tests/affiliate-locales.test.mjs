@@ -14,7 +14,7 @@ test('Instagram inputs become canonical profile URLs and reject external or non-
  for(const input of ['','https://evil.test/mycreator','https://instagram.com.evil.test/mycreator','https://instagram.com/p/123','https://instagram.com/reels/','https://instagram.com@evil.test/test','https://evil.test@instagram.com/test','@two words','a'.repeat(31),null])assert.equal(normalizeInstagram(input),null);
 });
 test('affiliate login return is explicitly allowed without opening redirect destinations',()=>{
- assert.equal(studioDestination('/affiliates'),'/affiliates');assert.equal(studioDestination('/affiliates?next=https://evil.test'),'/k4k-app/creator');assert.equal(studioDestination('https://evil.test/affiliates'),'/k4k-app/creator');
+ assert.equal(studioDestination('/affiliates'),'/affiliates');assert.equal(studioDestination('/affiliates?next=https://evil.test'),'/k4k-app/dashboard');assert.equal(studioDestination('https://evil.test/affiliates'),'/k4k-app/dashboard');
  const route=readFileSync('app/api/affiliates/apply/route.js','utf8');
  assert.match(route,/auth.getUser\(\)/);assert.match(route,/email_confirmed_at/);assert.match(route,/Idempotency-Key/);assert.match(route,/confirmation_sent_at/);assert.match(route,/pending_review/);
  assert.match(route,/VERCEL_ENV!==['"]production['"]/);
