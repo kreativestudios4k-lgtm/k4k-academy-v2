@@ -5,6 +5,7 @@ const LOGIN='/login?next='+encodeURIComponent('/k4k-app/higgsfield-connection');
 export default function HiggsfieldConnectionPage(){
  const [working,setWorking]=useState(false),[result,setResult]=useState(null);
  const [testBusy,setTestBusy]=useState(false),[testResult,setTestResult]=useState(null);
+ const [secondBusy,setSecondBusy]=useState(false),[secondResult,setSecondResult]=useState(null);
  async function qaRequest(method){
   if(testBusy)return;
   if(method==='POST'&&!window.confirm('Submit ONE paid Higgsfield Genjutsu test? 4.13-second source billed as 5 seconds, 480p, estimated $1.59. No automatic retry.'))return;
@@ -21,6 +22,23 @@ export default function HiggsfieldConnectionPage(){
    setTestResult({...payload,httpStatus:response.status});
   }catch(error){setTestResult({error:error?.message||'NETWORK_UNAVAILABLE'})}
   finally{setTestBusy(false)}
+ }
+ async function secondRequest(method){
+  if(secondBusy)return;
+  if(method==='POST'&&!window.confirm('Submit ONE paid 480p Higgsfield test using the 4.77-second restaurant video and only reference image 1? Estimated API charge $1.59, maximum $1.60. The previous failed test remains locked; no automatic retry.'))return;
+  setSecondBusy(true);
+  try{
+   const {data:{session}}=await createClient().auth.getSession();
+   if(!session?.access_token)throw Error('SIGN_IN_REQUIRED');
+   const response=await fetch('/api/higgsfield/second-paid-qa',{
+    method,cache:'no-store',
+    headers:{Authorization:'Bearer '+session.access_token,...(method==='POST'?{'Content-Type':'application/json'}:{})},
+    ...(method==='POST'?{body:JSON.stringify({confirmation:'RUN_SECOND_5_SECOND_480P_TEST'})}:{})
+   });
+   const payload=await response.json().catch(()=>({error:'INVALID_RESPONSE'}));
+   setSecondResult({...payload,httpStatus:response.status});
+  }catch(error){setSecondResult({error:error?.message||'NETWORK_UNAVAILABLE'})}
+  finally{setSecondBusy(false)}
  }
  async function testConnection(){
   if(working)return;
@@ -64,6 +82,24 @@ export default function HiggsfieldConnectionPage(){
      {testResult.videoUrl&&<a href={testResult.videoUrl} target="_blank" rel="noreferrer" style={{color:'#a3ff9b'}}>View generated test video</a>}
     </div>}
    </div>}
+   {result.authenticated&&<section style={{marginTop:22,padding:18,border:'1px solid #67846b',borderRadius:12}}>
+    <h2 style={{fontSize:20,fontWeight:800}}>Second test — single character replacement</h2>
+    <p style={{fontSize:14,lineHeight:1.6}}>Restaurant and pizza video: 4.77 seconds, billed as 5 · 480p · estimated $1.59 (limit $1.60). Replace only the central foreground player using reference image 1. Prompt contains no person names. Other players and the setting stay unchanged.</p>
+    <p style={{fontSize:13,color:'#bac6ba'}}>Owner-only, preview-only, one paid submission at most. The original failed test remains closed.</p>
+    <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+     <button type="button" disabled={secondBusy} onClick={()=>secondRequest('POST')} style={{background:'#a3ff9b',border:0,color:'#142414',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Run one new $1.59 test</button>
+     <button type="button" disabled={secondBusy} onClick={()=>secondRequest('GET')} style={{background:'transparent',border:'1px solid #a3ff9b',color:'#a3ff9b',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Check second test status</button>
+    </div>
+    {secondResult&&<div role="status" style={{marginTop:14,padding:12,border:'1px solid #466046',borderRadius:10}}>
+     <p>Generation: {secondResult.state||secondResult.error||'unknown'}</p>
+     {secondResult.requestId&&<p>Request ID: {secondResult.requestId}</p>}
+     {secondResult.estimatedCostUsd&&<p>Estimated API cost: ${secondResult.estimatedCostUsd}</p>}
+     {secondResult.noRetry&&<p>No retry has been made. Check the provider job before any further action.</p>}
+     {secondResult.providerErrorCode&&<p>Provider error: {secondResult.providerErrorCode}</p>}
+     {secondResult.providerErrorMessage&&<p>Failure reason: {secondResult.providerErrorMessage}</p>}
+     {secondResult.videoUrl&&<a href={secondResult.videoUrl} target="_blank" rel="noreferrer" style={{color:'#a3ff9b'}}>View generated test video</a>}
+    </div>}
+   </section>}
    {result.state==='sign_in_required'&&<a href={LOGIN} style={{color:'#a3ff9b'}}>Sign in on this preview</a>}
   </section>}
  </main>;
