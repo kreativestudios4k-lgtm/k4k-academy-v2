@@ -26,7 +26,7 @@ test('customer-facing generator keeps real signed quote and Generate button, no 
  assert.match(customer,/quoteToken:quote.quoteToken/);
  assert.match(customer,/action:'submit'/);
  assert.ok(owner.includes('<OwnerCreativeQA'));
- assert.ok(owner.includes('owner-qa'));
+ assert.ok(owner.includes('PRIVATE ENGINEERING TOOL'));
 });
 test('generator keeps black and white visual theme',()=>{
  assert.ok(!css.includes('#d6ff69'));
