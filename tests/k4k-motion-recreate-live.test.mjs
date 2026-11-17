@@ -22,7 +22,7 @@ test('Motion Library provides a distinct Recreate CTA only for generation-eligib
 test('Recreate does not bypass verified uploads or charging confirmation',()=>{
  assert.match(studio,/async function verifyUploads/);
  assert.match(studio,/CustomerGeneration/);
- assert.match(studio,/Confirm permission to use the source video and character photos/);
+ assert.match(studio,/By confirming generation, you confirm you have permission/);
  assert.match(studio,/if\(!castReady\)/);
 });
 test('Premium Motion cards direct to the production-gated Director, not an owner pilot dead end',()=>{
