@@ -143,3 +143,15 @@
 .khm-root .khm-lib-poster .khm-lib-play:focus-visible{outline:2px solid #fff;outline-offset:3px}
 .khm-root .khm-lib-poster .khm-lib-recreate:disabled{opacity:.5;cursor:not-allowed;transform:none}
 @media(max-width:760px){.khm-root .khm-lib-poster .khm-lib-recreate{min-height:36px;left:8px;right:8px;bottom:8px;font-size:11px}}
+
+/* Inline checkout: automatic private validation before a signed quote. */
+.khm-root .khm-quality-panel .khm-credit-summary{margin-bottom:18px;border-color:#555;background:#1d1d1f}
+.khm-root .khm-quality-panel .khm-credit-summary strong{color:#fff}
+.khm-root .khm-quality-panel .khm-credit-summary span{color:#dbdbdd}
+.khm-root .khm-quality-panel .khm-credit-summary small{color:#aaa}
+.khm-root .khm-quality-panel .khm-prompt-details{margin:10px 0 15px;border:1px solid #343436;border-radius:9px;background:#161617}
+.khm-root .khm-quality-panel .khm-prompt-details summary{padding:12px;cursor:pointer;color:#bdbdc0;font-size:12px;font-weight:700}
+.khm-root .khm-quality-panel .khm-prompt-details textarea{width:calc(100% - 22px)!important;margin:0 11px 11px!important}
+.khm-root .khm-quality-panel .khm-permission-note{font-size:11px;color:#939396!important;line-height:1.5;margin-top:14px}
+.khm-root .khm-quality-panel>h2{margin-top:0}
+.khm-root .khm-quality-panel>section{max-width:100%}

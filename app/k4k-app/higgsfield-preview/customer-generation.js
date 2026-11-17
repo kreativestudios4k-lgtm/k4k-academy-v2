@@ -2,7 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
 import {createClient} from '../../../lib/supabase/client';
-const button={padding:'12px 18px',border:'1px solid #a1efa5',borderRadius:10,background:'#a1efa5',color:'#142015',fontWeight:800,cursor:'pointer'};
+const button={padding:'12px 18px',border:'1px solid #f2f2f2',borderRadius:10,background:'#f2f2f2',color:'#101012',fontWeight:800,cursor:'pointer'};
 const messages={TOO_MANY_QUOTES:'Too many quotes. Please wait ten minutes before preparing another.',NOT_AVAILABLE:'K4K Motion is not available for this account yet.',INSUFFICIENT_CREDITS:'Your balance is too low for this video.',PROVIDER_BUDGET_BLOCKED:'This quality or duration exceeds the current per-video spending limit. Try a shorter video or lower resolution.',QUOTE_EXPIRED:'Your quote expired. Prepare a new quote.',PROVIDER_SUBMISSION_UNCERTAIN:'Submission needs review. Do not submit another video; use Refresh status.',DRAFT_ALREADY_EXISTS:'This draft already exists. Check your recent jobs before preparing another.',HIGGSFIELD_CUSTOMER_DISPATCH_DISABLED:'Generation is not enabled for this preview yet.',HIGGSFIELD_UNAVAILABLE:'The connection is temporarily unavailable. Your existing jobs are saved.'};
 async function request(action,input={}){
  const {data:{session}}=await createClient().auth.getSession();
@@ -10,13 +10,13 @@ async function request(action,input={}){
  const response=await fetch('/api/higgsfield/customer-jobs',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action,...input})});
  const body=await response.json();if(!response.ok)throw Error(messages[body.error]||body.error||'Unable to complete this request.');return body;
 }
-export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null}){
+export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey=''}){
  const [quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[output,setOutput]=useState(null),[active,setActive]=useState(null);
  useEffect(()=>{onBusyChange?.(busy);},[busy,onBusyChange]);
  const lock=useRef(false),requestKey=useRef(null),account=useRef(undefined);
  const mediaKey=JSON.stringify(media);
- const selection=JSON.stringify([media,resolution,prompt]);
- useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt]);
+ const selection=JSON.stringify([selectionKey||mediaKey,resolution,prompt]);
+ useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt,selectionKey]);
  async function refresh(){const rows=await request('list');setJobs(rows);return rows;}
  useEffect(()=>{
   let alive=true;
@@ -51,14 +51,16 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
  },[active]);
  return <>
   {!libraryOnly&&<>
-  <h2 style={{fontSize:20}}>04 · Generate with K4K Motion</h2>
-  <label htmlFor="motion-prompt">Automatic character prompt</label>
-  <textarea id="motion-prompt" value={prompt} readOnly rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',margin:'10px 0',padding:12,background:'#080f0b',color:'#fff',border:'1px solid #658768',borderRadius:10}}/>
-  <p style={{fontSize:13,color:'#b5c6b7'}}>Your cost is displayed above. Verify your private files, then continue to confirm the exact signed credit charge. Credits are reserved only after you press Generate.</p>
-  <button type="button" style={button} disabled={busy||!media||!prompt.trim()} onClick={()=>action(async()=>{
-   setQuote(null);const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
-   const result=await request('prepare',{jobId,...media,resolution,prompt});setQuote({...result,selection});await refresh();
-  })}>{busy?'Preparing…':'Generate'}</button>
+  <h2 style={{fontSize:20}}>Generate with K4K Motion</h2>
+  <details className="khm-prompt-details"><summary>View automatic character prompt</summary><textarea id="motion-prompt" aria-label="Automatic character prompt" value={prompt} readOnly rows={4} style={{display:'block',width:'100%',boxSizing:'border-box',margin:'10px 0',padding:12,background:'#111',color:'#fff',border:'1px solid #444',borderRadius:10}}/></details>
+  <p style={{fontSize:12,color:'#b5b5b5'}}>Private file checks happen when you press Generate. No credits are charged until you review and confirm the signed quote.</p>
+  <button type="button" style={button} disabled={busy||!canGenerate||(!media&&!onPrepareMedia)||!prompt.trim()} onClick={()=>action(async()=>{
+   setQuote(null);
+   const verified=onPrepareMedia?await onPrepareMedia():media;
+   if(!verified?.videoPath||!Array.isArray(verified.referencePaths)||verified.referencePaths.length<1)throw Error('Choose a source and character photos to generate.');
+   const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
+   const result=await request('prepare',{jobId,...verified,resolution,prompt});setQuote({...result,selection});await refresh();
+  })}>{busy?'Checking files…':'Generate · '+(Number.isInteger(estimatedCredits)?estimatedCredits+' estimated credits':'review credits')}</button>
   {quote?.selection===selection&&<div style={{marginTop:18}}>
    <p role="status"><strong>{quote.credits} credits — exact confirmed charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
    <p style={{fontSize:13}}>{customer?'':`Provider estimate: $${quote.usd.toFixed(2)}. `}Quote expires in five minutes.</p>
@@ -69,9 +71,9 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
    })}>{quote.dispatchEnabled?'Confirm & Generate · '+quote.credits+' credits':'Generation locked · Preview'}</button>
   </div>}
   </>}
-  {message&&<p role="status" style={{color:'#d8eecf'}}>{message}</p>}
+  {message&&<p role="status" style={{color:'#ededed'}}>{message}</p>}
   {output&&<video controls playsInline src={output.url} style={{maxWidth:'100%',maxHeight:500,marginTop:20}}/>}
-  {libraryOnly?<h3 style={{marginTop:28}}>Your K4K Motion videos</h3>:<Link href="/k4k-app/videos" style={{display:'inline-block',color:'#d6ff69',fontWeight:800,marginTop:18}}>View my generations in Library →</Link>}
+  {libraryOnly?<h3 style={{marginTop:28}}>Your K4K Motion videos</h3>:<Link href="/k4k-app/videos" style={{display:'inline-block',color:'#f4f4f5',fontWeight:800,marginTop:18}}>View my generations in Library →</Link>}
   {libraryOnly&&<>
   {!jobs.length&&<p style={{color:"#adbdaf"}}>Your generated Motion videos will appear here.</p>}
   <button type="button" style={button} disabled={busy} onClick={()=>action(refresh)}>Refresh library</button>
