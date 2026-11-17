@@ -1,6 +1,26 @@
 {
   "version": 7,
-  "mediaStatus": "19-hosted-videos",
+  "mediaStatus": {
+    "0": "1",
+    "1": "9",
+    "2": "-",
+    "3": "h",
+    "4": "o",
+    "5": "s",
+    "6": "t",
+    "7": "e",
+    "8": "d",
+    "9": "-",
+    "10": "v",
+    "11": "i",
+    "12": "d",
+    "13": "e",
+    "14": "o",
+    "15": "s",
+    "publicGallery": "k4k_originals_only",
+    "previousPublicFigureTemplates": "not_shown_in_motion_library",
+    "replacementBatch": "2026-11-17"
+  },
   "topPerforming": [],
   "trending": [
     {
@@ -254,113 +274,104 @@
   ],
   "discoveryPreviews": [
     {
-      "id": "featured-nov15-1",
-      "title": "Featured creation",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/e9JiMBF8CwUu1T2VHschk_higgsfield-62a55cab-8c60-40e9-a208-284ba9e2182c.mp4",
-      "durationSeconds": 6.03,
-      "previewOnly": true
+      "id": "k4k-original-01",
+      "title": "K4K Original · Night Goal Challenge",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e041/8UwpVm9EhBMZJyiE7YpFG_higgsfield-9de74ba5-2120-41d7-abd8-837d74185dcb.mp4",
+      "durationSeconds": 26.04,
+      "k4kOriginal": true,
+      "previewOnly": true,
+      "requiredImages": 1,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "featured-nov15-2",
-      "title": "K4K Original 02",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/nNaiAc3Cxd61D0HWDyiHX_higgsfield-ea4dd5cd-cb4e-4b35-b1ea-36929f161082.mp4",
+      "id": "k4k-original-02",
+      "title": "K4K Original · Hillside Dance Crew",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e042/mWnEITF_ov07agyMAHV8V_higgsfield-a8b52cee-b045-450d-bd46-6faa14243e47.mp4",
+      "durationSeconds": 16.03,
+      "k4kOriginal": true,
+      "previewOnly": true,
+      "requiredImages": 3,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
+    },
+    {
+      "id": "k4k-original-03",
+      "title": "K4K Original · Street Dance Reaction",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e043/W7GZR239hP_pWtK351pfU_higgsfield-3e4bbc70-c1b3-4ad8-8aed-f5bada0df841.mp4",
+      "durationSeconds": 8.04,
+      "k4kOriginal": true,
+      "previewOnly": false,
+      "requiredImages": 1,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
+    },
+    {
+      "id": "k4k-original-04",
+      "title": "K4K Original · Video Call Moment",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e043/UFlG1a57p1rwq1LyDr1oc_higgsfield-ea4dd5cd-cb4e-4b35-b1ea-36929f161082%281%29.mp4",
       "durationSeconds": 10.05,
-      "previewOnly": true
+      "k4kOriginal": true,
+      "previewOnly": false,
+      "requiredImages": 4,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "featured-nov15-3",
-      "title": "K4K Original 03",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29ada/Q3tUvZzVdYRV8ASPMyup8_higgsfield-3d7f6d0a-83ae-43c5-a476-e62ed6edd750.mp4",
+      "id": "k4k-original-05",
+      "title": "K4K Original · Cash Flow Moment",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e047/d7hgdrUkr8R6pIR_ICL53_higgsfield-3d7f6d0a-83ae-43c5-a476-e62ed6edd750%281%29.mp4",
       "durationSeconds": 14.72,
-      "previewOnly": true
+      "k4kOriginal": true,
+      "previewOnly": false,
+      "requiredImages": 1,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "featured-nov15-4",
-      "title": "K4K Original 04",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29adb/vTgYxD0vx5Ce0kw_o6kG-_higgsfield-b5651126-aa51-4126-b253-36f102c2bcce.mp4",
+      "id": "k4k-original-06",
+      "title": "K4K Original · City Steps Dance",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e048/2Zri6haLHjwaZH3Vxp3K4_higgsfield-b5651126-aa51-4126-b253-36f102c2bcce%282%29.mp4",
       "durationSeconds": 22.1,
+      "k4kOriginal": true,
       "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/5cv-ht7SSmy_LVBbYGpva_output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
+      "requiredImages": 2,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "new-1",
-      "title": "The Main Character",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab2b546/BC3oVjpAP_mDt3D_VpFOB_output.mp4",
-      "durationSeconds": 14.8,
-      "previewOnly": true
-    },
-    {
-      "id": "new-2",
-      "title": "Pitch Invasion",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29126/5r8gBlT-JHql5wTCLLaev_higgsfield-14d8e3a0-6564-4647-8011-e00fcf606eed.mp4",
-      "durationSeconds": 24,
+      "id": "k4k-original-07",
+      "title": "K4K Original · Living Room Dance",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e048/KyuARibgeDAR7GjcNR2Ei_higgsfield-f7abecea-0470-4aee-b819-20f4b2ca9c54%281%29.mp4",
+      "durationSeconds": 28.93,
+      "k4kOriginal": true,
       "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/98HQiLpZdDE1I9EQdUrXi_output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
+      "requiredImages": 1,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "new-3",
-      "title": "Luxury Lifestyle",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/DRLPXaCkv6LbrOxKtJ7FW_higgsfield-e81ffd4b-2e68-4687-98ad-faaa5b2518b0.mp4",
-      "durationSeconds": 11,
-      "previewOnly": true
-    },
-    {
-      "id": "new-4",
-      "title": "Street Court",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/EazWlisHQZMbfyJ5Rwz6j_higgsfield-12f3f57f-6ec8-4563-bf3e-0707522c3284.mp4",
-      "durationSeconds": 15,
+      "id": "k4k-original-08",
+      "title": "K4K Original · Street Court Challenge",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e04a/KzBNiJY5uXMLSW4G9PIee_higgsfield-12f3f57f-6ec8-4563-bf3e-0707522c3284%281%29.mp4",
+      "durationSeconds": 15.17,
+      "k4kOriginal": true,
       "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6ab/qSDa5GH3xzKpikn0_Uz1m_output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
+      "requiredImages": 2,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
-      "id": "new-5",
-      "title": "Night Football",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29127/Bvk63mKZJROdI4IInmVC-_higgsfield-5a956e2b-e691-4ca3-b51a-c763cecbbab4.mp4",
-      "durationSeconds": 26,
+      "id": "k4k-original-09",
+      "title": "K4K Original · Restaurant Surprise",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e04a/dbhilYpjutQRzFoX3KNFb_higgsfield-e81ffd4b-2e68-4687-98ad-faaa5b2518b0%281%29.mp4",
+      "durationSeconds": 11.05,
+      "k4kOriginal": true,
+      "previewOnly": false,
+      "requiredImages": 2,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
+    },
+    {
+      "id": "k4k-original-10",
+      "title": "K4K Original · Pitch-Side Prank",
+      "videoUrl": "https://v3b.fal.media/files/b/0ab2e04b/luJEyYX0_NVShhmQ8kCX4_higgsfield-14d8e3a0-6564-4647-8011-e00fcf606eed%281%29.mp4",
+      "durationSeconds": 23.63,
+      "k4kOriginal": true,
       "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/XW7I1kOqVxu79U1zxKGx__output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
-    },
-    {
-      "id": "new-6",
-      "title": "Stadium Entrance",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29128/4xXofpIsFtJHbKNZ_WC3F_higgsfield-e4e73e76-c107-4639-b320-fff51e25b69a%281%29.mp4",
-      "durationSeconds": 23,
-      "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a3/FE1gsKgnicJ-nIu0dR2rY_output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
-    },
-    {
-      "id": "new-7",
-      "title": "Living Room Dance",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29128/m76xZpIYoQtJ2yZJas2mH_higgsfield-f7abecea-0470-4aee-b819-20f4b2ca9c54.mp4",
-      "durationSeconds": 29,
-      "previewOnly": true,
-      "generationVideoUrl": "https://v3b.fal.media/files/b/0ab2b6a4/MsPrsnmKurYDTxzkq0_Vo_output.mp4",
-      "generationDurationSeconds": 14.8,
-      "characterCountReview": "Provisional: confirm replacement count within the shortened generation reference."
-    },
-    {
-      "id": "new-8",
-      "title": "Stadium Skills",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29129/qr1uRiBvjtwGe1Shl5wJR_K4K-5f2d7283-d331-493e-a6c1-cb8f1afb67d8%281%29.mp4",
-      "durationSeconds": 13,
-      "previewOnly": true
-    },
-    {
-      "id": "new-9",
-      "title": "Restaurant Moment",
-      "videoUrl": "https://v3b.fal.media/files/b/0ab29129/1SHwN0k7LHu-0vUX-uMfF_higgsfield-1bcbcf93-56d6-47fe-8ef9-a07f08aec2fc%281%29.mp4",
-      "durationSeconds": 11,
-      "previewOnly": true
+      "requiredImages": 2,
+      "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     }
   ]
 }
