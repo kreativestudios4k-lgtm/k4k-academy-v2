@@ -28,5 +28,5 @@ test('Pix intent and a valid plan survive login redirects without accepting inje
  assert.equal(studioDestination(dest),dest);
  assert.equal(planRegistration('starter',{manualPix:true}),'/k4k-app/register?plan=starter&payment=pix');
  assert.equal(studioDestination(planDestination(null,{manualPix:true})),'/k4k-app/credits?payment=pix');
- for(const bad of [dest+'&next=https://evil.test',dest+'#evil','/k4k-app/credits?plan=__proto__&payment=pix'])assert.equal(studioDestination(bad),'/k4k-app/creator');
+ for(const bad of [dest+'&next=https://evil.test',dest+'#evil','/k4k-app/credits?plan=__proto__&payment=pix'])assert.equal(studioDestination(bad),'/k4k-app/dashboard');
 });
