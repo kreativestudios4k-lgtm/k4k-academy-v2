@@ -16,7 +16,8 @@ export default function LandingRebuild(){
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
  const nav=[
   {text:tr('Home','Início','Inicio'),href:'/'},
-  {text:tr('Image – Video','Imagem – Vídeo','Imagen – Vídeo'),href:'/k4k-app/create'},
+  {text:tr('Image','Imagem','Imagen'),href:'/k4k-app/image'},
+  {text:tr('Video','Vídeo','Vídeo'),href:'/k4k-app/video'},
   {text:'K4K Motion',href:'/k4k-app/motion'}
  ];
  return <div className="k4k-rebuild">
