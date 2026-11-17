@@ -117,7 +117,7 @@ export default function HiggsfieldConnectionPage(){
     <p style={{fontSize:14,lineHeight:1.6}}>Restaurant and pizza video: 4.77 seconds, billed as 5 · 480p · estimated $1.59 (limit $1.60). Replace only the central foreground player using reference image 1. Prompt contains no person names. Other players and the setting stay unchanged.</p>
     <p style={{fontSize:13,color:'#bac6ba'}}>Owner-only, preview-only, one paid submission at most. The original failed test remains closed.</p>
     <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
-     <button type="button" disabled={secondBusy} onClick={()=>secondRequest('POST')} style={{background:'#a3ff9b',border:0,color:'#142414',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Run one new $1.59 test</button>
+     <button type="button" disabled title="The second paid test has already completed successfully." style={{background:'#506052',border:0,color:'#e0e8df',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Second paid test completed</button>
      <button type="button" disabled={secondBusy} onClick={()=>secondRequest('GET')} style={{background:'transparent',border:'1px solid #a3ff9b',color:'#a3ff9b',padding:'12px 16px',fontWeight:800,borderRadius:10}}>Check second test status</button>
     </div>
     {secondResult&&<div role="status" style={{marginTop:14,padding:12,border:'1px solid #466046',borderRadius:10}}>
