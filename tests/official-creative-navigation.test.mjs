@@ -10,19 +10,18 @@ const shell=read('app/k4k-app/PreviewShell.js');
 const homeCss=read('app/k4k-app/creative-home.css');
 const studioCss=read('app/k4k-app/create/create.css');
 const catalog=read('lib/creation-studio-catalog.mjs');
-test('official creative routes keep tools distinct while separate template pages redirect to Motion',()=>{
+test('official creative tools stay distinct, while the old Templates pages redirect to Motion',()=>{
  for(const route of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion'])assert.ok(home.includes(route),route);
- for(const route of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion'])assert.ok(motion.includes(route),route);
- assert.doesNotMatch(home,/href="\\/k4k-app\\/motion\\/explore"/);
- assert.doesNotMatch(motion,/href="\\/k4k-app\\/motion\\/explore"/);
- assert.match(read('app/k4k-app/motion/explore/page.js'),/redirect\\('\\/k4k-app\\/motion'\\)/);
- assert.match(read('app/templates/page.js'),/redirect\\('\\/k4k-app\\/motion'\\)/);
- assert.match(motion,/khm-motion-library/);
+ assert.ok(motion.includes('khm-motion-library'));
+ assert.ok(!home.includes('href="/k4k-app/motion/explore"'));
+ assert.ok(!motion.includes('href="/k4k-app/motion/explore"'));
+ assert.ok(read('app/k4k-app/motion/explore/page.js').includes("redirect('/k4k-app/motion')"));
+ assert.ok(read('app/templates/page.js').includes("redirect('/k4k-app/motion')"));
  const image=read('app/k4k-app/image/page.js'),video=read('app/k4k-app/video/page.js');
  assert.match(image,/kind=image&model=/);assert.match(video,/kind=video&model=/);
- assert.match(image,/\\['nano_banana_2','flux_3_image'\\]/);
- assert.match(video,/\\['seedance_2_5','kling4_0','wan-prime'\\]/);
- assert.match(studio,/new URLSearchParams\\(window.location.search\\)/);
+ assert.ok(image.includes("['nano_banana_2','flux_3_image']"));
+ assert.ok(video.includes("['seedance_2_5','kling4_0','wan-prime']"));
+ assert.ok(studio.includes('new URLSearchParams(window.location.search)'));
 });
 test('hero typography and cards adapt to desktop tablet and mobile viewports',()=>{
  assert.match(homeCss,/\.k4k-hf-home \.khf-hero-copy h1\{white-space:normal/);
