@@ -39,7 +39,7 @@ export default function K4KDashboard(){
   load();const onFocus=()=>{if(document.visibilityState==='visible')load()};document.addEventListener('visibilitychange',onFocus);
   return()=>{mounted=false;document.removeEventListener('visibilitychange',onFocus)}
  },[user?.id]);
- function create(){const p=prompt.trim();const href=kind==='image'?'/k4k-app/image':kind==='motion'?'/k4k-app/motion':'/k4k-app/video';if(p){try{sessionStorage.setItem('k4k-dashboard-draft',JSON.stringify({prompt:p,kind,createdAt:Date.now()}))}catch{}}router.push(href)}
+ function create(){const p=prompt.trim();const href=kind==='image'?'/k4k-app/create?kind=image&from=dashboard':kind==='motion'?'/k4k-app/motion':'/k4k-app/create?kind=video&from=dashboard';if(p&&kind!=='motion'){try{sessionStorage.setItem('k4k-dashboard-draft',JSON.stringify({prompt:p,kind,createdAt:Date.now()}))}catch{}}router.push(href)}
  const name=(user?.user_metadata?.full_name||user?.email?.split('@')[0]||'Creator').split(' ')[0];
  const active=projects.filter(p=>p.status==='processing'||p.status==='queued');
  const visible=projects.filter(p=>(labels[p.model]||'K4K creation').toLowerCase().includes(search.toLowerCase()));
