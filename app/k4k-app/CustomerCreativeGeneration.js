@@ -48,6 +48,6 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,ref
    </div>}
   {jobs.some(j=>j.status==='processing'||j.status==='queued')&&<div className="kcs-job-status"><span>Generation in progress</span><button disabled={busy} onClick={()=>attempt(async()=>{const active=jobs.find(j=>j.status==='processing'||j.status==='queued');if(active)await refresh(active.id);})}>Check progress</button></div>}<a className="kcs-library-action" href="/k4k-app/videos">Open my generations</a>
   {info&&<p role="status" style={{fontSize:13}}>{info}</p>}
-  {result&&<a href={result.url} target="_blank" rel="noopener noreferrer" style={{color:'#d6ff69',textDecoration:'underline'}}>Download private {result.kind}</a>}
+  {result&&<a href={result.url} target="_blank" rel="noopener noreferrer" style={{color:'#ececef',textDecoration:'underline'}}>Download private {result.kind}</a>}
  </section>;
 }
