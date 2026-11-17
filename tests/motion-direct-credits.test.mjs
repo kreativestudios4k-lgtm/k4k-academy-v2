@@ -23,7 +23,7 @@ test('private media verification and signed final credit confirmation still gate
  assert.match(checkout,/request\('submit'/);
  assert.match(checkout,/quote\.credits/);
  assert.match(checkout,/exact confirmed charge/);
- assert.match(checkout,/busy\?'Preparing…':'Generate'/);
+ assert.match(checkout,/busy\?'Checking files…':'Generate · '/);
  assert.match(checkout,/Confirm & Generate ·/);
  assert.doesNotMatch(checkout,/Prepare verified quote/);
 });
