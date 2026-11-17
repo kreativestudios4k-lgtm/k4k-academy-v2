@@ -9,13 +9,16 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[]}){
- const [templateId,setTemplateId]=useState(''),[consent,setConsent]=useState(false);
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
+ const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const selectedTemplate=templates.find(t=>t.id===templateId);
+ const initialTemplate=templates.find(t=>t.id===initialTemplateId);
+ const initialCast=templateCast(initialTemplate);
+ const initialSlots=initialCast.verified?initialCast.count:1;
  const source=selectedTemplate?generationReference(selectedTemplate):null;
  const rates={'480p':0.154,'720p':0.3446,'1080p':0.8346};
- const [video,setVideo]=useState(null),[images,setImages]=useState([null]),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
- const [targets,setTargets]=useState(['']),[main,setMain]=useState(0),[direction,setDirection]=useState('');
+ const [video,setVideo]=useState(null),[images,setImages]=useState(()=>Array(initialSlots).fill(null)),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
+ const [targets,setTargets]=useState(()=>Array(initialSlots).fill('')),[main,setMain]=useState(0),[direction,setDirection]=useState('');
  let prompt='',castError='';try{prompt=buildDirectorPrompt({targets,main,direction});}catch(e){castError=e.message;}
  const castReady=!!prompt&&images.length===targets.length&&images.every(Boolean);
  const actionLock=useRef(false),uploaded=useRef(null);
@@ -87,7 +90,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCred
  }
  return <main className="khm-root">
   <div className="khm-studio-layout">
-   <nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/explore">Explore</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/explore">Explore</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>
+   <nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/motion/explore">Explore templates</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/motion/explore">Explore templates</Link><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
    <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. Preview the credit cost before you generate. Files remain on this device until you choose Upload and verify; verification saves them privately without starting a generation.</p>
