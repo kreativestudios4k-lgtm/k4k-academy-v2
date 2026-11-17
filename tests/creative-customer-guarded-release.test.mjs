@@ -16,7 +16,7 @@ test('new customer models are default denied, independent from owner-only QA and
   assert.equal(creativeCustomerRelease(base,id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  }
  assert.equal(creativeCustomerRelease(base,'seedance_2_5','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
- assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true'},'kling4_0','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
+ assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true'},'kling4_0','0ef1af08-4df8-4858-967b-eac1a16f9f2c'),true);
  assert.equal(creativeCustomerRelease({...base,K4K_LIVE_CREDIT_ISOLATION_READY:'',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true',K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease(base,'kling4_0','11111111-1111-4111-8111-111111111111'),false);
  assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_OWNER_PILOT_ONLY:'false'},'kling4_0','11111111-1111-4111-8111-111111111111'),true);
