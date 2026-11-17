@@ -9,7 +9,7 @@ test('clock advance is preview-only, owner-authenticated and hardcoded to a sing
  assert.doesNotMatch(source,/sk_live_|createMembershipStore|studio_credit_accounts|k4k_apply_invoice_event/);
 });
 test('clock refuses arbitrary future time or clock id from the browser',()=>{
- assert.match(source,/body\.confirmation!=='ADVANCE_TEST_CLOCK_ONCE'/);
+ assert.match(source,/body\?\.confirmation!=='ADVANCE_TEST_CLOCK_ONCE'/);
  assert.match(source,/Object\.keys\(body\)\.length!==1/);
  assert.match(source,/clock\.frozen_time!==INITIAL_FROZEN/);
  assert.match(source,/clock\.frozen_time>=RENEW_AT/);
