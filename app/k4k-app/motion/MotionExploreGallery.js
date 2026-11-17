@@ -1,7 +1,7 @@
 'use client';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import Link from 'next/link';
-import {ArrowRight,CheckCircle2,Clapperboard,Film,ImagePlus,Play,Search,Volume2,VolumeX} from 'lucide-react';
+import {ArrowRight,CheckCircle2,Clapperboard,Film,ImagePlus,Play,Search,Volume2,VolumeX,Maximize2,X} from 'lucide-react';
 import catalogue from '../template-catalogue.json';
 import {generationReference} from '../../../lib/template-generation.mjs';
 import {useK4KLocale} from '../locale';
@@ -12,7 +12,7 @@ const ready=t=>{const r=generationReference(t);return r.supported&&r.seconds>=4&
 export default function MotionExploreGallery(){
  const {locale}=useK4KLocale();
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
- const [selected,setSelected]=useState(templates[0]?.id||null),[query,setQuery]=useState(''),[filter,setFilter]=useState('all'),[sound,setSound]=useState(false);
+ const [selected,setSelected]=useState(templates[0]?.id||null),[query,setQuery]=useState(''),[filter,setFilter]=useState('all'),[sound,setSound]=useState(false),[previewOpen,setPreviewOpen]=useState(false);
  const video=useRef(null);
  const shown=useMemo(()=>templates.filter(t=>(filter==='all'||(filter==='ready'?ready(t):!ready(t)))&&t.title.toLowerCase().includes(query.trim().toLowerCase())),[query,filter]);
  const current=templates.find(t=>t.id===selected)||templates[0];
@@ -38,14 +38,14 @@ export default function MotionExploreGallery(){
      <div className="kmx-field"><label>{tr('Selected scene','Cena selecionada','Escena seleccionada')}</label><strong>{current.title}</strong><small>{Math.round(current.durationSeconds||0)}s · {tr('Reference video','Vídeo de referência','Vídeo de referencia')}</small></div>
      <div className="kmx-field"><label>{tr('Character references','Referências de personagens','Referencias de personajes')}</label><span className="kmx-ref"><ImagePlus size={20}/>{Math.min(8,Math.max(1,Number(current.requiredImages||current.peopleCount||1)))} {tr('photo slots prepared in Director Studio','espaços de fotos no Director Studio','espacios de fotos en Director Studio')}</span></div>
      <p className="kmx-note">{tr('Previewing does not use credits. Generation requires a verified source, character photos and an approved quote.','Prévia sem consumo de créditos. Para gerar, confirme o vídeo, fotos e custo.','Vista previa sin créditos. Para generar, confirma el vídeo, las fotos y el coste.')}</p>
-     {playable?<Link className="kmx-generate" href={'/k4k-app/motion?template='+encodeURIComponent(current.id)}><Play size={17}/>{tr('Use this motion','Usar este movimento','Usar este movimiento')}<ArrowRight size={17}/></Link>:<span className="kmx-unavailable">{tr('Preview only · generation unavailable for this length','Somente prévia · geração indisponível para esta duração','Solo vista previa · generación no disponible para esta duración')}</span>}
+     {playable?<Link className="kmx-generate" href={'/k4k-app/motion?template='+encodeURIComponent(current.id)}><Play size={17}/>{tr('Recreate','Recriar','Recrear')}<ArrowRight size={17}/></Link>:<span className="kmx-unavailable">{tr('Preview only · generation unavailable for this length','Somente prévia · geração indisponível para esta duração','Solo vista previa · generación no disponible para esta duración')}</span>}
      <Link className="kmx-upload" href="/k4k-app/motion">{tr('Upload my own video instead','Enviar meu próprio vídeo','Subir mi propio vídeo')}</Link>
     </aside>
     <div className="kmx-content">
      <section className="kmx-preview" aria-label="Selected template preview">
       <div className="kmx-player">
        <video key={current.id} ref={video} src={current.videoUrl} poster={current.posterUrl||undefined} playsInline loop muted preload="metadata" onClick={()=>setSound(v=>!v)}/>
-       <button type="button" className="kmx-sound" onClick={()=>setSound(v=>!v)} aria-label={sound?'Mute preview':'Unmute preview'}>{sound?<Volume2 size={19}/>:<VolumeX size={19}/>}</button>
+       <button type="button" className="kmx-sound" onClick={()=>setSound(v=>!v)} aria-label={sound?'Mute preview':'Unmute preview'}>{sound?<Volume2 size={19}/>:<VolumeX size={19}/>}</button><button type="button" className="kmx-fullscreen" onClick={()=>setPreviewOpen(true)} aria-label="Open full screen template preview"><Maximize2 size={19}/></button>
       </div>
       <div className="kmx-preview-meta"><span className="kmx-eyebrow">SELECTED TEMPLATE</span><h2>{current.title}</h2><p>{Math.round(current.durationSeconds||0)}s · {tr('Keep the motion, change the cast','Mantenha o movimento, troque o elenco','Mantén el movimiento, cambia el reparto')}</p>{playable&&<span className="kmx-ready"><CheckCircle2 size={15}/> {tr('Ready to customise','Pronto para personalizar','Listo para personalizar')}</span>}</div>
      </section>
@@ -56,5 +56,6 @@ export default function MotionExploreGallery(){
     </div>
    </div>
   </div>
+  {previewOpen&&<div className="kmx-recreate-overlay" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setPreviewOpen(false)}}><section role="dialog" aria-modal="true" aria-label="Preview template and recreate" className="kmx-recreate-dialog"><button type="button" className="kmx-recreate-close" aria-label="Close full screen preview" onClick={()=>setPreviewOpen(false)}><X size={20}/></button><video src={current.videoUrl} poster={current.posterUrl||undefined} controls playsInline autoPlay loop className="kmx-recreate-video"/><div className="kmx-recreate-bottom"><strong>{current.title}</strong><small>{Math.ceil(current.durationSeconds||0)}s · K4K Motion</small>{playable?<Link href={'/k4k-app/motion?template='+encodeURIComponent(current.id)} className="kmx-generate"><Play size={17}/>Recreate<ArrowRight size={16}/></Link>:<p>Preview only · generation unavailable for this duration</p>}</div></section></div>}
  </main>;
 }

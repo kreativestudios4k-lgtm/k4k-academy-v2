@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
 import Link from 'next/link';
+import {ChevronDown,Search,X,Play,Upload} from 'lucide-react';
 import CustomerGeneration from './customer-generation';
 import './motion-wide.css';
 import DirectorView,{LocalMedia} from './director-view';
@@ -11,6 +12,7 @@ import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
 export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
+ const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
  const initialCast=templateCast(initialTemplate);
@@ -70,6 +72,12 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    setResult(body);
   }catch(e){setError(e.message||'Unable to verify media.')}finally{actionLock.current=false;setBusy(false)}
  }
+ function selectSourceTemplate(id){
+  setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');setAssetsOpen(false);
+  const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;
+  setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);
+ }
+ const filteredAssets=templates.filter(t=>t.title.toLowerCase().includes(assetsQuery.toLowerCase().trim()));
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
@@ -81,7 +89,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
    <p className="khm-subtitle">Don't follow the trend. <strong>Create it.</strong> Upload a reference video or choose a scene, cast your characters and direct the motion. See the credit cost instantly before you generate. Files remain on this device until you choose Upload and verify; verification saves them privately without starting a generation.</p>
-   {customer&&<label className="khm-source-selector" style={{display:'block',marginTop:24}}>Choose your source<select aria-label="Source template" disabled={busy} value={templateId} onChange={e=>{const id=e.target.value;setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');const item=templates.find(t=>t.id===id),cast=templateCast(item);const n=cast.verified?cast.count:1;setImages(Array(n).fill(null));setTargets(Array(n).fill(''));setMain(0);}} style={{display:'block',width:'100%',padding:14,marginTop:10,borderRadius:10,background:'#111b16',color:'white',border:'1px solid #415b47'}}><option value="">Upload my own video</option>{templates.map(t=><option key={t.id} value={t.id}>{t.title} · {Math.ceil(generationReference(t).seconds)}s</option>)}</select></label>}
+   {customer&&<div className="khm-source-selector"><label>Choose your source</label><button type="button" className="khm-source-trigger" onClick={()=>{setAssetsQuery('');setAssetsTab('presets');setAssetsOpen(true)}} disabled={busy}><span>{selectedTemplate?.title||'Upload my own video'}</span><span>Browse presets and uploads</span><ChevronDown size={18}/></button></div>}
    <div className="khm-video-stage" style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:18,marginTop:30}}>
     <section className="khm-video-panel" style={panel}>
      <h2 style={{fontSize:20}}>01 · Source video</h2>
@@ -122,5 +130,6 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt} media={castReady&&(!customer||consent)&&result?.verifiedInputStorage&&uploaded.current?{videoPath:uploaded.current.videoPath,referencePaths:uploaded.current.referencePaths}:null} resolution={resolution} estimatedCredits={credits}/>
    </section>
   </div>
+ {assetsOpen&&<div className="khm-assets-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAssetsOpen(false)}}><section className="khm-assets-dialog" role="dialog" aria-modal="true" aria-label="Choose motion reference video"><header><div><span>K4K MOTION · ASSETS</span><h2>Choose source video</h2></div><button aria-label="Close asset picker" type="button" onClick={()=>setAssetsOpen(false)}><X size={21}/></button></header><div className="khm-assets-tabs"><button type="button" className={assetsTab==='uploads'?'active':''} onClick={()=>setAssetsTab('uploads')}>Uploads</button><button type="button" className={assetsTab==='presets'?'active':''} onClick={()=>setAssetsTab('presets')}>Presets · {templates.length}</button><Link href="/k4k-app/motion/explore">Explore all</Link></div>{assetsTab==='presets'&&<label className="khm-assets-search"><Search size={16}/><input placeholder="Find a motion template" aria-label="Search motion templates" value={assetsQuery} onChange={e=>setAssetsQuery(e.target.value)}/></label>}<div className="khm-assets-grid"><button type="button" className="khm-asset-upload" onClick={()=>selectSourceTemplate('')}><Upload size={28}/><strong>Use my own video</strong><small>4–30s MP4 · max 50 MB</small></button>{assetsTab==='presets'&&filteredAssets.map(t=><button type="button" className={'khm-asset-card'+(t.id===templateId?' active':'')} key={t.id} onClick={()=>selectSourceTemplate(t.id)}><span className="khm-asset-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span><Play size={14}/></span></span><strong>{t.title}</strong><small>{Math.ceil(generationReference(t).seconds)}s</small></button>)}</div><footer>Preset videos are only available where K4K has a verified reference. Selecting a preset never charges credits.</footer></section></div>}
  </main>;
 }
