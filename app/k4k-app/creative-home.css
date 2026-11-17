@@ -361,3 +361,100 @@
 @media(prefers-reduced-motion:reduce){
  .k4k-hf-home .khf-reference-sculpture{animation:none}
 }
+
+
+/* K4K Motion atmosphere — use our own original clips as a subtle site-wide
+   background.  One muted video plays at a time to avoid loading simultaneous
+   decoders and the high-contrast foreground stays readable. */
+.k4k-hf-home{
+ isolation:isolate;
+ position:relative;
+ background:#050506;
+}
+.k4k-hf-home .khf-site-video-bg{
+ position:fixed;
+ inset:0;
+ overflow:hidden;
+ z-index:0;
+ pointer-events:none;
+ background:
+  radial-gradient(ellipse 75% 65% at 50% 35%,#35353b 0%,#101014 54%,#050506 100%);
+}
+.k4k-hf-home .khf-site-bg-video{
+ position:absolute;
+ display:block;
+ width:122%;
+ height:122%;
+ inset:-11%;
+ object-fit:cover;
+ filter:blur(34px) grayscale(1) brightness(.58) contrast(1.18);
+ opacity:.35;
+ transform-origin:center;
+ animation:khf-originals-drift 22s ease-in-out infinite alternate;
+ pointer-events:none;
+}
+.k4k-hf-home .khf-site-video-overlay{
+ position:absolute;
+ inset:0;
+ background:
+  radial-gradient(ellipse 48% 45% at 49% 45%,#ffffff0e,transparent 75%),
+  linear-gradient(90deg,#050506b0 0%,#05050658 25%,#05050648 70%,#050506a6 100%),
+  linear-gradient(180deg,#050506a1 0%,#05050641 38%,#050506aa 100%);
+ pointer-events:none;
+}
+@keyframes khf-originals-drift{
+ from{transform:scale(1.06) translate3d(-1%,-1%,0)}
+ to{transform:scale(1.14) translate3d(2%,1.5%,0)}
+}
+.k4k-hf-home .khf-topbar{z-index:80}
+.k4k-hf-home main,
+.k4k-hf-home .khf-footer{position:relative;z-index:1}
+.k4k-hf-home .khf-reference-hero{
+ background:transparent!important;
+}
+.k4k-hf-home .khf-reference-frame{
+ background:linear-gradient(130deg,#05050638,#1b1b2118 48%,#0505064b)!important;
+}
+.k4k-hf-home .khf-reference-frame::after{
+ opacity:.55;
+}
+.k4k-hf-home .khf-reference-atmosphere,
+.k4k-hf-home .khf-reference-sculpture{display:none!important}
+.k4k-hf-home .khf-reference-headline{
+ z-index:5;
+ top:43%;
+ width:calc(100% - 9%);
+}
+.k4k-hf-home .khf-reference-headline h1{
+ position:relative;
+ color:#f8f8fa;
+ text-shadow:0 7px 40px #000c,0 2px 12px #000c;
+ letter-spacing:-.075em;
+ white-space:nowrap;
+}
+.k4k-hf-home .khf-reference-headline h1 span{color:#fff}
+.k4k-hf-home .khf-toolband{
+ background:rgba(13,13,16,.72);
+ backdrop-filter:blur(12px);
+}
+.k4k-hf-home .khf-model-section{
+ background:rgba(13,13,17,.77);
+ backdrop-filter:blur(12px);
+}
+.k4k-hf-home .khf-discover,
+.k4k-hf-home .khf-last{background:transparent}
+.k4k-hf-home .khf-footer{
+ background:rgba(6,6,9,.88);
+ backdrop-filter:blur(14px);
+}
+.k4k-hf-home .khf-model-card{background:rgba(22,22,27,.9)}
+@media(max-width:760px){
+ .k4k-hf-home .khf-site-bg-video{
+  filter:blur(27px) grayscale(1) brightness(.55) contrast(1.15);
+  opacity:.27;
+ }
+ .k4k-hf-home .khf-reference-headline{top:39%;width:calc(100% - 28px)}
+}
+@media(prefers-reduced-motion:reduce){
+ .k4k-hf-home .khf-site-bg-video{animation:none}
+}
