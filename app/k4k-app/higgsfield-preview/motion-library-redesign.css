@@ -64,3 +64,9 @@
 .khm-assets-dialog button{color:inherit}
 @media(max-width:1050px){.khm-studio-layout{grid-template-columns:minmax(270px,320px) minmax(0,1fr)}.khm-lib-content{grid-template-columns:1fr}.khm-lib-feature{display:none}}
 @media(max-width:760px){.khm-studio-layout{display:flex!important;flex-direction:column;gap:12px;padding:0 10px 20px!important}.khm-studio-layout>*{width:100%;box-sizing:border-box}.khm-topnav{order:0}.khm-motion-control-title{order:1}.khm-motion-library{order:2;position:static;min-height:0;padding:14px}.khm-source-selector{order:3}.khm-video-stage{order:4}.khm-cast-panel{order:5}.khm-direction-panel{order:6}.khm-quality-panel{order:7}.khm-generate-panel{order:8}.khm-lib-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.khm-lib-tabs{gap:8px;flex-wrap:wrap}.khm-lib-top{align-items:stretch}.khm-lib-search{width:100%}.khm-lib-search input{width:100%}}
+
+/* Source video must scroll normally with the editor, never float or slide. */
+.khm-root .khm-studio-layout .khm-video-stage{position:static!important;top:auto!important;transform:none!important;transition:none!important;align-self:start}
+.khm-root .khm-video-panel{min-height:0!important;box-shadow:none!important}
+.khm-root .khm-video-panel video{display:block;position:static!important;width:100%!important;max-height:165px!important;min-height:0!important;object-fit:contain;transform:none!important;transition:none!important}
+@media(max-width:760px){.khm-root .khm-studio-layout .khm-video-stage{position:static!important}}
