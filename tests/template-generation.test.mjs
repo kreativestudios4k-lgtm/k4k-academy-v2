@@ -1,2 +1,19 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';import {generationReference} from '../lib/template-generation.mjs';import {motionCreditPreview} from '../lib/generation-experience.mjs';
-const catalogue=JSON.parse(readFileSync(new URL('../app/k4k-app/template-catalogue.json',import.meta.url),'utf8'));test('all 32 catalogue templates have supported generation references and matching estimates',()=>{const all=[...catalogue.trending,...catalogue.discoveryPreviews];assert.equal(all.length,32);for(const item of all){const r=generationReference(item);assert.equal(r.supported,true,item.id);assert.ok(motionCreditPreview('lite',r.seconds).credits>0);if(item.durationSeconds>15)assert.notEqual(r.url,item.videoUrl);if(r.trimmed)assert.equal(r.seconds,14.8)}});test('invalid duration fails closed',()=>{assert.equal(generationReference({videoUrl:'https://example.com/video.mp4',durationSeconds:15.01}).supported,false)});
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {generationReference} from '../lib/template-generation.mjs';
+import {motionCreditPreview} from '../lib/generation-experience.mjs';
+const cat=JSON.parse(readFileSync(new URL('../app/k4k-app/template-catalogue.json',import.meta.url),'utf8'));
+test('ten supplied K4K Originals have verified preview lengths and fail closed outside template generation limits',()=>{
+ assert.equal(cat.trending.length,0);
+ assert.equal(cat.discoveryPreviews.length,10);
+ for(const item of cat.discoveryPreviews){
+  const r=generationReference(item);
+  assert.equal(r.supported,item.durationSeconds<=15,item.id);
+  assert.equal(item.previewOnly,item.durationSeconds>15,item.id);
+  if(r.supported)assert.ok(motionCreditPreview('lite',r.seconds).credits>0);
+ }
+});
+test('invalid duration fails closed',()=>{
+ assert.equal(generationReference({videoUrl:'https://example.com/video.mp4',durationSeconds:15.01}).supported,false);
+});
