@@ -1,1 +1,61 @@
 .kcs-root{min-height:100vh;background:#08090b;color:#f5f5f6;font:14px/1.5 Arial,Helvetica,sans-serif}.kcs-root *{box-sizing:border-box}.kcs-root a{text-decoration:none;color:inherit}.kcs-nav{height:70px;border-bottom:1px solid #25272d;display:flex;justify-content:space-between;align-items:center;padding:0 max(4%,calc((100vw - 1420px)/2));gap:20px}.kcs-brand{font-size:23px;font-weight:900;letter-spacing:-1.5px}.kcs-brand span{color:#a3a6af}.kcs-nav nav{display:flex;gap:24px;align-items:center;color:#b6b9c3;font-size:12px;font-weight:700}.kcs-nav nav a:last-child{display:flex;align-items:center;gap:6px;padding:10px 15px;background:#24262c;color:white;border:1px solid #393b43;border-radius:100px}.kcs-shell{max-width:1440px;margin:auto;padding:48px 4% 90px}.kcs-hero{border-radius:26px;padding:49px 50px 30px;background:radial-gradient(ellipse at 85% 10%,#2a2b37 0%,#15161a 40%,#101114 70%);border:1px solid #292c35;margin-bottom:25px}.kcs-eyebrow,.kcs-section-label{display:flex;align-items:center;gap:9px;letter-spacing:2px;color:#a7aab4;font-size:11px;font-weight:800}.kcs-hero h1{font-size:clamp(35px,4vw,64px);letter-spacing:-.058em;line-height:1.04;margin:18px 0 15px}.kcs-hero p{font-size:15px;color:#a8aab3;max-width:640px}.kcs-segments{display:inline-flex;border-radius:13px;padding:5px;border:1px solid #3e4048;background:#121418;gap:4px;margin-top:22px}.kcs-segments button{display:flex;align-items:center;gap:10px;padding:12px 26px;border:0;background:transparent;color:#b4b7c2;border-radius:9px;font-weight:800;cursor:pointer}.kcs-segments button.selected{background:#f0f0f2;color:#121318}.kcs-layout{display:grid;grid-template-columns:minmax(300px,.88fr) minmax(0,1.42fr);gap:22px}.kcs-models,.kcs-compose{background:#131418;border:1px solid #2a2c33;border-radius:22px;padding:26px;min-width:0}.kcs-section-label span{margin-left:auto;letter-spacing:0;background:#282a31;padding:3px 9px;border-radius:50px}.kcs-model-grid{display:grid;gap:9px;margin-top:20px}.kcs-model{display:flex;text-align:left;align-items:flex-start;width:100%;gap:13px;background:#191b20;border:1px solid #30323b;color:#f4f4f6;border-radius:14px;padding:15px 12px;cursor:pointer}.kcs-model:hover{border-color:#797b85}.kcs-model.current{background:#252731;border-color:#dedee4;box-shadow:inset 0 0 0 1px #dedee439}.kcs-model-icon{display:grid;place-items:center;flex:0 0 39px;height:39px;border-radius:12px;background:#30333c}.kcs-model-info{display:grid;gap:2px;flex:1;min-width:0}.kcs-model-info strong{font-size:14px}.kcs-model-info small{color:#d0cdd0;font-size:11px}.kcs-model-info em{font-size:12px;font-style:normal;color:#9da0aa;margin-top:3px}.kcs-indicator{width:8px;height:8px;border-radius:50%;background:#71727a;margin-top:7px;flex:0 0 auto}.kcs-indicator.active{background:#86daa7}.kcs-indicator.api-pilot{background:#e8bf75}.kcs-compose-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.kcs-state{display:flex;align-items:center;gap:5px;border-radius:100px;padding:6px 10px;font-size:10px;font-weight:800;background:#24262a;color:#a3a7b0}.kcs-state.active{color:#8bd6a5;background:#193026}.kcs-state.api-pilot{color:#e6c18c;background:#342b1e}.kcs-compose h2{font-size:clamp(27px,3vw,41px);letter-spacing:-1.4px;margin:22px 0 4px}.kcs-desc{color:#a9acb5;margin:0 0 26px}.kcs-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.kcs-fields label,.kcs-prompt-label{font-size:12px;font-weight:800;color:#bfc0c8;display:flex;flex-direction:column;gap:9px}.kcs-fields select,.kcs-prompt-label textarea{border:1px solid #383a42;background:#1c1e24;color:#fff;border-radius:11px;padding:13px 14px;font:inherit;outline:none;width:100%}.kcs-fields select:focus,.kcs-prompt-label textarea:focus{border-color:#aaaebf}.kcs-prompt-label{margin:23px 0 20px}.kcs-prompt-label textarea{min-height:148px;resize:vertical;line-height:1.55}.kcs-reference-head{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:#c5c6cc;margin-bottom:12px}.kcs-reference-head span{color:#91949f}.kcs-refs{display:flex;flex-wrap:wrap;gap:10px}.kcs-thumb,.kcs-add{width:86px;height:95px;border-radius:11px;border:1px dashed #52535e;position:relative;overflow:hidden;background:#252730}.kcs-thumb img{width:100%;height:100%;object-fit:cover}.kcs-thumb button{position:absolute;right:3px;top:3px;border:0;border-radius:50%;background:#000c;color:#fff;display:grid;place-items:center;width:25px;height:25px;cursor:pointer}.kcs-add{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:4px;cursor:pointer;color:#aeb1bb;padding:4px;text-align:center}.kcs-add span{font-size:9px;line-height:1.3}.kcs-add input{position:absolute;width:1px;height:1px;opacity:0}.kcs-note{display:flex;gap:10px;margin:26px 0 20px;color:#b8bac5;background:#1c1e23;border:1px solid #30333a;border-radius:12px;padding:14px}.kcs-note svg{flex-shrink:0}.kcs-note p{margin:0;font-size:12px;line-height:1.5}.kcs-actions{display:flex;flex-wrap:wrap;gap:10px}.kcs-actions button,.kcs-actions a,.kcs-disabled{padding:14px 17px;border-radius:11px;display:flex;align-items:center;justify-content:center;gap:9px;font-weight:800;font-size:12px}.kcs-copy{border:1px solid #494b55;background:#282a32;color:#fff;cursor:pointer}.kcs-launch{background:#f1f1f3;color:#111!important}.kcs-disabled{background:#24262a;border:1px solid #333640;color:#9fa1a9}.kcs-error{font-size:12px;color:#ffb7ae}.kcs-root :focus-visible{outline:2px solid #f0f0f4;outline-offset:3px}@media(max-width:880px){.kcs-layout{grid-template-columns:1fr}.kcs-model-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kcs-hero{padding:35px}}@media(max-width:640px){.kcs-shell{padding:20px 3.5% 70px}.kcs-hero{padding:27px 22px;margin-bottom:14px;border-radius:18px}.kcs-hero h1{font-size:40px}.kcs-nav{padding:0 4%;height:62px}.kcs-brand{font-size:20px}.kcs-nav nav{gap:10px;font-size:10px}.kcs-nav nav a:first-child{display:none}.kcs-nav nav a:last-child{padding:8px 10px}.kcs-models,.kcs-compose{padding:19px;border-radius:18px}.kcs-model-grid{grid-template-columns:1fr}.kcs-fields{gap:9px}.kcs-fields select{padding:12px 8px}.kcs-segments{width:100%}.kcs-segments button{flex:1;justify-content:center;padding:11px}.kcs-actions button,.kcs-actions a,.kcs-disabled{width:100%}}
+/* Official K4K studio navigation and typography — original dark/lime design */
+.kcs-root{--kcs-accent:#d6ff69;font-size:15px;line-height:1.58;overflow-x:clip}
+.kcs-nav{height:auto;min-height:76px;padding:12px max(4%,calc((100vw - 1420px)/2));gap:clamp(15px,2.5vw,35px);flex-wrap:wrap}
+.kcs-brand{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-size:22px;flex:0 0 auto}
+.kcs-brand span{color:#d6ff69}
+.kcs-nav nav{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2.1vw,32px);font-size:14px;flex:1 1 auto;min-width:0}
+.kcs-nav nav a{display:inline-flex;align-items:center;min-height:44px;padding:8px 0;color:#d9dce0;white-space:nowrap;border-bottom:2px solid transparent}
+.kcs-nav nav a:last-child{padding:8px 0;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;color:#d9dce0}
+.kcs-nav nav a:hover,.kcs-nav nav a[aria-current=page]{color:#d6ff69;border-bottom-color:#d6ff69}
+.kcs-library-link{flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;padding:10px 15px;border:1px solid #535960;border-radius:10px;font-size:12px;font-weight:800}
+.kcs-library-link:hover{border-color:#d6ff69;color:#d6ff69}
+.kcs-shell{padding-top:35px}
+.kcs-hero{padding:clamp(28px,4vw,55px);background:radial-gradient(ellipse at 87% 12%,#252d25 0%,#181b20 44%,#111317 84%);border-color:#383d41}
+.kcs-eyebrow{color:#d6ff69;font-size:11px;letter-spacing:1.4px}
+.kcs-hero h1{font-size:clamp(36px,4.2vw,61px);line-height:1.1;max-width:920px;letter-spacing:-.054em;text-wrap:balance}
+.kcs-hero p{font-size:16px;line-height:1.7;color:#c0c6c9;max-width:760px}
+.kcs-segments{border-radius:12px}
+.kcs-segments button{font-size:14px;min-height:46px}
+.kcs-segments button.selected{background:#d6ff69;color:#11170f}
+.kcs-layout{grid-template-columns:minmax(250px,.78fr) minmax(0,1.45fr);gap:20px}
+.kcs-models,.kcs-compose{border-color:#373b41;background:#15171c}
+.kcs-model{padding:15px;border-color:#373d41;background:#1b1f24;min-height:74px}
+.kcs-model.current{border-color:#d6ff69;background:#263027;box-shadow:inset 0 0 0 1px #d6ff6930}
+.kcs-model-info strong{font-size:15px;line-height:1.35}
+.kcs-model-info small{font-size:12px;color:#b8c0c4}
+.kcs-model-info em{font-size:12px;line-height:1.5;color:#b0b8bd}
+.kcs-compose h2{line-height:1.14}
+.kcs-desc{font-size:14px;line-height:1.65;color:#b9c1c5}
+.kcs-fields label,.kcs-prompt-label{font-size:13px;color:#d5d9dd}
+.kcs-fields select,.kcs-prompt-label textarea{min-height:47px;border-color:#51575d;font-size:14px;background:#22262c}
+.kcs-prompt-label textarea{min-height:155px}
+.kcs-section-label{letter-spacing:1.15px;color:#c5cad0}
+.kcs-launch{background:#d6ff69;color:#131811!important}
+.kcs-root :focus-visible{outline-color:#d6ff69}
+@media(max-width:1060px){
+ .kcs-layout{grid-template-columns:minmax(0,1fr)}
+ .kcs-model-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .kcs-nav{gap:10px 18px}
+ .kcs-nav nav{order:3;flex:1 1 100%;justify-content:flex-start;gap:clamp(14px,4vw,32px);overflow-x:auto;scrollbar-width:thin}
+}
+@media(max-width:640px){
+ .kcs-nav{padding:13px 16px;gap:9px 10px;min-height:70px}
+ .kcs-brand{font-size:18px}
+ .kcs-brand img{width:26px;height:26px}
+ .kcs-library-link{margin-left:auto;padding:8px 10px;font-size:11px}
+ .kcs-nav nav{gap:21px;font-size:13px;order:3;width:100%;padding-top:5px}
+ .kcs-nav nav a:first-child{display:inline-flex}
+ .kcs-nav nav a:last-child{display:inline-flex;padding:8px 0}
+ .kcs-shell{padding:20px 15px 65px}
+ .kcs-hero{padding:25px 20px}
+ .kcs-hero h1{font-size:clamp(32px,8.8vw,42px);line-height:1.08}
+ .kcs-hero p{font-size:14px;line-height:1.65}
+ .kcs-model-grid{grid-template-columns:minmax(0,1fr)}
+ .kcs-models,.kcs-compose{padding:19px}
+ .kcs-model-info strong{font-size:15px}
+ .kcs-fields{grid-template-columns:minmax(0,1fr)}
+ .kcs-fields select{font-size:16px;padding:12px}
+ .kcs-prompt-label textarea{font-size:16px}
+ .kcs-library-link svg{display:none}
+}

@@ -40,7 +40,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(homepage,/return <CreativeHome\/>/);
  const newHome=source('app/k4k-app/CreativeHome.js');
  assert.match(newHome,/DON’T FOLLOW/);
- assert.match(newHome,/\/k4k-app\/create/);
+ assert.match(newHome,/\/k4k-app\/image/);assert.match(newHome,/\/k4k-app\/video/);assert.match(newHome,/\/k4k-app\/motion/);
  const launch=source('app/k4k-app/CinematicLaunch.js');
  assert.doesNotMatch(launch,/\d{2}\.\d{2}\.\d{4}|PLANNED RELEASE|COMING SOON/);
  assert.match(launch,/STARTING FROM ONLY/);
