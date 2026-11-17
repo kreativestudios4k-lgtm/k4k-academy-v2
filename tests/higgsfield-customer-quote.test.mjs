@@ -48,3 +48,11 @@ test('quote expires after five minutes; future default dispatch remains disabled
  const q=prepareHiggsfieldCustomerQuote({job,userId,verifiedMedia,env,now});
  assert.throws(()=>verifyHiggsfieldCustomerQuote({job,userId,verifiedMedia,token:q.quoteToken,env,now:now+300001}),/QUOTE_EXPIRED/);
 });
+test('new input CDN passes quote preparation and verification with identical credit terms',()=>{
+ const current='https://d3snorpfx4xhv8.cloudfront.net/user_x/';
+ const updated={...job,input:{...job.input,video_url:current+'source.mp4',image_urls:[current+'photo.jpg']}};
+ const q=prepareHiggsfieldCustomerQuote({job:updated,userId,verifiedMedia,env});
+ assert.equal(q.credits,8);
+ assert.equal(verifyHiggsfieldCustomerQuote({job:updated,userId,verifiedMedia,token:q.quoteToken,env}).credits,8);
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:updated,userId,verifiedMedia,env:{...env,K4K_HIGGSFIELD_APPROVED_MEDIA_HOSTS:'d2ol7oe51mr4n9.cloudfront.net'}}),/UNTRUSTED_REFERENCE_URL/);
+});

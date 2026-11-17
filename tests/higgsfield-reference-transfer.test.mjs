@@ -32,3 +32,8 @@ test('private output replay recovers only identical bytes after previous upload'
   if(same)assert.equal((await run).outputPath,userId+'/'+jobId+'.mp4');else await assert.rejects(run,/OUTPUT_UPLOAD_FAILED/);
  }
 });
+test('accepts the authenticated November upload contract without allowing arbitrary CDN hosts',()=>{
+ const current={...link,upload_url:'https://fnf-api-input-prod-20250414194641741400000002.s3.amazonaws.com/file?signature=test',public_url:'https://d3snorpfx4xhv8.cloudfront.net/file'};
+ assert.equal(validateHiggsfieldUploadLink(current).publicUrl,current.public_url);
+ for(const public_url of ['https://other.cloudfront.net/file','https://d3snorpfx4xhv8.cloudfront.net.evil.example/file','https://d3snorpfx4xhv8.cloudfront.net/file?secret=x','http://d3snorpfx4xhv8.cloudfront.net/file'])assert.throws(()=>validateHiggsfieldUploadLink({...current,public_url}),/UNTRUSTED_UPLOAD_URL/);
+});
