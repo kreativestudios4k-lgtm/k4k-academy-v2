@@ -77,3 +77,21 @@ test('explicit 720p approval allows a 13-second video at 45 credits but not 14 s
  const at30=prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:30},env:{...approved,K4K_GENERATION_MAX_USD:'5'}});
  assert.equal(at30.credits,47);
 });
+
+test('Lite quote signs exact model, truncates source to 15 output seconds and rejects Ultra token replay',()=>{
+ const lite={...job,input:undefined,normalized_input:{...job.input,motionModel:'lite'}};
+ const allowed={...env,K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'true',K4K_GENERATION_MAX_USD:'5'};
+ const media30={...verifiedMedia,seconds:30};
+ const q=prepareHiggsfieldCustomerQuote({job:lite,userId,verifiedMedia:media30,env:allowed});
+ assert.equal(q.motionModel,'lite');
+ assert.equal(q.duration,15);
+ assert.equal(q.usd,1.1085);
+ assert.equal(q.credits,12);
+ assert.equal(verifyHiggsfieldCustomerQuote({job:lite,userId,verifiedMedia:media30,token:q.quoteToken,env:allowed}).motionModel,'lite');
+ assert.throws(()=>verifyHiggsfieldCustomerQuote({job:{...lite,normalized_input:{...lite.normalized_input,motionModel:'ultra'}},userId,verifiedMedia:media30,token:q.quoteToken,env:allowed}),/QUOTE_CHANGED/);
+ const ultra=prepareHiggsfieldCustomerQuote({job:{...lite,normalized_input:{...lite.normalized_input,motionModel:'ultra'}},userId,verifiedMedia:media30,env:allowed});
+ assert.equal(ultra.duration,30);
+ assert.equal(ultra.usd,4.62);
+ assert.equal(ultra.credits,47);
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:lite,userId,verifiedMedia:media30,env:{...allowed,K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'false'}}),/RATE_CARD_REVIEW_REQUIRED/);
+});
