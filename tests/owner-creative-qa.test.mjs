@@ -4,6 +4,7 @@ import {readFileSync} from 'node:fs';
 const route=readFileSync(new URL('../app/api/creative/owner-qa/route.js',import.meta.url),'utf8');
 const ui=readFileSync(new URL('../app/k4k-app/OwnerCreativeQA.js',import.meta.url),'utf8');
 const studio=readFileSync(new URL('../app/k4k-app/create/page.js',import.meta.url),'utf8');
+const internal=readFileSync(new URL('../app/k4k-app/owner-qa/page.js',import.meta.url),'utf8');
 const migration=readFileSync(new URL('../supabase/migrations/20261117130000_owner_creative_qa_jobs.sql',import.meta.url),'utf8');
 test('owner real-test route is token authenticated, single-owner and separately release gated',()=>{
  for(const v of ['auth.getUser(token)','HIGGSFIELD_PREVIEW_OWNER',"K4K_OWNER_CREATIVE_QA_ENABLED==='true'","!user||user.is_anonymous","FAL_KEY"])assert.ok(route.includes(v),v);
@@ -37,5 +38,6 @@ test('real test button explicitly acknowledges paid provider cost and does not c
  assert.match(ui,/not a guaranteed provider charge limit/);
  assert.match(ui,/credits are not charged/);
  assert.match(ui,/Run one real test/);
- assert.match(studio,/OwnerCreativeQA/);
+ assert.doesNotMatch(studio,/OwnerCreativeQA/);
+ assert.match(internal,/OwnerCreativeQA/);
 });
