@@ -30,8 +30,9 @@ export default function CreativeHome(){
  return <div className="k4k-hf-home">
    <header className="khf-topbar">
      <div className="khf-nav-inner">
-       <Link className="khf-brand" href="/k4k-app" aria-label="K4K APP Home"><img src="/k4k-mark.svg" width="36" height="36" alt=""/><strong>K4K<span> APP</span></strong></Link>
+       <Link className="khf-brand" href="/" aria-label="K4K APP Home"><img src="/k4k-mark.svg" width="36" height="36" alt=""/><strong>K4K<span> APP</span></strong></Link>
        <nav className="khf-desktop-links" aria-label={tr('Main menu','Menu principal','Menú principal')}>
+         <Link href="/" aria-current="page">{tr('Home','Início','Inicio')}</Link>
          
          <Link href="/k4k-app/image">{tr('Image','Imagem','Imagen')}</Link>
          <Link href="/k4k-app/video">{tr('Video','Vídeo','Vídeo')}</Link>
@@ -42,11 +43,11 @@ export default function CreativeHome(){
        <div className="khf-header-actions" aria-label={tr("Account and creation","Conta e criação","Cuenta y creación")}>
          <label className="khf-locale"><Globe2 size={15}/><select value={locale} onChange={e=>changeLocale(e.target.value)} aria-label="Language"><option value="en">EN</option><option value="pt">PT</option><option value="es">ES</option></select></label>
          {user?<AccountMenu user={user}/>:<Link className="khf-signin" aria-label={tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} href="/login?next=%2Fk4k-app%2Fcreate">{tr('Log in','Entrar','Iniciar sesión')}</Link>}
-         <Link className="khf-header-cta" href="/k4k-app/motion">{tr('K4K Motion','K4K Motion','K4K Motion')}<ArrowUpRight size={15}/></Link>
+         {user?<Link className="khf-header-cta" href="/k4k-app/create">{tr('Create','Criar','Crear')}<ArrowUpRight size={15}/></Link>:<Link className="khf-header-cta" href="/k4k-app/register">{tr('Sign up','Criar conta','Registrarse')}<ArrowUpRight size={15}/></Link>}
          <button className="khf-menu-button" type="button" aria-controls="khf-mobile-menu" aria-label={menu?'Close menu':'Open menu'} aria-expanded={menu} onClick={()=>setMenu(v=>!v)}>{menu?<X size={20}/>:<Menu size={20}/>}</button>
        </div>
      </div>
-     {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/k4k-app/image">{tr('Image','Imagem','Imagen')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/video">{tr('Video','Vídeo','Vídeo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">Wan 3</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
+     {menu&&<nav id="khf-mobile-menu" className="khf-mobile-menu" aria-label="Mobile menu"><Link onClick={()=>setMenu(false)} href="/">{tr('Home','Início','Inicio')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/image">{tr('Image','Imagem','Imagen')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/video">{tr('Video','Vídeo','Vídeo')}</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/motion">K4K Motion</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/creator">Wan 3</Link><Link onClick={()=>setMenu(false)} href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link onClick={()=>setMenu(false)} href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link>{!user&&<Link onClick={()=>setMenu(false)} className="khf-mobile-signup" href="/k4k-app/register">{tr('Sign up','Criar conta','Registrarse')} <ArrowRight size={16}/></Link>}{!user&&<Link className="khf-mobile-login" onClick={()=>setMenu(false)} href="/login?next=%2Fk4k-app%2Fcreate">{tr("Log in to K4K","Entrar no K4K","Iniciar sesión en K4K")} <ArrowRight size={16}/></Link>}</nav>}
    </header>
    <main>
      <section className="khf-hero" aria-labelledby="khf-hero-title">
