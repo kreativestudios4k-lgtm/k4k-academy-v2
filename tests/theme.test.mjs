@@ -61,7 +61,7 @@ test('K4K homepage is the cinematic launch showcase, with no waitlist',()=>{
  assert.match(feed,/href:'\/login'/);
  assert.doesNotMatch(feed,/href:'\/academy'/);
  assert.match(waitlist,/consent/);
- assert.match(source('app/k4k-app/explore/page.js'),/redirect\('\/k4k-app\/motion\/explore'\)/);assert.match(source('app/k4k-app/motion/explore/page.js'),/MotionExploreGallery/);
+ assert.match(source('app/k4k-app/motion/explore/page.js'),/redirect\\('\\/k4k-app\\/motion'\\)/);
  assert.match(feed,/template-catalogue\.json/);
  assert.match(feed,/kf-scroll/);
  assert.match(feed,/kf-cta/);
