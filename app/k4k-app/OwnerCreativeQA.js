@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useRef,useState} from 'react';
-import {createClient} from '../../../lib/supabase/client';
+import {createClient} from '../../lib/supabase/client';
 const tests={
  seedance_2_5:{mode:'Text to video',name:'Seedance 2.5',reserve:4.50},
  kling4_0:{mode:'Text to video',name:'Kling 4.0',reserve:1.20},
