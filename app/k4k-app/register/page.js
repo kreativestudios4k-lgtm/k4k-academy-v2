@@ -11,7 +11,7 @@ export default function Register(){
  const [plan,setPlan]=useState(null),[planReady,setPlanReady]=useState(false);
  const [manualPix,setManualPix]=useState(false);
  const [affiliateReturn,setAffiliateReturn]=useState(false);
- const next=plan||manualPix?planDestination(plan,{manualPix}):affiliateReturn?'/affiliates':'/k4k-app/creator';
+ const next=plan||manualPix?planDestination(plan,{manualPix}):affiliateReturn?'/affiliates':'/k4k-app/dashboard';
  const loginHref='/login?next='+encodeURIComponent(next);
  useEffect(()=>{const selected=validPlan(new URLSearchParams(window.location.search).get('plan'));const pix=new URLSearchParams(window.location.search).get('payment')==='pix';setManualPix(pix);setAffiliateReturn(new URLSearchParams(window.location.search).get('next')==='/affiliates');setPlan(selected);setPlanReady(true);if(selected)createClient().auth.getUser().then(({data})=>{if(data?.user&&!data.user.is_anonymous)window.location.assign(planDestination(selected,{manualPix:pix}))}).catch(()=>{});},[]);
  async function google(){if(!planReady||requestLock.current)return;requestLock.current=true;setBusy(true);setError('');try{const {error}=await createClient().auth.signInWithOAuth({provider:'google',options:{redirectTo:window.location.origin+'/auth/callback?next='+encodeURIComponent(next),queryParams:{prompt:'select_account'}}});if(error)throw error;}catch{setError('Google sign-in could not start. Try email registration.');requestLock.current=false;setBusy(false);}}
