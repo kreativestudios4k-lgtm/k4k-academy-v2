@@ -20,7 +20,7 @@ export default function OwnerPlanQATool(){
     setAuth(error||!data?.user?{state:'signed-out',user:null}:{state:'signed-in',user:data.user});
    }catch{if(active)setAuth({state:'unavailable',user:null})}
   }
-  const subscription=supabase.auth.onAuthStateChange(()=>{void check()});
+  const subscription=supabase.auth.onAuthStateChange(()=>{setTimeout(()=>{if(active)void check()},0)});
   void check();
   const visible=()=>{if(document.visibilityState==='visible')void check()};
   window.addEventListener('pageshow',check);
