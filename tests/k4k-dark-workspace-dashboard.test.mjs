@@ -29,7 +29,8 @@ test('dashboard shows only sourced account and latest-six-job metrics',()=>{
 });
 test('image and video keep model-specific availability and signed quote controls',()=>{
  assert.match(create,/CustomerCreativeGeneration/);
- assert.match(create,/OwnerCreativeQA/);
+ assert.doesNotMatch(create,/OwnerCreativeQA/);
+ assert.match(read('app/k4k-app/owner-qa/page.js'),/OwnerCreativeQA/);
  assert.match(create,/creationModels\(kind\)\.length/);
  assert.match(create,/model\.name/);
  assert.match(create,/selectedLive/);
@@ -38,6 +39,7 @@ test('image and video keep model-specific availability and signed quote controls
 });
 test('dashboard follows reference dark visual system and remains responsive',()=>{
  assert.match(styles,/--k4kw-bg:#131416/);
+ assert.match(styles,/\.k4k-workspace-sidebar \.k4k-workspace-nav/);
  assert.match(styles,/\.k4k-workspace-sidebar/);
  assert.match(styles,/\.k4k-dashboard-kpis/);
  assert.match(styles,/\.kcs-dashboard-metrics/);
