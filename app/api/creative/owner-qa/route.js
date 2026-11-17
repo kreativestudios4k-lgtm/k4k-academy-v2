@@ -1,6 +1,7 @@
 // Owner-only paid provider QA. Never uses customer credits or public dispatch.
 import {createClient} from '@supabase/supabase-js';
 import {createHash} from 'node:crypto';
+import {boundedCreativeDownload} from '../../../../lib/server/creative-qa-output.mjs';
 import {HIGGSFIELD_PREVIEW_OWNER} from '../../../../lib/server/higgsfield-release-policy.mjs';
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
@@ -55,12 +56,8 @@ async function archiveOutput(db,owner,job,result){
  const raw=job.model_key==='seedance_2_5'||job.model_key==='kling4_0'?result.video?.url:result.images?.[0]?.url;
  if(!raw)throw Error('OUTPUT_MISSING');
  const address=trustedOutput(raw),video=['seedance_2_5','kling4_0'].includes(job.model_key),contentType=video?'video/mp4':job.model_key==='flux_3_image'?'image/jpeg':'image/png';
- const res=await fetch(address,{cache:'no-store',signal:AbortSignal.timeout(60000)});
- if(!res.ok)throw Error('OUTPUT_FETCH_FAILED');
- const size=Number(res.headers.get('content-length'));
- const limit=video?70_000_000:12_000_000;
- if(!Number.isSafeInteger(size)||size<12||size>limit)throw Error('OUTPUT_SIZE_UNVERIFIED');
- const buffer=Buffer.from(await res.arrayBuffer());if(buffer.length!==size)throw Error('OUTPUT_SIZE_MISMATCH');
+ const res=await fetch(address,{cache:'no-store',redirect:'error',signal:AbortSignal.timeout(60000)});
+ const buffer=await boundedCreativeDownload(res,{mime:contentType,maxBytes:video?70_000_000:12_000_000});
  const path=owner+'/owner-qa/'+job.id+(video?'.mp4':job.model_key==='flux_3_image'?'.jpg':'.png');
  const {error}=await db.storage.from(outputBucket(job.model_key)).upload(path,buffer,{contentType,upsert:false});
  if(error&&!/already exists|duplicate/i.test(error.message||''))throw Error('PRIVATE_STORE_FAILED');
