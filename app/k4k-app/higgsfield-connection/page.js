@@ -7,6 +7,7 @@ export default function HiggsfieldConnectionPage(){
  const [testBusy,setTestBusy]=useState(false),[testResult,setTestResult]=useState(null);
  const [secondBusy,setSecondBusy]=useState(false),[secondResult,setSecondResult]=useState(null);
  const [fileBusy,setFileBusy]=useState(false),[fileCheck,setFileCheck]=useState(null);
+ const [archiveBusy,setArchiveBusy]=useState(false),[archiveResult,setArchiveResult]=useState(null);
  async function qaRequest(method){
   if(testBusy)return;
   if(method==='POST'&&!window.confirm('Submit ONE paid Higgsfield Genjutsu test? 4.13-second source billed as 5 seconds, 480p, estimated $1.59. No automatic retry.'))return;
@@ -23,6 +24,23 @@ export default function HiggsfieldConnectionPage(){
    setTestResult({...payload,httpStatus:response.status});
   }catch(error){setTestResult({error:error?.message||'NETWORK_UNAVAILABLE'})}
   finally{setTestBusy(false)}
+ }
+ async function qaArchive(method,download=false){
+  if(archiveBusy)return;
+  if(method==='POST'&&!window.confirm('Archive the ALREADY GENERATED Higgsfield test video to private K4K QA storage? No paid generation, customer credit deduction or subscription change.'))return;
+  setArchiveBusy(true);setArchiveResult(null);
+  try{
+   const {data:{session}}=await createClient().auth.getSession();
+   if(!session?.access_token)throw Error('SIGN_IN_REQUIRED');
+   const response=await fetch('/api/higgsfield/qa-library'+(download?'?download=1':''),{
+    method,cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,...(method==='POST'?{'Content-Type':'application/json'}:{})},
+    ...(method==='POST'?{body:JSON.stringify({confirmation:'ARCHIVE_EXISTING_SUCCESS_ONLY'})}:{})
+   });
+   const payload=await response.json().catch(()=>({error:'INVALID_RESPONSE'}));
+   setArchiveResult({...payload,httpStatus:response.status});
+   if(response.ok&&download&&payload.downloadUrl)window.location.assign(payload.downloadUrl);
+  }catch(error){setArchiveResult({error:error?.message||'NETWORK_UNAVAILABLE'})}
+  finally{setArchiveBusy(false)}
  }
  async function verifyOutput(){
   if(fileBusy)return;setFileBusy(true);setFileCheck(null);
@@ -110,6 +128,15 @@ export default function HiggsfieldConnectionPage(){
      {secondResult.providerErrorCode&&<p>Provider error: {secondResult.providerErrorCode}</p>}
      {secondResult.providerErrorMessage&&<p>Failure reason: {secondResult.providerErrorMessage}</p>}
      {secondResult.videoUrl&&<a href={secondResult.videoUrl} target="_blank" rel="noreferrer" style={{color:'#a3ff9b'}}>View generated test video</a>}
+     {secondResult.state==='completed'&&<div style={{marginTop:14,border:'1px solid #567b5b',borderRadius:10,padding:13}}>
+      <strong>Private K4K QA video archive</strong>
+      <p style={{fontSize:13}}>Archive the existing completed video once into a private Supabase bucket. This is owner-only QA storage, not yet the full customer Library or credit-settlement system.</p>
+      <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+       <button disabled={archiveBusy} onClick={()=>qaArchive('POST')} type="button" style={{padding:10,borderRadius:8,background:'#a3ff9b',color:'#142414',border:0,fontWeight:700}}>Save existing video privately</button>
+       <button disabled={archiveBusy} onClick={()=>qaArchive('GET',true)} type="button" style={{padding:10,borderRadius:8,background:'transparent',color:'#a3ff9b',border:'1px solid #a3ff9b',fontWeight:700}}>Download saved MP4</button>
+      </div>
+      {archiveResult&&<p role="status">Archive: {archiveResult.state||archiveResult.error||'unverified'} {archiveResult.reason||''} {archiveResult.outputInOwnerQaLibrary===true?'· Private QA storage confirmed':''}</p>}
+     </div>}
      {secondResult.state==='completed'&&<button type="button" onClick={verifyOutput} disabled={fileBusy} style={{display:'block',marginTop:12,border:'1px solid #a3ff9b',background:'transparent',color:'#a3ff9b',padding:'10px 14px',borderRadius:10}}>{fileBusy?'Checking file…':'Verify output MP4 file'}</button>}
      {fileCheck&&<p>Output file check: {fileCheck.error||fileCheck.reason||(fileCheck.outputAvailable&&fileCheck.mp4HeaderValid?'MP4 header valid':'Not verified')}. K4K Library download: {fileCheck.downloadInK4KLibrary===false?'Not connected':'Not verified'}.</p>}
     </div>}
