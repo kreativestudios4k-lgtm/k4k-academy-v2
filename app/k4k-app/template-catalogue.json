@@ -259,7 +259,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e041/8UwpVm9EhBMZJyiE7YpFG_higgsfield-9de74ba5-2120-41d7-abd8-837d74185dcb.mp4",
       "durationSeconds": 26.04,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -268,7 +268,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e042/mWnEITF_ov07agyMAHV8V_higgsfield-a8b52cee-b045-450d-bd46-6faa14243e47.mp4",
       "durationSeconds": 16.03,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -304,7 +304,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e048/2Zri6haLHjwaZH3Vxp3K4_higgsfield-b5651126-aa51-4126-b253-36f102c2bcce%282%29.mp4",
       "durationSeconds": 22.1,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -313,7 +313,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e048/KyuARibgeDAR7GjcNR2Ei_higgsfield-f7abecea-0470-4aee-b819-20f4b2ca9c54%281%29.mp4",
       "durationSeconds": 28.93,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -322,7 +322,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e04a/KzBNiJY5uXMLSW4G9PIee_higgsfield-12f3f57f-6ec8-4563-bf3e-0707522c3284%281%29.mp4",
       "durationSeconds": 15.17,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     },
     {
@@ -340,7 +340,7 @@
       "videoUrl": "https://v3b.fal.media/files/b/0ab2e04b/luJEyYX0_NVShhmQ8kCX4_higgsfield-14d8e3a0-6564-4647-8011-e00fcf606eed%281%29.mp4",
       "durationSeconds": 23.63,
       "k4kOriginal": true,
-      "previewOnly": true,
+      "previewOnly": false,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     }
   ],
