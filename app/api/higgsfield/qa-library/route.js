@@ -53,10 +53,34 @@ async function signedLink(db,download){
   return respond({error:'SIGNED_LINK_INVALID'},503);
  return respond({state:'stored',outputInOwnerQaLibrary:true,downloadUrl:data.signedUrl,expiresIn:120,contentType:'video/mp4',sizeBytes:length,customerLibraryIntegrated:false,creditsSettled:false});
 }
+
+async function downloadableMp4(db){
+ const object=db.storage.from(BUCKET);
+ const {data:info,error:infoError}=await object.info(OUTPUT_PATH);
+ const mime=String(info?.contentType??info?.metadata?.mimetype??'').split(';')[0].trim().toLowerCase();
+ const size=Number(info?.size??info?.metadata?.size);
+ if(infoError||!info||mime!=='video/mp4'||!Number.isSafeInteger(size)||size<1024||size>MAX_BYTES)
+  return respond({error:'STORED_VIDEO_INVALID'},409);
+ const {data:file,error}=await object.download(OUTPUT_PATH);
+ if(error||!file||typeof file.arrayBuffer!=='function')return respond({error:'PRIVATE_DOWNLOAD_UNAVAILABLE'},503);
+ if(file.size!==size||file.size>MAX_BYTES)return respond({error:'STORED_VIDEO_SIZE_MISMATCH'},409);
+ const bytes=new Uint8Array(await file.arrayBuffer());
+ try{verifyGenerationOutputBytes(bytes,'video/mp4')}
+ catch{return respond({error:'STORED_VIDEO_HEADER_INVALID'},409)}
+ return new NextResponse(bytes,{status:200,headers:{
+  'Content-Type':'video/mp4',
+  'Content-Length':String(bytes.byteLength),
+  'Content-Disposition':'attachment; filename="K4K-Higgsfield-QA.mp4"',
+  'Cache-Control':'private, no-store',
+  'X-Content-Type-Options':'nosniff',
+  'Vary':'Authorization'
+ }});
+}
 export async function GET(request){
  const a=await authOwner(request);if(a.error)return respond({error:a.error},a.status);
  if(a.row.ingestion_state!=='stored'||a.row.private_output_path!==OUTPUT_PATH)
   return respond({state:a.row.ingestion_state,outputInOwnerQaLibrary:false,customerLibraryIntegrated:false,creditsSettled:false});
+ if(new URL(request.url).searchParams.get('file')==='1')return downloadableMp4(a.db);
  return signedLink(a.db,new URL(request.url).searchParams.get('download')==='1');
 }
 export async function POST(request){
