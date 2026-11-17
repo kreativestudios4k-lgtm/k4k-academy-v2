@@ -105,3 +105,16 @@
  .khm-root .khm-motion-library{position:static!important}
  .khm-root .khm-lib-tabs{gap:8px}
 }
+
+/* Center the desktop navigation in the available viewport and balance side margins. */
+@media(min-width:1051px){
+ .khm-root .khm-studio-layout{max-width:1360px!important;padding-inline:24px!important}
+ .khm-root .khm-topnav{grid-template-columns:minmax(160px,1fr) max-content minmax(160px,1fr)!important;column-gap:18px;padding-inline:20px!important}
+ .khm-root .khm-topnav>.khm-brand{grid-column:1;justify-self:start}
+ .khm-root .khm-topnav>.khm-desktop-links{grid-column:2;justify-content:center;justify-self:center;overflow:visible;max-width:none;gap:clamp(12px,1.5vw,24px)}
+ .khm-root .khm-motion-library{min-width:0}
+}
+@media(min-width:1051px) and (max-width:1190px){
+ .khm-root .khm-topnav{grid-template-columns:max-content minmax(0,1fr)!important}
+ .khm-root .khm-topnav>.khm-desktop-links{grid-column:2;justify-self:center;gap:10px;overflow-x:auto;max-width:100%}
+}
