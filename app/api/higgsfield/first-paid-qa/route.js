@@ -65,7 +65,25 @@ export async function GET(request){
  const {data:row,error}=await a.db.from('k4k_higgsfield_first_paid_qa').select('state,provider_request_id,result_video_url,error_code').eq('test_key',KEY).eq('user_id',USER_ID).maybeSingle();
  if(error)return respond({error:'TEST_LEDGER_UNAVAILABLE'},503);
  if(!row)return respond(publicJob(null));
- if(!row.provider_request_id||['completed','failed','submission_uncertain'].includes(row.state))return respond(publicJob(row));
+ if(row.state==='failed'&&row.provider_request_id){
+  // Read-only diagnostic for the original failed request. Never dispatch a new paid job,
+  // change the failed ledger state, or expose the provider's arbitrary raw payload.
+  try{
+   const response=await fetch('https://api.higgsfield.ai/requests/'+encodeURIComponent(row.provider_request_id)+'/status',{
+    method:'GET',headers:{Authorization:'Key '+a.credential,Accept:'application/json'},
+    cache:'no-store',redirect:'error',signal:AbortSignal.timeout(12000)
+   });
+   if(!response.ok)return respond({...publicJob(row),diagnostic:'PROVIDER_STATUS_UNAVAILABLE'});
+   const payload=await response.json();
+   const err=payload?.error;
+   const code=typeof err==='object'&&err!==null?err.code??err.type:payload?.error_code;
+   const rawMessage=typeof err==='string'?err:typeof err==='object'&&err!==null?err.message:payload?.message;
+   const safe=value=>typeof value==='string'&&/^[\w .,:;()/\-]{1,180}$/u.test(value)?value:null;
+   return respond({...publicJob(row),providerStatus:['failed','nsfw','canceled'].includes(payload?.status)?payload.status:'unknown',
+    providerErrorCode:safe(code),providerErrorMessage:safe(rawMessage),diagnostic:err||payload?.error_code?'REASON_RECEIVED':'NO_DETAIL_RETURNED'});
+  }catch{return respond({...publicJob(row),diagnostic:'PROVIDER_STATUS_UNAVAILABLE'});}
+ }
+ if(!row.provider_request_id||['completed','submission_uncertain'].includes(row.state))return respond(publicJob(row));
  try{
   const provider=createHiggsfieldPlatformApi({credentials:a.credential});
   const status=await provider.status(row.provider_request_id);
