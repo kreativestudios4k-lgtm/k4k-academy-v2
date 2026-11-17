@@ -56,3 +56,20 @@ test('new input CDN passes quote preparation and verification with identical cre
  assert.equal(verifyHiggsfieldCustomerQuote({job:updated,userId,verifiedMedia,token:q.quoteToken,env}).credits,8);
  assert.throws(()=>prepareHiggsfieldCustomerQuote({job:updated,userId,verifiedMedia,env:{...env,K4K_HIGGSFIELD_APPROVED_MEDIA_HOSTS:'d2ol7oe51mr4n9.cloudfront.net'}}),/UNTRUSTED_REFERENCE_URL/);
 });
+
+test('explicit 720p approval allows a 13-second video at 45 credits but not 14 seconds',()=>{
+ const approved={...env,K4K_GENERATION_MAX_USD:'4.5',K4K_MOTION_720P_APPROVED:'true'};
+ const video13={...verifiedMedia,seconds:13};
+ const job720={...job,input:{...job.input,resolution:'720p'}};
+ const q=prepareHiggsfieldCustomerQuote({job:job720,userId,verifiedMedia:video13,env:approved});
+ assert.equal(q.usd,4.4798);
+ assert.equal(q.duration,13);
+ assert.equal(q.credits,45);
+ assert.equal(verifyHiggsfieldCustomerQuote({job:job720,userId,verifiedMedia:video13,token:q.quoteToken,env:approved}).credits,45);
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job720,userId,verifiedMedia:{...video13,seconds:14},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job720,userId,verifiedMedia:video13,env:{...approved,K4K_MOTION_720P_APPROVED:'false'}}),/PROVIDER_BUDGET_BLOCKED/);
+ const job1080={...job,input:{...job.input,resolution:'1080p'}};
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job1080,userId,verifiedMedia:{...video13,seconds:5},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
+ const job480={...job,input:{...job.input,resolution:'480p'}};
+ assert.throws(()=>prepareHiggsfieldCustomerQuote({job:job480,userId,verifiedMedia:{...video13,seconds:14},env:approved}),/PROVIDER_BUDGET_BLOCKED/);
+});
