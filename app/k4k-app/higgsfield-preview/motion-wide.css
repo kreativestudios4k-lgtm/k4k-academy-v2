@@ -96,3 +96,22 @@
 .khm-root .khm-studio-layout button:not(:disabled):focus-visible{outline:2px solid #d6ff69;outline-offset:3px}
 @media(max-width:1180px){.khm-title{font-size:clamp(35px,6vw,59px)!important;line-height:1.06!important}}
 @media(max-width:620px){.khm-title{font-size:clamp(30px,8vw,40px)!important}.khm-kicker{margin:3px 0 0!important}.khm-subtitle{margin:0 0 10px}}
+
+/* Immediate customer credit pricing: no separate estimate step. */
+.khm-quality-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.khm-quality-choice{display:flex;min-width:0;align-items:center;flex-direction:column;gap:5px;justify-content:center;padding:13px 8px!important;border:1px solid #56635b;border-radius:12px;background:#24282a;color:#e6ece7;cursor:pointer}
+.khm-quality-choice strong{font-size:16px;letter-spacing:.2px}
+.khm-quality-choice span{font-size:12px;line-height:1.4;color:#bec8c0;text-align:center}
+.khm-quality-choice.selected{border-color:#d6ff69;background:#263428;color:#e7ffb9;box-shadow:inset 0 0 0 1px #d6ff6930}
+.khm-quality-choice.selected span{color:#e1f2cf}
+.khm-quality-choice:disabled{opacity:.4;cursor:not-allowed}
+.khm-credit-summary{display:flex;flex-direction:column;gap:6px;border:1px solid #637f64;border-radius:14px;padding:17px 18px;background:#1a2920;margin-top:16px}
+.khm-credit-summary span{font-size:12px;font-weight:750;color:#d3e3d4}
+.khm-credit-summary strong{font-size:clamp(24px,2.2vw,34px);line-height:1.18;letter-spacing:-.04em;color:#d6ff69;overflow-wrap:break-word}
+.khm-credit-summary small{font-size:12px;line-height:1.55;color:#b5c4b7}
+.khm-permission{display:flex;align-items:flex-start;gap:9px;margin-top:18px;color:#d5dfd7;font-size:13px;line-height:1.5}
+.khm-permission input{width:18px;height:18px;flex:0 0 18px;accent-color:#d6ff69}
+.khm-private-upload{display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:48px;margin:18px 0 0;padding:12px 15px;border:1px solid #9fcf79;border-radius:10px;background:transparent;color:#d6ff69;font-weight:800;font-size:13px;cursor:pointer}
+.khm-private-upload:disabled{opacity:.45;cursor:not-allowed}
+.khm-private-upload:not(:disabled):hover{background:#2c3728}
+@media(max-width:620px){.khm-quality-options{gap:7px}.khm-quality-choice{padding:12px 5px!important}.khm-quality-choice strong{font-size:15px}.khm-quality-choice span{font-size:10px}.khm-credit-summary{padding:15px}}
