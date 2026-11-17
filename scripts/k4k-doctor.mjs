@@ -22,7 +22,7 @@ ensure(genjutsuEstimate({sourceSeconds:30,resolution:'720p'}).usd>genjutsuCustom
 const studio=read('app/k4k-app/higgsfield-preview/page.js');
 const checkout=read('app/k4k-app/higgsfield-preview/customer-generation.js');
 const templateRoute=read('app/api/generation/template-reference/route.js');
-ensure(templateRoute.includes('durationSeconds>30'),'Template import must independently validate a 30s ceiling');
+ensure(templateRoute.includes('durationSeconds>(original?30:15)')&&templateRoute.includes('original?4:2'),'Template import must validate Higgsfield 4–30s and legacy Fal 2–15s independently');
 ensure(studio.includes('canGenerate={castReady&&billableSeconds!==null&&withinBudget}'),'Motion: Generate must enforce quality budget and cast readiness');
 ensure(studio.includes('onPrepareMedia={verifyUploads}'),'Motion: private media verification must occur before quote');
 ensure(checkout.includes("request('prepare'"),'Motion: signed quote phase is missing');
