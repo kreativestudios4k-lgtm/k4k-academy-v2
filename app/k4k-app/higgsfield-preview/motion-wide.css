@@ -72,3 +72,27 @@
 }
 @media(max-width:360px){.khm-root{padding-left:12px;padding-right:12px}.khm-brand{font-size:16px}.khm-title{font-size:clamp(27px,7.8vw,30px)!important}.khm-mobile-menu summary{padding:9px 12px}}
 @media(prefers-reduced-motion:reduce){.khm-root *{scroll-behavior:auto!important}}
+
+/* K4K Motion creation workspace: compact Genjutsu-inspired layout with left
+   setup controls and larger right preview. Mobile retains original step order. */
+@media(min-width:1181px){
+ .khm-studio-layout{grid-template-columns:minmax(340px,.78fr) minmax(0,1.22fr);column-gap:24px;row-gap:14px}
+ .khm-kicker{margin:18px 0 0!important;letter-spacing:2px;font-size:11px}
+ .khm-title{font-size:clamp(35px,3.4vw,57px)!important;line-height:1.045!important;letter-spacing:-.052em}
+ .khm-subtitle{max-width:1030px;font-size:14px;line-height:1.65;margin:0 0 20px}
+ .khm-source-selector{grid-column:1;grid-row:5;align-self:start}
+ .khm-video-stage{grid-column:2;grid-row:5 / span 5;top:18px}
+ .khm-cast-panel{grid-column:1;grid-row:6}
+ .khm-direction-panel{grid-column:1;grid-row:7}
+ .khm-quality-panel{grid-column:1;grid-row:8}
+ .khm-generate-panel{grid-column:1;grid-row:9}
+ .khm-video-panel{min-height:570px!important;gap:13px}
+ .khm-cast-panel>section,.khm-direction-panel,.khm-quality-panel,.khm-generate-panel{padding:18px!important}
+}
+.khm-topnav{min-height:76px}
+.khm-brand{font-size:20px}
+.khm-topnav>.khm-nav-context{font-size:10px}
+.khm-topnav .khm-desktop-links{font-size:13px}
+.khm-root .khm-studio-layout button:not(:disabled):focus-visible{outline:2px solid #d6ff69;outline-offset:3px}
+@media(max-width:1180px){.khm-title{font-size:clamp(35px,6vw,59px)!important;line-height:1.06!important}}
+@media(max-width:620px){.khm-title{font-size:clamp(30px,8vw,40px)!important}.khm-kicker{margin:3px 0 0!important}.khm-subtitle{margin:0 0 10px}}
