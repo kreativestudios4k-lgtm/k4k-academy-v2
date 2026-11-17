@@ -94,9 +94,9 @@ export async function POST(req){
  let body;try{const str=await req.text();if(str.length>14000)throw Error();body=JSON.parse(str);if(!body||Array.isArray(body)||typeof body!=='object')throw Error()}catch{return response({error:'INVALID_INPUT'},400)}
  const {user,db}=ctx;
  try{
- if(body.action==='models')return response({models:known.map(([id,m])=>({id,kind:m.kind,enabled:creativeCustomerRelease(process.env,id)}))});
+ if(body.action==='models')return response({models:known.map(([id,m])=>({id,kind:m.kind,enabled:creativeCustomerRelease(process.env,id,user.id)}))});
  if(body.action==='quote'){
-  const model=creativeCustomerQuote(body.modelId);
+  const model=creativeCustomerQuote(body.modelId,process.env,user.id);
   const prompt=typeof body.prompt==='string'?body.prompt.trim():'';
   const aspect=['9:16','16:9','1:1'].includes(body.aspect)?body.aspect:null;
   if(!aspect||prompt.length<10||prompt.length>1200)throw Error('INVALID_INPUT');
@@ -123,7 +123,7 @@ export async function POST(req){
  if(body.action==='submit'){
   if(!uuid.test(body.requestKey||''))throw Error('INVALID_INPUT');
   const job=await owned(db,user.id,body.jobId),model=byModel.get(job.model);
-  if(!creativeCustomerRelease(process.env,model.id))throw Error('CREATIVE_MODEL_NOT_LIVE');
+  if(!creativeCustomerRelease(process.env,model.id,user.id))throw Error('CREATIVE_MODEL_NOT_LIVE');
   const signing=process.env.K4K_GENERATION_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
   const signed=quoteSigner(signing).verify(body.quoteToken);
