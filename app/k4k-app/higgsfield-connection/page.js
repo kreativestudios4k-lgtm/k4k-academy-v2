@@ -24,7 +24,7 @@ export default function HiggsfieldConnectionPage(){
    <p style={{fontWeight:800}}>Connection status: {result.state.replace(/_/g,' ')}</p>
    <p>Credential verified: {result.authenticated?'Yes (read-only endpoint)':'Not yet'}</p>
    {result.attempts?.length>0&&<ul style={{paddingLeft:20}}>{result.attempts.map(a=><li key={a.source}>{a.source==='pilot'?'K4K preview API credential':'Higgsfield SDK credential'}: {String(a.state).replace(/_/g,' ')}</li>)}</ul>}
-   {result.state==='rejected'&&<p style={{color:'#ffb9b9'}}>A configured developer API credential was rejected (HTTP 401). Replace or rotate the API credential through your Higgsfield API console, then update the corresponding server-side Vercel preview secret. Your Higgsfield creator subscription is separate from this API.</p>}
+   {!result.authenticated&&result.attempts?.length>0&&<p style={{color:'#ffb9b9'}}>No valid K4K developer API credential has been confirmed. An SDK credential returning 401 must be replaced. A preview credential showing invalid format or not configured needs a complete developer API key in the Vercel preview environment. Do not paste credentials into chat or place them in browser-visible settings.</p>}
    <p>Paid production generation: Disabled pending integration verification</p>
    {result.state==='sign_in_required'&&<a href={LOGIN} style={{color:'#a3ff9b'}}>Sign in on this preview</a>}
   </section>}
