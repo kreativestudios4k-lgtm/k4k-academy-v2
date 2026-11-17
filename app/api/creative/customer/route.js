@@ -102,7 +102,7 @@ export async function POST(req){
   if(!aspect||prompt.length<10||prompt.length>1200)throw Error('INVALID_INPUT');
   if(body.modelId==='seedance_2_5'){
    // One real token-priced pilot only until the provider's actual charge is reconciled.
-   const {count:priorSeedance,error:seedanceCheck}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v');
+   const {count:priorSeedance,error:seedanceCheck}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').neq('status','draft');
    if(seedanceCheck)throw Error('UNAVAILABLE');
    if(priorSeedance>0)throw Error('SEEDANCE_PILOT_LIMIT');
   }
@@ -130,6 +130,11 @@ export async function POST(req){
   if(!uuid.test(body.requestKey||''))throw Error('INVALID_INPUT');
   const job=await owned(db,user.id,body.jobId),model=byModel.get(job.model);
   if(!creativeCustomerRelease(process.env,model.id,user.id))throw Error('CREATIVE_MODEL_NOT_LIVE');
+  if(model.id==='seedance_2_5'&&job.status==='draft'){
+   const {count,error}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('model','seedance-25-t2v').neq('id',job.id).neq('status','draft');
+   if(error)throw Error('UNAVAILABLE');
+   if(count>0)throw Error('SEEDANCE_PILOT_LIMIT');
+  }
   const signing=process.env.K4K_CREATIVE_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
   const signed=quoteSigner(signing).verify(body.quoteToken);
