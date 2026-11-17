@@ -6,6 +6,7 @@ import catalogue from './template-catalogue.json';
 import {useK4KLocale} from './locale';
 import {useVerifiedAccount} from './useVerifiedAccount';
 import AccountMenu from './AccountMenu';
+import QuickCreate from './QuickCreate';
 import './creative-home.css';
 
 // Showcase only K4K's curated original previews, not the legacy trending/celebrity templates.
@@ -70,6 +71,7 @@ export default function CreativeHome(){
          </div>
        </div>
      </section>
+     <QuickCreate/>
      <section className="khf-toolband" aria-label={tr('Creation shortcuts','Acesso rápido','Accesos rápidos')}>
        <div className="khf-toolband-inner">
          <div className="khf-toolband-heading"><span>{tr('WHAT WILL YOU CREATE?','O QUE VAI CRIAR?','¿QUÉ VAS A CREAR?')}</span><strong>{tr('Your next project starts here.','Seu próximo projeto começa aqui.','Tu próximo proyecto comienza aquí.')}</strong></div>
