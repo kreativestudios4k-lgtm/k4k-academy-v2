@@ -1,26 +1,6 @@
 {
   "version": 7,
-  "mediaStatus": {
-    "0": "1",
-    "1": "9",
-    "2": "-",
-    "3": "h",
-    "4": "o",
-    "5": "s",
-    "6": "t",
-    "7": "e",
-    "8": "d",
-    "9": "-",
-    "10": "v",
-    "11": "i",
-    "12": "d",
-    "13": "e",
-    "14": "o",
-    "15": "s",
-    "publicGallery": "k4k_originals_only",
-    "previousPublicFigureTemplates": "not_shown_in_motion_library",
-    "replacementBatch": "2026-11-17"
-  },
+  "mediaStatus": "19-hosted-videos",
   "topPerforming": [],
   "trending": [
     {
@@ -363,5 +343,7 @@
       "previewOnly": true,
       "characterCountReview": "Provisional replacement count; creator should confirm before generation."
     }
-  ]
+  ],
+  "originalsMediaStatus": "10-fal-hosted-originals-2026-11-17",
+  "publicGallery": "k4k_originals_only"
 }
