@@ -35,7 +35,7 @@ test('owner-scoped completed jobs use private signed downloads and image-specifi
  assert.match(route,/createSignedUrl|createMultimodelPrivateDelivery/);
  assert.match(route,/provider_request_id/);
  assert.match(migration,/studio-customer-images/);
- assert.match(migration,/public,false/);
+ assert.match(migration,/false,array\['image\/png','image\/jpeg'\]/);
 });
 test('UI shows signed quote, explicit customer credit confirmation and refuses reference assets not used by model',()=>{
  for(const value of ['Check credit cost','Confirm and generate','referenceCount>0','action:\x27quote\x27','action:\x27submit\x27','action:\x27status\x27','action:\x27download\x27'])assert.ok(client.includes(value),value);
