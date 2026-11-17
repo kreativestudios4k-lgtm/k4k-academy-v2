@@ -71,7 +71,7 @@
 .k4k-dashboard-actions-panel>a{display:flex;align-items:center;justify-content:space-between;margin-top:11px;border:1px solid #34353a;background:#28292d;padding:12px;border-radius:8px;font-size:12px;color:#f4f4f5!important}
 .k4k-dashboard-actions-panel>a:hover{border-color:#707176}
 .kcs-root .kcs-nav{background:#151618;border-color:#292a2d;height:62px;padding-inline:24px}
-.kcs-root .kcs-nav nav a:first-child{color:#aeb0b4}
+.kcs-root .kcs-nav .kcs-main-links a:first-child{color:#aeb0b4}
 .kcs-root .k4k-dashboard-frame{padding-top:16px}
 .kcs-root .kcs-shell{max-width:none!important;padding:0 5px 75px!important}
 .kcs-root .kcs-hero{background:linear-gradient(145deg,#202124,#17181a 65%)!important;border:1px solid #343539!important;border-radius:12px!important;padding:22px 26px 19px!important;margin-bottom:14px!important}
@@ -134,4 +134,19 @@
  .kcs-root .kcs-hero{padding:18px!important}
  .kcs-root .kcs-model-grid{grid-template-columns:1fr}
  .kcs-root .kcs-models,.kcs-root .kcs-compose{padding:15px!important}
+}
+
+/* Explicitly reset legacy globals: generic site nav was position:absolute. */
+.kcs-root .k4k-workspace-sidebar{display:flex;position:sticky;top:12px;flex-direction:column;align-items:stretch;justify-content:flex-start;row-gap:15px;isolation:isolate}
+.kcs-root .k4k-workspace-sidebar .k4k-workspace-space{display:flex;position:static;flex:0 0 auto;margin:0;width:100%;min-height:54px}
+.kcs-root .k4k-workspace-sidebar .k4k-workspace-nav{display:grid;grid-auto-flow:row;grid-template-columns:minmax(0,1fr);position:static!important;inset:auto!important;left:auto!important;top:auto!important;right:auto!important;bottom:auto!important;width:100%!important;min-width:0;height:auto!important;min-height:0;margin:0;padding:0;align-items:stretch;justify-items:stretch;justify-content:stretch;align-content:start;border:0;gap:3px;z-index:auto}
+.kcs-root .k4k-workspace-sidebar .k4k-workspace-group{display:block;position:static;width:auto;margin:0 0 3px;padding:5px 9px 6px;white-space:nowrap}
+.kcs-root .k4k-workspace-sidebar .k4k-workspace-nav-link{display:flex;position:relative;align-items:center;justify-content:flex-start;width:100%!important;min-height:39px;height:auto;gap:10px;padding:9px 10px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;line-height:1.35}
+.kcs-root .k4k-workspace-sidebar .k4k-workspace-nav-link span{display:inline-block;min-width:0;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:920px){
+ .kcs-root .k4k-workspace-sidebar{position:static;display:block;min-height:0}
+ .kcs-root .k4k-workspace-sidebar .k4k-workspace-nav{display:flex;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;padding:0 0 5px;gap:7px}
+ .kcs-root .k4k-workspace-sidebar .k4k-workspace-group{display:none}
+ .kcs-root .k4k-workspace-sidebar .k4k-workspace-nav-link{width:max-content!important;flex:0 0 auto;min-height:34px;overflow:visible}
+ .kcs-root .k4k-workspace-sidebar .k4k-workspace-space,.kcs-root .k4k-workspace-sidebar .k4k-workspace-sidebar-bottom{display:none}
 }
