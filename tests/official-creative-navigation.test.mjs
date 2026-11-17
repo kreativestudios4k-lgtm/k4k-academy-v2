@@ -5,12 +5,13 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const home=read('app/k4k-app/CreativeHome.js');
 const studio=read('app/k4k-app/create/page.js');
 const motion=read('app/k4k-app/higgsfield-preview/page.js');
+const gallery=read('app/k4k-app/motion/MotionExploreGallery.js');
 const shell=read('app/k4k-app/PreviewShell.js');
 const homeCss=read('app/k4k-app/creative-home.css');
 const studioCss=read('app/k4k-app/create/create.css');
 const catalog=read('lib/creation-studio-catalog.mjs');
 test('every official K4K section is a distinct route, not an inert duplicate',()=>{
- for(const p of ['/k4k-app/motion/explore','/k4k-app/image','/k4k-app/video','/k4k-app/motion'])for(const source of [home,studio,motion,shell])assert.ok(source.includes(p),p);
+ for(const p of ['/k4k-app/motion/explore','/k4k-app/image','/k4k-app/video','/k4k-app/motion'])for(const source of [home,studio,motion,shell,gallery])assert.ok(source.includes(p),p);
  const image=read('app/k4k-app/image/page.js'),video=read('app/k4k-app/video/page.js');
  assert.match(image,/kind=image&model=/);assert.match(video,/kind=video&model=/);
  assert.match(image,/\['nano_banana_2','flux_3_image'\]/);
