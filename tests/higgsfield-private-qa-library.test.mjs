@@ -19,5 +19,22 @@ test('archive validates content and bounded file, signs links only for owner, no
  assert.match(api,/download:'K4K-Higgsfield-QA\.mp4'/);
  assert.doesNotMatch(api,/provider\.submit|api\.higgsfield\.ai|k4k_apply_invoice|credit_accounts|stripe/);
  assert.match(page,/Save existing video privately/);
- assert.match(page,/Download saved MP4/);
+ assert.match(page,/Save \/ Download MP4/);
+ assert.match(page,/downloadPrivateMp4/);
+ assert.match(page,/navigator\.share/);
+ assert.match(page,/URL\.createObjectURL/);
+ assert.match(page,/link\.download=filename/);
+ assert.doesNotMatch(page,/window\.location\.assign\(payload\.downloadUrl\)/);
+});
+
+test('iPhone download is owner-scoped MP4 attachment, not a cross-origin media navigation',()=>{
+ assert.match(api,/searchParams\.get\('file'\)==='1'/);
+ assert.match(api,/downloadableMp4\(a\.db\)/);
+ assert.match(api,/object\.download\(OUTPUT_PATH\)/);
+ assert.match(api,/verifyGenerationOutputBytes\(bytes,'video\/mp4'\)/);
+ assert.match(api,/Content-Disposition':'attachment; filename="K4K-Higgsfield-QA\.mp4"'/);
+ assert.match(api,/Content-Length':String\(bytes\.byteLength\)/);
+ assert.match(api,/Cache-Control':'private, no-store'/);
+ assert.match(page,/fetch\('\/api\/higgsfield\/qa-library\?file=1'/);
+ assert.match(page,/navigator\.canShare\(\{files:\[file\]\}\)/);
 });
