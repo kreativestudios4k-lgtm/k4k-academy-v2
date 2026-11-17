@@ -9,8 +9,8 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[]}){
- const [templateId,setTemplateId]=useState(''),[consent,setConsent]=useState(false);
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,usdPerCredit=0.10,templates=[],initialTemplateId=''}){
+ const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:''),[consent,setConsent]=useState(false);
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const source=selectedTemplate?generationReference(selectedTemplate):null;
  const rates={'480p':0.154,'720p':0.3446,'1080p':0.8346};
