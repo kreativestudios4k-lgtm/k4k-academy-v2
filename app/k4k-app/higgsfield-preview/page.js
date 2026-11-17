@@ -88,6 +88,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const featuredTemplate=motionGallery.find(t=>t.id===previewOriginalId)||selectedTemplate||libraryItems[0]||motionGallery[0];
  const featuredUsable=!!featuredTemplate&&templates.some(t=>t.id===featuredTemplate.id);
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.ceil(seconds):null;
+ const maxSecondsFor=quality=>Math.min(30,Math.max(0,Math.floor((qualityCaps?.[quality]??maxUsd)/rates[quality]+1e-9)));
  const priceFor=quality=>billableSeconds===null?null:Math.ceil(Math.round(billableSeconds*rates[quality]*1000000)/Math.round(usdPerCredit*1000000));
  const credits=priceFor(resolution);
  const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=(qualityCaps?.[resolution]??maxUsd);
@@ -112,7 +113,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
       </article>
      })}</div>{!libraryItems.length&&<p className="khm-lib-empty">No K4K Originals match your search.</p>}
     <aside className="khm-lib-feature"><div className="khm-lib-feature-media">{featuredTemplate&&<video key={featuredTemplate.id} src={featuredTemplate.videoUrl} autoPlay muted playsInline loop preload="metadata" controls/>}</div><div className="khm-lib-feature-info"><small>K4K ORIGINALS · {featuredUsable?'MOTION READY':'PREVIEW ONLY'}</small><strong>{featuredTemplate?.title||'Choose a scene'}</strong><span>{featuredUsable?'This reference is ready for character casting.':'This clip exceeds the supported preset duration. You can watch it here or upload your own source video in the editor.'}</span><button type="button" disabled={!featuredUsable} onClick={()=>{if(featuredTemplate){selectSourceTemplate(featuredTemplate.id);document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}}>{featuredUsable?'Recreate':'Preview only'}</button></div></aside></div>
-    <p className="khm-lib-foot">K4K Originals only. Longer clips are preview-only; your generated videos stay private in My Generations.</p>
+    <p className="khm-lib-foot">K4K Originals support 4–30 second sources. Available qualities depend on the signed credit quote and safety budget; finished videos stay private in My Generations.</p>
    </section>}
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
    <h1 className="khm-title">YOUR VIDEO. YOUR CAST.<br/><em>YOUR NEXT VIRAL HIT.</em></h1>
@@ -136,12 +137,12 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    </section>
    <section className="khm-quality-panel" style={{...panel,marginTop:18}}>
     <h2 style={{fontSize:20}}>03 · Video quality</h2>
-    <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Your estimated credit cost updates automatically when you choose a quality or upload a video.</p>
+    <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Source videos: 4–30 seconds. Each quality shows its current maximum duration and instant credit estimate.</p>
     <div className="khm-quality-options" role="group" aria-label="Choose video quality">
      {['480p','720p','1080p'].map(q=>{
-      const cost=priceFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
-      const disabled=busy||(customer&&cost!==null&&!affordable);
-      return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{cost===null?'Choose video':affordable||!customer?cost+' credits':'Unavailable'}</span></button>
+      const cost=priceFor(q),maxQualitySeconds=maxSecondsFor(q),affordable=cost!==null&&billableSeconds*rates[q]<=(qualityCaps?.[q]??maxUsd);
+      const disabled=busy||(customer&&(maxQualitySeconds<4||(cost!==null&&!affordable)));
+      return <button key={q} type="button" disabled={disabled} aria-pressed={q===resolution} onClick={()=>{setResolution(q);setResult(null);uploaded.current=null}} className={'khm-quality-choice'+(q===resolution?' selected':'')}><strong>{q}</strong><span>{maxQualitySeconds<4?'Unavailable':cost===null?'Up to '+maxQualitySeconds+'s':affordable||!customer?cost+' credits':'Up to '+maxQualitySeconds+'s'}</span></button>
      })}
     </div>
     <div className="khm-credit-summary" aria-live="polite">
