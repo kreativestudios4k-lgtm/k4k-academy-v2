@@ -6,6 +6,9 @@ import {genjutsuEstimate} from '../../../../lib/server/higgsfield-genjutsu-motio
 export const runtime='nodejs';
 export const dynamic='force-dynamic';
 const KEY='genjutsu-owner-first-480p-20261117';
+// Permanently close this already-used paid QA path. A new test requires reviewed media,
+// a matching scene prompt, an independent ledger key and fresh explicit approval.
+const FIRST_PAID_TEST_CLOSED=true;
 const USER_ID='0ef1af08-4df8-4858-967b-eac1a16f9f2c';
 const VIDEO='https://d2ol7oe51mr4n9.cloudfront.net/user_3DOy5W2p4yZzTs2NXN4l8PDBwQY/85a1d371-b29e-435d-8a28-44f39132716f.mp4';
 const IMAGES=[
@@ -34,6 +37,7 @@ function publicJob(row){
   errorCode:row?.error_code??null};
 }
 export async function POST(request){
+ if(FIRST_PAID_TEST_CLOSED)return respond({error:'FIRST_PAID_TEST_CLOSED',reason:'SOURCE_PROMPT_MISMATCH',noRetry:true},410);
  const a=await owner(request,{mutation:true});if(a.error)return respond({error:a.error},a.status);
  if(cost.usd>1.60||cost.duration!==5||cost.usd!==1.59)return respond({error:'COST_CAP_BLOCKED'},409);
  let body;try{body=await request.json()}catch{return respond({error:'INVALID_REQUEST'},400)}
