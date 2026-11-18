@@ -73,7 +73,7 @@ test('HTTP boundary rejects production, foreign origins/users, unknown fields an
 test('Lite follows production customer reserve and exactly-once provider dispatch with saved model tier',async()=>{
  let submittedTier='',submittedPayload;
  const f=fixture({
-  env:{K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'true',K4K_GENERATION_MAX_USD:'5'},
+  env:{...env,K4K_HIGGSFIELD_LIGHT_RATE_CARD_APPROVED:'true',K4K_GENERATION_MAX_USD:'5'},
   transfer:async({userId,jobId,beforeTransfer})=>{
    await beforeTransfer(30);
    return {input:{video_url:'https://d2ol7oe51mr4n9.cloudfront.net/input.mp4',image_urls:['https://d2ol7oe51mr4n9.cloudfront.net/ref.png']},verifiedMedia:{userId,jobId,verified:true,contentType:'video/mp4',seconds:30}};
