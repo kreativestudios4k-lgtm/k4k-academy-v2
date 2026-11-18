@@ -22,8 +22,8 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const initialCast=templateCast(initialTemplate);
  const initialSlots=initialCast.verified?initialCast.count:1;
  const source=selectedTemplate?generationReference(selectedTemplate,{maxSeconds:30}):null;
- const rates=motionModel==='lite'?{'480p':0.0739,'720p':0.1471,'1080p':0.2936}:{'480p':0.154,'720p':0.3446,'1080p':0.8346};
  const [motionModel,setMotionModel]=useState(()=>initialMotionModel==='lite'&&liteEnabled?'lite':'ultra');
+ const rates=motionModel==='lite'?{'480p':0.0739,'720p':0.1471,'1080p':0.2936}:{'480p':0.154,'720p':0.3446,'1080p':0.8346};
  const [video,setVideo]=useState(null),[images,setImages]=useState(()=>Array(initialSlots).fill(null)),[seconds,setSeconds]=useState(null),[resolution,setResolution]=useState('480p');
  const [targets,setTargets]=useState(()=>Array(initialSlots).fill('')),[main,setMain]=useState(0),[direction,setDirection]=useState('');
  let prompt='',castError='';try{prompt=buildDirectorPrompt({targets,main,direction});}catch(e){castError=e.message;}
