@@ -33,7 +33,7 @@ test('the actual uploaded seven-second Kling sample is used, never a private cus
 });
 
 test('all selected models get a truthful animated preview with 16:9 framing',()=>{
- assert.match(page,/<ModelSelectionAnimation key=\{model\.id\} model=\{model\}/>);
+ assert.match(page,/<ModelSelectionAnimation key=\{model\.id\} model=\{model\}\/\>/);
  assert.match(animation,/model\.demoUrl\?/);
  assert.match(animation,/kcs-model-animation-art/);
  assert.match(animation,/Interface animation · not generated output/);
