@@ -1,26 +1,33 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 const home=readFileSync(new URL('../app/k4k-app/CreativeHome.js',import.meta.url),'utf8');
-const css=readFileSync(new URL('../app/k4k-app/creative-home.css',import.meta.url),'utf8');
-test('Header login points to real auth route and remains clickable on tablet/mobile',()=>{
- assert.match(home,/<Link className="khf-signin" aria-label=\{tr\("Log in to K4K"/);
- assert.match(home,/href="\/login\?next=%2Fk4k-app%2Fcreate"/);
- assert.match(home,/className="khf-mobile-login"/);
- assert.match(home,/className="khf-mobile-signup"/);
- assert.match(css,/@media\(max-width:1180px\)/);
- assert.match(css,/\.khf-desktop-links\{display:none\}/);
- assert.match(css,/\.khf-signin\{display:inline-flex/);
- assert.match(css,/\.khf-header-actions\{gap:6px\}/);
+const css=readFileSync(new URL('../app/k4k-app/k4k-clean-home.css',import.meta.url),'utf8');
+
+test('homepage header login points to real auth route and preserves mobile account entry',()=>{
+ assert.match(home,/className="kc26-login" href="\/login\?next=%2Fk4k-app%2Fcreate"/);
+ assert.match(home,/className="kc26-signup" href=\{user\?'\/k4k-app\/create':'\/k4k-app\/register'\}/);
+ assert.match(home,/id="kc26-mobile-menu"/);
+ assert.match(home,/aria-controls="kc26-mobile-menu"/);
+ assert.match(home,/\{!user&&<><Link href="\/login\?next=%2Fk4k-app%2Fcreate"/);
+ assert.match(home,/<Link href="\/k4k-app\/register" onClick=\{\(\)=>setMenuOpen\(false\)\}/);
+ assert.match(css,/@media\(max-width:1020px\)/);
+ assert.match(css,/\.kc26-menu-toggle\{display:grid\}/);
 });
-test('Header navigation is responsive and does not allow links to collide with authentication',()=>{
- assert.match(css,/grid-template-columns:max-content minmax\(0,1fr\) max-content/);
- assert.match(css,/\.khf-header-actions\{[\s\S]*?z-index:5/);
- assert.match(css,/\.khf-topbar\{isolation:isolate;z-index:100/);
- assert.match(home,/aria-controls="khf-mobile-menu"/);
- assert.match(home,/id="khf-mobile-menu"/);
+
+test('header navigation remains usable on narrow devices without colliding with auth actions',()=>{
+ assert.match(css,/\.kc26-header-inner\{[^}]*display:flex;align-items:center;justify-content:space-between/);
+ assert.match(css,/\.kc26-header-actions\{[^}]*display:flex;align-items:center;justify-content:flex-end/);
+ assert.match(css,/@media\(max-width:720px\)/);
+ assert.match(css,/@media\(max-width:440px\)/);
+ assert.match(css,/\.kc26-mobile-menu\{position:absolute!important/);
+ assert.match(css,/\.kc26-header\{position:sticky;top:0;z-index:70/);
 });
-test('Login component and public authentication route are retained',()=>{
+
+test('login component and public authentication route are retained',()=>{
  const login=readFileSync(new URL('../app/login/page.js',import.meta.url),'utf8');
  const auth=readFileSync(new URL('../app/components/AcademyAuthForm.js',import.meta.url),'utf8');
  assert.match(login,/AcademyAuthForm mode="login"/);
- assert.match(auth,/signInWithPassword/);assert.match(auth,/signInWithOAuth/);
+ assert.match(auth,/signInWithPassword/);
+ assert.match(auth,/signInWithOAuth/);
 });
