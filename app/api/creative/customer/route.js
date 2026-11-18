@@ -8,6 +8,8 @@ import {assertResponsiblePrompt} from '../../../../lib/server/fal-wan.mjs';
 import {createMultimodelLedger} from '../../../../lib/server/multimodel-ledger.mjs';
 import {createMultimodelPrivateDelivery} from '../../../../lib/server/multimodel-private-delivery.mjs';
 import {boundedCreativeDownload} from '../../../../lib/server/creative-qa-output.mjs';
+import {createHiggsfieldPlatformApi,higgsfieldCustomerCredential} from '../../../../lib/server/higgsfield-platform-api.mjs';
+import {createHiggsfieldVerifiedOutputRetriever} from '../../../../lib/server/higgsfield-verified-output.mjs';
 import {CUSTOMER_CREATIVE_MODELS,creativeCustomerQuote,creativeCustomerRelease} from '../../../../lib/server/creative-customer-policy.mjs';
 export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=300;
 const uuid=/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i;
@@ -37,9 +39,9 @@ async function auth(req){
 }
 async function owned(db,userId,jobId){
  if(!uuid.test(jobId||''))throw Error('INVALID_JOB');
- const {data,error}=await db.from('k4k_multimodel_jobs').select('*').eq('id',jobId).eq('user_id',userId).eq('provider','fal').maybeSingle();
+ const {data,error}=await db.from('k4k_multimodel_jobs').select('*').eq('id',jobId).eq('user_id',userId).in('provider',['fal','higgsfield']).maybeSingle();
  if(error)throw Error('UNAVAILABLE');
- if(!data||!byModel.has(data.model))throw Error('JOB_NOT_FOUND');
+ if(!data||!byModel.has(data.model)||(byModel.get(data.model).provider||'fal')!==data.provider)throw Error('JOB_NOT_FOUND');
  return data;
 }
 async function fal(path,method='GET',input){
@@ -50,6 +52,27 @@ async function fal(path,method='GET',input){
  return res.json();
 }
 async function state(db,userId,job){
+ if(job.provider==='higgsfield'){
+  const provider=createHiggsfieldPlatformApi({credentials:higgsfieldCustomerCredential()});
+  if(!job.provider_request_id||!uuid.test(job.provider_request_id))throw Error('PROVIDER_REQUEST_UNVERIFIED');
+  const status=await provider.status(job.provider_request_id);
+  if(status.request_id!==job.provider_request_id)throw Error('PROVIDER_RESPONSE_INVALID');
+  if(status.status==='queued'||status.status==='in_progress')return {jobId:job.id,status:'processing'};
+  if(status.status==='failed'){await refund(db,userId,job);return {jobId:job.id,status:'failed',refunded:true}}
+  if(status.status!=='completed')throw Error('PROVIDER_STATUS_UNVERIFIED');
+  const retriever=createHiggsfieldVerifiedOutputRetriever({provider,enabled:true});
+  const {bytes,contentType}=await retriever.retrieve({providerRequestId:job.provider_request_id,expectedKind:'video'});
+  const path=userId+'/'+job.id+'.mp4';
+  const {error:uploadError}=await db.storage.from('studio-generations').upload(path,bytes,{contentType,upsert:false});
+  if(uploadError){
+   const {data:details,error:infoErr}=await db.storage.from('studio-generations').info(path);
+   if(infoErr||!details||Number(details.size)!==bytes.length||String(details.contentType||details.metadata?.mimetype||'').split(';')[0]!==contentType)throw Error('OUTPUT_STORAGE_REVIEW');
+  }
+  const ledger=createMultimodelLedger({client:db,enabled:true});
+  await ledger.finish({userId,jobId:job.id,outcome:'completed',contentType,outputPath:path});
+  return {jobId:job.id,status:'completed',creditsCharged:job.credits_quoted};
+ }
+
  const model=byModel.get(job.model);
  if(!job.provider_request_id||!uuid.test(job.provider_request_id))throw Error('PROVIDER_REQUEST_UNVERIFIED');
  const base=model.endpoint.split('/').slice(0,2).join('/')+'/requests/'+job.provider_request_id;
@@ -80,7 +103,7 @@ async function state(db,userId,job){
  return {jobId:job.id,status:'completed',creditsCharged:job.credits_quoted};
 }
 async function refund(db,userId,job){
- const digest=hash(['fal-confirmed-terminal-v1',job.provider_request_id,'failed']);
+ const digest=hash([job.provider==='higgsfield'?'higgsfield-confirmed-terminal-v1':'fal-confirmed-terminal-v1',job.provider_request_id,'failed']);
  const {data,error}=await db.rpc('k4k_multimodel_refund_confirmed_provider_failure',{
   p_user:userId,p_job:job.id,p_provider_request:job.provider_request_id,p_terminal_status:'failed',p_evidence_digest:digest});
  if(error||data?.status!=='refunded')throw Error('REFUND_REVIEW_REQUIRED');
@@ -97,9 +120,9 @@ export async function POST(req){
  try{
  if(body.action==='models')return response({models:known.map(([id,m])=>({id,kind:m.kind,enabled:creativeCustomerRelease(process.env,id,user.id)}))});
  if(body.action==='quote'){
-  const model=creativeCustomerQuote(body.modelId,process.env,user.id);
+  const model=creativeCustomerQuote(body.modelId,process.env,user.id,{duration:body.duration,resolution:body.resolution});
   const prompt=typeof body.prompt==='string'?body.prompt.trim():'';
-  const aspect=['9:16','16:9','1:1'].includes(body.aspect)?body.aspect:null;
+  const aspect=(model.aspects||['9:16','16:9','1:1']).includes(body.aspect)?body.aspect:null;
   if(!aspect||prompt.length<10||prompt.length>1200)throw Error('INVALID_INPUT');
   if(body.modelId==='seedance_2_5'){
    // One paid Seedance request per account per UTC day. SQL unique index is the
@@ -110,20 +133,20 @@ export async function POST(req){
    if(count>0)throw Error('SEEDANCE_DAILY_LIMIT');
   }
   assertResponsiblePrompt(prompt);
-  const {count,error:limitError}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).eq('provider','fal').eq('status','draft').gte('created_at',new Date(Date.now()-600000).toISOString());
+  const {count,error:limitError}=await db.from('k4k_multimodel_jobs').select('id',{head:true,count:'exact'}).eq('user_id',user.id).in('provider',['fal','higgsfield']).eq('status','draft').gte('created_at',new Date(Date.now()-600000).toISOString());
   if(limitError)throw Error('UNAVAILABLE');if(count>=5)throw Error('TOO_MANY_QUOTES');
   budget(process.env);
   const credits=generationCredits(model.quoteUsdMicros/1e6);
   const {data:account,error:accountError}=await db.from('k4k_live_credit_accounts').select('balance,billing_hold').eq('user_id',user.id).maybeSingle();
   if(accountError)throw Error('UNAVAILABLE');if(!account||account.billing_hold||account.balance<credits)throw Error(account?.billing_hold?'BILLING_REVIEW_REQUIRED':'INSUFFICIENT_CREDITS');
-  const jobId=randomUUID(),fingerprint=hash(['creative-customer-v1',user.id,jobId,body.modelId,model.endpoint,prompt,aspect,model.quoteUsdMicros,credits]);
+  const jobId=randomUUID(),fingerprint=hash(['creative-customer-v1',user.id,jobId,body.modelId,model.endpoint,prompt,aspect,model.duration||null,model.resolution||null,model.quoteUsdMicros,credits]);
   const signing=process.env.K4K_CREATIVE_QUOTE_SECRET;
   if(!signing||signing.length<32)throw Error('QUOTE_SIGNING_UNAVAILABLE');
-  const signer=quoteSigner(signing),token=signer.issue({provider:'fal',userId:user.id,jobId,modelId:body.modelId,usdMicros:model.quoteUsdMicros,credits,fingerprint});
+  const signer=quoteSigner(signing),token=signer.issue({provider:model.provider||'fal',userId:user.id,jobId,modelId:body.modelId,usdMicros:model.quoteUsdMicros,credits,fingerprint});
   const signedQuote=signer.verify(token);
   const {error}=await db.from('k4k_multimodel_jobs').insert({
-   id:jobId,user_id:user.id,provider:'fal',model:model.dbModel,media_kind:model.kind,status:'draft',prompt,
-   normalized_input:{aspect_ratio:aspect,endpoint:model.endpoint},input_fingerprint:fingerprint,
+   id:jobId,user_id:user.id,provider:model.provider||'fal',model:model.dbModel,media_kind:model.kind,status:'draft',prompt,
+   normalized_input:{aspect_ratio:aspect,endpoint:model.endpoint,...(model.provider==='higgsfield'?{duration:model.duration,resolution:model.resolution}:{})},input_fingerprint:fingerprint,
    quoted_usd_micros:model.quoteUsdMicros,credits_quoted:credits,quote_expires_at:new Date(signedQuote.expiresAt).toISOString()
   });
   if(error)throw Error('JOB_CREATION_FAILED');
@@ -149,7 +172,8 @@ export async function POST(req){
   if(!['draft','queued'].includes(job.status))throw Error('INVALID_JOB_STATE');
   if(new Date(job.quote_expires_at).getTime()<=Date.now()+25000)throw Error('QUOTE_EXPIRED');
   // Fail BEFORE atomically reserving credits or claiming an irreversible dispatch.
-  if(typeof process.env.FAL_KEY!=='string'||!process.env.FAL_KEY.trim())throw Error('PROVIDER_CREDENTIALS_MISSING');
+  if((job.provider==='fal'&&(!process.env.FAL_KEY||!process.env.FAL_KEY.trim()))||
+     (job.provider==='higgsfield'&&!higgsfieldCustomerCredential()))throw Error('PROVIDER_CREDENTIALS_MISSING');
   const b=budget(process.env);
   const ledger=createMultimodelLedger({client:db,enabled:true});
   await ledger.reserve({userId:user.id,jobId:job.id,requestKey:body.requestKey,inputFingerprint:job.input_fingerprint,quoteMicros:job.quoted_usd_micros,credits:job.credits_quoted,...b});
@@ -157,7 +181,16 @@ export async function POST(req){
   if(claimError||!claim||claim.job_id!==job.id||typeof claim.claimed!=='boolean')throw Error('DISPATCH_CLAIM_REVIEW');
   if(!claim.claimed)return response({jobId:job.id,status:claim.state||'queued',reviewRequired:true});
   let created;
-  try{created=await fal(model.endpoint,'POST',model.input(job.prompt,job.normalized_input.aspect_ratio))}
+  try{
+   created=job.provider==='higgsfield'
+    ?await createHiggsfieldPlatformApi({credentials:higgsfieldCustomerCredential()}).submit({
+      modelPath:model.endpoint,enabled:true,
+      input:model.input(job.prompt,job.normalized_input.aspect_ratio,{
+       duration:job.normalized_input.duration,resolution:job.normalized_input.resolution
+      })
+     })
+    :await fal(model.endpoint,'POST',model.input(job.prompt,job.normalized_input.aspect_ratio));
+  }
   catch{throw Error('SUBMISSION_UNCERTAIN_DO_NOT_RETRY')}
   if(!uuid.test(created.request_id||''))throw Error('SUBMISSION_UNCERTAIN_DO_NOT_RETRY');
   const {data:record,error:recErr}=await db.rpc('k4k_multimodel_record_provider_request',{p_user:user.id,p_job:job.id,p_provider_request:created.request_id});
@@ -171,13 +204,13 @@ export async function POST(req){
  }
  if(body.action==='download')return response(await signed(db,user.id,body.jobId,body.download));
  if(body.action==='list'){
-  const {data,error}=await db.from('k4k_multimodel_jobs').select('id,model,status,media_kind,credits_quoted,created_at').eq('user_id',user.id).eq('provider','fal').in('model',[...byModel.keys()]).neq('status','draft').order('created_at',{ascending:false}).limit(20);
+  const {data,error}=await db.from('k4k_multimodel_jobs').select('id,model,status,media_kind,credits_quoted,created_at').eq('user_id',user.id).in('provider',['fal','higgsfield']).in('model',[...byModel.keys()]).neq('status','draft').order('created_at',{ascending:false}).limit(20);
   if(error)throw Error('UNAVAILABLE');
   return response({jobs:data});
  }
  return response({error:'INVALID_ACTION'},400);
  }catch(e){
-  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','SEEDANCE_DAILY_LIMIT','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE']);
+  const allowed=new Set(['CREATIVE_MODEL_NOT_LIVE','INVALID_INPUT','CONTENT_POLICY_BLOCKED','TOO_MANY_QUOTES','SEEDANCE_DAILY_LIMIT','INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','SUBMISSION_UNCERTAIN_DO_NOT_RETRY','PROVIDER_RECORDING_REVIEW','DISPATCH_CLAIM_REVIEW','PROVIDER_BUDGET_BLOCKED','REFUND_REVIEW_REQUIRED','OUTPUT_STORAGE_REVIEW','PROVIDER_STATUS_UNVERIFIED','INVALID_JOB_STATE','JOB_NOT_FOUND','UNAVAILABLE','PROVIDER_CREDENTIALS_MISSING']);
   const code=allowed.has(e.message)?e.message:'GENERATION_UNAVAILABLE';
   return response({error:code,reviewRequired:/REVIEW|UNCERTAIN/.test(code)},['INSUFFICIENT_CREDITS','BILLING_REVIEW_REQUIRED','QUOTE_EXPIRED','QUOTE_CHANGED','TOO_MANY_QUOTES','SEEDANCE_DAILY_LIMIT'].includes(code)?409:code==='CREATIVE_MODEL_NOT_LIVE'?503:code==='JOB_NOT_FOUND'?404:code==='INVALID_INPUT'?400:code==='CONTENT_POLICY_BLOCKED'?422:code==='SUBMISSION_UNCERTAIN_DO_NOT_RETRY'?202:503);
  }
