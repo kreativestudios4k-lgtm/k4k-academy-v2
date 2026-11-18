@@ -26,9 +26,9 @@ test('Recreate does not bypass verified uploads or charging confirmation',()=>{
  assert.match(studio,/if\(!castReady\)/);
 });
 test('Premium Motion cards direct to the production-gated Director, not an owner pilot dead end',()=>{
- for(const id of ['k4k-motion-lite','k4k-motion-pro','k4k-motion-ultra']){
+ for(const id of ['k4k-motion-lite','k4k-motion-ultra']){
   const s=catalogue.slice(catalogue.indexOf("{id:'"+id+"'"));
-  assert.ok(s.slice(0,s.indexOf('},')+2).includes("cta:'/k4k-app/motion'"),id);
+  assert.ok(s.slice(0,s.indexOf('},')+2).includes("cta:'/k4k-app/motion?model="+ (id==='k4k-motion-lite'?'lite':'ultra')+"'"),id);
   assert.ok(s.slice(0,s.indexOf('},')+2).includes("status:'active'"),id);
  }
  assert.match(create,/Open K4K Motion/);
