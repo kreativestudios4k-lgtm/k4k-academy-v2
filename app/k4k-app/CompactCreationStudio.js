@@ -4,6 +4,8 @@ import Link from 'next/link';
 import {ArrowLeft,ArrowRight,ArrowUpRight,ChevronDown,Clock3,FileText,Film,Globe2,Image as ImageIcon,Images,Info,Layers3,Play,Plus,ShieldCheck,Sparkles,Upload,Video,X} from 'lucide-react';
 import {publicCreationModels} from '../../lib/creation-studio-catalog.mjs';
 import CustomerCreativeGeneration from './CustomerCreativeGeneration';
+import EmbeddedMotionStudio from './EmbeddedMotionStudio';
+import WanCreator from './creator/page';
 import './compact-creation-studio.css';
 
 const videoModels=publicCreationModels('video');
@@ -95,7 +97,7 @@ export default function CompactCreationStudio({
     <Link href="/" className="kcp-explore-link"><ArrowLeft size={15}/> Explore</Link>
    </nav>
   </header>
-  <div className="kcp-workspace">
+  {model.premium?<section className="kcp-motion-section" aria-label={model.name+" motion generation"}><EmbeddedMotionStudio key={model.motionModel} model={model}/></section>:model.id==="wan-prime"?<section className="kcp-wan-section" aria-label="Wan 3 generator"><WanCreator embedded/></section>:<div className="kcp-workspace">
    <section className="kcp-input" aria-labelledby="kcp-input-title">
     <div className="kcp-input-scroll">
      <div className="kcp-panel-head"><h1 id="kcp-input-title">Input</h1><span>{model.name}</span></div>
@@ -131,6 +133,6 @@ export default function CompactCreationStudio({
      <div className="kcp-result-foot"><p>This is {model.demoUrl?'a supplied showcase video':'an interface preview'}, not the output of your prompt. Generated files are saved privately in your Library.</p><Link href="/k4k-app/videos">Open Library <ArrowUpRight size={15}/></Link></div>
     </div>
    </section>
-  </div>
+  </div>}
  </main>;
 }
