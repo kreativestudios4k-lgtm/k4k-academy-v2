@@ -17,7 +17,7 @@ const HERO_VIDEO_URL=process.env.NEXT_PUBLIC_K4K_HOME_HERO_VIDEO_URL||
  'https://d2ol7oe51mr4n9.cloudfront.net/user_3DOy5W2p4yZzTs2NXN4l8PDBwQY/6250e761-2957-4f49-92d3-69b1f23d907e.mp4';
 
 const originals=catalogue.discoveryPreviews.filter(item=>item.videoUrl).slice(0,8);
-const modelOrder=['kling4_hf','seedance_2_5','k4k-motion-lite','wan-prime','nano_banana_2','flux_3_image','kling4_0','seedance_2_5_flash','k4k-motion-ultra','kling_4_0_flash','gpt_image_2_6','kling_omni_image'];
+const modelOrder=['kling4_hf','seedance_2_5','k4k-motion-lite','wan-prime','nano_banana_2','flux_3_image','seedance_2_5_flash','k4k-motion-ultra','gpt_image_2_6','kling_omni_image'];
 const orderedModels=modelOrder.map(id=>CREATION_MODELS.find(model=>model.id===id)).filter(Boolean);
 const groups=[
  {id:'all',name:'All models'},
