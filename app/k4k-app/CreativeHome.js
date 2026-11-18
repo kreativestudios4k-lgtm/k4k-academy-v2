@@ -25,8 +25,10 @@ const groups=[
  {id:'image',name:'Image'},
  {id:'motion',name:'K4K Motion'}
 ];
+// Every public model opens the same studio workspace first. Once inside, workflows
+// that need a specialist Director can be launched explicitly, without silently
+// bypassing the selected-model interface or altering its provider routing.
 function studioHref(model){
- if(model.cta)return model.cta;
  return '/k4k-app/create?kind='+encodeURIComponent(model.kind)+'&model='+encodeURIComponent(model.id);
 }
 function ModelArt({model}){
