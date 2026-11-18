@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="K4K APP symbol">
+<defs><linearGradient id="v" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f5e8ff"/><stop offset=".43" stop-color="#b56bff"/><stop offset="1" stop-color="#6920f8"/></linearGradient><filter id="glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="6"/></filter></defs>
+<path d="M16 18h22v92H16zM44 65 89 18h29L77 62l41 48H88z" fill="#a45cff" opacity=".4" filter="url(#glow)"/>
+<path d="M16 18h23v92H16z" fill="#fff"/>
+<path d="M45 63 86 18h32L76 63z" fill="url(#v)"/>
+<path d="m45 68 31-5 42 47H86z" fill="url(#v)"/>
+<path d="m59 62 20-12v25z" fill="#130327"/>
+</svg>
