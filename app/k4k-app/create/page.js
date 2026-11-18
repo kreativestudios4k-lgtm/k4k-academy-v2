@@ -5,6 +5,7 @@ import {ArrowRight,ArrowUpRight,Images,Film,Layers,Upload,Plus,X,Copy,Check,Shie
 import {CREATION_MODELS,creationModels,creationModelGroups,creationBrief} from '../../../lib/creation-studio-catalog.mjs';
 import {creativeModelReadiness} from '../../../lib/creative-provider-readiness.mjs';
 import CustomerCreativeGeneration from '../CustomerCreativeGeneration';
+import VideoGenerationPopup from '../VideoGenerationPopup';
 import {useK4KLocale} from '../locale';
 import './create.css';
 import StudioSidebar from '../StudioSidebar';
@@ -17,11 +18,13 @@ export default function CreativeStudio(){
  const [prompt,setPrompt]=useState(''),[files,setFiles]=useState([]),[copied,setCopied]=useState(false),[error,setError]=useState('');
  const [customerModels,setCustomerModels]=useState({});
  const [modelPickerOpen,setModelPickerOpen]=useState(false),[modelQuery,setModelQuery]=useState('');
+ const [generatorOpen,setGeneratorOpen]=useState(false);
  const visiblePickerModels=creationModels(kind).filter(item=>item.name.toLowerCase().includes(modelQuery.trim().toLowerCase()));
  const selectedLive=customerModels[model.id]===true&&((model.kind==='video'&&mode==='Text to video')||(model.kind==='image'&&mode==='Text to image'));
  useEffect(()=>{if(selectedLive){setResolution(model.id==='kling4_hf'?'720p':model.id==='kling4_0'?'720p':model.id==='seedance_2_5'?'480p':'1K');if(model.duration&&model.id!=='kling4_hf')setDuration(5)}},[selectedLive,model.id]);
- function chooseModel(next){setModelPickerOpen(false);setId(next.id);setMode(next.modes[0]);setResolution(next.resolution[0]);setAspect(next.aspect[0]);setDuration(next.duration?.[0]||5);setFiles(old=>old.slice(0,next.refs));setError('');}
+ function chooseModel(next){setGeneratorOpen(false);setModelPickerOpen(false);setId(next.id);setMode(next.modes[0]);setResolution(next.resolution[0]);setAspect(next.aspect[0]);setDuration(next.duration?.[0]||5);setFiles(old=>old.slice(0,next.refs));setError('');}
  function chooseKind(next){setKind(next);chooseModel(creationModels(next)[0]);}
+ function openVideoPopup(){if(model.kind!=='video')return;if(model.aspect.includes('16:9'))setAspect('16:9');setGeneratorOpen(true);}
  useEffect(()=>{
   // Named Image and Video destinations stay on the same proven generation
   // backend, selecting only catalog models permitted for the chosen tab.
@@ -60,13 +63,15 @@ export default function CreativeStudio(){
     {model.status==='provider-verified'&&<div className="kcs-note" role="status"><ShieldCheck size={17}/><p><strong>{selectedLive?'Ready to create':'Workflow availability'}</strong> — {selectedLive?'Choose your prompt and review the exact credit price before generating. Your finished work is saved privately.':'This specific workflow is not yet enabled for customer generation. Choose an available model or workflow; no credits are charged for selecting a tool.'}</p></div>}
     {model.refs===0&&<div className="kcs-input-info"><ImagePlus size={18}/><p>Text prompt only for this model. Image reference uploads and edits will appear here only when the selected API supports them.</p></div>}
     
-    {model.status==='provider-verified'&&<CustomerCreativeGeneration model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={setCustomerModels}/>}
+    {kind==='video'&&<button type="button" className="kcs-video-popup-launch" onClick={openVideoPopup}><Play size={18}/> Open video creation popup <span>16:9 preview</span><ArrowUpRight size={17}/></button>}
+    {kind==='image'&&model.status==='provider-verified'&&<CustomerCreativeGeneration model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={setCustomerModels}/>}
     <div className="kcs-note"><ShieldCheck size={17}/><p>{selectedLive?'Credits are only reserved after you confirm a signed generation quote.':t.note} {model.kind==='video'&&model.status==='active'?'Wan 3 uses the existing Wan-powered video generator. Premium K4K Motion is a separate character swap pilot.':''}</p></div>
     {error&&<p className="kcs-error" role="alert">{error}</p>}
     <div className="kcs-actions"><button type="button" onClick={copyBrief} className="kcs-copy">{copied?<Check size={17}/>:<Copy size={17}/>} {copied?t.copied:t.copy}</button>{model.cta?<Link className="kcs-launch" href={model.cta}><Play size={17}/>{model.premium?'Open K4K Motion':t.open}<ArrowRight size={17}/></Link>:selectedLive?<span className="kcs-launch"><CheckCircle2 size={17}/> Model ready above</span>:<span className="kcs-disabled"><Clock3 size={17}/>{t.ready}</span>}</div>
    </section></div>
   </div>
   </div></div>
+  <VideoGenerationPopup open={generatorOpen} setOpen={setGeneratorOpen} model={model} mode={mode} setMode={setMode} prompt={prompt} setPrompt={setPrompt} aspect={aspect} setAspect={setAspect} duration={duration} setDuration={setDuration} resolution={resolution} setResolution={setResolution} files={files} setFiles={setFiles} thumbnails={thumbnails} addFiles={addFiles} onModels={setCustomerModels}/>
   {modelPickerOpen&&<div className="kcs-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setModelPickerOpen(false)}}><section className="kcs-model-dialog" role="dialog" aria-modal="true" aria-label="Choose creation model"><header><div><span>K4K APP · MODELS</span><h2>Select model</h2></div><button type="button" aria-label="Close model picker" onClick={()=>setModelPickerOpen(false)}><X size={21}/></button></header><div className="kcs-dialog-tabs" role="group" aria-label="Choose image or video">{['image','video'].map(k=><button key={k} type="button" aria-pressed={kind===k} onClick={()=>{chooseKind(k);setModelPickerOpen(true);setModelQuery('')}}>{k==='image'?<Images size={17}/>:<Film size={17}/>} {k==='image'?'Image':'Video'}</button>)}</div><label className="kcs-search-model"><Search size={19}/><input autoFocus value={modelQuery} onChange={e=>setModelQuery(e.target.value)} placeholder="Search available models" aria-label="Search models"/></label><div className="kcs-dialog-list">{visiblePickerModels.length?visiblePickerModels.map(item=><button type="button" key={item.id} className={'kcs-dialog-model'+(item.id===model.id?' active':'')} onClick={()=>chooseModel(item)}><span className="kcs-dialog-model-icon">{item.kind==='image'?<Images size={22}/>:<Film size={22}/>}</span><span><strong>{item.name}</strong><small>{item.description}</small></span>{item.id===model.id?<CheckCircle2 size={18}/>:<ArrowRight size={18}/>}</button>):<p>No models found.</p>}</div><footer>Models display only their verified K4K workflows. Generation requires a signed credit confirmation.</footer></section></div>}
  </main>;
 }
