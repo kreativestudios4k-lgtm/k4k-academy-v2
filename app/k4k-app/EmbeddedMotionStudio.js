@@ -43,16 +43,21 @@ export default function EmbeddedMotionStudio({model}){
   return()=>{active=false};
  },[]);
  const allowed=!!config?.enabled&&(model.motionModel==='ultra'||config.liteEnabled);
- if(!allowed)return <MotionUnavailable model={model} loading={!config&&!error} error={error}/>;
- return <HiggsfieldPreview
-   key={model.motionModel}
-   customer embedded
-   templates={config.templates}
-   gallery={config.gallery}
-   initialMotionModel={model.motionModel}
-   liteEnabled={config.liteEnabled}
-   maxUsd={config.maxUsd}
-   usdPerCredit={config.usdPerCredit}
-   qualityCaps={config.qualityCaps}
- />;
+ return <div className="kcp-motion-embedded">
+   <div className="kcp-motion-mode-tabs" role="tablist" aria-label="K4K Motion workflow">
+     <button type="button" role="tab" aria-selected="true">Motion transfer</button>
+     <button type="button" role="tab" aria-selected="false" disabled title="Object Swap is not enabled">Objects swap · Coming soon</button>
+   </div>
+   {allowed?<HiggsfieldPreview
+     key={model.motionModel}
+     customer embedded
+     templates={config.templates}
+     gallery={config.gallery}
+     initialMotionModel={model.motionModel}
+     liteEnabled={config.liteEnabled}
+     maxUsd={config.maxUsd}
+     usdPerCredit={config.usdPerCredit}
+     qualityCaps={config.qualityCaps}
+   />:<MotionUnavailable model={model} loading={!config&&!error} error={error}/>}
+ </div>;
 }
