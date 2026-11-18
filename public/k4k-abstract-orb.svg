@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 970" aria-hidden="true"><defs>
+<radialGradient id="sphere" cx=".38" cy=".25" r=".85"><stop offset="0" stop-color="#0b0e16"/><stop offset=".44" stop-color="#080b19"/><stop offset=".7" stop-color="#151020"/><stop offset=".9" stop-color="#490e39"/><stop offset="1" stop-color="#07070c"/></radialGradient>
+<radialGradient id="tint" cx=".22" cy=".18" r=".9"><stop stop-color="#13edaa" stop-opacity=".95"/><stop offset=".18" stop-color="#00bcdf" stop-opacity=".70"/><stop offset=".46" stop-color="#2448be" stop-opacity=".34"/><stop offset=".78" stop-color="#bd1261" stop-opacity=".37"/><stop offset="1" stop-color="#ed165c" stop-opacity=".96"/></radialGradient>
+<linearGradient id="rim" x1=".08" y1=".12" x2=".91" y2=".87"><stop stop-color="#19ed8c"/><stop offset=".23" stop-color="#148edc"/><stop offset=".5" stop-color="#0e111d"/><stop offset=".83" stop-color="#db237a"/><stop offset="1" stop-color="#f02457"/></linearGradient>
+<radialGradient id="highlight" cx=".13" cy=".78" r=".9"><stop stop-color="#e0d7f0" stop-opacity=".83"/><stop offset=".18" stop-color="#6378aa" stop-opacity=".48"/><stop offset=".38" stop-color="#101625" stop-opacity=".06"/><stop offset="1" stop-color="#070710" stop-opacity="0"/></radialGradient>
+<radialGradient id="darkCore" cx=".49" cy=".38" r=".57"><stop stop-color="#05060d" stop-opacity=".98"/><stop offset=".6" stop-color="#050710" stop-opacity=".92"/><stop offset=".9" stop-color="#060712" stop-opacity=".3"/><stop offset="1" stop-color="#060712" stop-opacity="0"/></radialGradient>
+<filter id="blur"><feGaussianBlur stdDeviation="35"/></filter><filter id="glow"><feGaussianBlur stdDeviation="14"/></filter>
+</defs>
+<ellipse cx="560" cy="493" rx="388" ry="389" fill="url(#tint)" opacity=".55" filter="url(#blur)"/>
+<circle cx="555" cy="475" r="374" fill="url(#sphere)" stroke="url(#rim)" stroke-width="3"/>
+<circle cx="555" cy="475" r="368" fill="url(#tint)" opacity=".90"/>
+<circle cx="555" cy="475" r="367" fill="url(#highlight)"/>
+<circle cx="555" cy="475" r="354" fill="url(#darkCore)"/>
+<path d="M232 290C287 157 424 102 536 103" fill="none" stroke="#5fffb5" stroke-width="9" opacity=".23" filter="url(#glow)"/>
+<path d="M685 810C804 769 901 680 921 543" fill="none" stroke="#ff2a79" stroke-width="15" opacity=".26" filter="url(#glow)"/>
+</svg>

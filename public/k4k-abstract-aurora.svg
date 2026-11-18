@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 760" aria-hidden="true"><defs><linearGradient id="a" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#00b9ff"/><stop offset=".32" stop-color="#125fd8"/><stop offset=".57" stop-color="#24174e"/><stop offset=".8" stop-color="#f25858"/><stop offset="1" stop-color="#fa9a50"/></linearGradient><linearGradient id="b" x1=".1" y1=".15" x2=".8" y2=".85"><stop stop-color="#007bce"/><stop offset=".36" stop-color="#0d1849"/><stop offset=".72" stop-color="#b8266c"/><stop offset="1" stop-color="#ff7439"/></linearGradient><filter id="blur"><feGaussianBlur stdDeviation="40"/></filter><pattern id="grid" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" stroke="#d0c1fc" stroke-width=".7" opacity=".19" fill="none"/></pattern></defs>
+<rect width="1600" height="760" fill="#02040a"/>
+<path d="M-80-60H550C480 230 730 270 1040 416c240 113 420 24 640-68V820H-80Z" fill="url(#a)"/>
+<path d="M-100 650C232 330 595 560 875 402c258-146 433-270 808-197v-280H-100Z" fill="url(#b)" opacity=".7"/>
+<path d="M-60 520C390 220 545 510 917 390c303-98 490-230 774-160" fill="none" stroke="#00acff" stroke-width="100" opacity=".27" filter="url(#blur)"/>
+<path d="M-80 760C313 440 722 585 1047 472c225-78 363-67 643-30" fill="none" stroke="#f38163" stroke-width="146" opacity=".24" filter="url(#blur)"/>
+<path d="M0 0H1600V760H0z" fill="url(#grid)" opacity=".18" />
+</svg>
