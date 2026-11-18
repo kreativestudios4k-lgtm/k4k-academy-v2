@@ -6,6 +6,7 @@ import {publicCreationModels} from '../../lib/creation-studio-catalog.mjs';
 import CustomerCreativeGeneration from './CustomerCreativeGeneration';
 import EmbeddedMotionStudio from './EmbeddedMotionStudio';
 import WanCreator from './creator/page';
+import VideoCreationWorkspace from './VideoCreationWorkspace';
 import './compact-creation-studio.css';
 
 const videoModels=publicCreationModels('video');
@@ -97,7 +98,15 @@ export default function CompactCreationStudio({
     <Link href="/" className="kcp-explore-link"><ArrowLeft size={15}/> Explore</Link>
    </nav>
   </header>
-  {model.premium?<section className="kcp-motion-section" aria-label={model.name+" motion generation"}><EmbeddedMotionStudio key={model.motionModel} model={model}/></section>:model.id==="wan-prime"?<section className="kcp-wan-section" aria-label="Wan 3 generator"><WanCreator embedded/></section>:<div className="kcp-workspace">
+  {model.premium?<section className="kcp-motion-section" aria-label={model.name+" motion generation"}><EmbeddedMotionStudio key={model.motionModel} model={model}/></section>:model.id==="wan-prime"?<section className="kcp-wan-section" aria-label="Wan 3 generator"><WanCreator embedded/></section>:kind==='video'?<VideoCreationWorkspace
+   model={model} mode={mode} setMode={setMode}
+   resolution={resolution} setResolution={setResolution}
+   aspect={aspect} setAspect={setAspect}
+   duration={duration} setDuration={setDuration}
+   prompt={prompt} setPrompt={setPrompt}
+   files={files} setFiles={setFiles} thumbnails={thumbnails} addFiles={addFiles}
+   onSelectModel={onSelectModel} customerModels={customerModels} onModels={onModels} error={error}
+  />:<div className="kcp-workspace">
    <section className="kcp-input" aria-labelledby="kcp-input-title">
     <div className="kcp-input-scroll">
      <div className="kcp-panel-head"><h1 id="kcp-input-title">Input</h1><span>{model.name}</span></div>
