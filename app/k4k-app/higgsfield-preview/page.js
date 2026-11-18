@@ -146,7 +146,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
       {liteEnabled&&<button type="button" aria-pressed={motionModel==='lite'} className={motionModel==='lite'?'selected':''} disabled={busy} onClick={()=>{setMotionModel('lite');setResult(null);setError('')}}><strong>K4K Motion Lite</strong><small>First 15 seconds · source audio preserved · lower credit cost</small></button>}
       <button type="button" aria-pressed={motionModel==='ultra'} className={motionModel==='ultra'?'selected':''} disabled={busy} onClick={()=>{setMotionModel('ultra');setResult(null);setError('')}}><strong>K4K Motion Ultra</strong><small>Full motion transfer · up to 30-second source · high-detail model</small></button>
     </div>
-    {motionModel==='lite'&&<p className="khm-model-length-note" role="note">Lite uses only the first 15 seconds of a longer source video and preserves the original audio. A 30-second source produces up to 15 seconds, not 30.</p>
+    {motionModel==='lite'&&<p className="khm-model-length-note" role="note">Lite uses only the first 15 seconds of a longer source video and preserves the original audio. A 30-second source produces up to 15 seconds, not 30.</p>}
     <p style={{fontSize:13,color:'#b9c8bd',marginTop:6}}>Source videos: 4–30 seconds. Each quality shows its current maximum duration and instant credit estimate.</p>
     <div className="khm-quality-options" role="group" aria-label="Choose video quality">
      {['480p','720p','1080p'].map(q=>{
