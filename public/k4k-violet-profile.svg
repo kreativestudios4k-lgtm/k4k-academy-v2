@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" aria-hidden="true">
+<defs>
+ <radialGradient id="back" cx=".71" cy=".43" r=".62"><stop stop-color="#9c32ff" stop-opacity=".24"/><stop offset=".42" stop-color="#6511d0" stop-opacity=".15"/><stop offset="1" stop-color="#090411" stop-opacity="0"/></radialGradient>
+ <linearGradient id="skin" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#35115e"/><stop offset=".42" stop-color="#120820"/><stop offset=".78" stop-color="#31105d"/><stop offset="1" stop-color="#09020e"/></linearGradient>
+ <linearGradient id="visor" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b962ff"/><stop offset=".5" stop-color="#eb80ff"/><stop offset="1" stop-color="#a62afa"/></linearGradient>
+ <linearGradient id="hood" x1="0" y1=".1" x2=".75" y2="1"><stop stop-color="#2e1060"/><stop offset=".48" stop-color="#0b0718"/><stop offset="1" stop-color="#240947"/></linearGradient>
+ <radialGradient id="meshLight" cx=".58" cy=".27" r=".83"><stop stop-color="#e778ff"/><stop offset=".65" stop-color="#a652ff"/><stop offset="1" stop-color="#5620ac"/></radialGradient>
+ <pattern id="dots" width="16" height="15" patternUnits="userSpaceOnUse" patternTransform="rotate(-8)"><circle cx="4.5" cy="4.5" r="2.4" fill="url(#meshLight)"/></pattern>
+ <filter id="halo" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="11"/></filter>
+ <filter id="soft" x="-25%" y="-25%" width="150%" height="150%"><feGaussianBlur stdDeviation="5"/></filter>
+ <clipPath id="mesh"><path d="M713 334C723 173 833 26 1024-25c201-52 359 56 442 227 30 60 37 112 43 179-79-9-138-18-236-41-121-27-315-21-560-6z"/></clipPath>
+</defs>
+<rect width="1600" height="900" fill="url(#back)"/>
+<path d="M454 900c26-135 120-198 292-245 108-29 197-73 262-75 110-3 260 18 340 131 58 82 85 141 100 189z" fill="#07040e"/>
+<path d="M484 900c52-119 117-194 264-231 143-36 199-96 317-88 124 9 223 76 309 197 39 54 54 90 64 122z" fill="url(#hood)" stroke="#6834b6" stroke-opacity=".48" stroke-width="4"/>
+<path d="M712 339c1-166 144-315 333-335 182-20 316 77 393 213 28 49 48 107 54 163 22 19 44 36 60 62 6 11-5 24-34 28-13 17-18 37-19 60 10 19 34 32 21 47-22 19-62 24-85 32-16 39-45 80-75 107-42 38-94 63-164 56-69-7-125-29-176-77-41-39-71-100-94-147-59-29-107-93-122-159-4-20-5-41-2-61z" fill="url(#skin)" stroke="#642ab5" stroke-opacity=".42" stroke-width="3"/>
+<path d="M741 318c34-124 139-248 289-279 158-32 291 40 390 176 20 26 40 78 54 122-111-10-178-17-270-30-173-23-317-19-463 11z" fill="#170a30"/>
+<g clip-path="url(#mesh)"><path d="M700-60h850v480H700z" fill="url(#dots)" opacity=".9"/><path d="M742 290c166-100 370-113 710-36" fill="none" stroke="#dd7dff" stroke-opacity=".33" stroke-width="92" filter="url(#soft)"/></g>
+<path d="M714 328c208-51 399-35 556-14 86 11 146 30 247 45" stroke="#af42ff" stroke-width="24" fill="none" stroke-linecap="round" opacity=".76" filter="url(#halo)"/>
+<path d="M714 328c208-51 399-35 556-14 86 11 146 30 247 45" stroke="url(#visor)" stroke-width="6" fill="none" stroke-linecap="round"/>
+<path d="M751 372c135-23 270-41 416-26 99 10 160 27 271 42-7 30-21 61-47 79-66 16-132 16-208 6-185-24-335-21-431-47z" fill="#0b0419" opacity=".96"/>
+<path d="M764 386c116-33 269-27 425-12 91 8 145 16 229 24" stroke="#a744fc" stroke-opacity=".38" stroke-width="6" fill="none"/>
+<path d="M1420 405c10 9 16 22 16 30-2 7-11 12-20 14" stroke="#e099ff" stroke-opacity=".55" stroke-width="4" fill="none"/>
+<path d="M1415 516c33-5 56-3 83 7-12 19-51 32-84 27" fill="#2d0e46" opacity=".8"/>
+<path d="M1414 565c30 6 48 2 76-5-29 28-59 34-93 26" fill="#6d227b" opacity=".57"/>
+<path d="M1347 640c-89 32-181-9-241-55" fill="none" stroke="#8a39c1" stroke-opacity=".3" stroke-width="12" filter="url(#soft)"/>
+<path d="M670 776c222-102 419-119 578-55" fill="none" stroke="#b550ff" stroke-opacity=".32" stroke-width="5"/>
+<path d="M588 897c148-126 316-176 510-148" fill="none" stroke="#8441dd" stroke-opacity=".32" stroke-width="3"/>
+</svg>
