@@ -50,7 +50,7 @@ test('existing Wan 3 source video, character inputs and credit confirmation rend
  assert.match(wan,/export default function Creator\(\{embedded=false\}\)/);
  assert.match(wan,/const Frame=embedded\?EmbeddedCreatorFrame:PreviewShell/);
  assert.match(wan,/return <Frame active="Creator" studio>/);
- assert.match(wan,/\/api\/generation\/jobs\/\'+kind/);
+ assert.ok(wan.includes("fetch('/api/generation/jobs/'+kind"));
  assert.match(wan,/generationAction\('quote'/);
  assert.match(wan,/generationAction\('submit'/);
  assert.match(compact,/kcp-wan-section/);
