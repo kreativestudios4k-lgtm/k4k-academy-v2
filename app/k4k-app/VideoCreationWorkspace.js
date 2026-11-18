@@ -109,7 +109,7 @@ export default function VideoCreationWorkspace({
    <nav className="k4kv-tabs" aria-label="Video workflows">
     <button type="button" onClick={()=>onTab('create')} aria-current={selectedTab==='create'?'page':undefined}>Create Video</button>
     <button type="button" onClick={()=>onTab('edit')} aria-current={selectedTab==='edit'?'page':undefined}>Edit Video</button>
-    <button type="button" onClick={()=>onTab('motion')} aria-current={tab==='motion'?'page':undefined}>Motion Control</button>
+    <button type="button" onClick={()=>onTab('motion')}>Motion Control</button>
    </nav>
    <div className="k4kv-editor-scroll">
     <div className="k4kv-current-model">
