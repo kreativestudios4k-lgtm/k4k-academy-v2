@@ -77,3 +77,9 @@
  .kcp-motion-gated-input{min-height:0}
  .kcp-motion-gated-grid{max-height:none}
 }
+
+.kcp-motion-mode-tabs{display:flex;align-items:center;gap:5px;margin-bottom:10px;max-width:100%;border:1px solid #323338;border-radius:11px;background:#1b1c1f;width:max-content;padding:4px}
+.kcp-motion-mode-tabs button{border:0;border-radius:8px;background:transparent;color:#9c9da5;padding:9px 14px;font-size:12px;font-weight:750}
+.kcp-motion-mode-tabs button[aria-selected=true]{color:#111;background:#f0f0f2}
+.kcp-motion-mode-tabs button:disabled{cursor:not-allowed;color:#73757e}
+@media(max-width:540px){.kcp-motion-mode-tabs{width:100%}.kcp-motion-mode-tabs button{flex:1;padding-inline:7px;font-size:11px}}
