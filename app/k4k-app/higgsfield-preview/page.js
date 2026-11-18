@@ -11,7 +11,7 @@ import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
 import {createClient} from '../../../lib/supabase/client';
 const panel={background:'#111b16',border:'1px solid #334b37',borderRadius:16,padding:22};
-export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId='',initialMotionModel='ultra',liteEnabled=false}){
+export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCaps=null,usdPerCredit=0.10,templates=[],gallery=[],initialTemplateId='',initialPreviewId='',initialMotionModel='ultra',liteEnabled=false,embedded=false}){
  const [templateId,setTemplateId]=useState(()=>templates.some(t=>t.id===initialTemplateId)?initialTemplateId:'');
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
@@ -98,9 +98,9 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const credits=priceFor(resolution);
  const withinBudget=billableSeconds!==null&&billableSeconds*rates[resolution]<=currentCap(resolution)+1e-9;
 
- return <main className="khm-root">
+ return <main className={'khm-root'+(embedded?' khm-embedded':'')}>
   <div className="khm-studio-layout">
-   <nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>
+   {!embedded&&<nav className="khm-topnav" aria-label="K4K Motion navigation"><Link href={customer?"/k4k-app":"/k4k-app/higgsfield-connection"} className="khm-brand"><img src="/k4k-mark.svg" width="34" height="34" alt=""/> <span>K4K APP</span></Link><span className="khm-nav-context">K4K MOTION <b>·</b> CREATE</span><div className="khm-desktop-links"><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">Library</Link></div><details className="khm-mobile-menu"><summary aria-label="Open K4K Motion menu">Menu</summary><div><Link href="/k4k-app/image">Image</Link><Link href="/k4k-app/video">Video</Link><Link href="/k4k-app/motion" aria-current="page">K4K Motion</Link><Link href="/k4k-app/videos">My Generations</Link>{customer&&<Link href="/login">Sign in</Link>}</div></details></nav>}
    {customer&&<section id="motion-library" className="khm-motion-library" aria-label="K4K Motion Library">
     <div className="khm-lib-top"><div className="khm-lib-tabs"><strong>◉ K4K Originals · Motion Library</strong><Link href="/k4k-app/videos">History</Link></div><label className="khm-lib-search"><Search size={15}/><input aria-label="Search motion templates" placeholder="Search motions" value={librarySearch} onChange={e=>setLibrarySearch(e.target.value)}/></label></div>
     <div className="khm-lib-categories" role="group" aria-label="Filter motions"><button className={libraryCategory==='all'?'active':''} onClick={()=>setLibraryCategory('all')}>All</button><button className={libraryCategory==='short'?'active':''} onClick={()=>setLibraryCategory('short')}>Short clips</button><button className={libraryCategory==='long'?'active':''} onClick={()=>setLibraryCategory('long')}>Longer scenes</button></div>
@@ -162,7 +162,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     </div>
     {customer&&credits!==null&&!withinBudget&&<p role="status" style={{color:'#efc895',fontSize:13}}>This quality exceeds the current per-video provider limit. Choose a lower resolution or shorter video.</p>}
     {error&&<p role="alert" style={{color:'#ffa9a9'}}>{error}</p>}
-    <CustomerGeneration customer={customer} onBusyChange={setBusy} prompt={prompt}
+    <CustomerGeneration customer={customer} stayInWorkspace={embedded} onBusyChange={setBusy} prompt={prompt}
       onPrepareMedia={verifyUploads}
       canGenerate={castReady&&billableSeconds!==null&&withinBudget}
       motionModel={motionModel}
