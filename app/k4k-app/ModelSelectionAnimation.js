@@ -9,7 +9,7 @@ export default function ModelSelectionAnimation({model}){
  return <section key={model.id} className="kcs-model-animation" aria-label={'Animated preview of '+model.name}>
   <div className="kcs-model-animation-header">
    <span><Sparkles size={14}/> MODEL SHOWCASE</span>
-   <span>{model.demoUrl?'UPLOADED VIDEO · 7s':'ANIMATED MODEL INTRO'}</span>
+   <span>{model.demoUrl?'MODEL DEMO · '+(model.demoDurationSec||'')+'s':'ANIMATED MODEL INTRO'}</span>
   </div>
   <div className="kcs-model-animation-stage">
    {model.demoUrl?
@@ -30,7 +30,7 @@ export default function ModelSelectionAnimation({model}){
    <div className="kcs-model-animation-overlay">
     <span>{model.kind==='image'?'IMAGE MODEL':'VIDEO MODEL'}</span>
     <strong>{model.name}</strong>
-    <small>{model.demoUrl?<><Play size={12}/> Autoplay demo · 16:9</>:'Interface animation · not generated output'}</small>
+    <small>{model.demoUrl?<><Play size={12}/> Autoplay demo · {model.demoAspect||'16:9'} source</>:'Interface animation · not generated output'}</small>
    </div>
   </div>
  </section>;
