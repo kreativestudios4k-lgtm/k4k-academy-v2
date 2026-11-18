@@ -41,7 +41,12 @@ test('Recreate selects authorized source and exposes avatar photo slots without 
 
 test('Access-gated Motion still offers previews but never falsely enables Recreate or customer billing',()=>{
  assert.match(gated,/MotionTemplatePreview/);
- assert.match(gated,/canRecreate=\{false\}/);
+ assert.match(gated,/canRecreate=\{canPrepareDraft\(selected\)\} draftOnly/);
+ assert.match(gated,/addAvatarFiles/);
+ assert.match(gated,/URL\.createObjectURL/);
+ assert.match(gated,/setPreparedId\(selected\.id\)/);
+ assert.match(gated,/Your images stay on this device and are not uploaded or charged/);
+ assert.match(gated,/Generate · unavailable/);
  assert.match(gated,/Generate · unavailable/);
  assert.match(gated,/const allowed=!!config\?\.enabled/);
  assert.match(gated,/templates=\{config\.templates\}/);
