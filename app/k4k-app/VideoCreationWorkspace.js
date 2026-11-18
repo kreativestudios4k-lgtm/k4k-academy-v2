@@ -16,7 +16,7 @@ const tutorials=[
  {number:'03',title:'GENERATE & SAVE',text:'Review the K4K credit quote, confirm generation and find the output in your private Library.'},
 ];
 const inspiration=catalogue.discoveryPreviews.filter(p=>p.videoUrl).slice(0,5);
-function ModelDemo({model,poster=false,small=false,controls=false}){
+function ModelDemo({model,controls=false}){
  const ref=useRef(null),[visible,setVisible]=useState(false);
  useEffect(()=>{
   const node=ref.current;
@@ -32,10 +32,10 @@ function ModelDemo({model,poster=false,small=false,controls=false}){
  },[visible,model.id]);
  return <video ref={ref} src={model.demoUrl} muted playsInline loop preload="metadata" controls={controls} aria-label={model.name+' showcase video'} />;
 }
-function StudioSelect({title,value,onChange,options,disabled=false}){
+function StudioSelect({title,value,onChange,options,disabled=false,selectRef=null}){
  return <label className="k4kv-option">
   <span>{title}</span>
-  <span className="k4kv-option-choice"><select aria-label={title} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled}>{options.map(option=><option key={String(option)} value={option}>{option}</option>)}</select><ChevronDown size={14}/></span>
+  <span className="k4kv-option-choice"><select ref={selectRef} aria-label={title} value={value} onChange={e=>onChange(e.target.value)} disabled={disabled}>{options.map(option=>typeof option==="object"?<option key={option.value} value={option.value}>{option.label}</option>:<option key={String(option)} value={option}>{option}</option>)}</select><ChevronDown size={14}/></span>
  </label>;
 }
 function GalleryTile({item,onClick,selected}){
@@ -54,10 +54,8 @@ function TutorialCard({step,index,onPickModel}){
   <strong>{step.title}</strong><p>{step.text}</p>
  </div>;
 }
-function ModelShowcase({model,onSelectModel,mode}){
- const [tab,setTab]=useState('models'),[highlight,setHighlight]=useState(model.id);
- const demo=videoShowcases.find(x=>x.id===highlight)||model;
- useEffect(()=>{setHighlight(model.id)},[model.id]);
+function ModelShowcase({model,onSelectModel}){
+ const [tab,setTab]=useState('models');
  return <section className="k4kv-discovery" aria-labelledby="k4kv-discovery-title">
   <div className="k4kv-discovery-head">
    <div className="k4kv-discovery-tabs" role="tablist" aria-label="Video workspace preview">
@@ -89,27 +87,28 @@ export default function VideoCreationWorkspace({
  model,mode,setMode,resolution,setResolution,aspect,setAspect,duration,setDuration,
  prompt,setPrompt,files,setFiles,thumbnails,addFiles,onSelectModel,customerModels,onModels,error
 }){
- const [tab,setTab]=useState('create'),[isPromptHelp,setPromptHelp]=useState(false),[showOptions,setShowOptions]=useState(false);
+ const [isPromptHelp,setPromptHelp]=useState(false),[showOptions,setShowOptions]=useState(false);
  const modelSelect=useRef(null);
  const preview=model.demoUrl;
  const canAddRefs=model.refs>0&&mode!=='Text to video'&&!model.cta;
- const extendedMode=model.modes.includes('Extend')&&mode==='Extend';
  const isText=mode==='Text to video';
- useEffect(()=>{setTab('create');setPromptHelp(false);setShowOptions(false)},[model.id]);
+ const selectedTab=mode==='Video edit'?'edit':'create';
+ useEffect(()=>{setPromptHelp(false);setShowOptions(false)},[model.id]);
  function onTab(next){
-  setTab(next);
   if(next==='motion'){onSelectModel(VIDEOS.find(m=>m.id==='k4k-motion-lite'));return}
   if(next==='edit'){
-    const ed=VIDEOS.find(m=>m.id==='seedance_2_5_flash');
-    if(ed){onSelectModel(ed);setMode('Video edit');}
+   if(model.modes.includes('Video edit')){setMode('Video edit');return}
+   const editingModel=VIDEOS.find(m=>m.id==='seedance_2_5_flash');
+   if(editingModel){onSelectModel(editingModel);setMode('Video edit');}
+   return;
   }
-  if(next==='create'&&model.kind!=='video')onSelectModel(VIDEOS.find(m=>m.id==='seedance_2_5'));
+  setMode(model.modes.includes('Text to video')?'Text to video':model.modes[0]);
  }
  return <div className="k4kv-layout">
   <section className="k4kv-sidebar" aria-label="Video creation settings">
    <nav className="k4kv-tabs" aria-label="Video workflows">
-    <button type="button" onClick={()=>onTab('create')} aria-current={tab==='create'?'page':undefined}>Create Video</button>
-    <button type="button" onClick={()=>onTab('edit')} aria-current={tab==='edit'?'page':undefined}>Edit Video</button>
+    <button type="button" onClick={()=>onTab('create')} aria-current={selectedTab==='create'?'page':undefined}>Create Video</button>
+    <button type="button" onClick={()=>onTab('edit')} aria-current={selectedTab==='edit'?'page':undefined}>Edit Video</button>
     <button type="button" onClick={()=>onTab('motion')} aria-current={tab==='motion'?'page':undefined}>Motion Control</button>
    </nav>
    <div className="k4kv-editor-scroll">
@@ -118,11 +117,7 @@ export default function VideoCreationWorkspace({
      <div className="k4kv-current-shade"/>
      <small>{isText?'GENERAL':mode.toUpperCase()}</small>
      <strong>{model.name}</strong>
-     <button type="button" onClick={()=>modelSelect.current?.focus()}><SlidersHorizontal size={14}/> Change</button>
-    </div>
-    <div className="k4kv-model-form">
-     <StudioSelect title="Model" value={model.id} onChange={id=>{const next=VIDEOS.find(m=>m.id===id);if(next)onSelectModel(next)}} options={VIDEOS.map(m=>m.id)} />
-     <select ref={modelSelect} className="k4kv-sr-select" aria-label="Choose video model" value={model.id} onChange={e=>{const next=VIDEOS.find(m=>m.id===e.target.value);if(next)onSelectModel(next)}}>{VIDEOS.map(m=><option key={m.id} value={m.id}>{m.name}</option>)}</select>
+     <button type="button" onClick={()=>{const select=modelSelect.current;if(select?.showPicker)select.showPicker();else select?.focus()}}><SlidersHorizontal size={14}/> Change</button>
     </div>
     <div className="k4kv-ref-tabs" aria-label="Video input mode">{model.modes.includes('Text to video')&&<button type="button" aria-pressed={isText} onClick={()=>setMode('Text to video')}>Text</button>}{model.modes.filter(m=>m!=='Text to video').map(m=><button type="button" key={m} aria-pressed={mode===m} onClick={()=>setMode(m)}>{m==='Omni-reference'?'References':m}</button>)}</div>
     <div className={'k4kv-upload'+(!canAddRefs?' is-disabled':'')}>
@@ -137,6 +132,7 @@ export default function VideoCreationWorkspace({
      <span>Audio available only where supported</span>
     </div>
     {isPromptHelp&&<div className="k4kv-prompt-help">Try: subject, action, environment, lens, camera movement and lighting. This does not automatically rewrite your prompt.</div>}
+    <div className="k4kv-model-form"><StudioSelect title="Model" selectRef={modelSelect} value={model.id} onChange={id=>{const next=VIDEOS.find(m=>m.id===id);if(next)onSelectModel(next)}} options={VIDEOS.map(m=>({value:m.id,label:m.name}))}/></div>
     <div className="k4kv-editor-options">
      <div className="k4kv-grid-option"><StudioSelect title="Duration" value={duration} onChange={v=>setDuration(Number(v))} options={model.duration?Array.from({length:model.duration[1]-model.duration[0]+1},(_,i)=>model.duration[0]+i):[]}/><StudioSelect title="Aspect Ratio" value={aspect} onChange={setAspect} options={model.aspect}/></div>
      <div className="k4kv-grid-option"><StudioSelect title="Quality" value={resolution} onChange={setResolution} options={model.resolution}/><label className="k4kv-option"><span>Bitrate</span><strong>Provider default</strong></label></div>
@@ -148,6 +144,6 @@ export default function VideoCreationWorkspace({
    </div>
    <div className="k4kv-editor-bottom"><CustomerCreativeGeneration key={model.id} model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={onModels} stayInWorkspace/></div>
   </section>
-  <ModelShowcase key={model.id+'library'} model={model} mode={mode} onSelectModel={onSelectModel}/>
+  <ModelShowcase key={model.id+'library'} model={model} onSelectModel={onSelectModel}/>
  </div>;
 }
