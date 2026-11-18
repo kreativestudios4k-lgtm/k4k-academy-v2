@@ -127,3 +127,20 @@
 @media(max-width:760px){.kcp-motion-section .khm-embedded .khm-motion-library{min-height:0}.kcp-motion-section .khm-embedded .khm-lib-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:440px){.kcp-motion-section .khm-embedded .khm-lib-grid,.kcp-motion-unavailable .kcp-motion-gated-grid{gap:7px!important}.khm-root .khm-lib-recreate,.kcp-motion-template-recreate{min-height:34px;font-size:11px}}
 @media(prefers-reduced-motion:reduce){.khm-root .khm-lib-card:hover .khm-lib-poster>video,.kcp-motion-template-card:hover video{transform:none}.kcp-motion-template-media>video,.khm-root .khm-lib-poster>video{transition:none}}
+
+
+/* Secure offline draft: no upload endpoint, no API credentials, no credit quote. */
+.kcp-motion-draft{display:flex;flex-direction:column;gap:10px;padding:10px;border-radius:11px;background:#27282d;border:1px solid #4c4d55}
+.kcp-motion-draft>strong{font-size:13px;color:#f5f5f7}
+.kcp-motion-draft>video{display:block;width:100%;max-height:215px;object-fit:contain;background:#050506;border-radius:8px}
+.kcp-motion-draft>small{font-size:11px;color:#e0e0e6}
+.kcp-motion-avatar-upload{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;padding:18px 10px;border:1px dashed #989aa5;background:#1b1c22;border-radius:10px;color:#f4f4f7;cursor:pointer}
+.kcp-motion-avatar-upload strong{font-size:12px}
+.kcp-motion-avatar-upload small{font-size:10px;color:#a3a5ad;line-height:1.5}
+.kcp-motion-avatar-upload input{width:100%;font-size:10px;color:#d1d2d8}
+.kcp-motion-avatar-previews{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.kcp-motion-avatar-previews>div{position:relative;aspect-ratio:4/5;overflow:hidden;border-radius:8px;border:1px solid #676871}
+.kcp-motion-avatar-previews img{display:block;width:100%;height:100%;object-fit:cover}
+.kcp-motion-avatar-previews button{position:absolute;top:2px;right:2px;display:grid;place-items:center;width:25px;height:25px;border-radius:50%;border:1px solid #ddd;background:#111b;color:#fff;cursor:pointer}
+.kcp-motion-draft>p{color:#bcbec7;font-size:10px;line-height:1.5;margin:0}
+.kcp-motion-file-error{color:#ffb0a7!important}
