@@ -1,0 +1,46 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {CREATION_MODELS} from '../lib/creation-studio-catalog.mjs';
+const source=readFileSync(new URL('../app/k4k-app/CreativeHome.js',import.meta.url),'utf8');
+const css=readFileSync(new URL('../app/k4k-app/k4k-clean-home.css',import.meta.url),'utf8');
+
+test('homepage concept retains K4K navigation and account state',()=>{
+ assert.match(source,/useVerifiedAccount/);
+ assert.match(source,/AccountMenu/);
+ assert.match(source,/\\/k4k-app\\/register/);
+ assert.match(source,/\\/login\?next=/);
+ for(const path of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion','/k4k-app/credits'])assert.ok(source.includes(path));
+ assert.match(source,/DON’T FOLLOW/);
+ assert.match(source,/k4k-clean-home\.css/);
+ assert.doesNotMatch(source,/fetch\(['"]\/api\/(?:creative|billing)/);
+});
+
+test('hero video uses explicit supplied asset env; original chrome animation is a no-network fallback',()=>{
+ assert.match(source,/NEXT_PUBLIC_K4K_HOME_HERO_VIDEO_URL/);
+ assert.match(source,/HERO_VIDEO_URL&&<video src=\{HERO_VIDEO_URL\} autoPlay muted loop playsInline preload="metadata"/);
+ assert.match(source,/kc26-chrome-stage/);
+ assert.match(source,/kc26-with-video/);
+ assert.match(css,/\.kc26-chrome-stage\.kc26-with-video\{display:none\}/);
+ assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+});
+
+test('model catalogue retains truthful preview labels, and existing Kling demo only',()=>{
+ assert.match(source,/CREATION_MODELS/);
+ assert.match(source,/model\.demoUrl\?/);
+ assert.match(source,/INTERFACE ANIMATION/);
+ assert.match(source,/REAL MODEL EXAMPLE/);
+ assert.match(source,/access varies/);
+ assert.match(source,/aria-pressed=\{filter===g.id\}/);
+ assert.ok(CREATION_MODELS.find(model=>model.id==='kling4_hf')?.demoUrl?.startsWith('https://'));
+});
+
+test('real original video gallery links safely into motion and remains metadata-lazy',()=>{
+ assert.match(source,/catalogue\.discoveryPreviews/);
+ assert.match(source,/preload="metadata"/);
+ assert.match(source,/muted loop playsInline/);
+ assert.match(source,/onMouseEnter=\{play\} onMouseLeave=\{pause\}/);
+ assert.match(source,/encodeURIComponent\(item.id\)/);
+ assert.match(css,/\.kc26-original-grid/);
+ assert.match(css,/@media\(max-width:720px\)/);
+});
