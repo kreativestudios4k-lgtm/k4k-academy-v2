@@ -1,0 +1,122 @@
+/* K4K Motion studio: fixed creation rail on the left, motion library on the right.
+   Self-contained and scoped to .kms so the older .ks override layers above cannot
+   reach in. Only layout and skin live here; every control keeps its behaviour. */
+.k4k-studio-shell:has(.kms) .k4k-light-main{background:#0a0a0a!important;padding:0!important;max-width:none!important}
+.kms{--edge:#242424;--rail:#141414;--field:#1c1c1c;--ink:#f6f6f6;--dim:#8d8d8d;--neon:#c7ff36;
+ display:grid;grid-template-columns:330px minmax(0,1fr);gap:0;align-items:stretch;
+ min-height:calc(100dvh - 76px);background:#0a0a0a;color:var(--ink)}
+.kms *{box-sizing:border-box}
+.kms button,.kms select,.kms textarea,.kms input{font:inherit}
+.kms button{cursor:pointer}
+.kms button:disabled{opacity:.45;cursor:not-allowed}
+.kms :focus-visible{outline:2px solid var(--neon);outline-offset:2px}
+.kms p{color:var(--dim)}
+
+/* ---------- left creation rail ---------- */
+.kms-rail{background:var(--rail);border-right:1px solid var(--edge);display:flex;flex-direction:column;
+ max-height:calc(100dvh - 76px);position:sticky;top:0}
+.kms-brand{padding:20px 18px 16px;text-align:center;border-bottom:1px solid var(--edge)}
+.kms-brand small{display:block;font-size:9px;letter-spacing:2.4px;color:var(--dim);text-transform:uppercase}
+.kms-brand strong{display:block;font-size:27px;font-weight:800;letter-spacing:-.5px;margin-top:6px;line-height:1}
+.kms-brand strong em{font-style:normal;color:var(--neon)}
+.kms-scroll{flex:1;overflow:auto;padding:14px;scrollbar-width:thin;display:flex;flex-direction:column;gap:12px}
+
+.kms-modes{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--field);border:1px solid var(--edge);border-radius:10px;padding:4px}
+.kms-modes button{display:flex;align-items:center;justify-content:center;gap:7px;border:0;border-radius:7px;background:none;color:var(--dim);padding:10px 6px;font-size:11.5px;font-weight:600}
+.kms-modes button[aria-pressed=true]{background:#2e2e2e;color:var(--ink)}
+.kms-modes button span{font-size:8px;letter-spacing:.8px;color:#0a0a0a;background:var(--neon);border-radius:4px;padding:2px 4px;font-weight:800}
+
+.kms-drop{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;
+ text-align:center;border:1px dashed #3d3d3d;background:var(--field);border-radius:12px;padding:26px 16px;min-height:148px;
+ color:var(--dim);overflow:hidden;cursor:pointer;transition:border-color .15s,background .15s}
+.kms-drop:hover{border-color:#5a5a5a;background:#222}
+.kms-drop strong{font-size:13px;color:var(--ink);font-weight:650;line-height:1.35;max-width:210px}
+.kms-drop small{font-size:10.5px;color:#7d7d7d}
+.kms-drop input{position:absolute!important;inset:0!important;opacity:0;width:100%;height:100%;cursor:pointer;margin:0!important;padding:0!important}
+.kms-drop-icon{width:40px;height:40px;border-radius:50%;background:#2c2c2c;display:grid;place-items:center;color:#d6d6d6}
+.kms-drop.has-media{padding:0;border-style:solid;border-color:#3d3d3d}
+.kms-drop.has-media video{width:100%;height:188px;object-fit:cover;display:block}
+.kms-replace{position:absolute;right:8px;bottom:8px;display:flex;align-items:center;gap:5px;background:#0d0d0dd9;
+ border:1px solid #585858;border-radius:6px;color:#fff;padding:6px 9px;font-size:10px}
+.kms-stack{display:flex;justify-content:center}
+.kms-stack i{width:26px;height:26px;border-radius:50%;background:#2c2c2c;border:2px solid var(--field);display:block}
+.kms-stack i+i{margin-left:-9px}
+
+.kms-thumbs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.kms-thumb{position:relative;aspect-ratio:1;border-radius:8px;overflow:hidden;border:1px solid #3d3d3d}
+.kms-thumb img{width:100%;height:100%;object-fit:cover}
+.kms-thumb button{position:absolute;top:3px;right:3px;display:grid;place-items:center;border:0;border-radius:4px;background:#0a0a0ad0;color:#fff;padding:3px}
+.kms-thumb small{position:absolute;left:4px;bottom:3px;font-size:8px;background:#0a0a0ac4;padding:1px 4px;border-radius:3px}
+.kms-addmore{position:relative;display:grid;place-items:center;aspect-ratio:1;border:1px dashed #3d3d3d;border-radius:8px;background:var(--field);color:#c9c9c9;cursor:pointer}
+.kms-addmore input{position:absolute!important;inset:0!important;opacity:0;width:100%;height:100%;cursor:pointer}
+
+.kms-row{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--field);
+ border:1px solid var(--edge);border-radius:10px;padding:13px;font-size:12px;font-weight:600;color:var(--ink);width:100%}
+.kms-row[role=button],.kms-row button{border:0;background:none;color:inherit}
+.kms-switch{width:38px;height:21px;border-radius:999px;background:#3a3a3a;position:relative;flex:0 0 auto;transition:background .15s}
+.kms-switch:after{content:'';position:absolute;top:2px;left:2px;width:17px;height:17px;border-radius:50%;background:#9a9a9a;transition:.15s}
+.kms-row[aria-expanded=true] .kms-switch{background:var(--neon)}
+.kms-row[aria-expanded=true] .kms-switch:after{left:19px;background:#0a0a0a}
+.kms-field{display:grid;gap:7px;font-size:10.5px;color:var(--dim)}
+.kms textarea,.kms select{width:100%;background:var(--field);border:1px solid #333;border-radius:10px;color:var(--ink);padding:12px;font-size:12px}
+.kms textarea{min-height:96px;line-height:1.7;resize:vertical}
+.kms textarea::placeholder{color:#6f6f6f}
+.kms [hidden]{display:none!important}
+.kms-note{font-size:10px;line-height:1.55;margin:0;color:#7f7f7f}
+.kms-alert{background:#3a201d;border:1px solid #7b4036;color:#ffc9ba;padding:10px;border-radius:8px;font-size:11px;margin:0}
+
+.kms-foot{border-top:1px solid var(--edge);background:var(--rail);padding:12px 14px 14px;display:grid;gap:8px}
+.kms-generate{width:100%;min-height:50px;display:flex;align-items:center;justify-content:center;gap:9px;border:0;border-radius:11px;
+ background:var(--neon);color:#0f1403;font-size:13.5px;font-weight:800;letter-spacing:.2px}
+.kms-generate:not(:disabled):hover{filter:brightness(1.08)}
+.kms-foot>p{font-size:9px;line-height:1.5;text-align:center;margin:0}
+.kms-quote{display:grid;gap:4px;padding:10px;border:1px solid #4d4d4d;border-radius:9px;background:#1f1f1f}
+.kms-quote strong{font-size:17px;color:var(--ink)}
+.kms-quote span,.kms-quote small{font-size:10.5px;color:#b6b6b6;line-height:1.5}
+.kms-estimate{display:grid;gap:4px;padding:12px;border:1px solid #5f5f5f;border-radius:10px;background:linear-gradient(120deg,#2b2b2b,#1d1d1d)}
+.kms-estimate>span{font-size:8.5px;letter-spacing:1.4px;color:#bdbdbd}
+.kms-estimate strong{font-size:20px;line-height:1.2}
+.kms-estimate small{font-size:10.5px;color:#c6c6c6}
+.kms-feedback{font-size:11.5px;line-height:1.6;padding:10px;border-radius:8px;background:#2a2a2a;border:1px solid #4f4f4f;margin:0;overflow-wrap:anywhere;color:var(--ink)}
+.kms-feedback[role=alert]{background:#372a1d;border-color:#7d6241;color:#ffe3bc}
+
+/* ---------- right library ---------- */
+.kms-main{min-width:0;display:flex;flex-direction:column;background:#0a0a0a}
+.kms-top{display:flex;align-items:center;gap:8px;padding:14px 20px;border-bottom:1px solid var(--edge);flex-wrap:wrap}
+.kms-seg{display:flex;gap:4px;background:var(--field);border:1px solid var(--edge);border-radius:10px;padding:4px}
+.kms-seg button{display:flex;align-items:center;gap:7px;border:0;border-radius:7px;background:none;color:var(--dim);padding:8px 13px;font-size:12px;font-weight:600}
+.kms-seg button[aria-pressed=true]{background:#2e2e2e;color:var(--ink)}
+.kms-search{margin-left:auto;background:var(--field);border:1px solid #333;border-radius:9px;color:var(--ink);padding:9px 12px;font-size:11.5px;width:190px}
+.kms-filters{display:flex;align-items:center;gap:8px;padding:14px 20px 10px;flex-wrap:wrap}
+.kms-chips{display:flex;gap:7px;flex-wrap:wrap;min-width:0}
+.kms-chips button{border:0;background:none;color:var(--dim);font-size:12.5px;font-weight:600;padding:7px 2px;border-bottom:2px solid transparent}
+.kms-chips button[aria-pressed=true]{color:var(--ink);border-bottom-color:var(--ink)}
+.kms-sort{margin-left:auto;display:flex;gap:4px;background:var(--field);border:1px solid var(--edge);border-radius:9px;padding:3px}
+.kms-sort button{display:flex;align-items:center;gap:5px;border:0;border-radius:7px;background:none;color:var(--dim);padding:7px 11px;font-size:11px;font-weight:600}
+.kms-sort button[aria-pressed=true]{background:#2e2e2e;color:var(--ink)}
+
+.kms-grid{padding:6px 20px 28px;columns:3;column-gap:14px}
+.kms-card{break-inside:avoid;margin:0 0 14px;position:relative;border-radius:12px;overflow:hidden;background:#141414;border:1px solid #2b2b2b;display:block;width:100%;padding:0;text-align:left;color:var(--ink);transition:border-color .15s,transform .15s}
+.kms-card:hover,.kms-card.selected{border-color:var(--neon);transform:translateY(-2px)}
+.kms-card video{width:100%;display:block;background:#0f0f0f}
+.kms-card-meta{position:absolute;left:8px;bottom:8px;display:flex;gap:5px;align-items:center}
+.kms-card-meta span{display:flex;align-items:center;gap:4px;background:#0a0a0ac9;border-radius:5px;padding:4px 6px;font-size:9.5px;color:#e4e4e4}
+.kms-card-title{display:block;padding:9px 10px 11px;font-size:11.5px;line-height:1.4;font-weight:600;
+ overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.kms-card-use{position:absolute;inset:auto 8px 36px 8px;padding:9px;border-radius:7px;background:var(--neon);color:#0f1403;
+ font-size:11px;font-weight:750;text-align:center;opacity:0;transform:translateY(6px);transition:.15s;pointer-events:none}
+.kms-card:hover .kms-card-use,.kms-card:focus-visible .kms-card-use,.kms-card.selected .kms-card-use{opacity:1;transform:none}
+.kms-empty{padding:50px 20px;text-align:center;color:var(--dim);font-size:12.5px}
+.kms-panel{padding:16px 20px 28px}
+
+@media(max-width:1180px){.kms-grid{columns:2}}
+@media(max-width:900px){
+ .kms{grid-template-columns:1fr;min-height:0}
+ .kms-rail{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--edge)}
+ .kms-scroll{overflow:visible;max-height:none}
+ .kms-grid{columns:2;padding:6px 14px 100px}
+ .kms-top,.kms-filters{padding-left:14px;padding-right:14px}
+ .kms-search{width:100%;margin-left:0;order:3}
+}
+@media(max-width:560px){.kms-grid{columns:1}.kms-brand strong{font-size:23px}}
+@media(prefers-reduced-motion:reduce){.kms *{transition:none!important}}
