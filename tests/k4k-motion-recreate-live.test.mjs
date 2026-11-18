@@ -1,13 +1,16 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readdirSync,readFileSync} from 'node:fs';
+import {CREATION_MODELS} from '../lib/creation-studio-catalog.mjs';
 const root=new URL('../',import.meta.url);
 const read=p=>readFileSync(new URL(p,root),'utf8');
 const studio=read('app/k4k-app/higgsfield-preview/page.js');
 const css=read('app/k4k-app/embedded-motion-studio.css');
 const modal=read('app/k4k-app/MotionTemplatePreview.js');
 const gated=read('app/k4k-app/EmbeddedMotionStudio.js');
-const catalogue=read('lib/creation-studio-catalog.mjs');
+// Model declarations live one per file in lib/creation-catalog/models/, so the
+// catalogue source is the entry file plus every declaration beside it.
+const catalogue=['lib/creation-studio-catalog.mjs',...readdirSync(new URL('lib/creation-catalog/models/',root)).filter(f=>f.endsWith('.mjs')).map(f=>'lib/creation-catalog/models/'+f)].map(read).join('\n');
 const create=read('app/k4k-app/create/page.js');
 
 test('Motion cards open full video preview; hovering exposes Recreate for eligible originals',()=>{
@@ -55,8 +58,9 @@ test('Access-gated Motion still offers previews but never falsely enables Recrea
 
 test('Premium Motion catalogue retains existing server-guarded routes',()=>{
  for(const id of ['k4k-motion-lite','k4k-motion-ultra']){
-  const s=catalogue.slice(catalogue.indexOf("{id:'"+id+"'"));
-  assert.ok(s.slice(0,s.indexOf('},')+2).includes("cta:'/k4k-app/motion?model="+ (id==='k4k-motion-lite'?'lite':'ultra')+"'"),id);
+  // Asserted on the exported entry rather than the declaration's formatting,
+  // so a reformat cannot pass while the route silently changes.
+  assert.equal(CREATION_MODELS.find(m=>m.id===id)?.cta,'/k4k-app/motion?model='+(id==='k4k-motion-lite'?'lite':'ultra'),id);
  }
  assert.match(create,/Continue to Motion Director/);
  assert.ok(!create.includes('Generation and credit checkout are not yet available.'));

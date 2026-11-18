@@ -1,0 +1,94 @@
+@import url('https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap');
+
+/* K4K full-screen hero. Scoped to .h3.
+   NOTE: app/globals.css carries a document-wide `nav{position:absolute;top:0;
+   width:100%;height:78px;justify-content:space-between}` rule. Any <nav> on any
+   page inherits it and is thrown across the viewport, so .h3-nav resets every
+   one of those properties explicitly. Same for the bare `header` risk. */
+.h3{
+ --bg:hsl(260 87% 3%);
+ --fg:hsl(40 6% 95%);
+ --sub:hsl(40 6% 82%);
+ --body:"Geist Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+ --display:"General Sans","Geist Sans",ui-sans-serif,system-ui,sans-serif;
+ position:relative;min-height:100vh;min-height:100dvh;overflow:hidden;
+ background:var(--bg);color:var(--fg);font-family:var(--body)}
+.h3 *{box-sizing:border-box;margin:0;padding:0}
+.h3 a{color:inherit;text-decoration:none}
+.h3 button{font:inherit;cursor:pointer;background:none;border:0;color:inherit}
+.h3 :focus-visible{outline:2px solid var(--fg);outline-offset:3px}
+
+/* ---------- background video ---------- */
+.h3-bg{position:absolute;inset:0;background:url(/k4k-home-hero-poster.svg) center/cover no-repeat;pointer-events:none;z-index:0}
+.h3-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none;z-index:0}
+
+/* ---------- liquid glass ---------- */
+.liquid-glass{background:rgba(255,255,255,.01);background-blend-mode:luminosity;
+ backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);border:none;
+ box-shadow:inset 0 1px 1px rgba(255,255,255,.1);position:relative;overflow:hidden}
+.liquid-glass:before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.4px;
+ background:linear-gradient(180deg,rgba(255,255,255,.45) 0%,rgba(255,255,255,.15) 20%,rgba(255,255,255,0) 40%,rgba(255,255,255,0) 60%,rgba(255,255,255,.15) 80%,rgba(255,255,255,.45) 100%);
+ -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+ -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+
+/* ---------- layout ---------- */
+.h3-shell{position:relative;z-index:10;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;overflow:visible}
+.h3-blur{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+ width:984px;height:527px;max-width:120vw;opacity:.9;background:#030712;filter:blur(82px);
+ pointer-events:none;z-index:-1}
+
+/* ---------- navbar ---------- */
+.h3-bar{padding:20px 32px;display:flex;align-items:center;justify-content:space-between;gap:24px;position:relative;z-index:2}
+.h3-brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:17px;letter-spacing:-.4px}
+.h3-brand svg{width:32px;height:32px}
+.h3-nav{position:static;top:auto;width:auto;height:auto;padding:0;border:0;z-index:auto;
+ display:flex;align-items:center;justify-content:center;gap:28px}
+.h3-nav button{display:inline-flex;align-items:center;gap:5px;font-size:14.5px;
+ color:rgba(247,246,244,.9);transition:color .2s ease}
+.h3-nav button:hover{color:var(--fg)}
+.h3-nav svg{opacity:.75}
+.h3-signup{border-radius:999px;padding:8px 16px;font-size:14px;color:var(--fg)}
+.h3-rule{height:1px;margin-top:3px;background:linear-gradient(to right,transparent,rgba(247,246,244,.2),transparent);position:relative;z-index:2}
+
+/* ---------- hero copy ---------- */
+.h3-mid{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:visible}
+.h3-copy{position:relative;text-align:center;max-width:1100px}
+.h3-title{font-family:var(--display);font-weight:600;text-transform:uppercase;
+ font-size:clamp(40px,8.6vw,132px);line-height:.95;letter-spacing:-.035em;color:var(--fg);
+ display:flex;flex-direction:column;align-items:center}
+.h3-title span{display:block}
+.h3-title em{font-style:normal;background-clip:text;-webkit-background-clip:text;color:transparent;
+ background-image:linear-gradient(to left,#6366f1,#a855f7,#fcd34d)}
+.h3-sub{color:var(--sub);font-size:18px;line-height:32px;max-width:28rem;margin:9px auto 0;opacity:.8}
+.h3-cta{display:inline-flex;align-items:center;justify-content:center;
+ padding:24px 29px;margin-top:25px;border-radius:12px;font-size:15px;font-weight:500;color:var(--fg)}
+
+/* ---------- marquee ---------- */
+.h3-foot{padding-bottom:40px;position:relative;z-index:2}
+.h3-foot-in{max-width:64rem;margin:0 auto;display:flex;align-items:center;gap:48px;padding:0 24px}
+.h3-foot-label{color:rgba(247,246,244,.5);font-size:14px;line-height:1.45;flex:0 0 auto}
+.h3-marquee{flex:1;overflow:hidden;-webkit-mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent);
+ mask-image:linear-gradient(to right,transparent,#000 8%,#000 92%,transparent)}
+.h3-track{display:flex;align-items:center;gap:64px;width:max-content;animation:h3-scroll 20s linear infinite}
+@keyframes h3-scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.h3-item{display:inline-flex;align-items:center;gap:10px;white-space:nowrap}
+.h3-chip{width:24px;height:24px;border-radius:8px;display:grid;place-items:center;
+ font-size:11px;font-weight:700;color:var(--fg);flex:0 0 auto}
+.h3-item span{font-size:16px;font-weight:600;color:var(--fg)}
+
+@media(max-height:820px){.h3-title{font-size:clamp(38px,7vw,104px)}.h3-cta{padding:18px 26px;margin-top:18px}.h3-sub{margin-top:6px}}
+@media(max-height:700px){.h3-title{font-size:clamp(34px,6vw,84px)}.h3-foot{padding-bottom:24px}}
+@media(max-width:900px){
+ .h3-bar{padding:16px 18px}
+ .h3-nav{display:none}
+ .h3-foot-in{flex-direction:column;gap:20px;align-items:flex-start}
+ .h3-foot-label{text-align:left}
+ .h3-marquee{width:100%}
+ .h3-blur{width:120vw;height:60vh}
+ .h3-cta{padding:18px 24px}
+}
+@media(prefers-reduced-motion:reduce){
+ .h3-track{animation:none}
+ .h3-video{display:none}
+}

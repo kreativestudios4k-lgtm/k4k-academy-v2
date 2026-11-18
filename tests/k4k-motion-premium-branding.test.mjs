@@ -6,7 +6,7 @@ import {readFileSync} from 'node:fs';
 test('K4K Motion has exactly two public models, each bound to its real Higgsfield endpoint',()=>{
  const models=CREATION_MODELS.filter(x=>x.premium);
  assert.deepEqual(models.map(x=>x.id),['k4k-motion-lite','k4k-motion-ultra']);
- assert.deepEqual(models.map(x=>x.name),['K4K Motion Lite','K4K Motion Ultra']);
+ assert.deepEqual(models.map(x=>x.name),['K4K Motion Lite','K4K Motion Pro']);
  const [lite,ultra]=models;
  assert.equal(lite.providerModelId,'higgsfield/genjutsu-light/motion-transfer/v1.0');
  assert.equal(ultra.providerModelId,'higgsfield/genjutsu/motion-transfer/v1.0');
@@ -46,4 +46,18 @@ test('client discovery hides upstream vendor and retains verified Motion Directo
  const page=readFileSync(new URL('../app/k4k-app/create/page.js',import.meta.url),'utf8');
  assert.doesNotMatch(page,/motionProviderEstimate|Genjutsu|Higgsfield/);
  assert.match(page,/Create through the live K4K Motion Director/);
+});
+
+// K4K Motion is sold under its own name. The upstream vendor and its model names
+// must not appear in anything a customer can read. providerModelId is exempt:
+// routing needs it and no customer sees it.
+test('no upstream vendor name reaches a customer-facing K4K Motion field',()=>{
+ const vendor=/genjutsu|higgsfield|\bwan\b/i;
+ for(const model of CREATION_MODELS.filter(x=>x.premium)){
+  for(const field of ['name','provider','description']){
+   assert.doesNotMatch(String(model[field]),vendor,model.id+'.'+field+' names the upstream vendor');
+  }
+ }
+ const lite=CREATION_MODELS.find(x=>x.id==='k4k-motion-lite');
+ assert.doesNotMatch(String(motionProviderEstimate(lite,10).provider),vendor);
 });
