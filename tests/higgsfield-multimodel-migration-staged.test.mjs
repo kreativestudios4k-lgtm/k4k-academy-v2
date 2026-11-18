@@ -42,8 +42,8 @@ test('live fal.ai customer credits, queue and output delivery remain unchanged',
  const route=read('app/api/creative/customer/route.js');
  const policy=read('lib/server/creative-customer-policy.mjs');
  // The original fal.ai Kling product is preserved; Higgsfield uses its own model id.
- assert.match(policy,/kling4_0:Object.freeze\\(\\{dbModel:'kling-4-t2v',endpoint:'kling\\/v4\\/text-to-video'/);
- assert.match(route,/model.provider\\|\\|'fal'/);
+ assert.ok(policy.includes("kling4_0:Object.freeze({dbModel:'kling-4-t2v',endpoint:'kling/v4/text-to-video'"));
+ assert.ok(route.includes("model.provider||'fal'"));
  assert.match(route,/createMultimodelLedger/);
  assert.match(route,/createMultimodelPrivateDelivery/);
  assert.match(route,/k4k_multimodel_jobs/);

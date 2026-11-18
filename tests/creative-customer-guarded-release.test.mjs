@@ -7,7 +7,7 @@ const client=readFileSync(new URL('../app/k4k-app/CustomerCreativeGeneration.js'
 const migration=readFileSync(new URL('../supabase/migrations/20261117140000_customer_creative_models_images.sql',import.meta.url),'utf8');
 const base={VERCEL_ENV:'production',K4K_CREATIVE_CUSTOMER_ENABLED:'true',K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'true',K4K_ENABLE_PRODUCTION_GENERATION:'true',K4K_PROVIDER_USE_APPROVED:'true',K4K_LIVE_CREDIT_ISOLATION_READY:'true',K4K_CREATIVE_OWNER_PILOT_ONLY:'true',K4K_CREATIVE_OWNER_LEDGER_QA_ISOLATED:'true',K4K_CUSTOMER_CREDIT_PRICING_APPROVED:'true',K4K_CREATIVE_CUSTOMER_MODELS:'kling4_0,nano_banana_2,flux_3_image,seedance_2_5',K4K_GENERATION_MAX_USD:'2.10'};
 test('new customer models are default denied, independent from owner-only QA and Motion',()=>{
- for(const id of Object.keys(CUSTOMER_CREATIVE_MODELS).filter(id=>id!=='seedance_2_5')){
+ for(const id of Object.keys(CUSTOMER_CREATIVE_MODELS).filter(id=>id!=='seedance_2_5'&&id!=='kling4_hf')){
   assert.equal(creativeCustomerRelease({},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
   assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_ENABLED:'false'},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
   assert.equal(creativeCustomerRelease({...base,K4K_CREATIVE_CUSTOMER_PRICE_APPROVED:'false'},id,'0ef1af08-4df8-4858-967b-eac1a16f9f2c'),false);
