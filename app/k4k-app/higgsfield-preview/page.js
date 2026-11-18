@@ -6,6 +6,7 @@ import CustomerGeneration from './customer-generation';
 import './motion-wide.css';
 import './motion-library-redesign.css';
 import DirectorView,{LocalMedia} from './director-view';
+import MotionTemplatePreview from '../MotionTemplatePreview';
 import {generationReference} from '../../../lib/template-generation.mjs';
 import {templateCast} from '../../../lib/template-cast.mjs';
 import {buildDirectorPrompt} from '../../../lib/director-cast.mjs';
@@ -16,6 +17,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const [assetsOpen,setAssetsOpen]=useState(false),[assetsQuery,setAssetsQuery]=useState(''),[assetsTab,setAssetsTab]=useState('presets');
  const [libraryCategory,setLibraryCategory]=useState('all'),[librarySearch,setLibrarySearch]=useState('');
  const [previewOriginalId,setPreviewOriginalId]=useState(initialPreviewId||initialTemplateId||'');
+ const [modalTemplateId,setModalTemplateId]=useState('');
  const motionGallery=gallery.length?gallery:templates;
  const selectedTemplate=templates.find(t=>t.id===templateId);
  const initialTemplate=templates.find(t=>t.id===initialTemplateId);
@@ -78,6 +80,16 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
    return {videoPath:saved.videoPath,referencePaths:[...saved.referencePaths]};
   }catch(e){const safe=e instanceof Error?e:Error('Unable to verify media.');setError(safe.message);throw safe}finally{actionLock.current=false}
  }
+ function openTemplatePreview(id){
+  setPreviewOriginalId(id);
+  setModalTemplateId(id);
+ }
+ function recreateFromPreview(){
+  if(busy||!modalTemplateId||!templates.some(t=>t.id===modalTemplateId))return;
+  selectSourceTemplate(modalTemplateId);
+  setModalTemplateId('');
+  requestAnimationFrame(()=>document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'}));
+ }
  function selectSourceTemplate(id){
   setPreviewOriginalId(id);
   setTemplateId(id);setVideo(null);uploaded.current=null;setResult(null);setError('');setAssetsOpen(false);
@@ -87,6 +99,7 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
  const filteredAssets=templates.filter(t=>t.title.toLowerCase().includes(assetsQuery.toLowerCase().trim()));
  const libraryItems=motionGallery.filter(t=>t.title.toLowerCase().includes(librarySearch.toLowerCase().trim())&&(libraryCategory==='all'||(libraryCategory==='short'?t.durationSeconds<=10:t.durationSeconds>10)));
  const featuredTemplate=motionGallery.find(t=>t.id===previewOriginalId)||selectedTemplate||libraryItems[0]||motionGallery[0];
+ const modalTemplate=motionGallery.find(t=>t.id===modalTemplateId)||null;
  const featuredUsable=!!featuredTemplate&&templates.some(t=>t.id===featuredTemplate.id);
  const billableSeconds=Number.isFinite(seconds)&&seconds>=4&&seconds<=30?Math.min(Math.ceil(seconds),motionModel==='lite'?15:30):null;
  const currentCap=quality=>motionModel==='lite'?maxUsd:(qualityCaps?.[quality]??maxUsd);
@@ -106,18 +119,20 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <div className="khm-lib-categories" role="group" aria-label="Filter motions"><button className={libraryCategory==='all'?'active':''} onClick={()=>setLibraryCategory('all')}>All</button><button className={libraryCategory==='short'?'active':''} onClick={()=>setLibraryCategory('short')}>Short clips</button><button className={libraryCategory==='long'?'active':''} onClick={()=>setLibraryCategory('long')}>Longer scenes</button></div>
     <div className="khm-lib-content"><div className="khm-lib-grid">{libraryItems.map(t=>{
       const canRecreate=templates.some(ready=>ready.id===t.id);
-      return <article key={t.id} className={'khm-lib-card'+(t.id===featuredTemplate?.id?' active':'')}>
-        <span className="khm-lib-poster">
-          <video src={t.videoUrl} muted playsInline preload="metadata" onLoadedMetadata={e=>{const v=e.currentTarget;if(Number.isFinite(v.duration)&&v.duration>0)v.currentTime=Math.min(0.15,v.duration/2)}}/>
-          <button type="button" className="khm-lib-play" aria-label={'Preview '+t.title} disabled={busy} onClick={()=>setPreviewOriginalId(t.id)}><Play size={17}/></button>
-          <span className="khm-lib-length">{Math.ceil(t.durationSeconds)}s</span>
-          {canRecreate&&<button type="button" className="khm-lib-recreate" disabled={busy} onClick={()=>{selectSourceTemplate(t.id);document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}>Recreate</button>}
-        </span>
-        <span className="khm-lib-card-title">{t.title}</span>
-        <span className="khm-lib-card-status">{canRecreate?'Ready to recreate':'Preview only · longer than supported generation'}</span>
+      return <article key={t.id} className={'khm-lib-card'+(t.id===featuredTemplate?.id?' active':'')}
+       onMouseEnter={event=>{const v=event.currentTarget.querySelector('video');if(v&&!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)v.play().catch(()=>{})}}
+       onMouseLeave={event=>{const v=event.currentTarget.querySelector('video');v?.pause()}}>
+       <div className="khm-lib-poster">
+        <video src={t.videoUrl} muted loop playsInline preload="metadata" aria-hidden="true"
+         onLoadedMetadata={event=>{const v=event.currentTarget;if(Number.isFinite(v.duration)&&v.duration>0)v.currentTime=Math.min(.15,v.duration/2)}}/>
+        <button type="button" className="khm-lib-open" aria-label={'Open preview of '+t.title} disabled={busy} onClick={()=>openTemplatePreview(t.id)}><Play size={26}/></button>
+        <span className="khm-lib-length">{Math.ceil(t.durationSeconds)}s</span>
+        {canRecreate&&<button type="button" className="khm-lib-recreate" disabled={busy} onClick={()=>openTemplatePreview(t.id)}>Recreate <Play size={14}/></button>}
+       </div>
+       <span className="khm-lib-card-title">{t.title}</span>
+       <span className="khm-lib-card-status">{canRecreate?'Select Recreate to view and cast your avatar':'Preview only · not approved for generation'}</span>
       </article>
-     })}</div>{!libraryItems.length&&<p className="khm-lib-empty">No K4K Originals match your search.</p>}
-    <aside className="khm-lib-feature"><div className="khm-lib-feature-media">{featuredTemplate&&<video key={featuredTemplate.id} src={featuredTemplate.videoUrl} autoPlay muted playsInline loop preload="metadata" controls/>}</div><div className="khm-lib-feature-info"><small>K4K ORIGINALS · {featuredUsable?'MOTION READY':'PREVIEW ONLY'}</small><strong>{featuredTemplate?.title||'Choose a scene'}</strong><span>{featuredUsable?'This reference is ready for character casting.':'This clip exceeds the supported preset duration. You can watch it here or upload your own source video in the editor.'}</span><button type="button" disabled={!featuredUsable} onClick={()=>{if(featuredTemplate){selectSourceTemplate(featuredTemplate.id);document.querySelector('.khm-cast-panel')?.scrollIntoView({behavior:'smooth',block:'center'})}}}>{featuredUsable?'Recreate':'Preview only'}</button></div></aside></div>
+     })}</div>{!libraryItems.length&&<p className="khm-lib-empty">No K4K Originals match your search.</p>}</div>
     <p className="khm-lib-foot">K4K Originals support 4–30 second sources. Available qualities depend on the signed credit quote and safety budget; finished videos stay private in My Generations.</p>
    </section>}
    <p className="khm-kicker">K4K MOTION <span>✦</span> {customer?'DIRECTOR STUDIO':'CUSTOMER FLOW PREVIEW'}</p>
@@ -171,6 +186,14 @@ export default function HiggsfieldPreview({customer=false,maxUsd=1.60,qualityCap
     <p className="khm-permission-note">By confirming generation, you confirm you have permission to use the source video and character photos.</p>
    </section>
   </div>
+ {customer&&modalTemplate&&<MotionTemplatePreview
+   template={modalTemplate} library={motionGallery}
+   canRecreate={!busy&&templates.some(t=>t.id===modalTemplate.id)}
+   unavailableReason="This example is preview-only; choose a supported K4K Original or upload a source video."
+   onClose={()=>setModalTemplateId('')}
+   onChooseTemplate={openTemplatePreview}
+   onRecreate={recreateFromPreview}
+ />}
  {assetsOpen&&<div className="khm-assets-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setAssetsOpen(false)}}><section className="khm-assets-dialog" role="dialog" aria-modal="true" aria-label="Choose motion reference video"><header><div><span>K4K MOTION · ASSETS</span><h2>Choose source video</h2></div><button aria-label="Close asset picker" type="button" onClick={()=>setAssetsOpen(false)}><X size={21}/></button></header><div className="khm-assets-tabs"><button type="button" className={assetsTab==='uploads'?'active':''} onClick={()=>setAssetsTab('uploads')}>Uploads</button><button type="button" className={assetsTab==='presets'?'active':''} onClick={()=>setAssetsTab('presets')}>Presets · {templates.length}</button></div>{assetsTab==='presets'&&<label className="khm-assets-search"><Search size={16}/><input placeholder="Find a motion template" aria-label="Search motion templates" value={assetsQuery} onChange={e=>setAssetsQuery(e.target.value)}/></label>}<div className="khm-assets-grid"><button type="button" className="khm-asset-upload" onClick={()=>selectSourceTemplate('')}><Upload size={28}/><strong>Use my own video</strong><small>4–30s MP4 · max 50 MB</small></button>{assetsTab==='presets'&&filteredAssets.map(t=><button type="button" className={'khm-asset-card'+(t.id===templateId?' active':'')} key={t.id} onClick={()=>selectSourceTemplate(t.id)}><span className="khm-asset-poster"><img src={t.posterUrl||undefined} alt="" loading="lazy"/><span><Play size={14}/></span></span><strong>{t.title}</strong><small>{Math.ceil(generationReference(t,{maxSeconds:30}).seconds)}s</small></button>)}</div><footer>Preset videos are only available where K4K has a verified reference. Selecting a preset never charges credits.</footer></section></div>}
  </main>;
 }
