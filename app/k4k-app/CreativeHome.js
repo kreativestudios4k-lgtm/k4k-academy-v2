@@ -7,6 +7,7 @@ import {useK4KLocale} from './locale';
 import {useVerifiedAccount} from './useVerifiedAccount';
 import AccountMenu from './AccountMenu';
 import './creative-home.css';
+import './k4k-violet-hero.css';
 
 // Showcase only K4K's curated original previews, not the legacy trending/celebrity templates.
 // Original MP4 entries do not require separate poster images.
@@ -32,7 +33,7 @@ export default function CreativeHome(){
    </div>
    <header className="khf-topbar">
      <div className="khf-nav-inner">
-       <Link className="khf-brand" href="/" aria-label="K4K APP Home"><img src="/k4k-mark.svg" width="36" height="36" alt=""/><strong>K4K<span> APP</span></strong></Link>
+       <Link className="khf-brand" href="/" aria-label="K4K APP Home"><img src="/k4k-violet-mark.svg" width="36" height="36" alt=""/><strong>K4K<span> APP</span></strong></Link>
        <nav className="khf-desktop-links" aria-label={tr('Main menu','Menu principal','Menú principal')}>
          <Link href="/" aria-current="page">{tr('Home','Início','Inicio')}</Link>
          
@@ -54,11 +55,14 @@ export default function CreativeHome(){
    <main>
      <section className="khf-hero khf-reference-hero" aria-labelledby="khf-hero-title">
        <div className="khf-reference-frame">
+         <img className="khf-violet-portrait" src="/k4k-violet-profile.svg" alt="" aria-hidden="true"/>
+         <div className="khf-violet-mesh" aria-hidden="true"/>
+         <div className="khf-violet-year" aria-hidden="true">20<br/>26</div>
          <div className="khf-reference-shimmer" aria-hidden="true"/>
-         <div className="khf-reference-sideyear" aria-hidden="true">K4K · 2026</div>
+         <div className="khf-reference-sideyear" aria-hidden="true">K4K BRAND VISION · 2026</div>
          <div className="khf-reference-headline">
-           <span className="khf-reference-eyebrow">{tr('THE NEXT ERA OF CREATION','A NOVA ERA DA CRIAÇÃO','LA NUEVA ERA DE CREACIÓN')}</span>
-           <h1 id="khf-hero-title">K4K <span>APP</span></h1>
+           <span className="khf-reference-eyebrow">{tr('CREATIVE INTELLIGENCE · THE FUTURE IS YOURS','INTELIGÊNCIA CRIATIVA · O FUTURO É SEU','INTELIGENCIA CREATIVA · EL FUTURO ES TUYO')}</span>
+           <h1 id="khf-hero-title"><img className="khf-violet-hero-mark" src="/k4k-violet-mark.svg" alt=""/>K4K <span>APP</span></h1>
          </div>
          <div className="khf-reference-socials" aria-label={tr('Social links','Redes sociais','Redes sociales')}>
            <a href="https://www.instagram.com/kreativestudios4k/" target="_blank" rel="noopener noreferrer" aria-label="K4K on Instagram">IG</a>
@@ -73,7 +77,7 @@ export default function CreativeHome(){
            <Link className="khf-reference-watch" href="#discover">{tr('Explore K4K Originals','Explorar K4K Originals','Explorar K4K Originals')} <span><Play size={15} fill="currentColor"/></span></Link>
            <Link className="khf-reference-start" href="/k4k-app/motion">{tr('Start creating','Comece a criar','Empieza a crear')} <ArrowUpRight size={16}/></Link>
          </div>
-         <div className="khf-reference-bottomtag" aria-hidden="true">IMAGE / VIDEO / K4K MOTION</div>
+         <div className="khf-reference-bottomtag" aria-hidden="true"><span>CREATE</span><i/><span>EDIT</span><i/><span>GENERATE</span><i/><span>SCALE</span></div>
        </div>
      </section>
      <section className="khf-toolband" aria-label={tr('Creation shortcuts','Acesso rápido','Accesos rápidos')}>
@@ -96,6 +100,6 @@ export default function CreativeHome(){
      </section>
      <section className="khf-section khf-last"><span className="khf-overline">K4K APP · KREATIVE STUDIOS 4K</span><h2>{tr('Your next viral idea','Sua próxima ideia viral','Tu próxima idea viral')}<br/><em>{tr('starts with you.','começa com você.','empieza contigo.')}</em></h2><p>{tr('Make something people haven’t seen before.','Crie algo que ninguém viu antes.','Crea algo que nadie haya visto antes.')}</p><Link className="khf-primary" href="/k4k-app/video">{tr('Enter Creative Studio','Entrar no Estúdio Criativo','Entrar al Estudio Creativo')}<ArrowRight size={20}/></Link></section>
    </main>
-   <footer className="khf-footer"><Link href="/k4k-app" className="khf-brand"><img src="/k4k-mark.svg" width="28" height="28" alt=""/><strong>K4K APP</strong></Link><span>© K4K APP · KREATIVE STUDIOS 4K</span><div><Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link><Link href="/privacy">{tr('Privacy','Privacidade','Privacidad')}</Link><Link href="/k4k-app/support">{tr('Support','Suporte','Soporte')}</Link></div></footer>
+   <footer className="khf-footer"><Link href="/k4k-app" className="khf-brand"><img src="/k4k-violet-mark.svg" width="28" height="28" alt=""/><strong>K4K APP</strong></Link><span>© K4K APP · KREATIVE STUDIOS 4K</span><div><Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link><Link href="/affiliates">{tr('Affiliates','Afiliados','Afiliados')}</Link><Link href="/privacy">{tr('Privacy','Privacidade','Privacidad')}</Link><Link href="/k4k-app/support">{tr('Support','Suporte','Soporte')}</Link></div></footer>
  </div>
 }
