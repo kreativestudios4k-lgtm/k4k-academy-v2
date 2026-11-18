@@ -121,7 +121,7 @@ export default function CompactCreationStudio({
     </div>
     <div className="kcp-action-area">
      {model.cta?<Link href={model.cta} className="kcp-continue"><Sparkles size={17}/> Continue to {model.premium?'Motion Director':'Wan 3 Creator'} <ArrowRight size={17}/></Link>:
-       <CustomerCreativeGeneration key={model.id} model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={onModels}/>}
+       <CustomerCreativeGeneration key={model.id} stayInWorkspace model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={onModels}/>}
     </div>
    </section>
    <section className="kcp-result" aria-labelledby="kcp-result-title">
