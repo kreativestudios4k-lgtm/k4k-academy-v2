@@ -26,6 +26,15 @@ test('video models use screenshot-inspired Create Video layout with model and pr
  assert.match(styles,/@media\(max-width:760px\)/);
 });
 
+test('video editor tabs never reference an unbound tab variable during React rendering',()=>{
+ const editor=video.slice(video.indexOf('export default function VideoCreationWorkspace('));
+ assert.match(editor,/const selectedTab=mode==='Video edit'\?'edit':'create'/);
+ assert.doesNotMatch(editor,/\btab\s*===/);
+ assert.match(editor,/aria-current=\{selectedTab==='create'\?'page':undefined\}/);
+ assert.match(editor,/aria-current=\{selectedTab==='edit'\?'page':undefined\}/);
+ assert.match(editor,/<button type="button" onClick=\{\(\)=>onTab\('motion'\)\}>Motion Control<\/button>/);
+});
+
 test('featured preview is taken from selected model and all six clips are selectable and correctly labelled',()=>{
  const models=publicCreationModels('video');
  assert.equal(models.length,6);
