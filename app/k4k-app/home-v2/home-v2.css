@@ -1,0 +1,132 @@
+/* K4K landing, rebuilt. No video, no images, no CDN media: every moving thing
+   here is CSS or inline SVG. Scoped to .kv2 so it shares nothing with the older
+   landing layers. Motion is transform/opacity only, and all of it stops under
+   prefers-reduced-motion. */
+.kv2{--ink:#f7f7f5;--dim:#9a9a96;--edge:#222;--panel:#121212;--neon:#c7ff36;
+ background:#070707;color:var(--ink);min-height:100dvh;overflow-x:hidden;
+ font-feature-settings:'ss01';position:relative}
+.kv2 *{box-sizing:border-box}
+.kv2 button,.kv2 select,.kv2 input{font:inherit}
+.kv2 a{color:inherit;text-decoration:none}
+.kv2 :focus-visible{outline:2px solid var(--neon);outline-offset:3px}
+.kv2 p{color:var(--dim)}
+
+/* ---------- header ---------- */
+.kv2-head{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);background:#070707cc;border-bottom:1px solid var(--edge)}
+.kv2-head-in{max-width:1240px;margin:0 auto;padding:14px 22px;display:flex;align-items:center;gap:18px}
+.kv2-logo{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.4px;font-size:17px}
+.kv2-logo i{width:26px;height:26px;border-radius:7px;background:var(--neon);display:block;position:relative;overflow:hidden}
+.kv2-logo i:after{content:'';position:absolute;inset:4px;border-radius:3px;background:#070707}
+.kv2-logo span{color:var(--neon)}
+.kv2-nav{display:flex;gap:22px;margin-left:14px;font-size:13px;color:var(--dim)}
+.kv2-nav a:hover{color:var(--ink)}
+.kv2-head-cta{margin-left:auto;display:flex;align-items:center;gap:10px}
+.kv2-ghost{border:1px solid #3a3a3a;border-radius:9px;padding:9px 14px;font-size:12.5px;background:none;color:var(--ink)}
+.kv2-solid{border:0;border-radius:9px;padding:10px 16px;font-size:12.5px;font-weight:750;background:var(--neon);color:#0d1203;display:inline-flex;align-items:center;gap:7px}
+.kv2-solid:hover{filter:brightness(1.08)}
+
+/* ---------- hero ---------- */
+.kv2-hero{position:relative;max-width:1240px;margin:0 auto;padding:84px 22px 72px;text-align:center}
+.kv2-aura{position:absolute;inset:-18% -10% auto;height:560px;pointer-events:none;
+ background:radial-gradient(48% 52% at 50% 36%,#c7ff3622,transparent 70%),radial-gradient(36% 44% at 72% 22%,#38d1ff1a,transparent 70%);
+ animation:kv2-drift 22s ease-in-out infinite alternate}
+@keyframes kv2-drift{from{transform:translate3d(-2%,0,0) scale(1)}to{transform:translate3d(2%,2%,0) scale(1.07)}}
+.kv2-kicker{display:inline-flex;align-items:center;gap:9px;border:1px solid #2d2d2d;border-radius:999px;
+ padding:7px 14px;font-size:10.5px;letter-spacing:1.6px;color:#b9b9b5;background:#101010;position:relative;z-index:2}
+.kv2-kicker i{width:6px;height:6px;border-radius:50%;background:var(--neon);animation:kv2-blink 2.4s ease-in-out infinite}
+@keyframes kv2-blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.35;transform:scale(.8)}}
+.kv2-hero h1{position:relative;z-index:2;margin:24px auto 0;max-width:15ch;
+ font-size:clamp(42px,8.4vw,104px);line-height:.94;letter-spacing:-3.4px;font-weight:800}
+.kv2-hero h1 span{display:block;overflow:hidden}
+.kv2-hero h1 span b{display:block;font-weight:inherit;animation:kv2-rise .9s cubic-bezier(.19,1,.22,1) backwards}
+.kv2-hero h1 span:nth-child(1) b{animation-delay:.05s}
+.kv2-hero h1 span:nth-child(2) b{animation-delay:.16s}
+.kv2-hero h1 span:nth-child(3) b{animation-delay:.27s;color:var(--neon)}
+@keyframes kv2-rise{from{transform:translateY(102%)}to{transform:none}}
+.kv2-sub{position:relative;z-index:2;max-width:52ch;margin:24px auto 0;font-size:15px;line-height:1.72;
+ animation:kv2-fade 1s ease .5s backwards}
+@keyframes kv2-fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.kv2-acts{position:relative;z-index:2;display:flex;gap:11px;justify-content:center;flex-wrap:wrap;margin-top:30px;
+ animation:kv2-fade 1s ease .62s backwards}
+
+/* render grid: the "frames resolving" motif, built from divs */
+.kv2-frame{position:relative;z-index:2;max-width:940px;margin:52px auto 0;border:1px solid var(--edge);border-radius:16px;
+ background:linear-gradient(180deg,#0f0f0f,#0a0a0a);padding:12px;box-shadow:0 40px 90px -40px #000}
+.kv2-frame-bar{display:flex;align-items:center;gap:6px;padding:4px 6px 12px}
+.kv2-frame-bar i{width:9px;height:9px;border-radius:50%;background:#2e2e2e}
+.kv2-frame-bar small{margin-left:auto;font-size:9.5px;letter-spacing:1.4px;color:#5f5f5f}
+.kv2-cells{display:grid;grid-template-columns:repeat(24,1fr);gap:3px;border-radius:9px;overflow:hidden}
+.kv2-cell{aspect-ratio:1;border-radius:2px;background:#171717;animation:kv2-resolve 4.6s ease-in-out infinite}
+@keyframes kv2-resolve{0%,72%,100%{background:#171717}
+ 32%{background:#c7ff3633}40%{background:var(--neon)}52%{background:#2a2a2a}}
+.kv2-scan{position:absolute;left:12px;right:12px;height:72px;border-radius:9px;pointer-events:none;
+ background:linear-gradient(180deg,transparent,#c7ff3614,transparent);animation:kv2-scan 4.6s linear infinite}
+@keyframes kv2-scan{from{top:40px}to{top:calc(100% - 60px)}}
+
+/* ---------- strip ---------- */
+.kv2-strip{border-block:1px solid var(--edge);background:#0a0a0a;overflow:hidden;padding:15px 0;margin-top:76px}
+.kv2-track{display:flex;gap:46px;width:max-content;animation:kv2-slide 34s linear infinite}
+.kv2-strip:hover .kv2-track{animation-play-state:paused}
+@keyframes kv2-slide{from{transform:none}to{transform:translateX(-50%)}}
+.kv2-track span{font-size:12.5px;letter-spacing:2.2px;color:#6d6d6a;white-space:nowrap;display:flex;align-items:center;gap:46px}
+.kv2-track span:after{content:'';width:5px;height:5px;border-radius:50%;background:#2f2f2f}
+
+/* ---------- sections ---------- */
+.kv2-sec{max-width:1240px;margin:0 auto;padding:86px 22px}
+.kv2-eye{font-size:10px;letter-spacing:2.4px;color:#6f6f6c}
+.kv2-sec h2{font-size:clamp(28px,4vw,46px);line-height:1.06;letter-spacing:-1.6px;font-weight:800;margin:14px 0 0;max-width:20ch}
+.kv2-sec h2 em{font-style:normal;color:var(--neon)}
+.kv2-lead{max-width:56ch;margin-top:16px;font-size:14.5px;line-height:1.75}
+
+.kv2-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:40px}
+.kv2-step{border:1px solid var(--edge);border-radius:15px;background:var(--panel);padding:24px;position:relative;overflow:hidden}
+.kv2-step:before{content:'';position:absolute;inset:0 auto 0 0;width:2px;background:var(--neon);transform:scaleY(0);transform-origin:top;transition:transform .5s cubic-bezier(.19,1,.22,1)}
+.kv2-step.in:before{transform:none}
+.kv2-step b{display:block;font-size:10px;letter-spacing:2px;color:#6f6f6c}
+.kv2-step h3{font-size:19px;letter-spacing:-.5px;margin:14px 0 9px;font-weight:750}
+.kv2-step p{font-size:13px;line-height:1.7;margin:0}
+.kv2-step svg{margin-top:20px;display:block}
+.kv2-step .kv2-draw{stroke:var(--neon);stroke-width:1.6;fill:none;stroke-dasharray:240;stroke-dashoffset:240;transition:stroke-dashoffset 1.3s ease .15s}
+.kv2-step.in .kv2-draw{stroke-dashoffset:0}
+
+.kv2-reveal{opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s cubic-bezier(.19,1,.22,1)}
+.kv2-reveal.in{opacity:1;transform:none}
+
+/* ---------- plans ---------- */
+.kv2-plans{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:40px}
+.kv2-plan{border:1px solid var(--edge);border-radius:15px;background:var(--panel);padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-color .2s,transform .2s}
+.kv2-plan:hover{border-color:#3d4a28;transform:translateY(-3px)}
+.kv2-plan.pop{border-color:#3f5a1c;background:linear-gradient(180deg,#141a0c,#101010)}
+.kv2-plan-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kv2-plan-top b{font-size:11px;letter-spacing:1.8px}
+.kv2-tag{font-size:8.5px;letter-spacing:1.2px;background:var(--neon);color:#0d1203;border-radius:4px;padding:3px 6px;font-weight:800}
+.kv2-price{font-size:31px;font-weight:800;letter-spacing:-1.4px}
+.kv2-price small{font-size:12px;font-weight:500;color:var(--dim);letter-spacing:0}
+.kv2-credits{font-size:12.5px;color:#cfcfcb}
+.kv2-credits b{color:var(--neon);font-size:17px}
+.kv2-plan p{font-size:11.5px;line-height:1.6;margin:0}
+.kv2-plan a{margin-top:auto;border:1px solid #3a3a3a;border-radius:9px;padding:11px;text-align:center;font-size:12px;font-weight:650}
+.kv2-plan.pop a{background:var(--neon);color:#0d1203;border-color:transparent}
+
+/* ---------- close ---------- */
+.kv2-close{max-width:1240px;margin:0 auto 96px;padding:0 22px}
+.kv2-close-in{border:1px solid var(--edge);border-radius:20px;background:radial-gradient(70% 120% at 50% 0%,#17200c,#0c0c0c);padding:64px 24px;text-align:center;position:relative;overflow:hidden}
+.kv2-close-in h2{margin:0 auto;max-width:18ch}
+.kv2-close-in p{max-width:46ch;margin:16px auto 26px}
+.kv2-foot{border-top:1px solid var(--edge);padding:26px 22px;display:flex;gap:16px;flex-wrap:wrap;align-items:center;max-width:1240px;margin:0 auto;font-size:11.5px;color:#6f6f6c}
+.kv2-foot nav{margin-left:auto;display:flex;gap:18px}
+
+@media(max-width:1000px){.kv2-steps,.kv2-plans{grid-template-columns:repeat(2,minmax(0,1fr))}.kv2-cells{grid-template-columns:repeat(16,1fr)}}
+@media(max-width:620px){
+ .kv2-nav{display:none}
+ .kv2-hero{padding:56px 18px 48px}
+ .kv2-sec{padding:60px 18px}
+ .kv2-steps,.kv2-plans{grid-template-columns:1fr}
+ .kv2-cells{grid-template-columns:repeat(12,1fr)}
+ .kv2-foot nav{margin-left:0;width:100%}
+}
+@media(prefers-reduced-motion:reduce){
+ .kv2 *,.kv2 *:before,.kv2 *:after{animation:none!important;transition:none!important}
+ .kv2-reveal{opacity:1;transform:none}
+ .kv2-hero h1 span b{animation:none}
+}
