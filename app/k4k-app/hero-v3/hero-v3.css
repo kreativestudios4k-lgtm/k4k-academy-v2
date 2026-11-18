@@ -53,8 +53,10 @@
 /* ---------- hero copy ---------- */
 .h3-mid{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:visible}
 .h3-copy{position:relative;text-align:center;max-width:1100px}
-.h3-title{font-family:var(--display);font-weight:400;font-size:clamp(68px,15.2vw,220px);
- line-height:1.02;letter-spacing:-.024em;color:var(--fg)}
+.h3-title{font-family:var(--display);font-weight:600;text-transform:uppercase;
+ font-size:clamp(40px,8.6vw,132px);line-height:.95;letter-spacing:-.035em;color:var(--fg);
+ display:flex;flex-direction:column;align-items:center}
+.h3-title span{display:block}
 .h3-title em{font-style:normal;background-clip:text;-webkit-background-clip:text;color:transparent;
  background-image:linear-gradient(to left,#6366f1,#a855f7,#fcd34d)}
 .h3-sub{color:var(--sub);font-size:18px;line-height:32px;max-width:28rem;margin:9px auto 0;opacity:.8}
@@ -74,6 +76,8 @@
  font-size:11px;font-weight:700;color:var(--fg);flex:0 0 auto}
 .h3-item span{font-size:16px;font-weight:600;color:var(--fg)}
 
+@media(max-height:820px){.h3-title{font-size:clamp(38px,7vw,104px)}.h3-cta{padding:18px 26px;margin-top:18px}.h3-sub{margin-top:6px}}
+@media(max-height:700px){.h3-title{font-size:clamp(34px,6vw,84px)}.h3-foot{padding-bottom:24px}}
 @media(max-width:900px){
  .h3-bar{padding:16px 18px}
  .h3-nav{display:none}
