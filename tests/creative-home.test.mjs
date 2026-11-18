@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readdirSync,readFileSync} from 'node:fs';
 import {CREATION_MODELS} from '../lib/creation-studio-catalog.mjs';
 const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 const home=read('app/k4k-app/CreativeHome.js');
@@ -55,7 +55,10 @@ test('K4K studio brand navigates home instead of video generation',()=>{
 
 const motion=read('app/k4k-app/higgsfield-preview/page.js');
 const motionCss=read('app/k4k-app/higgsfield-preview/motion-wide.css');
-const catalog=read('lib/creation-studio-catalog.mjs');
+// Model declarations live one per file in lib/creation-catalog/models/, so the
+// catalogue source is the entry file plus every declaration beside it.
+const catalogFiles=['lib/creation-studio-catalog.mjs',...readdirSync(new URL('../lib/creation-catalog/models/',import.meta.url)).filter(f=>f.endsWith('.mjs')).map(f=>'lib/creation-catalog/models/'+f)];
+const catalog=catalogFiles.map(read).join('\n');
 test('production K4K Motion still has full Director workspace and signed generation flow',()=>{
  assert.match(motion,/khm-studio-layout/);
  assert.match(motion,/YOUR NEXT VIRAL HIT/);

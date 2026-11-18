@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readdirSync,readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const home=read('app/k4k-app/CreativeHome.js');
 const studio=read('app/k4k-app/create/page.js');
@@ -9,7 +9,9 @@ const gallery=read('app/k4k-app/motion/MotionExploreGallery.js');
 const shell=read('app/k4k-app/PreviewShell.js');
 const homeCss=read('app/k4k-app/creative-home.css');
 const studioCss=read('app/k4k-app/create/create.css');
-const catalog=read('lib/creation-studio-catalog.mjs');
+// Model declarations live one per file in lib/creation-catalog/models/, so the
+// catalogue source is the entry file plus every declaration beside it.
+const catalog=['lib/creation-studio-catalog.mjs',...readdirSync(new URL('../lib/creation-catalog/models/',import.meta.url)).filter(f=>f.endsWith('.mjs')).map(f=>'lib/creation-catalog/models/'+f)].map(read).join('\n');
 test('official creative tools stay distinct, while the old Templates pages redirect to Motion',()=>{
  for(const route of ['/k4k-app/image','/k4k-app/video','/k4k-app/motion'])assert.ok(home.includes(route),route);
  assert.ok(motion.includes('khm-motion-library'));
