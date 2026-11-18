@@ -8,7 +8,7 @@ import './motion-template-preview.css';
  * All source media comes from the K4K Originals catalogue. Recreate is delegated
  * to the existing signed Motion flow only for server-approved templates.
  */
-export default function MotionTemplatePreview({template,library=[],canRecreate=false,onClose,onRecreate,onChooseTemplate,unavailableReason=''}) {
+export default function MotionTemplatePreview({template,library=[],canRecreate=false,draftOnly=false,onClose,onRecreate,onChooseTemplate,unavailableReason=''}) {
  const closeRef=useRef(null),dialogRef=useRef(null),previousFocus=useRef(null);
  useEffect(()=>{
   if(!template)return;
@@ -55,9 +55,9 @@ export default function MotionTemplatePreview({template,library=[],canRecreate=f
      </button>)}
     </div></div>
     <div className="k4km-preview-steps"><strong>How to recreate</strong><p>1. Select this source video</p><p>2. Add your avatar / character photos</p><p>3. Verify media, review the signed credit quote and generate</p></div>
-    {canRecreate?<button className="k4km-recreate-primary" type="button" onClick={onRecreate}><Play size={17} fill="currentColor"/> Recreate this motion <ArrowRight size={18}/></button>:
+    {canRecreate?<button className="k4km-recreate-primary" type="button" onClick={onRecreate}><Play size={17} fill="currentColor"/> {draftOnly?"Use template & add avatar":"Recreate this motion"} <ArrowRight size={18}/></button>:
       <div className="k4km-recreate-unavailable"><ShieldCheck size={17}/><span>{unavailableReason||'This motion is preview-only and cannot be submitted for generation.'}</span></div>}
-    <small className="k4km-preview-disclaimer">Viewing a video never charges credits. Generation requires permission to use the source and reference photos.</small>
+    <small className="k4km-preview-disclaimer">{draftOnly?"Draft mode: avatar images stay in your browser. Paid generation is not enabled here.":"Viewing a video never charges credits. Generation requires permission to use the source and reference photos."}</small>
    </aside>
   </section>
  </div>;
