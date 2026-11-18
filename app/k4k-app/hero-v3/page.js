@@ -75,8 +75,12 @@ export default function HeroV3(){
 
    <main className="h3-mid">
     <div className="h3-copy">
-     <h1 className="h3-title">Create <em>AI</em></h1>
-     <p className="h3-sub">An AI video and image studio built for independent creators.</p>
+     <h1 className="h3-title">
+      <span>Don&rsquo;t follow</span>
+      <span>the trend.</span>
+      <em>Create it.</em>
+     </h1>
+     <p className="h3-sub">Your ideas. Your characters. Your next viral creation.</p>
      <Link href="/k4k-app/studio" className="h3-cta liquid-glass">Start creating</Link>
     </div>
    </main>
