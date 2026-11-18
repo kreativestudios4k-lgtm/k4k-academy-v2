@@ -81,7 +81,7 @@ export default function CreativeHome(){
    </div>
    {menuOpen&&<nav id="kc26-mobile-menu" className="kc26-mobile-menu" aria-label="Mobile navigation">{[
     ['Explore','/'],['Image','/k4k-app/image'],['Video','/k4k-app/video'],['K4K Motion','/k4k-app/motion'],['Pricing','/k4k-app/credits'],['My library','/k4k-app/videos']
-   ].map(([name,href])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)}>{name}<ArrowUpRight size={15}/></Link>)}</nav>}
+   ].map(([name,href])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)}>{name}<ArrowUpRight size={15}/></Link>)}{!user&&<><Link href="/login?next=%2Fk4k-app%2Fcreate" onClick={()=>setMenuOpen(false)}>{tr("Sign in","Entrar","Entrar")}<ArrowUpRight size={15}/></Link><Link href="/k4k-app/register" onClick={()=>setMenuOpen(false)}>{tr("Create account","Criar conta","Crear cuenta")}<ArrowUpRight size={15}/></Link></>}</nav>}
   </header>
   <main>
    <section className="kc26-hero" aria-labelledby="kc26-hero-title">
