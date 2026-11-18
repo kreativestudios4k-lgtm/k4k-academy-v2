@@ -18,10 +18,12 @@ test('homepage concept retains K4K navigation and account state',()=>{
 
 test('hero video uses explicit supplied asset env; chrome animation is a no-network fallback',()=>{
  assert.match(source,/NEXT_PUBLIC_K4K_HOME_HERO_VIDEO_URL/);
- assert.ok(source.includes('HERO_VIDEO_URL&&<video src={HERO_VIDEO_URL} autoPlay muted loop playsInline preload="metadata"'));
+ assert.match(source,/6250e761-2957-4f49-92d3-69b1f23d907e\.mp4/);
+ assert.match(css,/\.kc26-hero-video\{z-index:2/);
+ assert.ok(source.includes('HERO_VIDEO_URL&&<video src={HERO_VIDEO_URL} poster="/k4k-home-hero-poster.svg" autoPlay muted loop playsInline preload="metadata"'));
  assert.match(source,/kc26-chrome-stage/);
  assert.match(source,/kc26-with-video/);
- assert.ok(css.includes('.kc26-chrome-stage.kc26-with-video{display:none}'));
+ assert.ok(css.includes('.kc26-chrome-stage.kc26-with-video{display:block}'));
  assert.ok(css.includes('@media(prefers-reduced-motion:reduce)'));
 });
 
