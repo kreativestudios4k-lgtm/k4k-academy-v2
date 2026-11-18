@@ -31,6 +31,6 @@ test('Premium Motion cards direct to the production-gated Director, not an owner
   assert.ok(s.slice(0,s.indexOf('},')+2).includes("cta:'/k4k-app/motion?model="+ (id==='k4k-motion-lite'?'lite':'ultra')+"'"),id);
   assert.ok(s.slice(0,s.indexOf('},')+2).includes("status:'active'"),id);
  }
- assert.match(create,/Open K4K Motion/);
+ assert.match(create,/Continue to Motion Director/);
  assert.ok(!create.includes('Generation and credit checkout are not yet available.'));
 });
