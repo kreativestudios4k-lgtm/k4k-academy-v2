@@ -50,7 +50,7 @@ export default function MotionTemplatePreview({template,library=[],canRecreate=f
     <p>Preview this source motion. When you choose Recreate, K4K will prepare the selected template in your creator so you can add your own avatar or replacement character images.</p>
     <div className="k4km-preview-section"><h3>More K4K Originals</h3><div className="k4km-related-grid">
      {related.map(item=><button key={item.id} type="button" onClick={()=>onChooseTemplate(item.id)} title={'Preview '+item.title}>
-      <span><video src={item.videoUrl} muted playsInline preload="none"/></span>
+      <span><video src={item.videoUrl} muted playsInline preload="metadata" onLoadedMetadata={event=>{const video=event.currentTarget;if(Number.isFinite(video.duration)&&video.duration>0)video.currentTime=Math.min(.2,video.duration/2)}}/></span>
       <small>{item.title.replace('K4K Original · ','')}</small>
      </button>)}
     </div></div>
