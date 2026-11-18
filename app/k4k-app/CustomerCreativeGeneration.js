@@ -9,7 +9,7 @@ async function call(body){
  if(!r.ok||json.error)throw Error(json.error||'Generation unavailable');
  return json;
 }
-export default function CustomerCreativeGeneration({model,mode,prompt,aspect,duration,resolution,referenceCount=0,onModels}){
+export default function CustomerCreativeGeneration({model,mode,prompt,aspect,duration,resolution,referenceCount=0,onModels,stayInWorkspace=false}){
  const [access,setAccess]=useState({}),[quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[info,setInfo]=useState(''),[result,setResult]=useState(null);
  const lock=useRef(false),key=useRef(null);
  const enabled=access[model.id]===true&&(mode==='Text to video'||mode==='Text to image');
@@ -41,8 +41,8 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,dur
      const requestKey=key.current||crypto.randomUUID();key.current=requestKey;
      const v=await call({action:'submit',jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey});
      setJobs(j=>[{id:quote.jobId,model:model.id,status:v.status,media_kind:model.kind,credits_quoted:quote.credits},...j.filter(x=>x.id!==quote.jobId)]);
-     setQuote(null);setInfo('Generation submitted. Opening your generations…');
-     window.location.assign('/k4k-app/videos#creative-generations');
+     setQuote(null);setInfo(stayInWorkspace?'Generation submitted. You can check its progress here or open your private Library.':'Generation submitted. Opening your generations…');
+     if(!stayInWorkspace)window.location.assign('/k4k-app/videos#creative-generations');
     })} className="kcs-generate-primary">{busy?'Submitting…':'Confirm & Generate · '+quote.credits+' credits'}</button>
     <button onClick={()=>{setQuote(null);key.current=null}} style={{marginLeft:10,padding:'11px 15px',borderRadius:8}}>Cancel</button>
    </div>}
