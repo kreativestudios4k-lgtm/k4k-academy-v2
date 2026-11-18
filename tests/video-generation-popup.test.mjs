@@ -9,12 +9,13 @@ const animation=readFileSync(new URL('../app/k4k-app/ModelSelectionAnimation.js'
 const animationCSS=readFileSync(new URL('../app/k4k-app/model-selection-animation.css',import.meta.url),'utf8');
 const page=readFileSync(new URL('../app/k4k-app/create/page.js',import.meta.url),'utf8');
 
-test('two-panel popup is only shown for Kling 4.0 Higgsfield, not every model',()=>{
+test('optional two-panel popup remains exclusive to K4K Cinema; standard studio is the default',()=>{
  assert.match(popup,/model\.id!=='kling4_hf'/);
  assert.match(page,/function openVideoPopup\(\)\{if\(model\.id!=='kling4_hf'\)return/);
- assert.match(page,/setGeneratorOpen\(next\.id==='kling4_hf'\)/);
+ assert.match(page,/setGeneratorOpen\(false\)/);
+ assert.doesNotMatch(page,/setGeneratorOpen\(next\.id==='kling4_hf'\)/);
  assert.match(page,/model\.id==='kling4_hf'&&<button/);
- assert.match(page,/\(kind==='image'\|\|model\.id!=='kling4_hf'\)&&model\.status==='provider-verified'&&<CustomerCreativeGeneration/);
+ assert.match(page,/!model\.cta&&model\.status==='provider-verified'&&<CustomerCreativeGeneration/);
  assert.match(popup,/CustomerCreativeGeneration/);
  assert.match(popup,/referenceCount=\{files\.length\}/);
  assert.match(popup,/role="dialog" aria-modal="true"/);
