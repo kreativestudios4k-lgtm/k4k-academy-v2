@@ -41,7 +41,9 @@ test('no runtime flag can turn on new spending without approved billing integrat
 test('live fal.ai customer credits, queue and output delivery remain unchanged',()=>{
  const route=read('app/api/creative/customer/route.js');
  const policy=read('lib/server/creative-customer-policy.mjs');
- assert.match(route,/provider:'fal'/);
+ // The original fal.ai Kling product is preserved; Higgsfield uses its own model id.
+ assert.ok(policy.includes("kling4_0:Object.freeze({dbModel:'kling-4-t2v',endpoint:'kling/v4/text-to-video'"));
+ assert.ok(route.includes("model.provider||'fal'"));
  assert.match(route,/createMultimodelLedger/);
  assert.match(route,/createMultimodelPrivateDelivery/);
  assert.match(route,/k4k_multimodel_jobs/);
