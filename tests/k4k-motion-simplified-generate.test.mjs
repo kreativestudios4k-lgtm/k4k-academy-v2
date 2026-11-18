@@ -12,7 +12,7 @@ test('credits appear immediately from source duration and selected resolution',(
  assert.match(motion,/khm-credit-summary/);
  assert.match(motion,/Estimated credits · updated automatically/);
  assert.match(motion,/credits!==null\?credits\+' credits'/);
- assert.match(motion,/qualityCaps\?\.\[resolution\]/);
+ assert.match(motion,/currentCap\(resolution\)/);
 });
 test('private upload verification is automatic when customer presses Generate',()=>{
  assert.match(motion,/async function verifyUploads/);
@@ -24,7 +24,7 @@ test('private upload verification is automatic when customer presses Generate',(
  assert.doesNotMatch(motion,/khm-private-upload/);
  assert.doesNotMatch(motion,/<input type="checkbox"/);
  assert.match(generate,/const verified=onPrepareMedia\?await onPrepareMedia\(\):media/);
- assert.match(generate,/request\('prepare',\{jobId,\.\.\.verified,resolution,prompt\}\)/);
+ assert.match(generate,/request\('prepare',\{jobId,\.\.\.verified,resolution,prompt,motionModel\}\)/);
  assert.match(generate,/Checking files…/);
 });
 test('customer must review signed quote and confirm before any paid dispatch',()=>{

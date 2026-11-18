@@ -10,13 +10,13 @@ async function request(action,input={}){
  const response=await fetch('/api/higgsfield/customer-jobs',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action,...input})});
  const body=await response.json();if(!response.ok)throw Error(messages[body.error]||body.error||'Unable to complete this request.');return body;
 }
-export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey=''}){
+export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey='',motionModel='ultra'}){
  const [quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[output,setOutput]=useState(null),[active,setActive]=useState(null);
  useEffect(()=>{onBusyChange?.(busy);},[busy,onBusyChange]);
  const lock=useRef(false),requestKey=useRef(null),account=useRef(undefined);
  const mediaKey=JSON.stringify(media);
- const selection=JSON.stringify([selectionKey||mediaKey,resolution,prompt]);
- useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt,selectionKey]);
+ const selection=JSON.stringify([selectionKey||mediaKey,resolution,prompt,motionModel]);
+ useEffect(()=>{setQuote(null);requestKey.current=null;},[mediaKey,resolution,prompt,selectionKey,motionModel]);
  async function refresh(){const rows=await request('list');setJobs(rows);return rows;}
  useEffect(()=>{
   let alive=true;
@@ -59,10 +59,10 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
    const verified=onPrepareMedia?await onPrepareMedia():media;
    if(!verified?.videoPath||!Array.isArray(verified.referencePaths)||verified.referencePaths.length<1)throw Error('Choose a source and character photos to generate.');
    const jobId=crypto.randomUUID();requestKey.current=crypto.randomUUID();
-   const result=await request('prepare',{jobId,...verified,resolution,prompt});setQuote({...result,selection});await refresh();
+   const result=await request('prepare',{jobId,...verified,resolution,prompt,motionModel});setQuote({...result,selection});await refresh();
   })}>{busy?'Checking files…':'Generate · '+(Number.isInteger(estimatedCredits)?estimatedCredits+' estimated credits':'review credits')}</button>
   {quote?.selection===selection&&<div style={{marginTop:18}}>
-   <p role="status"><strong>{quote.credits} credits — exact confirmed charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
+   <p role="status"><strong>{quote.credits} credits — exact {quote.motionModel==='lite'?'K4K Motion Lite':'K4K Motion Ultra'} charge</strong> · {quote.duration} billed seconds · {quote.resolution}</p>
    <p style={{fontSize:13}}>{customer?'':`Provider estimate: $${quote.usd.toFixed(2)}. `}Quote expires in five minutes.</p>
    <button type="button" disabled={busy||!quote.dispatchEnabled} style={{...button,opacity:quote.dispatchEnabled?1:.5}} onClick={()=>action(async()=>{
     const current=quote;setQuote(null);
@@ -78,7 +78,7 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
   {!jobs.length&&<p style={{color:"#adbdaf"}}>Your generated Motion videos will appear here.</p>}
   <button type="button" style={button} disabled={busy} onClick={()=>action(refresh)}>Refresh library</button>
   {jobs.map(job=><div key={job.jobId} style={{padding:'16px 0',borderBottom:'1px solid #334b37',display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}}>
-   <span>{new Date(job.createdAt).toLocaleString()} · {job.status} · {job.credits} credits</span>
+   <span>{new Date(job.createdAt).toLocaleString()} · K4K Motion {job.motionModel==='lite'?'Lite':'Ultra'} · {job.status} · {job.credits} credits</span>
    {['processing','queued'].includes(job.status)&&<button style={button} disabled={busy} onClick={()=>action(()=>check(job.jobId))}>Refresh status</button>}
    {job.status==='completed'&&<>
     <button style={button} disabled={busy} onClick={()=>action(async()=>setOutput(await request('download',{jobId:job.jobId,download:false})))}>Play</button>

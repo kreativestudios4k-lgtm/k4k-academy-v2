@@ -34,7 +34,7 @@ export const POST=createHiggsfieldCustomerHttp({
    },
    async insert(job){const {error}=await database.from('k4k_multimodel_jobs').insert(job);if(error)throw Error('DRAFT_SAVE_FAILED');},
    async listOwned(userId){
-    const {data,error}=await database.from('k4k_multimodel_jobs').select('id,status,credits_quoted,created_at').eq('user_id',userId).eq('provider','higgsfield').neq('status','draft').order('created_at',{ascending:false}).limit(30);
+    const {data,error}=await database.from('k4k_multimodel_jobs').select('id,status,credits_quoted,created_at,normalized_input').eq('user_id',userId).eq('provider','higgsfield').neq('status','draft').order('created_at',{ascending:false}).limit(30);
     if(error)throw Error('JOB_LOOKUP_FAILED');return data;
    }
   };

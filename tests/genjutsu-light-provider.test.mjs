@@ -10,8 +10,8 @@ test('model accepts supported inputs and rejects invalid references',()=>{
  assert.throws(()=>validateGenjutsuLightInput({...input,image_urls:Array(9).fill('https://example.com/x.png')}));
 });
 test('billing estimate includes rounded output seconds',()=>{
- assert.equal(estimateGenjutsuLightCost({resolution:'720p',outputSeconds:14.2}),1.5);
- assert.equal(estimateGenjutsuLightCost({resolution:'480p',outputSeconds:10,referenceSeconds:5}),0.75);
+ assert.equal(estimateGenjutsuLightCost({resolution:'720p',outputSeconds:14.2}),2.2065);
+ assert.equal(estimateGenjutsuLightCost({resolution:'480p',outputSeconds:10,referenceSeconds:5}),0.739);
 });
 test('provider fails closed without explicit enablement',async()=>{
  const provider=createGenjutsuLightProvider({credentials:'key:secret',fetchImpl:()=>{throw new Error('must not call')}});
@@ -33,7 +33,7 @@ test('enabled provider rejects requests without verified budget and duration bef
  const base={enabled:true,credentials:'key:secret',fetchImpl};
  await assert.rejects(createGenjutsuLightProvider(base).submit(input),/spending cap/);
  await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:5}).submit(input),/media duration/);
- await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:5,verifiedOutputSeconds:15,verifiedReferenceSeconds:50}).submit(input),/exceeds authorized/);
+ await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:0.5,verifiedOutputSeconds:15,verifiedReferenceSeconds:50}).submit(input),/exceeds authorized/);
  await assert.rejects(createGenjutsuLightProvider({...base,maxUsd:6,verifiedOutputSeconds:5,verifiedReferenceSeconds:5}).submit(input),/spending cap/);
  assert.equal(calls,0);
 });
@@ -56,4 +56,11 @@ test('complete copied credentials are accepted and empty keys rejected',async()=
  }});
  await provider.submit(input);
  assert.equal(authorization,'Key opaque-api-key');
+});
+
+test('Genjutsu Light charges published output-only seconds, never extra reference seconds',()=>{
+ assert.equal(estimateGenjutsuLightCost({resolution:'480p',outputSeconds:5}),0.3695);
+ assert.equal(estimateGenjutsuLightCost({resolution:'720p',outputSeconds:15,referenceSeconds:30}),2.2065);
+ assert.equal(estimateGenjutsuLightCost({resolution:'1080p',outputSeconds:15}),4.404);
+ assert.throws(()=>estimateGenjutsuLightCost({outputSeconds:15.01}),/Invalid duration/);
 });
