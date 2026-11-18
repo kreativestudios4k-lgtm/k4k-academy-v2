@@ -31,7 +31,7 @@ test('image and video keep model-specific availability and signed quote controls
  assert.match(create,/CustomerCreativeGeneration/);
  assert.doesNotMatch(create,/OwnerCreativeQA/);
  assert.match(read('app/k4k-app/owner-qa/page.js'),/OwnerCreativeQA/);
- assert.match(create,/creationModels\(kind\)\.length/);
+ assert.match(create,/publicCreationModels\(kind\)\.length/);
  assert.match(create,/model\.name/);
  assert.match(create,/selectedLive/);
  assert.match(create,/kcs-dashboard-metrics/);
