@@ -60,13 +60,13 @@ export default function VideoGenerationPopup({
      {model.status==='provider-verified'?<CustomerCreativeGeneration model={model} mode={mode} prompt={prompt} aspect={aspect} duration={duration} resolution={resolution} referenceCount={files.length} onModels={onModels}/>:model.cta?<Link href={model.cta} className="k4k-video-popup-cta"><Upload size={17}/> Continue in {model.name}<ArrowUpRight size={17}/></Link>:<p className="k4k-video-popup-unavailable">Generation is not enabled for this workflow.</p>}
     </div>
     <div className="k4k-video-popup-result">
-     <div className="k4k-video-popup-result-heading"><h3>Result</h3><span>KLING 4.0 · 16:9 SAMPLE</span></div>
+     <div className="k4k-video-popup-result-heading"><h3>Result</h3><span>K4K CINEMA · 16:9 SAMPLE</span></div>
      <div className="k4k-video-popup-stage">
-      <video controls autoPlay muted loop playsInline preload="metadata" src={model.demoUrl} aria-label="Uploaded Kling 4.0 Higgsfield sample animation"/>
+      <video controls autoPlay muted loop playsInline preload="metadata" src={model.demoUrl} aria-label="K4K Cinema model demonstration video"/>
       <span className="k4k-video-popup-demo-chip">7s MODEL DEMO</span>
      </div>
      <div className="k4k-video-popup-result-meta">
-      <div><strong>Kling 4.0 · Higgsfield</strong><span>Uploaded example video · loops automatically · 16:9</span></div>
+      <div><strong>K4K Cinema</strong><span>Powered by Kling 4.0 · demonstration · 16:9</span></div>
       <span className="k4k-video-popup-nocharge">Preview only</span>
      </div>
      <div className="k4k-video-popup-result-note"><span>DEMO VIDEO</span><p>This animation demonstrates the selected model. It is not the output of your prompt. When you generate a new video, the result is saved securely in your private library.</p><Link href="/k4k-app/videos">Open video library <ArrowUpRight size={15}/></Link></div>
