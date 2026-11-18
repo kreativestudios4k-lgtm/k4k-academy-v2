@@ -137,3 +137,10 @@
  .kcs-root .kcs-nav .kcs-main-links{gap:16px}
  .kcs-root .kcs-nav .kcs-main-links a{font-size:11px;min-height:34px}
 }
+
+/* Launch existing studio workflow in its screenshot-inspired two-panel popup. */
+.kcs-video-popup-launch{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;min-height:55px;padding:12px 17px;margin:19px 0 12px;border:1px solid #f1f1f3;border-radius:12px;background:#eeeef1;color:#151517;font-size:14px;font-weight:850;cursor:pointer;transition:background .15s}
+.kcs-video-popup-launch:hover{background:#fff}
+.kcs-video-popup-launch span{border:1px solid #b8bac0;border-radius:40px;padding:3px 9px;color:#51525a;font-size:11px;font-weight:750}
+.kcs-video-popup-launch svg:last-child{margin-left:auto}
+@media(max-width:640px){.kcs-video-popup-launch svg:last-child{display:none}}
