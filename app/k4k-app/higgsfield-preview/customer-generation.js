@@ -10,7 +10,7 @@ async function request(action,input={}){
  const response=await fetch('/api/higgsfield/customer-jobs',{method:'POST',cache:'no-store',headers:{Authorization:'Bearer '+session.access_token,'Content-Type':'application/json'},body:JSON.stringify({action,...input})});
  const body=await response.json();if(!response.ok)throw Error(messages[body.error]||body.error||'Unable to complete this request.');return body;
 }
-export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey='',motionModel='ultra'}){
+export default function CustomerGeneration({media,resolution,prompt,customer=false,libraryOnly=false,onBusyChange,estimatedCredits=null,onPrepareMedia=null,canGenerate=true,selectionKey='',motionModel='ultra',stayInWorkspace=false}){
  const [quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[output,setOutput]=useState(null),[active,setActive]=useState(null);
  useEffect(()=>{onBusyChange?.(busy);},[busy,onBusyChange]);
  const lock=useRef(false),requestKey=useRef(null),account=useRef(undefined);
@@ -66,7 +66,7 @@ export default function CustomerGeneration({media,resolution,prompt,customer=fal
    <p style={{fontSize:13}}>{customer?'':`Provider estimate: $${quote.usd.toFixed(2)}. `}Quote expires in five minutes.</p>
    <button type="button" disabled={busy||!quote.dispatchEnabled} style={{...button,opacity:quote.dispatchEnabled?1:.5}} onClick={()=>action(async()=>{
     const current=quote;setQuote(null);
-    try{const result=await request('submit',{jobId:current.jobId,quoteToken:current.quoteToken,requestKey:requestKey.current});setActive(result.jobId);setMessage('Generation submitted. You can return here to check its progress.');if(customer)window.location.assign('/k4k-app/videos');}
+    try{const result=await request('submit',{jobId:current.jobId,quoteToken:current.quoteToken,requestKey:requestKey.current});setActive(result.jobId);setMessage('Generation submitted. You can return here to check its progress.');if(customer&&!stayInWorkspace)window.location.assign('/k4k-app/videos');}
     finally{await refresh();}
    })}>{quote.dispatchEnabled?'Confirm & Generate · '+quote.credits+' credits':'Generation locked · Preview'}</button>
   </div>}
