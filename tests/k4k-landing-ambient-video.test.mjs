@@ -24,7 +24,8 @@ test('homepage is black/chrome without old coloured portraits or unnecessary med
  assert.match(home,/NEXT_PUBLIC_K4K_HOME_HERO_VIDEO_URL/);
  assert.match(css,/\.kc26-chrome-stage/);
  assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
- assert.match(css,/\.kc26-chrome-stage\.kc26-with-video\{display:none\}/);
+ assert.match(css,/\.kc26-chrome-stage\.kc26-with-video\{display:block\}/);
+ assert.match(home,/poster="\/k4k-home-hero-poster\.svg"/);
 });
 
 test('real K4K gallery and essential creator links remain, without generation calls',()=>{
