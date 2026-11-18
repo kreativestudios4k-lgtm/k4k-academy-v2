@@ -15,7 +15,10 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,dur
  const enabled=access[model.id]===true&&(mode==='Text to video'||mode==='Text to image');
  useEffect(()=>{let alive=true;call({action:'models'}).then(v=>{if(alive){const availability=Object.fromEntries(v.models.map(m=>[m.id,m.enabled]));setAccess(availability);onModels?.(availability)}}).catch(()=>{if(alive){setAccess({});onModels?.({})}});call({action:'list'}).then(v=>{if(alive)setJobs(v.jobs||[])}).catch(()=>{});return()=>{alive=false}},[]);
  useEffect(()=>{setQuote(null);setResult(null);key.current=null;setInfo('')},[model.id,mode,prompt,aspect,duration,resolution]);
- if(!enabled)return <p style={{marginTop:12,fontSize:13,color:'#c9d0cb'}}>To generate with this model, <a href="/login" style={{textDecoration:'underline'}}>sign in</a> and select the text-only workflow. Models without public approval remain unavailable.</p>;
+ if(!enabled)return <section className="kcs-generation-panel" aria-label="Generation availability">
+  <button type="button" className="kcs-generate-primary" disabled aria-disabled="true">Generate · unavailable</button>
+  <p style={{marginTop:8,fontSize:12,color:'#bcbec6'}}>Sign in and select a supported text-only workflow. Models without approved API access remain unavailable; no credits are charged.</p>
+ </section>;
  async function attempt(fn){
   if(lock.current)return;lock.current=true;setBusy(true);
   try{await fn()}catch(e){setInfo(e.message)}finally{lock.current=false;setBusy(false)}
