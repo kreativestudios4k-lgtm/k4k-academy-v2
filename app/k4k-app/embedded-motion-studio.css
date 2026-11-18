@@ -1,0 +1,79 @@
+/* Embedded, release-gated K4K Motion. Reuses original media checks, quote and
+   provider dispatch in HiggsfieldPreview; styling only, never a new API path. */
+.kcp-motion-section{min-width:0;max-width:1540px;margin:auto;padding:12px 14px 30px}
+.kcp-motion-section .khm-root.khm-embedded{background:#101113!important;color:#f6f6f8;min-height:0;width:100%;max-width:100%;padding:0!important;overflow:visible}
+.kcp-motion-section .khm-root.khm-embedded .khm-studio-layout{width:100%!important;max-width:none!important;display:grid!important;grid-template-columns:minmax(290px,34%) minmax(0,1fr)!important;gap:10px 15px!important;padding:0!important;align-items:start}
+.kcp-motion-section .khm-embedded .khm-topnav{display:none!important}
+.kcp-motion-section .khm-embedded .khm-studio-layout>.khm-motion-library{grid-column:2!important;grid-row:2/span 12!important;position:static!important;min-height:calc(100dvh - 110px);margin:0!important;border-color:#303136;background:#1b1c1f!important;border-radius:16px;padding:15px!important}
+.kcp-motion-section .khm-embedded .khm-motion-control-title{grid-column:1!important;grid-row:2!important;background:#1b1c1f;border:1px solid #303136;padding:14px;border-radius:14px}
+.kcp-motion-section .khm-embedded .khm-motion-control-title h2{font-size:25px}
+.kcp-motion-section .khm-embedded .khm-source-selector{grid-column:1!important;grid-row:3!important}
+.kcp-motion-section .khm-embedded .khm-video-stage{grid-column:1!important;grid-row:4!important;position:static!important}
+.kcp-motion-section .khm-embedded .khm-cast-panel{grid-column:1!important;grid-row:5!important}
+.kcp-motion-section .khm-embedded .khm-direction-panel{grid-column:1!important;grid-row:6!important}
+.kcp-motion-section .khm-embedded .khm-quality-panel{grid-column:1!important;grid-row:7!important}
+.kcp-motion-section .khm-embedded .khm-source-selector,.kcp-motion-section .khm-embedded .khm-video-panel,.kcp-motion-section .khm-embedded .khm-cast-panel>section,.kcp-motion-section .khm-embedded .khm-direction-panel,.kcp-motion-section .khm-embedded .khm-quality-panel{background:#1b1c1f!important;border:1px solid #34353a!important;border-radius:13px!important;padding:13px!important}
+.kcp-motion-section .khm-embedded .khm-video-panel{min-height:0!important}
+.kcp-motion-section .khm-embedded .khm-video-panel input[type=file]{border-color:#696b72!important;background:#292a2e!important}
+.kcp-motion-section .khm-embedded .khm-video-panel input[type=file]::file-selector-button{background:#eeeef1!important;color:#151516!important}
+.kcp-motion-section .khm-embedded .khm-cast-panel input,.kcp-motion-section .khm-embedded .khm-direction-panel textarea{border-color:#505158!important;background:#292a2f!important;color:#fff!important}
+.kcp-motion-section .khm-embedded .khm-cast-panel>section>p{color:#c3c3cb!important}
+.kcp-motion-section .khm-embedded .khm-quality-panel .khm-credit-summary{background:#292a2e!important;border-color:#44454c!important}
+.kcp-motion-section .khm-embedded .khm-quality-panel .khm-credit-summary strong{color:#fff!important}
+.kcp-motion-section .khm-embedded :is(button,a):focus-visible{outline-color:#fff!important}
+.kcp-motion-section .khm-embedded :is(.khm-lib-top,.khm-lib-categories,.khm-lib-content,.khm-lib-card-status){color:#d1d1d6}
+.kcp-motion-section .khm-embedded .khm-lib-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.kcp-motion-section .khm-embedded .khm-lib-content{grid-template-columns:minmax(0,1.9fr) minmax(200px,1fr)}
+.kcp-motion-section .khm-embedded .khm-lib-feature-media{background:#060607}
+.kcp-motion-section .khm-embedded .khm-lib-feature-media video{object-fit:contain!important}
+.kcp-motion-section .khm-embedded .khm-quality-panel>section button{max-width:100%}
+.kcp-motion-unavailable{display:grid;grid-template-columns:minmax(290px,34%) minmax(0,1fr);gap:15px}
+.kcp-motion-gated-input,.kcp-motion-gated-library{min-width:0;background:#1b1c1f;border:1px solid #303136;border-radius:16px;padding:16px}
+.kcp-motion-gated-input{display:flex;flex-direction:column;gap:13px;min-height:550px}
+.kcp-motion-gated-input h2{font-size:19px;margin:0}
+.kcp-motion-gated-input p{color:#b6b7bf;font-size:12px;line-height:1.6;margin:0}
+.kcp-motion-upload-disabled{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;text-align:center;border:1px dashed #55565e;background:#292a2e;border-radius:12px;padding:25px 15px}
+.kcp-motion-upload-disabled strong{font-size:13px}
+.kcp-motion-upload-disabled small{color:#9596a0}
+.kcp-motion-release-status{display:flex;gap:8px;border:1px solid #55565d;border-radius:10px;padding:12px;color:#c3c4cc;font-size:11px;line-height:1.5}
+.kcp-motion-release-status svg{flex:0 0 auto}
+.kcp-motion-gated-generate{margin-top:auto;width:100%;padding:14px;border-radius:10px;border:0;background:#bfc0c5;color:#111;font-weight:800;opacity:.45;cursor:not-allowed}
+.kcp-motion-gated-library>header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 17px}
+.kcp-motion-gated-library>header>div{display:flex;flex-direction:column;gap:4px}
+.kcp-motion-gated-library header strong{font-size:14px}
+.kcp-motion-gated-library header small{font-size:11px;color:#a5a5ad}
+.kcp-motion-gated-library header label{display:flex;align-items:center;gap:7px;background:#292a2e;border-radius:9px;padding:9px}
+.kcp-motion-gated-library header label input{background:transparent;border:0;color:#fff;outline:0;max-width:165px}
+.kcp-motion-gated-layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(170px,1fr);gap:12px}
+.kcp-motion-gated-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:11px;max-height:70dvh;overflow-y:auto}
+.kcp-motion-gated-grid button{border:1px solid #44454b;border-radius:12px;background:#26272b;overflow:hidden;min-width:0;text-align:left;color:#eee;padding:0 0 10px;display:flex;flex-direction:column;gap:7px}
+.kcp-motion-gated-grid button.selected{border-color:#eee}
+.kcp-motion-gated-grid button>span{width:100%;aspect-ratio:16/9;background:#050505;overflow:hidden}
+.kcp-motion-gated-grid button video{width:100%;height:100%;object-fit:cover;pointer-events:none}
+.kcp-motion-gated-grid button strong,.kcp-motion-gated-grid button small{margin-inline:10px}
+.kcp-motion-gated-grid button strong{font-size:12px;line-height:1.4}
+.kcp-motion-gated-grid button small{font-size:10px;color:#9b9ba2}
+.kcp-motion-gated-feature{display:flex;flex-direction:column;gap:10px;min-width:0}
+.kcp-motion-gated-feature video{display:block;width:100%;max-height:60dvh;aspect-ratio:9/15;object-fit:contain;background:#090909;border-radius:11px}
+.kcp-motion-gated-feature strong{font-size:13px}
+.kcp-motion-gated-feature small{font-size:10px;color:#999ba3}
+.kcp-wan-section{max-width:1540px;margin:auto;padding:12px 14px 30px}
+.kcp-wan-section .ks{max-width:none;margin:0 auto;min-height:calc(100dvh - 90px);background:#101113}
+.kcp-wan-section .ks-new-hero{margin-top:0}
+.kcp-wan-section .ks-panel{background:#1b1c1f}
+@media(max-width:1100px){.kcp-motion-section .khm-embedded .khm-lib-content{grid-template-columns:1fr}.kcp-motion-section .khm-embedded .khm-lib-feature{display:none}.kcp-motion-gated-layout{grid-template-columns:1fr}.kcp-motion-gated-feature{display:none}}
+@media(max-width:760px){
+ .kcp-motion-section,.kcp-wan-section{padding:10px}
+ .kcp-motion-section .khm-root.khm-embedded .khm-studio-layout{display:flex!important;flex-direction:column;gap:10px!important}
+ .kcp-motion-section .khm-embedded .khm-studio-layout>*{width:100%;min-width:0}
+ .kcp-motion-section .khm-embedded .khm-motion-control-title{order:1}
+ .kcp-motion-section .khm-embedded .khm-motion-library{order:2;min-height:0}
+ .kcp-motion-section .khm-embedded .khm-source-selector{order:3}
+ .kcp-motion-section .khm-embedded .khm-video-stage{order:4}
+ .kcp-motion-section .khm-embedded .khm-cast-panel{order:5}
+ .kcp-motion-section .khm-embedded .khm-direction-panel{order:6}
+ .kcp-motion-section .khm-embedded .khm-quality-panel{order:7}
+ .kcp-motion-unavailable{display:flex;flex-direction:column}
+ .kcp-motion-gated-input{min-height:0}
+ .kcp-motion-gated-grid{max-height:none}
+}
