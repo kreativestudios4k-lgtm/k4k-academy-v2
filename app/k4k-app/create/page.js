@@ -37,7 +37,8 @@ export default function CreativeStudio(){
   setDuration(next.duration?.[0]||5);
   setFiles(old=>old.slice(0,next.refs));
   setError('');
-  const nextUrl='/k4k-app/create?kind='+encodeURIComponent(next.kind)+'&model='+encodeURIComponent(next.id);
+  const preserveClassic=new URLSearchParams(window.location.search).get('classic')==='1';
+  const nextUrl='/k4k-app/create?kind='+encodeURIComponent(next.kind)+'&model='+encodeURIComponent(next.id)+(preserveClassic?'&classic=1':'');
   window.history.replaceState(null,'',nextUrl);
 }
  function chooseKind(next){setKind(next);chooseModel(publicCreationModels(next)[0]);}
