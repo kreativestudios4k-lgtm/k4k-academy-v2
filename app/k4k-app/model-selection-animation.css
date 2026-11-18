@@ -1,0 +1,37 @@
+/* The selected model always has a 16:9 motion preview.
+ * When no real demo exists, the artwork is explicitly an interface animation. */
+.kcs-model-animation{overflow:hidden;border:1px solid #41434a;border-radius:15px;background:#17181c;margin:20px 0 25px;animation:kcsModelAppear .55s ease-out both}
+.kcs-model-animation-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;color:#c4c5cb;font-size:10px;font-weight:800;letter-spacing:1.2px}
+.kcs-model-animation-header span{display:inline-flex;align-items:center;gap:7px}
+.kcs-model-animation-header span:last-child{color:#898b92;font-size:9px;letter-spacing:.8px;text-align:right}
+.kcs-model-animation-stage{aspect-ratio:16/9;max-height:315px;position:relative;overflow:hidden;border-top:1px solid #2d2f36;background:#08090c}
+.kcs-model-animation-stage>video{width:100%;height:100%;display:block;object-fit:contain;background:#08090c}
+.kcs-model-animation-art{height:100%;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(ellipse at 55% 45%,#383940 0%,#141519 48%,#090a0c 90%)}
+.kcs-model-animation-core{width:105px;height:105px;border:1px solid #a7a8b6;box-shadow:0 0 65px #ffffff20,inset 0 0 23px #ffffff14;background:linear-gradient(140deg,#45464d,#17181c);border-radius:22px;display:flex;align-items:center;justify-content:center;gap:5px;flex-direction:column;color:#fafafa;z-index:2;animation:kcsModelFloat 3.2s ease-in-out infinite}
+.kcs-model-animation-core b{font-size:16px;letter-spacing:5px;margin-left:5px}
+.kcs-model-animation-orbit{position:absolute;width:290px;height:290px;border:1px solid #7779835e;transform:rotate(-19deg);border-radius:42%;animation:kcsOrbit 16s linear infinite}
+.kcs-model-animation-orbit.second{width:420px;height:420px;border-color:#ffffff19;animation-duration:25s;animation-direction:reverse;border-radius:50%}
+.kcs-model-animation-stripe{position:absolute;width:250%;height:2px;background:linear-gradient(90deg,transparent,#e7e8f0a6,transparent);left:-70%;transform:rotate(-22deg);animation:kcsModelSweep 4s ease-in-out infinite}
+.kcs-model-animation-stripe.two{top:35%;animation-delay:-1.3s;opacity:.5}
+.kcs-model-animation-stripe.three{top:65%;animation-delay:-2.8s;opacity:.4}
+.kcs-model-animation-scan{position:absolute;inset:0;background:repeating-linear-gradient(transparent 0px,transparent 8px,#ffffff06 9px,transparent 10px);pointer-events:none;animation:kcsModelScan 6s linear infinite}
+.kcs-model-animation-motion .kcs-model-animation-orbit{border-style:dashed;animation-duration:7s}
+.kcs-model-animation-image .kcs-model-animation-core{width:128px;height:92px;border-radius:7px;animation:kcsModelFloat 4.8s ease-in-out infinite}
+.kcs-model-animation-image .kcs-model-animation-orbit{border-radius:20px;animation-duration:22s}
+.kcs-model-animation-image .kcs-model-animation-orbit.second{border-radius:55px}
+.kcs-model-animation-cinematic .kcs-model-animation-orbit{width:310px;height:155px;transform:rotate(0);border-radius:8px;animation:kcsCineMove 6s ease-in-out infinite}
+.kcs-model-animation-cinematic .kcs-model-animation-orbit.second{width:410px;height:225px;animation-delay:-3s}
+.kcs-model-animation-kinetic .kcs-model-animation-stripe{height:4px;transform:rotate(-45deg);animation-duration:1.7s}
+.kcs-model-animation-shade{position:absolute;inset:45% 0 0;pointer-events:none;background:linear-gradient(transparent,#050608c4)}
+.kcs-model-animation-overlay{position:absolute;bottom:0;left:0;right:0;z-index:3;padding:15px 19px;color:#f8f8f8;display:flex;flex-direction:column;gap:1px}
+.kcs-model-animation-overlay>span{font-size:9px;letter-spacing:2px;color:#ccccd2;font-weight:850}
+.kcs-model-animation-overlay strong{font-size:20px;letter-spacing:-.5px;text-shadow:0 2px 10px #000b}
+.kcs-model-animation-overlay small{display:flex;align-items:center;gap:5px;color:#c6c7ce;font-size:10px}
+@keyframes kcsModelAppear{from{opacity:0;transform:translateY(12px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes kcsModelFloat{0%,100%{transform:translateY(-5px) rotate(-3deg)}50%{transform:translateY(8px) rotate(3deg)}}
+@keyframes kcsOrbit{to{transform:rotate(341deg)}}
+@keyframes kcsModelSweep{0%{transform:translate(-15%,-25px) rotate(-22deg);opacity:0}35%{opacity:.6}100%{transform:translate(15%,45px) rotate(-22deg);opacity:0}}
+@keyframes kcsModelScan{50%{transform:translateY(6px)}}
+@keyframes kcsCineMove{0%,100%{transform:translateX(-12px) rotate(-3deg)}50%{transform:translateX(12px) rotate(3deg)}}
+@media(max-width:640px){.kcs-model-animation-overlay strong{font-size:17px}.kcs-model-animation-stage{max-height:none}.kcs-model-animation-core{width:82px;height:82px}.kcs-model-animation-header{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.kcs-model-animation,.kcs-model-animation-art *{animation:none!important}.kcs-model-animation-stage>video{display:none}.kcs-model-animation-stage:has(video){background:#101113}}

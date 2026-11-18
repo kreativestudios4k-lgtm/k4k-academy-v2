@@ -69,3 +69,8 @@
 @media(max-width:850px){.k4k-video-popup-backdrop{padding:0;align-items:flex-end}.k4k-video-popup{width:100%;height:95dvh;max-height:95dvh;border-radius:20px 20px 0 0}.k4k-video-popup-grid{display:flex;flex-direction:column;gap:10px;overflow-y:auto;padding:10px}.k4k-video-popup-input,.k4k-video-popup-result{overflow:visible;flex:0 0 auto}.k4k-video-popup-result{order:-1}.k4k-video-popup-stage{max-height:45dvh}.k4k-video-popup-header{min-height:63px}.k4k-video-popup-header h2 small{display:none}}
 @media(max-width:470px){.k4k-video-popup-header{padding:10px 13px}.k4k-video-popup-input,.k4k-video-popup-result{padding:12px}.k4k-video-popup-result-meta{align-items:flex-start;flex-direction:column}.k4k-video-popup-controls{gap:8px}.k4k-video-popup-result-heading span{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.k4k-video-popup-switch i{transition:none}}
+
+/* Higgsfield Kling 4.0 plays the uploaded example, not customer library output. */
+.k4k-video-popup-demo-chip{position:absolute;top:11px;right:12px;display:inline-flex;align-items:center;gap:5px;background:#08090dcc;border:1px solid #9c9fa76d;border-radius:999px;padding:5px 10px;color:#fff;font-size:10px;font-weight:850;letter-spacing:.65px;pointer-events:none}
+.k4k-video-popup-nocharge{font-size:11px;color:#ccd0d3;border:1px solid #555963;border-radius:999px;padding:7px 12px;white-space:nowrap}
+@media(max-width:470px){.k4k-video-popup-demo-chip{top:6px;right:6px;font-size:8px;padding:4px 7px}}
