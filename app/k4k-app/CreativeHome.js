@@ -10,7 +10,7 @@ import {useVerifiedAccount} from './useVerifiedAccount';
 import AccountMenu from './AccountMenu';
 import './k4k-clean-home.css';
 
-// The user-supplied 8-second K4K chrome film, uploaded to the K4K Higgsfield media account.
+// The user-supplied 8-second K4K chrome film, stored at the approved media CDN.
 // Keep the public hero as a non-billable presentation asset. Changing the model APIs is unnecessary.
 // The optional environment override lets us move the master to a first-party CDN later.
 const HERO_VIDEO_URL=process.env.NEXT_PUBLIC_K4K_HOME_HERO_VIDEO_URL||
