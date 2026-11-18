@@ -126,3 +126,8 @@
 @media(prefers-reduced-motion:reduce){
  .k4k-hf-home .khf-violet-portrait{transition:none}
 }
+
+/* Keep the original semantic h1 intact while presenting a branded lockup. */
+.k4k-hf-home .khf-violet-lockup{display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.7vw,28px)}
+.k4k-hf-home .khf-violet-lockup h1{display:block;gap:0}
+@media(max-width:760px){.k4k-hf-home .khf-violet-lockup{gap:8px}}
