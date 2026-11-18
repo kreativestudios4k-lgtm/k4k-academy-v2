@@ -7,6 +7,7 @@ import {creativeModelReadiness} from '../../../lib/creative-provider-readiness.m
 import CustomerCreativeGeneration from '../CustomerCreativeGeneration';
 import VideoGenerationPopup from '../VideoGenerationPopup';
 import ModelSelectionAnimation from '../ModelSelectionAnimation';
+import CompactCreationStudio from '../CompactCreationStudio';
 import {useK4KLocale} from '../locale';
 import './create.css';
 import StudioSidebar from '../StudioSidebar';
@@ -57,6 +58,20 @@ export default function CreativeStudio(){
  function addFiles(list){const accepted=Array.from(list||[]).filter(f=>['image/jpeg','image/png','image/webp'].includes(f.type)&&f.size<=10*1024*1024);setFiles(old=>[...old,...accepted].slice(0,model.refs));setError(accepted.length<Array.from(list||[]).length?'Use JPG, PNG or WebP files up to 10 MB.':'')}
  const providerReadiness=creativeModelReadiness(model.id,mode);
  const [thumbnails,setThumbnails]=useState([]);useEffect(()=>{const urls=files.map(f=>URL.createObjectURL(f));setThumbnails(urls);return()=>urls.forEach(u=>URL.revokeObjectURL(u))},[files]);
+ // The compact Input | Result experience is the default. A deliberate ?classic=1
+ // query remains available as a safe, temporary visual fallback during review;
+ // it does not change any generation routing or billing rules.
+ const [classicView,setClassicView]=useState(false);
+ useEffect(()=>{if(new URLSearchParams(window.location.search).get('classic')==='1')setClassicView(true)},[]);
+ if(!classicView)return <CompactCreationStudio
+  model={model} kind={kind} mode={mode} setMode={setMode}
+  resolution={resolution} setResolution={setResolution}
+  aspect={aspect} setAspect={setAspect}
+  duration={duration} setDuration={setDuration}
+  prompt={prompt} setPrompt={setPrompt}
+  files={files} setFiles={setFiles} thumbnails={thumbnails} addFiles={addFiles}
+  onSelectModel={chooseModel} customerModels={customerModels} onModels={setCustomerModels} error={error}
+ />;
  return <main className="kcs-root">
   <header className="kcs-nav"><Link className="kcs-brand" href="/k4k-app"><img src="/k4k-mark.svg" width="29" height="29" alt=""/> K4K<span> APP</span></Link><div className="kcs-main-links" role="navigation" aria-label="Creative Studio navigation"><Link href="/k4k-app/dashboard">Dashboard</Link><Link href="/k4k-app/image" aria-current={kind==='image'?'page':undefined}>Image</Link><Link href="/k4k-app/video" aria-current={kind==='video'?'page':undefined}>Video</Link><Link href="/k4k-app/motion">K4K Motion</Link></div><Link href="/k4k-app/videos" className="kcs-library-link">{t.library}<ArrowUpRight size={15}/></Link></header>
   <div className="k4k-dashboard-frame"><StudioSidebar active={kind}/><div className="k4k-dashboard-main">
