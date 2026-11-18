@@ -62,7 +62,7 @@ export default function CreativeHome(){
          <div className="khf-reference-sideyear" aria-hidden="true">K4K BRAND VISION · 2026</div>
          <div className="khf-reference-headline">
            <span className="khf-reference-eyebrow">{tr('CREATIVE INTELLIGENCE · THE FUTURE IS YOURS','INTELIGÊNCIA CRIATIVA · O FUTURO É SEU','INTELIGENCIA CREATIVA · EL FUTURO ES TUYO')}</span>
-           <h1 id="khf-hero-title"><img className="khf-violet-hero-mark" src="/k4k-violet-mark.svg" alt=""/>K4K <span>APP</span></h1>
+           <div className="khf-violet-lockup"><img className="khf-violet-hero-mark" src="/k4k-violet-mark.svg" alt=""/><h1 id="khf-hero-title">K4K <span>APP</span></h1></div>
          </div>
          <div className="khf-reference-socials" aria-label={tr('Social links','Redes sociais','Redes sociales')}>
            <a href="https://www.instagram.com/kreativestudios4k/" target="_blank" rel="noopener noreferrer" aria-label="K4K on Instagram">IG</a>
