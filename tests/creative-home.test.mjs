@@ -70,7 +70,7 @@ test('Wan 3 remains a display name; Motion stays primary without changing provid
  assert.match(home,/'wan-prime'/);
  assert.match(home,/href="\/k4k-app\/motion"/);
  assert.match(catalog,/id:'wan-prime',demoUrl:/);
- assert.equal(wan?.name,'Wan 3');
+ assert.equal(CREATION_MODELS.find(m=>m.id==='wan-prime')?.name,'Wan 3');
  assert.match(catalog,/cta:'\/k4k-app\/creator'/);
  assert.doesNotMatch(home,/K4K Remix/);
 });
