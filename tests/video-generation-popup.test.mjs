@@ -29,7 +29,7 @@ test('the actual uploaded seven-second Kling sample is used, never a private cus
  assert.match(popup,/Preview only/);
  assert.match(popup,/It is not the output of your prompt/);
  assert.doesNotMatch(popup,/action:'list'|action:'download'|auth\.getSession\(\)/);
- assert.equal(CREATION_MODELS.filter(m=>m.demoUrl).length,1);
+ assert.equal(CREATION_MODELS.filter(m=>m.demoUrl).length,6);
 });
 
 test('all selected models get a truthful animated preview with 16:9 framing',()=>{
