@@ -30,9 +30,24 @@ function studioHref(model){
  return '/k4k-app/create?kind='+encodeURIComponent(model.kind)+'&model='+encodeURIComponent(model.id);
 }
 function ModelArt({model}){
- return <div className={'kc26-card-art '+(model.kind==='image'?'kc26-card-art-image':model.premium?'kc26-card-art-motion':'kc26-card-art-video')}>
+ const videoRef=useRef(null);
+ useEffect(()=>{
+  const video=videoRef.current;
+  if(!video||!model.demoUrl)return;
+  // Keep motion respectful of reduced-motion preferences and avoid loading six full
+  // videos while visitors are still watching the large homepage hero.
+  if(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)return;
+  const play=()=>{video.play().catch(()=>{});};
+  if(!('IntersectionObserver' in window)){play();return ()=>video.pause();}
+  const observer=new IntersectionObserver(([entry])=>{
+   if(entry.isIntersecting)play();else video.pause();
+  },{threshold:0.35,rootMargin:'60px 0px'});
+  observer.observe(video);
+  return ()=>{observer.disconnect();video.pause();};
+ },[model.demoUrl]);
+ return <div className={'kc26-card-art '+(model.demoAspect==='9:16'?'kc26-card-art-portrait ':'')+(model.kind==='image'?'kc26-card-art-image':model.premium?'kc26-card-art-motion':'kc26-card-art-video')}>
   {model.demoUrl?
-   <video src={model.demoUrl} autoPlay muted loop playsInline preload="metadata" aria-label={model.name+' example clip'}/>:
+   <video ref={videoRef} src={model.demoUrl} muted loop playsInline preload="metadata" aria-label={model.name+' example clip'}/>:
    <div className="kc26-generated-visual" aria-hidden="true"><span className="kc26-grid-aura"/><span className="kc26-visual-orbit"/><span className="kc26-visual-glow"/>{model.kind==='image'?<Images size={42} strokeWidth={1}/>:model.premium?<Clapperboard size={42} strokeWidth={1}/>:<Film size={42} strokeWidth={1}/>}</div>}
   <div className="kc26-card-art-overlay"/>
   <span className="kc26-card-art-marker">{model.demoUrl?'REAL MODEL EXAMPLE':'INTERFACE ANIMATION'}</span>
