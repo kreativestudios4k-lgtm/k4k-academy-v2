@@ -27,3 +27,11 @@ Four originally recurring subscription prices (each with GBP/EUR/USD/BRL) and al
 `node --test tests/v2-live-price-cutover.test.mjs`
 
 This draft is **not** permission to enable the production checkout, amend Stripe records or apply a database migration. Production rollout requires a separate explicit owner approval and successful e2e verification.
+
+## Phase 2 audit: funded credits and unit economics (19 Nov)
+- Production subscription launch credit cap: **1,600**; current committed subscription credits: **240**, committed manual Pix credits: **80**, occupied launch seats: **3**. Remaining allowance = **1,280** credits.
+- A new Creator (840) fits one reservation, but Pro (1,680) and Studio (3,360) cannot fit. Existing limits max 35,000 at SQL validation and must not be increased without actual provider funding.
+- Existing generation code computes `ceil(providerUsd / providerUsdPerCredit)`. Production `K4K_PROVIDER_USD_PER_CREDIT=0.1`, so a fully spent Starter/Creator/Pro/Studio new allowance could use up to **$42/$84/$168/$336** provider cost, respectively, versus prices **$20.95/$39.30/$78.61/$157.24**. Single video at 140 credits could cost up to **$14** of provider generation at a **$7.85** sale price.
+- These are worst-case provider-cost equivalents if credits are fully used, not proof of actual provider spend. Require a tested per-model provider cost table, revised credit conversion/allowance, taxes, FX, refunds, payment fees and affiliate commission margin check.
+- `K4K_V2_CREDIT_UNIT_ECONOMICS_QA_APPROVED` is a separate **default-unset** launch gate. Do not set any migration flag or deploy an altered pricing/grant policy until economics are approved.
+- Pure function `lib/server/v2-launch-reservation-preview.mjs` and tests provide a read-only funding preflight. It is not an atomic SQL reservation or an authorization to change the current database.
