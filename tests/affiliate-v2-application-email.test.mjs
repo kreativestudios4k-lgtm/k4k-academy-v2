@@ -29,7 +29,7 @@ test('original application remains idempotent and accepts only verified bearer o
  assert.match(src,/auth\.getUser\(\)/);
  assert.match(src,/request\.headers\.get\('origin'\)/);
  assert.match(src,/origin!==new URL\(request\.url\)\.origin/);
- assert.match(src,/\/^Bearer \\S\+\$\/i/); // regex spelling is checked by source below too
+ assert.ok(src.includes(String.raw`const bearer=/^Bearer \S+$/i.test`));
  assert.match(src,/pending_review/);
  assert.match(src,/confirmation_sent_at/);
  assert.match(src,/Idempotency-Key/);
