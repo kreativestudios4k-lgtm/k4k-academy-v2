@@ -11,6 +11,13 @@ import './compact-creation-studio.css';
 
 const videoModels=publicCreationModels('video');
 const imageModels=publicCreationModels('image');
+const defaultVideoModel=videoModels.find(item=>item.id==='wan-prime')||videoModels.find(item=>!item.premium&&!item.id.startsWith('seedance'))||videoModels[0];
+const pickerGroups=[
+ {id:'video',label:'VIDEO MODELS',matches:item=>item.kind==='video'&&!item.premium&&!item.id.startsWith('seedance')},
+ {id:'image',label:'IMAGE MODELS',matches:item=>item.kind==='image'},
+ {id:'motion',label:'K4K MOTION',matches:item=>item.premium},
+ {id:'business',label:'BUSINESS STUDIO · SEEDANCE',matches:item=>item.id.startsWith('seedance')}
+];
 const allModels=[...videoModels,...imageModels];
 const durations=model=>model.duration?Array.from({length:model.duration[1]-model.duration[0]+1},(_,i)=>model.duration[0]+i):[];
 const isTextGeneration=(model,mode)=>!model.cta&&((model.kind==='video'&&mode==='Text to video')||(model.kind==='image'&&mode==='Text to image'));
@@ -85,15 +92,15 @@ export default function CompactCreationStudio({
     </button>
     {switchOpen&&<div className="kcp-switch-menu" role="dialog" aria-label="Switch AI model">
      <label className="kcp-switch-search">Search models<input autoFocus value={filter} onChange={e=>setFilter(e.target.value)} placeholder="Search video and image models"/></label>
-     {['video','image'].map(type=><div key={type} className="kcp-switch-group">
-      <strong>{type==='video'?'VIDEO MODELS':'IMAGE MODELS'}</strong>
-      {choices.filter(item=>item.kind===type).map(item=><button key={item.id} type="button" aria-current={model.id===item.id?'true':undefined} onClick={()=>{onSelectModel(item);setSwitchOpen(false);}}><span>{item.name}</span>{model.id===item.id?<span className="kcp-selected-dot"/>:<ArrowUpRight size={13}/>}</button>)}
+     {pickerGroups.map(group=><div key={group.id} className="kcp-switch-group">
+      <strong>{group.label}</strong>
+      {choices.filter(group.matches).map(item=><button key={item.id} type="button" aria-current={model.id===item.id?'true':undefined} onClick={()=>{onSelectModel(item);setSwitchOpen(false);}}><span>{item.name}</span>{model.id===item.id?<span className="kcp-selected-dot"/>:<ArrowUpRight size={13}/>}</button>)}
      </div>)}
      {!choices.length&&<p className="kcp-no-models">No matching models</p>}
     </div>}
    </div>
    <nav className="kcp-header-right" aria-label="Workspace">
-    <div className="kcp-kind-tabs"><button type="button" aria-pressed={!isImage} onClick={()=>onSelectModel(videoModels[0])}><Film size={15}/> Video</button><button type="button" aria-pressed={isImage} onClick={()=>onSelectModel(imageModels[0])}><Images size={15}/> Image</button></div>
+    <div className="kcp-kind-tabs"><button type="button" aria-pressed={!isImage} onClick={()=>onSelectModel(defaultVideoModel)}><Film size={15}/> Video</button><button type="button" aria-pressed={isImage} onClick={()=>onSelectModel(imageModels[0])}><Images size={15}/> Image</button></div>
     <Link href="/k4k-app/videos" className="kcp-library-link">Library <ArrowUpRight size={15}/></Link>
     <Link href="/" className="kcp-explore-link"><ArrowLeft size={15}/> Explore</Link>
    </nav>
