@@ -12,6 +12,12 @@ import {useK4KLocale} from '../locale';
 import './create.css';
 import StudioSidebar from '../StudioSidebar';
 const UI={en:{eyebrow:'K4K CREATIVE STUDIO',headline:'Create what you imagine.',subtitle:'Choose Image or Video, select a model, and review the credit cost before creating. Advanced reference tools are shown only when supported.',images:'Images',videos:'Videos',models:'AI MODELS',settings:'CREATIVE CONTROLS',prompt:'Your prompt',placeholder:'Describe your scene, lighting, characters, movement and mood…',mode:'Workflow',resolution:'Quality',ratio:'Aspect ratio',duration:'Duration',reference:'Reference images',add:'Add references',preview:'Prepared references',copy:'Copy creative brief',copied:'Copied',active:'Workflow available',pilot:'API preview',pending:'Integration planned',open:'Open Wan 3',ready:'This workflow is not yet available',note:'No credits are charged on this page. Pending models cannot generate yet.',actions:'NEXT STEP',library:'My videos',explore:'Explore templates',title:'Your creation starts here',hint:'K4K Motion is premium character swapping. Wan 3 (Wan-powered) is the standard video generation tool.'},pt:{eyebrow:'K4K ESTÚDIO CRIATIVO',headline:'Crie sem limites.',subtitle:'Imagem e vídeo no mesmo lugar. Escolha um modelo, prepare suas referências e desenvolva sua ideia.',images:'Imagens',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CRIATIVOS',prompt:'Seu prompt',placeholder:'Descreva sua cena, iluminação, personagens, movimento e atmosfera…',mode:'Ferramenta',resolution:'Qualidade',ratio:'Proporção',duration:'Duração',reference:'Imagens de referência',add:'Adicionar referências',preview:'Referências preparadas',copy:'Copiar briefing',copied:'Copiado',active:'Ferramenta disponível',pilot:'Prévia da API',pending:'Integração planejada',open:'Abrir Wan 3',ready:'Prévia — geração ainda não conectada',note:'Nenhum crédito é cobrado nesta página. Os novos modelos ainda não podem gerar.',actions:'PRÓXIMO PASSO',library:'Meus vídeos',explore:'Explorar templates',title:'Sua criação começa aqui',hint:'Escolha um modelo e prepare seu briefing. Use o Wan 3 enquanto conectamos os modelos premium.'},es:{eyebrow:'K4K ESTUDIO CREATIVO',headline:'Crea sin límites.',subtitle:'Imágenes y vídeo en un solo lugar. Elige un modelo y prepara tus referencias.',images:'Imágenes',videos:'Vídeos',models:'MODELOS DE IA',settings:'CONTROLES CREATIVOS',prompt:'Tu prompt',placeholder:'Describe tu escena, iluminación, personajes, movimiento y ambiente…',mode:'Flujo',resolution:'Calidad',ratio:'Formato',duration:'Duración',reference:'Imágenes de referencia',add:'Agregar referencias',preview:'Referencias preparadas',copy:'Copiar briefing',copied:'Copiado',active:'Flujo disponible',pilot:'Vista previa API',pending:'Integración pendiente',open:'Abrir Wan 3',ready:'Vista previa — generación aún no conectada',note:'No se cobran créditos aquí. Los modelos pendientes aún no generan.',actions:'SIGUIENTE PASO',library:'Mis vídeos',explore:'Explorar plantillas',title:'Tu creación comienza aquí',hint:'Selecciona un modelo y prepara el briefing. Puedes seguir usando Wan 3.'}};
+function preferredModelResolution(model){
+ if(model.id==='seedance_2_5_flash'&&model.resolution.includes('720p'))return '720p';
+ if(model.id.startsWith('kling')&&model.resolution.includes('720p'))return '720p';
+ if(model.resolution.includes('1K'))return '1K';
+ return model.resolution[0];
+}
 export default function CreativeStudio(){
  const {locale}=useK4KLocale(),t=UI[locale]||UI.en;
  const [kind,setKind]=useState('video'),[id,setId]=useState('wan-prime');
@@ -23,7 +29,7 @@ export default function CreativeStudio(){
  const [generatorOpen,setGeneratorOpen]=useState(false);
  const visiblePickerModels=publicCreationModels(kind).filter(item=>item.name.toLowerCase().includes(modelQuery.trim().toLowerCase()));
  const selectedLive=customerModels[model.id]===true&&((model.kind==='video'&&mode==='Text to video')||(model.kind==='image'&&mode==='Text to image'));
- useEffect(()=>{if(selectedLive){setResolution(model.id==='kling4_hf'?'720p':model.id==='kling4_0'?'720p':model.id==='seedance_2_5'?'480p':'1K');if(model.duration&&model.id!=='kling4_hf')setDuration(5)}},[selectedLive,model.id]);
+ useEffect(()=>{if(selectedLive){setResolution(preferredModelResolution(model));if(model.duration&&model.id!=='kling4_hf')setDuration(5)}},[selectedLive,model.id]);
  function chooseModel(next){
   // Keep all selected models on the same full-page creation workspace. The
   // K4K Cinema popup remains opt-in, never an automatic detour.
@@ -32,7 +38,7 @@ export default function CreativeStudio(){
   setKind(next.kind);
   setId(next.id);
   setMode(next.modes[0]);
-  setResolution(next.resolution[0]);
+  setResolution(preferredModelResolution(next));
   setAspect(next.id==='kling4_hf'?'16:9':next.aspect[0]);
   setDuration(next.duration?.[0]||5);
   setFiles(old=>old.slice(0,next.refs));
