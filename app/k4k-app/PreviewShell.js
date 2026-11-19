@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import {useState} from 'react';
-import {MessageCircle,X,Mail,HelpCircle,Compass,Film,Sparkles,Coins,UserRound} from 'lucide-react';
+import {MessageCircle,X,Mail,HelpCircle,Compass,Film,Sparkles,Coins,UserRound,BriefcaseBusiness} from 'lucide-react';
 import './preview.css';
 import AccountStatus from './AccountStatus';
 import {useK4KLocale,LanguageSwitcher} from './locale';
@@ -32,7 +32,7 @@ export default function PreviewShell({active,children,studio=true,dashboard=fals
  return <div className={'k4k-light'+(studio?' k4k-studio-shell':'')+(dashboard?' k4k-dashboard-shell':'')}>
   <header className="k4k-global-header">
    <Link className="k4k-global-brand" href="/" aria-label="K4K APP home"><img src="/k4k-mark.svg" alt="" width="34" height="34"/> <span>K4K <b>APP</b></span></Link>
-   {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app/motion/explore" aria-current={active==='Home'?'page':undefined}>{labels.Explore||'Explore'}</Link><Link href="/k4k-app/image">{locale==='pt'?'Imagem':locale==='es'?'Imagen':'Image'}</Link><Link href="/k4k-app/video" aria-current={active==='Creator'?'page':undefined}>{locale==='pt'?'Vídeo':locale==='es'?'Vídeo':'Video'}</Link><Link href="/k4k-app/motion">K4K Motion</Link></nav>}
+   {studio&&<nav className="k4k-studio-topnav" aria-label="Studio navigation"><Link href="/k4k-app/motion/explore" aria-current={active==='Home'?'page':undefined}>{labels.Explore||'Explore'}</Link><Link href="/k4k-app/image">{locale==='pt'?'Imagem':locale==='es'?'Imagen':'Image'}</Link><Link href="/k4k-app/video" aria-current={active==='Creator'?'page':undefined}>{locale==='pt'?'Vídeo':locale==='es'?'Vídeo':'Video'}</Link><Link href="/k4k-app/motion">K4K Motion</Link><Link href="/k4k-app/business">{locale==='pt'?'Business Studio':locale==='es'?'Business Studio':'Business Studio'}</Link></nav>}
    <nav className="k4k-customer-nav" aria-label="Customer links"><LanguageSwitcher/><AccountStatus/></nav>
   </header>
   <main className="k4k-light-main">{children}</main>
