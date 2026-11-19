@@ -4,6 +4,7 @@ import {assertTestModeKey, buildCheckoutForm, resolvePrice} from '../../../../li
 import {livePrices} from '../../../../lib/server/live-price-config.mjs';
 import {assertBillingKey,assertTaxReady,billingMode,assertLiveLaunchReady,ownerLivePilot} from '../../../../lib/server/billing-policy.mjs';
 import {currencyForCountry} from '../../../../lib/k4k-market.mjs';
+import {verifiedBillingCountry} from '../../../../lib/server/billing-region-relay.mjs';
 import {launchLimits,claimPaidSeat,openLaunchCheckout} from '../../../../lib/server/soft-launch.mjs';
 import {configureBrazilPixCheckout} from '../../../../lib/server/brazil-pix.mjs';
 import {REFERRAL_COOKIE,recordReferral,referralsEnabled,validReferralCode} from '../../../../lib/server/referral-tracking.mjs';
@@ -33,9 +34,11 @@ export async function POST(request) {
   const {data: {user} = {}, error} = await auth.auth.getUser(token);
   if (error || !user || user.is_anonymous) return json({error: 'UNAUTHENTICATED'}, 401);
 
-  let body;
+  let body,rawBody;
   try {
-    body = await request.json();
+    rawBody = await request.text();
+    if(rawBody.length>2000) return json({error: 'INVALID_REQUEST'}, 413);
+    body = JSON.parse(rawBody);
   } catch {
     return json({error: 'INVALID_REQUEST'}, 400);
   }
@@ -45,7 +48,20 @@ export async function POST(request) {
   if(requestedDiscount&&(!discountReferral||(billingMode()==='test'&&!studentCode(body.discountCode))))return json({error:'INVALID_DISCOUNT_CODE'},400);
   // Region must be derived from the trusted Vercel edge header, not browser input.
   // Reject mismatches before any Stripe API request to avoid currency/price surprises.
-  const expectedCurrency = currencyForCountry(request.headers.get('x-vercel-ip-country'));
+  // Preserve native edge geolocation for direct legacy clients; on an
+  // authenticated V2-to-legacy request use a tamper-proof region assertion
+  // tied to this exact request body and Supabase access token. An unsigned
+  // forwarded x-vercel-ip-country is rewritten by Vercel at the second hop.
+  let customerCountry=request.headers.get('x-vercel-ip-country');
+  try {
+    const trusted=verifiedBillingCountry(request.headers,{body:rawBody,token});
+    if(trusted)customerCountry=trusted;
+  } catch(error) {
+    const code=error?.message==='COUNTRY_RELAY_SETUP_REQUIRED'
+      ? 'COUNTRY_RELAY_SETUP_REQUIRED':'COUNTRY_RELAY_INVALID';
+    return json({error:code},code==='COUNTRY_RELAY_SETUP_REQUIRED'?503:403);
+  }
+  const expectedCurrency = currencyForCountry(customerCountry);
   if (body?.currency !== expectedCurrency) return json({error: 'CURRENCY_REGION_MISMATCH', currency: expectedCurrency}, 409);
   let priceId;
   try { priceId = billingMode()==='test'?resolvePrice(body?.plan, expectedCurrency):livePrices('plans')?.[body?.plan]?.[expectedCurrency]; }
