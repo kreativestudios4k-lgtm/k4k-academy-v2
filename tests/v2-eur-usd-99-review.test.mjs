@@ -10,19 +10,21 @@ import {
  V2_SINGLE_VIDEO,PRESERVED_LIVE_PLAN_PRICES
 } from '../lib/server/v2-live-price-policy.mjs';
 
-test('all ten proposed EUR/USD prices end .99 and remain unapproved, with no fabricated Price IDs',()=>{
+test('all ten EUR/USD .99 prices are verified LIVE identities but not approved for public checkout',()=>{
  const lines=eurUsd99ReviewMatrix();
  assert.equal(lines.length,10);
  assert.equal(EUR_USD_99_REVIEW_ONLY,true);
- assert.equal(EUR_USD_99_NEW_PRICE_IDS_APPROVED_AND_VERIFIED,false);
+ assert.equal(EUR_USD_99_NEW_PRICE_IDS_APPROVED_AND_VERIFIED,true);
  for(const line of lines){
   assert.equal(line.proposedMinor%100,99,line.plan+line.currency);
-  assert.equal(line.replacementPriceId,null);
+  assert.equal(line.replacementPriceId,line.currentLivePriceId);
+  assert.notEqual(line.replacementPriceId,line.priorV2PriceId);
+  assert.equal(line.currentLiveMinor,line.proposedMinor);
   assert.equal(line.checkoutReady,false);
   assert.match(line.currentLivePriceId,/^price_[A-Za-z0-9]+$/);
-  assert.equal(line.changeMinor,line.proposedMinor-line.currentLiveMinor);
+  assert.equal(line.changeMinor,line.proposedMinor-line.priorV2Minor);
  }
- assert.throws(()=>ensureNoUnverifiedEurUsdPriceCutover(),/EUR_USD_99_CUTOVER_NOT_APPROVED/);
+ assert.throws(()=>ensureNoUnverifiedEurUsdPriceCutover(),/EUR_USD_99_PAYMENT_INTEGRATION_NOT_WIRED/);
 });
 
 test('all existing GBP and Brazilian prices and credit allowances are unchanged',()=>{
@@ -71,7 +73,8 @@ test('legacy Starter EUR €18.99 and USD $20.99 cannot be reused for new 420-cr
   assert.equal(proposed.historicalEntitlementCollision,true);
   assert.equal(proposed.credits,420);
   assert.notEqual(proposed.currentLivePriceId,PRESERVED_LIVE_PLAN_PRICES.starter[currency]);
-  assert.equal(proposed.replacementPriceId,null);
+  assert.notEqual(proposed.currentLivePriceId,proposed.priorV2PriceId);
+  assert.match(proposed.replacementPriceId,/^price_[A-Za-z0-9]+$/);
  }
  assert.equal(PRESERVED_LIVE_PLAN_PRICES.starter.EUR,'price_1UbQBCL7fmdMaK0kAmHSt8oc');
  assert.equal(PRESERVED_LIVE_PLAN_PRICES.starter.USD,'price_1UbQBAL7fmdMaK0k2PtIGUDU');
@@ -83,4 +86,22 @@ test('unknown plan/currency is rejected rather than rounding and choosing a Stri
  assert.throws(()=>eurUsd99ReviewLine('secret','EUR'),/UNKNOWN_PLAN/);
  assert.equal(EUR_USD_99_PROPOSED_MINOR.single_video.EUR,699);
  assert.equal(EUR_USD_99_PROPOSED_MINOR.single_video.USD,799);
+});
+
+test('verified price IDs exactly match all ten newly created Stripe LIVE .99 records',()=>{
+ const expected={
+  starter:{EUR:['price_1UddzFL7fmdMaK0kzN2sF4mq',1899],USD:['price_1UddzcL7fmdMaK0khce6RBqF',2099]},
+  creator:{EUR:['price_1UddzeL7fmdMaK0k3IQHJbl1',3599],USD:['price_1UddzhL7fmdMaK0kiA3ZSb62',3999]},
+  pro:{EUR:['price_1UddzjL7fmdMaK0kCPzo3pQv',7199],USD:['price_1Ude03L7fmdMaK0kuN8hI153',7899]},
+  studio:{EUR:['price_1Ude05L7fmdMaK0kszKPnctk',14399],USD:['price_1Ude07L7fmdMaK0kQlPm0v1c',15799]},
+  single_video:{EUR:['price_1Ude0AL7fmdMaK0kTJW2vvLv',699],USD:['price_1Ude0CL7fmdMaK0klngx62PZ',799]}
+ };
+ for(const [plan,byCurrency] of Object.entries(expected))
+  for(const [currency,[priceId,minor]] of Object.entries(byCurrency)){
+   const actual=eurUsd99ReviewLine(plan,currency);
+   assert.equal(actual.replacementPriceId,priceId);
+   assert.equal(actual.currentLiveMinor,minor);
+   assert.equal(actual.proposedMinor,minor);
+   assert.equal(actual.checkoutReady,false);
+  }
 });
