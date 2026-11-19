@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {V2_CREDIT_ECONOMICS_SCENARIOS,quotedCreditsForProviderCost,assessV2Contribution,forecastPlanProviderCap} from '../lib/server/v2-credit-economics-preview.mjs';
+import {V2_CREDIT_ECONOMICS_SCENARIOS,V2_APPROVED_PROVIDER_USD_PER_CREDIT,quotedCreditsForProviderCost,assessV2Contribution,forecastPlanProviderCap} from '../lib/server/v2-credit-economics-preview.mjs';
 
 const margin=(grossAmountLocal,credits,localUnitsPerUsd,providerUsdPerCredit)=>
  assessV2Contribution({grossAmountLocal,localUnitsPerUsd,credits,providerUsdPerCredit,
@@ -38,4 +38,10 @@ test('input validation fails closed, including nonexistent plan and negative fee
  assert.throws(()=>quotedCreditsForProviderCost(0,0.015),/INVALID_ECONOMICS_INPUT/);
  assert.throws(()=>forecastPlanProviderCap('invalid',0.015),/INVALID_PLAN/);
  assert.throws(()=>assessV2Contribution({grossAmountLocal:10,credits:100,providerUsdPerCredit:0.015,affiliatePercent:-1}),/INVALID_ECONOMICS_INPUT/);
+});
+
+test('Option B is approved for new credits only; historical option A remains comparison-only',()=>{
+ assert.equal(V2_APPROVED_PROVIDER_USD_PER_CREDIT,0.012);
+ assert.equal(V2_CREDIT_ECONOMICS_SCENARIOS.approvedOptionB,0.012);
+ assert.notEqual(V2_CREDIT_ECONOMICS_SCENARIOS.previouslyConsideredOptionA,V2_APPROVED_PROVIDER_USD_PER_CREDIT);
 });
