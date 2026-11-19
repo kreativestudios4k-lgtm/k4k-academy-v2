@@ -53,4 +53,5 @@ test('studio navigation keeps Business Seedance and Motion separate from standar
  assert.ok(picker.includes("item.id==='wan-prime'"));
  assert.ok(picker.includes('BUSINESS STUDIO · SEEDANCE'));
  assert.ok(dashboard.includes('<AccountDashboard/>'));
+ assert.ok(studio.includes("model.id==='seedance_2_5_flash'&&model.resolution.includes('720p')"));
 });
