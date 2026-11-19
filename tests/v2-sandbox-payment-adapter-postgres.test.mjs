@@ -46,13 +46,27 @@ async function setup(){
    return {userId:x.user_id,kind:x.kind,status:x.status,priceId:x.price_id,
     customerId:x.stripe_customer_id,subscriptionId:x.stripe_subscription_id,sessionId:x.stripe_session_id};
   },
+  async findReceipt(receiptId){
+   const r=await pg.query('select receipt_key,user_id,source_kind,amount_minor,currency,status from public.k4k_v2_credit_receipts where receipt_key=$1',[receiptId]);
+   const x=r.rows[0];
+   return x?{receiptId:x.receipt_key,userId:x.user_id,sourceKind:x.source_kind,
+    amountMinor:Number(x.amount_minor),currency:x.currency,status:x.status}:null;
+  },
   async rpc(name,args){
-   assert.equal(name,V2_SANDBOX_RPC_NAME);
-   const result=await pg.query('select public.k4k_v2_grant_paid_test($1,$2,$3,$4,$5,$6,$7,$8) as result',[
-    args.p_event,args.p_user,args.p_receipt,args.p_source_kind,args.p_stripe_price,
-    args.p_amount_minor,args.p_currency,args.p_credits
-   ]);
-   return {data:result.rows[0].result,error:null};
+   if(name===V2_SANDBOX_RPC_NAME){
+    const result=await pg.query('select public.k4k_v2_grant_paid_test($1,$2,$3,$4,$5,$6,$7,$8) as result',[
+     args.p_event,args.p_user,args.p_receipt,args.p_source_kind,args.p_stripe_price,
+     args.p_amount_minor,args.p_currency,args.p_credits
+    ]);
+    return {data:result.rows[0].result,error:null};
+   }
+   if(name==='k4k_v2_refund_paid'){
+    const r=await pg.query('select public.k4k_v2_refund_paid($1,$2,$3) as result',[
+     args.p_event,args.p_user,args.p_receipt
+    ]);
+    return {data:r.rows[0].result,error:null};
+   }
+   throw Error('BAD_RPC_NAME');
   }
  };
  return {pg,gateway};
@@ -195,4 +209,55 @@ test('Stripe TEST reader fetches current server-side payment evidence and reject
  const wrong=createStripeTestReader({secret:'sk_test_mock123456789',fetchImpl:async()=>
   ({ok:true,json:async()=>({...mockInvoice(),livemode:true})})});
  await assert.rejects(wrong.getInvoice('in_test_starter12345'),/STRIPE_TEST_MODE_MISMATCH/);
+});
+
+test('verified TEST full refund after spent Single video credits creates debt but never touches legacy credits',async()=>{
+ const {pg,gateway}=await setup();try{
+  const payment='pi_test_paid12345678';
+  const makeCharge=(amountRefunded=599)=>({
+   id:'ch_test_refund123456',livemode:false,refunded:true,disputed:false,
+   amount:599,amount_refunded:amountRefunded,currency:'gbp',payment_intent:payment
+  });
+  let charge=makeCharge();
+  const stripe={getInvoice:async()=>mockInvoice(),getSession:async()=>mockSession(),
+   getCharge:async()=>charge};
+  const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe});
+  await adapter.applyPaidSingleVideo({sessionId:sessionKey,eventId:'evt_test_single_for_refund'});
+  await pg.query('select public.k4k_v2_reserve_generation($1,$2,$3,$4,$5,$6)',[
+   'evt_test_full_spend12345',user,'33333333-3333-4333-8333-333333333333','a'.repeat(64),1680000,140
+  ]);
+  await pg.query('select public.k4k_v2_finish_generation($1,$2,$3,$4)',[
+   'evt_test_finish_spend12345',user,'33333333-3333-4333-8333-333333333333','settled'
+  ]);
+  charge=makeCharge(100);
+  await assert.rejects(adapter.applyFullRefund({
+   eventId:'evt_test_partial_refund',chargeId:charge.id,receiptId:payment
+  }),/V2_TEST_FULL_REFUND_UNVERIFIED/);
+  assert.equal((await balance(pg)).reversal_debt,0);
+  charge=makeCharge();
+  const first=await adapter.applyFullRefund({
+   eventId:'evt_test_full_refund12345',chargeId:charge.id,receiptId:payment
+  });
+  const duplicate=await adapter.applyFullRefund({
+   eventId:'evt_test_full_refund_retry12345',chargeId:charge.id,receiptId:payment
+  });
+  assert.equal(first.refunded,true);assert.equal(duplicate.refunded,false);
+  assert.equal((await balance(pg)).reversal_debt,140);
+  assert.equal((await balance(pg)).available,0);
+  assert.equal(await legacy(pg),80);
+ }finally{await pg.close()}
+});
+test('refunds cannot attach a TEST charge to a different invoice, wrong price, or owner',async()=>{
+ const {pg,gateway}=await setup();try{
+  const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe:{
+   getInvoice:async()=>mockInvoice(),getSession:async()=>mockSession(),
+   getCharge:async()=>({id:'ch_test_refund123456',livemode:false,refunded:true,disputed:false,
+    amount:599,amount_refunded:599,currency:'gbp',payment_intent:'pi_wrong123456'})
+  }});
+  await adapter.applyPaidSingleVideo({sessionId:sessionKey,eventId:'evt_test_single_refund2'});
+  await assert.rejects(adapter.applyFullRefund({
+   eventId:'evt_test_bad_refund1234',chargeId:'ch_test_refund123456',receiptId:'pi_test_paid12345678'
+  }),/V2_TEST_FULL_REFUND_UNVERIFIED/);
+  assert.equal((await balance(pg)).available,140);
+ }finally{await pg.close()}
 });
