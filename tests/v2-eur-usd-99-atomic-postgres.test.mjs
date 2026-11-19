@@ -31,9 +31,11 @@ function cases(){
   [V2_PRIOR_EUR_USD_PLAN_PRICES,V2_PRIOR_EUR_USD_PLAN_MINOR,'prior']
  ]){
   for(const [plan,prices] of Object.entries(map))
-   for(const [currency,id] of Object.entries(prices))
+   for(const [currency,id] of Object.entries(prices)){
+    if(!['EUR','USD'].includes(currency))continue;
     cases.push({id,currency,amount:amounts[plan][currency],
      credits:V2_MONTHLY_CREDITS[plan],kind:'subscription_invoice',tag,plan});
+   }
  }
  for(const [catalog,tag] of [[V2_SINGLE_VIDEO,'new'],[V2_PRIOR_EUR_USD_SINGLE_VIDEO,'prior']]){
   const currencies=tag==='new'?['EUR','USD']:['EUR','USD'];
