@@ -107,7 +107,10 @@ test('an active Stripe session cannot be relinked to a second user or subscripti
   session={...session,subscription:'sub_test_different12345678'};
   await assert.rejects(flow.activatePaidSession({sessionId:session.id}),/V2_TEST_BINDING_REPLAY_CONFLICT/);
   session={...session,client_reference_id:stranger};
-  await assert.rejects(flow.activatePaidSession({sessionId:session.id}),/V2_TEST_CHECKOUT_BINDING_CONFLICT/);
+  // Inconsistent identity metadata may be detected before the stored binding
+  // mismatch; both must fail before mutating any Stripe or credit state.
+  await assert.rejects(flow.activatePaidSession({sessionId:session.id}),
+   /V2_TEST_CHECKOUT_(BINDING_CONFLICT|METADATA_INVALID)/);
  }finally{await db.close()}
 });
 test('non-service callers cannot write or inspect checkout binding ownership',async()=>{
