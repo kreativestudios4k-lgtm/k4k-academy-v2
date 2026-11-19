@@ -4,6 +4,8 @@
 -- Server must first verify Stripe signature, live-mode, paid status, owner, price,
 -- invoice and payment-intent with Stripe API. SQL validates immutable contract too.
 -- No Black Friday discounts until independently verified and added to contract.
+-- Exact LIVE price allowlist includes both current .99 and previous V2 EUR/USD
+-- Price IDs for immutable receipt history; this file is NOT applied in LIVE.
 -- No PUBLIC/anon/authenticated execute privilege. No production migration created.
 CREATE OR REPLACE FUNCTION public.k4k_v2_grant_paid(
  p_event text,p_user uuid,p_receipt text,p_source_kind text,
@@ -43,7 +45,19 @@ BEGIN
     ('price_1UdaO5L7fmdMaK0kvyYSd3Fj','GBP',599,140,'single_video_payment'),
     ('price_1UdaOCL7fmdMaK0kfOyMORbz','EUR',715,140,'single_video_payment'),
     ('price_1UdaOEL7fmdMaK0kxjtFqgtE','USD',785,140,'single_video_payment'),
-    ('price_1UdaOFL7fmdMaK0kjgrYoO9f','BRL',4490,140,'single_video_payment')
+    ('price_1UdaOFL7fmdMaK0kjgrYoO9f','BRL',4490,140,'single_video_payment'),
+    -- 19 Nov .99 revision: NEW purchase Price IDs. Previous V2 rows above
+    -- remain independently valid for already-paid receipts and renewals.
+    ('price_1UddzFL7fmdMaK0kzN2sF4mq','EUR',1899,420,'subscription_invoice'),
+    ('price_1UddzcL7fmdMaK0khce6RBqF','USD',2099,420,'subscription_invoice'),
+    ('price_1UddzeL7fmdMaK0k3IQHJbl1','EUR',3599,840,'subscription_invoice'),
+    ('price_1UddzhL7fmdMaK0kiA3ZSb62','USD',3999,840,'subscription_invoice'),
+    ('price_1UddzjL7fmdMaK0kCPzo3pQv','EUR',7199,1680,'subscription_invoice'),
+    ('price_1Ude03L7fmdMaK0kuN8hI153','USD',7899,1680,'subscription_invoice'),
+    ('price_1Ude05L7fmdMaK0kszKPnctk','EUR',14399,3360,'subscription_invoice'),
+    ('price_1Ude07L7fmdMaK0kQlPm0v1c','USD',15799,3360,'subscription_invoice'),
+    ('price_1Ude0AL7fmdMaK0kTJW2vvLv','EUR',699,140,'single_video_payment'),
+    ('price_1Ude0CL7fmdMaK0klngx62PZ','USD',799,140,'single_video_payment')
  ) AS catalog(price_id,currency,amount_minor,credits,kind)
  WHERE catalog.price_id=p_stripe_price AND catalog.currency=p_currency
    AND catalog.amount_minor=p_amount_minor AND catalog.credits=p_credits
