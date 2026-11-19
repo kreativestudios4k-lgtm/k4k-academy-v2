@@ -110,3 +110,22 @@ test('the 140-credit single-video product cannot claim to cover 30s Standard und
  assert.equal(quotedCreditsForProviderCost(2.10,0.012),175);
  assert.ok(quotedCreditsForProviderCost(2.10,0.012)>V2_SINGLE_VIDEO.credits);
 });
+
+
+test('refund during pending generation repays debt first on failed-job release and retains billing hold',()=>{
+ let s=apply(ledger(),paid(140));
+ s=apply(s,event('reserve_generation',140,'job_evt_reserve_refund',{jobId:'job_refund_pending'}));
+ assert.equal(s.available,0);assert.equal(s.reserved,140);
+ s=apply(s,event('refund_payment',140,'stripe_evt_refund_pending',{paymentId:'pi_1234567890',fullRefund:true}));
+ assert.equal(s.debt,140);assert.equal(s.billingHold,true);
+ s=apply(s,event('release_generation',140,'job_evt_failed_refund',{jobId:'job_refund_pending'}));
+ assert.equal(s.debt,0);
+ assert.equal(s.available,0);
+ assert.equal(s.reserved,0);
+ assert.equal(s.billingHold,true);
+ assert.equal(s.legacySnapshot,80);
+ const again=applyV2LedgerEvent(s,event('release_generation',140,'job_evt_failed_refund_retry',{jobId:'job_refund_pending'}));
+ assert.equal(again.duplicate,true);
+ assert.equal(again.ledger.available,0);
+ assert.throws(()=>apply(s,event('reserve_generation',1,'job_evt_block_refund',{jobId:'job_must_hold'})),/BILLING_REVIEW_REQUIRED/);
+});
