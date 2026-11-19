@@ -50,7 +50,7 @@ export default function CreativeStudio(){
   const requestedKind=params.get('kind');
   if(!['image','video'].includes(requestedKind))return;
   const requested=CREATION_MODELS.find(m=>m.id===params.get('model')&&m.kind===requestedKind);
-  const fallback=requestedKind==='image'?'nano_banana_2':'seedance_2_5';
+  const fallback=requestedKind==='image'?'nano_banana_2':'wan-prime';
   const selected=requested||CREATION_MODELS.find(m=>m.id===fallback);
   if(selected){setKind(requestedKind);chooseModel(selected)}
  },[]);
