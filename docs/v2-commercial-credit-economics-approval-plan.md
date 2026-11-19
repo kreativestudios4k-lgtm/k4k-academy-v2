@@ -1,3 +1,5 @@
+> **Status update — 19 November 2026, Stage 4:** The distinct Starter GBP £15.99 monthly Stripe LIVE Price ID is NOW CREATED and verified: `price_1UdblmL7fmdMaK0kyknLHpoV` (420-credit V2 entitlement metadata). The old `price_1UbQB0L7fmdMaK0kr3CRE9bd` remains the original Starter product default and is still used by an existing 80-credit subscriber. Any older statements below saying the new Starter price has not been created are superseded. Checkout stays disabled: atomic V2 SQL proposals and credit ledger are only in draft CI; provider unit economics, funded budget, Single video redemption semantics, Black Friday coupon and real payment E2E QA remain unapproved.
+
 # K4K V2 pricing and credit-economics implementation plan — REVIEW ONLY
 Approved commercial decision: **Creator Brazil regular R$224.90/month**, 19 November 2026.
 Status: draft PRs only. No production changes, new Stripe Price, coupon, payment, subscription, wallet write, SQL migration, env flag or deployment.
