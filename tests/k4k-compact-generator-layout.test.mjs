@@ -25,7 +25,9 @@ test('all ten models can be switched from within the same creator without page r
  assert.match(compact,/const allModels=\[\.\.\.videoModels,\.\.\.imageModels\]/);
  assert.match(compact,/Switch AI model/);
  assert.match(compact,/onSelectModel\(item\)/);
- assert.match(compact,/onSelectModel\(videoModels\[0\]\)/);
+ assert.match(compact,/onSelectModel\(defaultVideoModel\)/);
+ assert.match(compact,/item\.id==='wan-prime'/);
+ assert.match(compact,/BUSINESS STUDIO · SEEDANCE/);
  assert.match(compact,/onSelectModel\(imageModels\[0\]\)/);
  assert.match(page,/window\.history\.replaceState\(null,'',nextUrl\)/);
 });
