@@ -39,7 +39,24 @@ export async function POST(request){
   let body;try{body=JSON.parse(raw)}catch{return respond({error:'Invalid application.'},400)}
   const db=service();let {data:row,error}=await db.from('k4k_affiliate_applications').select('*').eq('user_id',user.id).maybeSingle();if(error)throw Error('Application lookup failed');
   if(!row){const name=typeof body?.name==='string'?body.name.trim():'';const country=body?.country;const language=body?.language;const instagram=normalizeInstagram(body?.instagram);if(name.length<2||name.length>100||!countries.includes(country)||!Object.hasOwn(languages,language)||!instagram)return respond({error:'Enter your name, country, preferred language and a valid Instagram profile.'},400);
-   const {error:insertError}=await db.from('k4k_affiliate_applications').upsert({user_id:user.id,email:user.email,full_name:name,country,language,instagram},{onConflict:'user_id',ignoreDuplicates:true});if(insertError)throw Error('Application save failed');
+   // Requirements are verified on the server, never trusted solely to the
+   // front-end checkboxes. Every *new* application is subject to manual review.
+   const followers=body?.followersCount;
+   const niche=typeof body?.contentNiche==='string'?body.contentNiche.trim():'';
+   const motivation=typeof body?.motivation==='string'?body.motivation.trim():'';
+   const declaration=body?.eligibility;
+   const categories=['football','ai-video','gaming','entertainment','lifestyle','education','technology','other'];
+   if(!Number.isInteger(followers)||followers<1000||followers>200000000||
+      !categories.includes(niche)||motivation.length<30||motivation.length>600||
+      !declaration||declaration.age18!==true||declaration.publicProfile!==true||
+      declaration.recentOriginalContent!==true||declaration.authenticAudience!==true||
+      declaration.agreeToReview!==true){
+     return respond({error:'AFFILIATE_ELIGIBILITY_NOT_MET'},422);
+   }
+   const {error:insertError}=await db.from('k4k_affiliate_applications').upsert({user_id:user.id,email:user.email,full_name:name,country,language,instagram,
+     followers_count:followers,content_niche:niche,application_motivation:motivation,
+     eligibility_confirmed_at:new Date().toISOString()
+    },{onConflict:'user_id',ignoreDuplicates:true});if(insertError)throw Error('Application save failed');
    const saved=await db.from('k4k_affiliate_applications').select('*').eq('user_id',user.id).single();if(saved.error)throw Error('Application read failed');row=saved.data;
   }
   if(row.status!=='pending_review')return respond({received:true,status:row.status,confirmationSent:!!row.confirmation_sent_at});
