@@ -35,7 +35,7 @@ test('a filled TEST environment still cannot claim E2E payment validation or pro
  const testEnv={
   ...preview,K4K_V2_SANDBOX_ADAPTER_ENABLED:'true',
   K4K_V2_SANDBOX_WEBHOOK_ENABLED:'true',
-  STRIPE_V2_TEST_SECRET_KEY:'sk_test_secret_fixture123456789',
+  STRIPE_V2_TEST_SECRET_KEY:'sk_test_fakefixture123456789',
   STRIPE_V2_TEST_WEBHOOK_SECRET:'whsec_fakefixture123456789',
   SUPABASE_SERVICE_ROLE_KEY:'sb_secret_fake_test_key_fixture',
   K4K_V2_SANDBOX_ALLOWED_TEST_USERS:user
