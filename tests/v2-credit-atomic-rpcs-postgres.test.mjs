@@ -19,7 +19,8 @@ async function fixture(){
   insert into auth.users(id) values('${owner}'),('${other}');
   create table public.k4k_live_credit_accounts(user_id uuid primary key,balance integer not null check (balance>=0));
   insert into public.k4k_live_credit_accounts(user_id,balance) values('${owner}',80);
-  grant usage on schema public to authenticated,service_role;`);
+  grant usage on schema public to authenticated,service_role;
+  grant select on public.k4k_live_credit_accounts to service_role;`);
  await db.exec(schema);
  await db.exec(functions);
  return db;
@@ -83,7 +84,7 @@ test('generation reserve/settle and duplicate retries are atomic and idempotent'
   assert.equal((await db.query(finish())).rows[0].v.changed,true);
   assert.equal((await db.query(finish('job_finish_duplicate'))).rows[0].v.changed,false);
   assert.equal((await wallet(db)).reserved,0);
-  await assert.rejects(db.query(finish('job_wrong','released')),/V2_JOB_ALREADY_FINAL/);
+  await assert.rejects(db.query(finish('job_wrong',owner,'released')),/V2_JOB_ALREADY_FINAL/);
  }finally{await db.close()}
 });
 test('failed generation releases once; wrong owner, quote or overdraw are rejected',async()=>{
