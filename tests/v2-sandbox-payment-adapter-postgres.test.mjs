@@ -187,6 +187,16 @@ test('production, unknown isolated project, client role and live Stripe key fail
  assert.throws(()=>assertV2SandboxRuntime({...env,VERCEL_ENV:'production'}),/V2_SANDBOX_ONLY/);
  assert.throws(()=>createV2SandboxPaymentAdapter({env:{...env,K4K_V2_SANDBOX_PROJECT_ISOLATED:'false'}}),/V2_SANDBOX_ONLY/);
  assert.throws(()=>createV2SandboxSupabaseGateway({}),/V2_TEST_DB_NOT_ISOLATED/);
+ const dummyDb={from(){return this;},rpc(){return this;}};
+ assert.throws(()=>createV2SandboxSupabaseGateway(dummyDb,{
+  isolatedProjectConfirmed:true,projectRef:'tqlvfqjvfqfigsauqjtl'
+ }),/V2_TEST_DB_NOT_ISOLATED/);
+ assert.throws(()=>createV2SandboxSupabaseGateway(dummyDb,{
+  isolatedProjectConfirmed:true,projectRef:'anothertestproject01'
+ }),/V2_TEST_DB_NOT_ISOLATED/);
+ assert.doesNotThrow(()=>createV2SandboxSupabaseGateway(dummyDb,{
+  isolatedProjectConfirmed:true,projectRef:'yhbhrkyihiyyfzqogyri'
+ }));
  assert.throws(()=>createStripeTestReader({secret:'sk_live_example123456'}),/STRIPE_TEST_SECRET_REQUIRED/);
  const {pg}=await setup();try{
   await pg.exec('set role authenticated');
