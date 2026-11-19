@@ -36,10 +36,13 @@ test('all old LIVE price IDs fail closed as new V2 reservations',()=>{
   }
 });
 
-test('starter GBP overlap cannot be reserved as 420-credit V2 while old 80-credit contract exists',()=>{
+test('distinct Starter GBP 420-credit V2 reservation is allowed; historic 80-credit price cannot reserve V2',()=>{
  const starter=forPlan('starter','GBP');
- assert.equal(starter.allowed,false);
- assert.equal(starter.reason,'SHARED_LEGACY_PRICE');
+ assert.equal(starter.allowed,true);
+ assert.equal(starter.credits,420);
+ const old=quote({...base,plan:'starter',currency:'GBP',priceId:PRESERVED_LIVE_PLAN_PRICES.starter.GBP});
+ assert.equal(old.allowed,false);
+ assert.equal(old.reason,'PRICE_NOT_IN_V2_CATALOGUE');
  assert.equal(forPlan('starter','BRL').credits,V2_MONTHLY_CREDITS.starter);
 });
 
