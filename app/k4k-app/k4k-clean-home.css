@@ -60,7 +60,7 @@
 .kc26-hero-bottom{display:flex;align-items:center;justify-content:space-between;gap:15px;width:min(1536px,100%);padding:16px clamp(22px,6vw,96px) 25px;margin:auto;font-size:10px;letter-spacing:.15em;font-weight:750;color:#aaaab1}
 .kc26-hero-bottom a{display:inline-flex;align-items:center;gap:10px;color:#ededf2}
 .kc26-hero-bottom a span{font-size:20px;line-height:1}
-.kc26-quicklinks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));max-width:1450px;margin:0 auto;gap:10px;padding:22px clamp(20px,4vw,64px) 0}
+.kc26-quicklinks{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));max-width:1450px;margin:0 auto;gap:10px;padding:22px clamp(20px,4vw,64px) 0}
 .kc26-quicklinks a{display:flex;align-items:center;gap:16px;background:#111114;border:1px solid #34353b;border-radius:12px;padding:19px 18px;min-width:0;transition:background .2s,border-color .2s}
 .kc26-quicklinks a:hover{background:#1c1d22;border-color:#98999d}
 .kc26-quicklinks a>svg:first-child{flex:0 0 auto;width:24px;color:#ececee}
@@ -148,3 +148,7 @@
 
 /* The actual uploaded film is 910×512. Desktop: cover the stage; mobile: bias towards the K4K emblem. */
 @media(max-width:720px){.k4k-clean-home .kc26-hero-video{object-position:58% center;filter:brightness(.62) contrast(1.16)}}
+
+/* Four product pillars: Image, Video, Motion and Business Studio. */
+@media (min-width:721px) and (max-width:1120px){.kc26-quicklinks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:720px){.kc26-quicklinks{grid-template-columns:1fr}}
