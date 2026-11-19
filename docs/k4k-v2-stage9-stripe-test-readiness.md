@@ -1,3 +1,9 @@
+## Post-transaction TEST installation verified
+
+- The corrected `public.k4k_v2_finish_generation` function was installed **only** in TEST Supabase project `yhbhrkyihiyyfzqogyri`. Independent readback confirmed the debt-first statement is present, `service_role` can execute, and `anon`/`authenticated` cannot.
+- Readback immediately after installation confirmed `0` test Auth users, V2 wallets and Stripe receipts. The earlier refund-during-reservation exercise was **transactional and rolled back**; installation of the reviewed function itself remains in the TEST project for later end-to-end QA.
+- Production Supabase `tqlvfqjvfqfigsauqjtl` and LIVE Stripe were not changed.
+
 # Stage 9 — Stripe TEST E2E readiness and refund/reservation safety
 
 **Review branch only; 19 November 2026. Do not merge, deploy production, enable LIVE checkout or touch legacy credit balances.**
