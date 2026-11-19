@@ -62,10 +62,12 @@ test('K4K Stripe checkout and webhook are restricted to Preview and trusted depl
 
 test('public account registration does not promise paid generation',()=>{
  const register=read('app/k4k-app/register/page.js');
- assert.match(register,/AI generation remains disabled/);
+ assert.match(register,/paid generation is not yet available/);
+ assert.match(register,/Stripe TEST mode/);
+ assert.match(register,/does not charge real money/);
 });
 
-test('signup redirect lands on the public K4K account rather than Academy membership gate',()=>{
+test('registration confirmation redirects to K4K plan selection rather than Academy membership gate',()=>{
  const register=read('app/k4k-app/register/page.js');
  const callback=read('app/auth/callback/route.js');
  assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Faccount/);
