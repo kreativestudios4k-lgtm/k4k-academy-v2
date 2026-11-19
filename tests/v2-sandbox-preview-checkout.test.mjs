@@ -100,8 +100,13 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
  };
  const handler=createV2SandboxWebhookDispatcher({stripe,gateway,env:testEnv});
  const event={id:'evt_test_1234567890',livemode:false,type:'customer.subscription.deleted',data:{object:{id:'sub_test_1234567890'}}};
- const x=await handler.handleVerifiedEvent(event);
- assert.equal(x.handled,false);assert.equal(queries,0);
+ for(const type of ['invoice.payment_failed','checkout.session.expired','customer.subscription.deleted']){
+  await assert.rejects(handler.handleVerifiedEvent({...event,type}),
+   /V2_TEST_ACCOUNT_STATE_RECONCILIATION_PENDING/);
+ }
+ const outside=await handler.handleVerifiedEvent({...event,type:'customer.created'});
+ assert.equal(outside.handled,false);
+ assert.equal(queries,0);
  await assert.rejects(handler.handleVerifiedEvent({...event,livemode:true}),/V2_TEST_WEBHOOK_EVENT_INVALID/);
  await assert.rejects(handler.handleVerifiedEvent({...event,type:'charge.dispute.created'}),/V2_TEST_DISPUTE_REVIEW_REQUIRED/);
  assert.equal(queries,0);
