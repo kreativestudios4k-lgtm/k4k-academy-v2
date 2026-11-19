@@ -131,28 +131,40 @@ CREATE OR REPLACE FUNCTION public.k4k_v2_finish_generation(
 ) RETURNS jsonb LANGUAGE plpgsql SECURITY INVOKER SET search_path TO ''
 AS $body$
 DECLARE j public.k4k_v2_generation_reservations%rowtype;
+        a public.k4k_v2_credit_accounts%rowtype;
+        v_repay integer;
+        v_returned integer;
 BEGIN
  IF current_user<>'service_role' THEN RAISE EXCEPTION 'FORBIDDEN';END IF;
  IF p_user IS NULL OR p_job IS NULL OR length(coalesce(p_event,''))<5 OR p_outcome NOT IN ('settled','released')
  THEN RAISE EXCEPTION 'V2_FINISH_INVALID';END IF;
- PERFORM 1 FROM public.k4k_v2_credit_accounts WHERE user_id=p_user FOR UPDATE;
+ SELECT * INTO a FROM public.k4k_v2_credit_accounts
+ WHERE user_id=p_user FOR UPDATE;
  IF NOT FOUND THEN RAISE EXCEPTION 'V2_ACCOUNT_MISSING';END IF;
  SELECT * INTO j FROM public.k4k_v2_generation_reservations WHERE job_id=p_job FOR UPDATE;
  IF NOT FOUND OR j.user_id<>p_user THEN RAISE EXCEPTION 'V2_JOB_NOT_FOUND';END IF;
  IF j.state=p_outcome THEN RETURN jsonb_build_object('changed',false,'state',j.state);END IF;
  IF j.state<>'reserved' THEN RAISE EXCEPTION 'V2_JOB_ALREADY_FINAL';END IF;
+ -- If a refunded payment created debt while the job was reserved,
+ -- returned credits must first repay that debt. Never resurrect refunded
+ -- spendable credits. The billing hold remains until independent review.
+ v_repay:=CASE WHEN p_outcome='released' THEN least(j.credits,a.reversal_debt) ELSE 0 END;
+ v_returned:=CASE WHEN p_outcome='released' THEN j.credits-v_repay ELSE 0 END;
  UPDATE public.k4k_v2_generation_reservations
  SET state=p_outcome,settled_at=now() WHERE job_id=p_job;
  UPDATE public.k4k_v2_credit_accounts
  SET reserved=reserved-j.credits,
-     available=available+CASE WHEN p_outcome='released' THEN j.credits ELSE 0 END,
-     updated_at=now() WHERE user_id=p_user AND reserved>=j.credits;
+     available=available+v_returned,
+     reversal_debt=reversal_debt-v_repay,
+     updated_at=now() WHERE user_id=p_user
+       AND reserved>=j.credits AND reversal_debt>=v_repay;
  IF NOT FOUND THEN RAISE EXCEPTION 'V2_LEDGER_INVARIANT';END IF;
  INSERT INTO public.k4k_v2_credit_events
  (event_key,user_id,event_kind,generation_job_id,delta_available,delta_reserved,delta_reversal_debt,payload_sha256)
  VALUES(p_event,p_user,CASE WHEN p_outcome='released' THEN 'release_generation' ELSE 'settle_generation' END,
-        p_job,CASE WHEN p_outcome='released' THEN j.credits ELSE 0 END,-j.credits,0,j.quote_sha256);
- RETURN jsonb_build_object('changed',true,'state',p_outcome,'credits',j.credits);
+        p_job,v_returned,-j.credits,-v_repay,j.quote_sha256);
+ RETURN jsonb_build_object('changed',true,'state',p_outcome,'credits',j.credits,
+   'debt_repaid',v_repay,'available_returned',v_returned);
 END
 $body$;
 
