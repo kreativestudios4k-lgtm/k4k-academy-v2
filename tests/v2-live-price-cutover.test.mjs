@@ -134,3 +134,13 @@ test('without a V2 adapter, LIVE paid invoices fail without crediting the legacy
   applyInvoiceEvent:async()=>{throw Error('LEGACY_WALLET_MUST_NOT_BE_WRITTEN');}};
  await assert.rejects(handleStripeEvent(event,store,{liveMode:true,env}),/V2_CREDIT_LEDGER_UNAVAILABLE/);
 });
+
+test('signed LIVE V2 Single video event stays in webhook scope and cannot be silently acknowledged',async()=>{
+ const session={id:'cs_test_unexpected12345678',livemode:true,mode:'payment',
+  metadata:{kind:'k4k_v2_single_video'},payment_status:'paid'};
+ const event={id:'evt_unexpected_v2single',livemode:true,type:'checkout.session.completed',
+  created:1800000001,data:{object:session}};
+ assert.equal(isK4KLiveEvent(event,env),true);
+ const store={hasProcessedEvent:async()=>false};
+ await assert.rejects(handleStripeEvent(event,store,{liveMode:true,env}),/V2_CREDIT_LEDGER_UNAVAILABLE/);
+});
