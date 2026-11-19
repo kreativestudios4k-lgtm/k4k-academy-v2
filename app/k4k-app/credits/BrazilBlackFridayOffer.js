@@ -20,7 +20,7 @@ const translations={
   after:'Depois:',
   credits:'créditos mensais previstos no novo catálogo',
   video:'Até {count} vídeos de 30s com Motion Saver*',
-  cta:'Criar conta',
+  cta:'Ver planos atuais',
   included:'O que o plano oferece',
   items:['Modelos de imagem e vídeo no mesmo estúdio','Biblioteca privada, downloads e templates','K4K Motion para recriar tendências e movimentos'],
   info:'* Estimativa apenas: vídeos de 30 segundos com o modelo Kling Motion Saver a 140 créditos cada. Modelos, duração, qualidade, custos e limites estão sujeitos à verificação técnica antes do lançamento. Alguns modelos permitem vídeos mais curtos ou têm preço superior.',
@@ -41,7 +41,7 @@ const translations={
   after:'Then:',
   credits:'proposed monthly credits in the new catalogue',
   video:'Up to {count} 30-second Motion Saver videos*',
-  cta:'Create account',
+  cta:'View current plans',
   included:'What you get',
   items:['Image and video model selector in one studio','Private library, downloads and templates','K4K Motion workflows for viral recreations'],
   info:'* Estimate only: 30-second Kling Motion Saver videos at 140 credits each. Model availability, duration, quality, costs and limits require verification before launch. Other models may cost more or allow shorter videos.',
@@ -62,7 +62,7 @@ const translations={
   after:'Después:',
   credits:'créditos mensuales propuestos para el nuevo catálogo',
   video:'Hasta {count} vídeos de 30 segundos con Motion Saver*',
-  cta:'Crear cuenta',
+  cta:'Ver planes actuales',
   included:'Qué incluye',
   items:['Modelos de imagen y vídeo en un estudio','Biblioteca privada, descargas y plantillas','K4K Motion para recrear movimientos y tendencias'],
   info:'* Solo estimación: vídeos de 30 segundos con Kling Motion Saver a 140 créditos cada uno. Modelos, duración, calidad, costes y límites deben verificarse antes del lanzamiento.',
@@ -102,7 +102,7 @@ export default function BrazilBlackFridayOffer(){
       <strong>{t.included}</strong>
       <ul>{t.items.map(item=><li key={item}>{item}</li>)}</ul>
      </div>
-     <Link href="/register" className="k4k-bf-signup">{t.cta}<span aria-hidden="true">↗</span></Link>
+     <Link href="/k4k-app/credits" className="k4k-bf-signup">{t.cta}<span aria-hidden="true">↗</span></Link>
     </article>)}
    </div>
    <div className="k4k-bf-disclaimer">
