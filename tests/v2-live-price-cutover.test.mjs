@@ -62,19 +62,58 @@ test('live webhook identifies grandfathered BRL and future distinct V2 prices ev
  assert.equal(isK4KLiveEvent(invoice('price_not_ours'),v2Env),false);
 });
 
-test('webhook routes paid V2 Creator invoice exclusively to versioned credit adapter',async()=>{
- let actual=null;const store={
+test('webhook routes fresh-verified paid V2 Creator invoice to V2 only',async()=>{
+ const userId='11111111-1111-4111-8111-111111111111';
+ const customer='cus_01234567890',subscription='sub_01234567890';
+ const invoice={
+  livemode:true,id:'in_V2_creator',customer,subscription,status:'paid',paid:true,
+  currency:'brl',billing_reason:'subscription_cycle',total:22490,
+  amount_paid:22490,amount_due:22490,amount_remaining:0,discounts:[],
+  total_discount_amounts:[],
+  lines:{data:[{price:{id:V2_LIVE_PLAN_PRICES.creator.BRL},quantity:1,period:{end:1802000000}}]}
+ };
+ let actual=null;
+ const store={
   async hasProcessedEvent(){return false;},
-  async userIdForCustomer(){return 'user_1';},
+  async userIdForCustomer(){return userId;},
   async applyInvoiceEvent(){throw Error('LEGACY_CREDIT_ROUTE_CALLED');},
+  async loadVerifiedV2Invoice(){return {invoice,verifiedOwnerUserId:userId};},
   async applyV2InvoiceEvent(receipt){actual=receipt;return {handled:true,credits:receipt.credits};}
  };
- const event={livemode:true,id:'evt_V2_creator',type:'invoice.paid',created:1800000000,data:{object:{
-  id:'in_V2_creator',customer:'cus_1',subscription:'sub_1',billing_reason:'subscription_cycle',
-  lines:{data:[{price:{id:V2_LIVE_PLAN_PRICES.creator.BRL},period:{end:1802000000}}]}
- }}};
+ const event={livemode:true,id:'evt_V2_creator',type:'invoice.paid',created:1800000000,data:{object:invoice}};
  const result=await handleStripeEvent(event,store,{liveMode:true,env});
- assert.equal(result.credits,840);assert.equal(actual.credits,840);
+ assert.equal(result.credits,840);
+ assert.equal(actual.credits,840);
+ assert.equal(actual.verifiedPaidEvidence.credits,840);
+ assert.equal(actual.verifiedPaidEvidence.sourceKind,'subscription_invoice');
+});
+
+test('one-time verified payment event never grants into legacy pack or subscription wallet',async()=>{
+ const userId='11111111-1111-4111-8111-111111111111';
+ const session={
+  id:'cs_mock_1234567890',livemode:true,mode:'payment',status:'complete',payment_status:'paid',
+  client_reference_id:userId,currency:'gbp',amount_total:599,amount_subtotal:599,
+  total_details:{amount_discount:0},automatic_tax:{enabled:true,status:'complete'},
+  metadata:{kind:'k4k_v2_single_video',user_id:userId,credit_version:'v2',
+   product_id:V2_SINGLE_VIDEO.productId},
+  line_items:{data:[{price:{id:V2_SINGLE_VIDEO.prices.GBP},quantity:1}]},
+  payment_intent:{id:'pi_mock_1234567890',status:'succeeded',
+   latest_charge:{refunded:false,disputed:false,amount_refunded:0}}
+ };
+ let creditEvent=null;
+ const store={
+  async hasProcessedEvent(){return false;},
+  async loadVerifiedV2SingleVideoSession(){return {session,verifiedOwnerUserId:userId};},
+  async applyV2SingleVideoEvent(receipt){creditEvent=receipt;return {handled:true,credits:receipt.credits};},
+  async applyTopupEvent(){throw Error('LEGACY_TOPUP_MUST_NOT_BE_CALLED');},
+  async linkCustomer(){throw Error('NO_SUBSCRIPTION_FOR_SINGLE_VIDEO');}
+ };
+ const event={livemode:true,id:'evt_single_video',type:'checkout.session.completed',created:1800000000,data:{object:session}};
+ const result=await handleStripeEvent(event,store,{liveMode:true,env});
+ assert.equal(result.credits,140);
+ assert.equal(creditEvent.creditVersion,'v2');
+ assert.equal(creditEvent.sourceKind,'single_video_payment');
+ assert.equal(creditEvent.receiptId,'pi_mock_1234567890');
 });
 
 test('one-time video credits remain catalogued but are not falsely processed as subscription invoices',()=>{
