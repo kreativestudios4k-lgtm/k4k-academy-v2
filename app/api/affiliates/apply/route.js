@@ -10,7 +10,7 @@ async function verifiedUser(request){
  // its validated user's bearer token. Never trust an arbitrary user_id/email
  // from browser JSON. The original Supabase Auth server verifies the token.
  const auth=request.headers.get('authorization')||'';
- const match=auth.match(/^Bearer (\\S+)$/i);
+ const match=auth.match(/^Bearer (\S+)$/i);
  if(match){
   const client=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
   const {data,error}=await client.auth.getUser(match[1]);
@@ -29,7 +29,7 @@ export async function POST(request){
   // Browser mutations require same-origin. A server-to-server request from
   // K4K V2 omits Origin and MUST provide a bearer token verified by Supabase.
   const origin=request.headers.get('origin');
-  const bearer=/^Bearer \\S+$/i.test(request.headers.get('authorization')||'');
+  const bearer=/^Bearer \S+$/i.test(request.headers.get('authorization')||'');
   if(origin?origin!==new URL(request.url).origin:!bearer)
    return respond({error:'Invalid request origin.'},403);
   const user=await verifiedUser(request);if(!user?.email_confirmed_at||!user.email)return respond({error:'Sign in with a verified email to apply.'},401);
