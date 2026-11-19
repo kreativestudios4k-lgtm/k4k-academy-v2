@@ -1,12 +1,14 @@
 -- SANDBOX-ONLY checkout ownership bindings. Execute only in disposable PGlite
 -- or an independently provisioned test Supabase project, NEVER the live project.
--- Rows must be written by the server immediately after Stripe TEST Checkout
--- session creation; no browser-supplied owner or Stripe metadata alone is trusted.
+-- Server records a pending binding after Stripe TEST Checkout creation and
+-- activates it only after re-fetching a complete paid Stripe TEST session.
+-- Pending subscription has no subscription ID until Stripe assigns one.
+-- No browser-supplied owner or Stripe metadata alone is trusted.
 create table public.k4k_v2_checkout_bindings (
  session_key text primary key check(session_key ~ '^cs_[A-Za-z0-9_]+$'),
  user_id uuid not null references auth.users(id) on delete restrict,
  kind text not null check (kind in ('subscription','single_video')),
- status text not null default 'active' check(status in ('active','canceled','expired')),
+ status text not null default 'active' check(status in ('pending','active','canceled','expired')),
  price_id text not null check(price_id ~ '^price_[A-Za-z0-9]+$'),
  stripe_customer_id text,
  stripe_subscription_id text,
@@ -14,7 +16,8 @@ create table public.k4k_v2_checkout_bindings (
  created_at timestamptz not null default now(),
  constraint binding_has_verified_route check (
    (kind='subscription' and stripe_customer_id like 'cus_%'
-    and stripe_subscription_id like 'sub_%')
+    and ((status='pending' and stripe_subscription_id is null)
+     or (status<>'pending' and stripe_subscription_id like 'sub_%')))
    or (kind='single_video' and stripe_subscription_id is null)
  )
 );
