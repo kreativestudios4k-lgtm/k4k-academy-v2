@@ -34,14 +34,16 @@ test('reserve then settle consumes only V2 credits and never changes legacy snap
  assert.equal(dupe.duplicate,true);
  s=apply(s,event('settle_generation',47,'job_evt_settle',{jobId:'job_123456789'}));
  assert.equal(s.available,93);assert.equal(s.reserved,0);
- assert.throws(()=>apply(s,event('settle_generation',47,'job_evt_settle_again',{jobId:'job_123456789'})),/GENERATION_STATE_CONFLICT/);
+ assert.equal(applyV2LedgerEvent(s,event('settle_generation',47,'job_evt_settle_again',{jobId:'job_123456789'})).duplicate,true);
+ assert.throws(()=>apply(s,event('release_generation',47,'job_evt_wrong_outcome',{jobId:'job_123456789'})),/GENERATION_STATE_CONFLICT/);
 });
 test('a failed job releases reserved credits only once',()=>{
  let s=apply(ledger(),paid());
  s=apply(s,event('reserve_generation',100,'job_evt_reserve',{jobId:'job_987654321'}));
  s=apply(s,event('release_generation',100,'job_evt_release',{jobId:'job_987654321'}));
  assert.equal(s.available,140);assert.equal(s.reserved,0);
- assert.throws(()=>apply(s,event('release_generation',100,'job_evt_release_again',{jobId:'job_987654321'})),/GENERATION_STATE_CONFLICT/);
+ assert.equal(applyV2LedgerEvent(s,event('release_generation',100,'job_evt_release_again',{jobId:'job_987654321'})).duplicate,true);
+ assert.throws(()=>apply(s,event('settle_generation',100,'job_evt_wrong_finish',{jobId:'job_987654321'})),/GENERATION_STATE_CONFLICT/);
 });
 test('overdrafts, release before reserve and job amount mismatches fail closed',()=>{
  const s=apply(ledger(),paid());
@@ -57,7 +59,8 @@ test('full refund after spending results in debt and billing hold, no legacy cla
  s=apply(s,event('refund_payment',140,'stripe_evt_refund',{paymentId:'pi_1234567890',fullRefund:true}));
  assert.equal(s.available,0);assert.equal(s.debt,100);assert.equal(s.billingHold,true);assert.equal(s.legacySnapshot,80);
  assert.throws(()=>apply(s,event('reserve_generation',1,'job_evt_new',{jobId:'job_b12345'})),/BILLING_REVIEW_REQUIRED/);
- assert.throws(()=>apply(s,event('refund_payment',140,'stripe_evt_refund_2',{paymentId:'pi_1234567890',fullRefund:true})),/REFUND_RECEIPT_CONFLICT/);
+ assert.equal(applyV2LedgerEvent(s,event('refund_payment',140,'stripe_evt_refund_2',{paymentId:'pi_1234567890',fullRefund:true})).duplicate,true);
+ assert.equal(s.debt,100);
 });
 test('future valid V2 invoice pays reversal debt first; cannot self-clear billing hold',()=>{
  let s=apply(ledger(),paid());
