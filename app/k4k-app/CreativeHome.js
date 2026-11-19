@@ -2,7 +2,7 @@
 
 import {useState,useEffect,useRef} from 'react';
 import Link from 'next/link';
-import {ArrowRight,ArrowUpRight,Check,ChevronDown,Film,Globe2,Images,Menu,Play,Sparkles,Clapperboard,X} from 'lucide-react';
+import {ArrowRight,ArrowUpRight,Check,ChevronDown,Film,Globe2,Images,Menu,Play,Sparkles,Clapperboard,BriefcaseBusiness,X} from 'lucide-react';
 import catalogue from './template-catalogue.json';
 import {CREATION_MODELS} from '../../lib/creation-studio-catalog.mjs';
 import {useK4KLocale} from './locale';
@@ -23,7 +23,8 @@ const groups=[
  {id:'all',name:'All models'},
  {id:'video',name:'Video'},
  {id:'image',name:'Image'},
- {id:'motion',name:'K4K Motion'}
+ {id:'motion',name:'K4K Motion'},
+ {id:'business',name:'Business Studio'}
 ];
 // Every public model opens the same studio workspace first. Once inside, workflows
 // that need a specialist Director can be launched explicitly, without silently
@@ -77,7 +78,7 @@ export default function CreativeHome(){
  const [menuOpen,setMenuOpen]=useState(false);
  const [filter,setFilter]=useState('all');
  const tr=(en,pt,es)=>locale==='pt'?pt:locale==='es'?es:en;
- const visible=orderedModels.filter(m=>filter==='all'||(filter==='motion'?m.premium:filter==='video'?m.kind==='video'&&!m.premium:m.kind==='image'));
+ const visible=orderedModels.filter(m=>filter==='all'||(filter==='motion'?m.premium:filter==='business'?m.id.startsWith('seedance'):filter==='video'?m.kind==='video'&&!m.premium&&!m.id.startsWith('seedance'):m.kind==='image'));
  useEffect(()=>{if(!menuOpen)return;function keydown(e){if(e.key==='Escape')setMenuOpen(false)}window.addEventListener('keydown',keydown);return()=>window.removeEventListener('keydown',keydown)},[menuOpen]);
  return <div className="k4k-clean-home">
   <header className="kc26-header">
@@ -88,6 +89,7 @@ export default function CreativeHome(){
      <Link href="/k4k-app/image">{tr('Image','Imagem','Imagen')}</Link>
      <Link href="/k4k-app/video">{tr('Video','Vídeo','Vídeo')}</Link>
      <Link href="/k4k-app/motion">K4K Motion</Link>
+     <Link href="/k4k-app/business">Business Studio</Link>
      <Link href="/k4k-app/credits">{tr('Pricing','Preços','Precios')}</Link>
     </nav>
     <div className="kc26-header-actions">
@@ -98,7 +100,7 @@ export default function CreativeHome(){
     </div>
    </div>
    {menuOpen&&<nav id="kc26-mobile-menu" className="kc26-mobile-menu" aria-label="Mobile navigation">{[
-    ['Explore','/'],['Image','/k4k-app/image'],['Video','/k4k-app/video'],['K4K Motion','/k4k-app/motion'],['Pricing','/k4k-app/credits'],['My library','/k4k-app/videos']
+    ['Explore','/'],['Image','/k4k-app/image'],['Video','/k4k-app/video'],['K4K Motion','/k4k-app/motion'],['Business Studio','/k4k-app/business'],['Pricing','/k4k-app/credits'],['My library','/k4k-app/videos']
    ].map(([name,href])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)}>{name}<ArrowUpRight size={15}/></Link>)}{!user&&<><Link href="/login?next=%2Fk4k-app%2Fcreate" onClick={()=>setMenuOpen(false)}>{tr("Sign in","Entrar","Entrar")}<ArrowUpRight size={15}/></Link><Link href="/k4k-app/register" onClick={()=>setMenuOpen(false)}>{tr("Create account","Criar conta","Crear cuenta")}<ArrowUpRight size={15}/></Link></>}</nav>}
   </header>
   <main>
@@ -129,6 +131,7 @@ export default function CreativeHome(){
     <Link href="/k4k-app/image"><Images size={20}/><span><strong>{tr('Create image','Criar imagem','Crear imagen')}</strong><small>{tr('From a single idea','A partir de uma ideia','Desde una idea')}</small></span><ArrowUpRight size={18}/></Link>
     <Link href="/k4k-app/video"><Film size={20}/><span><strong>{tr('Create video','Criar vídeo','Crear vídeo')}</strong><small>{tr('Motion starts here','O movimento começa aqui','El movimiento empieza aquí')}</small></span><ArrowUpRight size={18}/></Link>
     <Link href="/k4k-app/motion"><Clapperboard size={20}/><span><strong>K4K Motion</strong><small>{tr('Recast your next scene','Recrie a próxima cena','Recrea tu próxima escena')}</small></span><ArrowUpRight size={18}/></Link>
+     <Link href="/k4k-app/business"><BriefcaseBusiness size={20}/><span><strong>Business Studio</strong><small>{tr('Seedance for premium campaigns','Seedance para campanhas premium','Seedance para campañas premium')}</small></span><ArrowUpRight size={18}/></Link>
    </section>
 
    <section id="models" className="kc26-section kc26-models">
