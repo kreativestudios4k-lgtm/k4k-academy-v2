@@ -70,7 +70,7 @@ test('public account registration does not promise paid generation',()=>{
 test('registration confirmation redirects to K4K plan selection rather than Academy membership gate',()=>{
  const register=read('app/k4k-app/register/page.js');
  const callback=read('app/auth/callback/route.js');
- assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Faccount/);
+ assert.match(register,/auth\/callback\?next=%2Fk4k-app%2Fcredits/);
  assert.match(callback,/\/k4k-app\/account/);
  assert.match(callback,/K4K_PUBLIC_DESTINATIONS\.has\(next\)/);
  assert.match(callback,/safeNext\|\|'\/membership-required'/);
