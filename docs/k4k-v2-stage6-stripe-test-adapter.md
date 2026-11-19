@@ -1,3 +1,15 @@
+# Update: isolated TEST project activated and SQL verified — 19 Nov 2026
+
+- Owner approved Supabase quoted **$10/month** on existing organisation `tremgwsgohsfhjccwwke`.
+- Created **K4K APP TEST** in London `eu-west-2`, project ref `yhbhrkyihiyyfzqogyri`, independent from production `tqlvfqjvfqfigsauqjtl`.
+- Installed **five** isolated sandbox tables with RLS on, the TEST-only `k4k_v2_grant_paid_test` function, and TEST reserve/finish/full-refund functions. **Did NOT install the LIVE-price grant function.**
+- Verified the four financial functions have **service_role-only EXECUTE**, none for `anon` or `authenticated`. Supabase Security Advisor shows five informational `rls_enabled_no_policy` notices; this is **intentional deny-by-default** for tables with no client access.
+- Executed transaction-scoped SQL checks on TEST: unique 420-credit grant/duplicate prevention, 175-credit generation reserve/settle, full-refund debt/hold, and denial of a 175-credit generation to a 140-credit buyer. All passed. Rolled back tests and verified zero persisted Auth users, wallets, receipts, ledger events and checkout bindings.
+- Pinned `createV2SandboxSupabaseGateway` in draft code to the **exact TEST project ref**, still rejects production. No Vercel env secrets/deployments, Stripe paid session, real hosted Checkout, webhook or TEST payment was executed yet.
+- **Still pending:** safe TEST-only Supabase service credentials in protected Vercel Preview, true authenticated Checkout writer and protected Stripe TEST webhook, real test-card purchase and renewal/refund lifecycle, separate provider-cost funding verification. No public checkout activation is authorized.
+
+---
+
 # K4K APP V2 — Stage 6 Stripe TEST + database adapter
 
 **Review branch only, 19 November 2026. No production rollout.**
