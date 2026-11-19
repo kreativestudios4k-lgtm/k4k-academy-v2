@@ -15,7 +15,8 @@ import {prepareV2CheckoutIntent,createV2CheckoutSession,V2_CHECKOUT_WIRED_AND_VE
  from '../lib/server/v2-checkout-intent.mjs';
 const user='11111111-1111-4111-8111-111111111111';
 const customer='cus_01234567890',subscription='sub_01234567890';
-const env={VERCEL_ENV:'production',K4K_LIVE_PAYMENTS_ENABLED:'true'};
+const env={VERCEL_ENV:'production',K4K_LIVE_PAYMENTS_ENABLED:'true',
+ K4K_LIVE_PLAN_PRICES_JSON:JSON.stringify(PRESERVED_LIVE_PLAN_PRICES)};
 const credentials={
  verifiedOwnerUserId:user,requestingUserId:user,verifiedCustomerId:customer,
  verifiedSubscriptionId:subscription
