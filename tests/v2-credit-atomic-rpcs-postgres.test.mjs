@@ -124,3 +124,40 @@ test('authenticated/anon callers cannot execute financial RPCs or read V2 balanc
   await assert.rejects(db.query(refund()),/permission denied/);
  }finally{await db.close()}
 });
+
+
+test('refund while all 140 credits are reserved then failed-job release repays debt before available',async()=>{
+ const db=await fixture();try{
+  await db.exec('set role service_role');
+  await db.query(grant('stripe_evt_single_hold',owner,'pi_single_hold',single,599,140,'single_video_payment'));
+  await db.query(reserve('evt_reserve_pending_hold'));
+  const ref=(await db.query(refund('evt_refund_pending_hold',owner,'pi_single_hold'))).rows[0].v;
+  assert.equal(ref.debt_added,140);
+  assert.deepEqual({...await wallet(db)},{
+    available:0,reserved:140,reversal_debt:140,billing_hold:true
+  });
+  const released=(await db.query(finish('evt_release_pending_hold',owner,'released'))).rows[0].v;
+  assert.equal(released.debt_repaid,140);
+  assert.equal(released.available_returned,0);
+  assert.deepEqual({...await wallet(db)},{
+    available:0,reserved:0,reversal_debt:0,billing_hold:true
+  });
+  assert.equal((await db.query(finish('evt_release_pending_retry',owner,'released'))).rows[0].v.changed,false);
+  assert.equal((await db.query('select sum(delta_available)::integer as d, sum(delta_reversal_debt)::integer as debt from public.k4k_v2_credit_events where event_kind=\'release_generation\'')).rows[0].d,0);
+  await assert.rejects(db.query(reserve('evt_cannot_spend_held',owner,1,'44444444-4444-4444-8444-444444444444')),/BILLING_REVIEW_REQUIRED/);
+ }finally{await db.close()}
+});
+test('partial available recovery then refund and reservation release settles only remaining debt',async()=>{
+ const db=await fixture();try{
+  await db.exec('set role service_role');
+  await db.query(grant('stripe_evt_start_refund',owner,'in_partial_refund_qa'));
+  await db.query(reserve('evt_reserve_175_for_refund',owner,140));
+  const ref=(await db.query(refund('evt_refund_420_pending',owner,'in_partial_refund_qa'))).rows[0].v;
+  assert.equal(ref.recovered,280);assert.equal(ref.debt_added,140);
+  const result=(await db.query(finish('evt_release_after_420_refund',owner,'released'))).rows[0].v;
+  assert.equal(result.debt_repaid,140);assert.equal(result.available_returned,0);
+  const w=await wallet(db);
+  assert.equal(w.available,0);assert.equal(w.reversal_debt,0);
+  assert.equal(w.reserved,0);assert.equal(w.billing_hold,true);
+ }finally{await db.close()}
+});
