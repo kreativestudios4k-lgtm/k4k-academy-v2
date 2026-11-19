@@ -22,7 +22,8 @@ test('official creative tools stay distinct, while the old Templates pages redir
  const image=read('app/k4k-app/image/page.js'),video=read('app/k4k-app/video/page.js');
  assert.match(image,/kind=image&model=/);assert.match(video,/kind=video&model=/);
  assert.ok(image.includes("['nano_banana_2','flux_3_image']"));
- assert.ok(video.includes("['seedance_2_5','kling4_0','wan-prime']"));
+ assert.ok(video.includes("['seedance_2_5','seedance_2_5_flash','kling4_hf','kling4_0','wan-prime']"));
+ assert.ok(video.includes("?query.model:'wan-prime'")); // Standard Video starts on the ordinary video workflow.
  assert.ok(studio.includes('new URLSearchParams(window.location.search)'));
 });
 test('hero typography and cards adapt to desktop tablet and mobile viewports',()=>{
@@ -39,4 +40,17 @@ test('official customer models show genuinely supported, charged outputs only',(
  assert.match(studio,/model.refs>0&&/);
  assert.doesNotMatch(studio,/Provider endpoint found/);
  assert.match(studio,/Ready to create/);
+});
+
+test('studio navigation keeps Business Seedance and Motion separate from standard Video',()=>{
+ const business=read('app/k4k-app/business/page.js');
+ const dashboard=read('app/k4k-app/dashboard/page.js');
+ const picker=read('app/k4k-app/CompactCreationStudio.js');
+ assert.ok(home.includes('href="/k4k-app/business"'));
+ assert.ok(shell.includes('href="/k4k-app/business"'));
+ assert.ok(business.includes("'seedance_2_5_flash','seedance_2_5'"));
+ assert.ok(business.includes('720p'));
+ assert.ok(picker.includes("item.id==='wan-prime'"));
+ assert.ok(picker.includes('BUSINESS STUDIO · SEEDANCE'));
+ assert.ok(dashboard.includes('<AccountDashboard/>'));
 });
