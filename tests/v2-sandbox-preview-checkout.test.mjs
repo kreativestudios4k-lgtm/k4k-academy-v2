@@ -72,6 +72,9 @@ test('TEST-only writer builds single-item checkout with no coupons or LIVE keys 
  assert.equal(f.get('metadata[credit_version]'),'v2');
  assert.equal(f.get('metadata[kind]'),'k4k_v2_single_video');
  assert.equal(f.get('automatic_tax[enabled]'),'true');
+ assert.equal(f.get('customer_update[address]'),'auto');
+ assert.equal(f.get('managed_payments[enabled]'),'false');
+ assert.equal(f.get('payment_method_types[0]'),null);
  assert.equal(f.get('customer'),customer.id);
  assert.ok(f.get('success_url').startsWith('https://k4k-nextjs-isolated-preview-'));
  assert.equal(calls[1].auth,'Bearer sk_test_mock1234567890');
