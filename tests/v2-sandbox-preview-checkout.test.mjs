@@ -103,10 +103,13 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
  };
  const handler=createV2SandboxWebhookDispatcher({stripe,gateway,env:testEnv});
  const event={id:'evt_test_1234567890',livemode:false,type:'customer.subscription.deleted',data:{object:{id:'sub_test_1234567890'}}};
- for(const type of ['invoice.payment_failed','checkout.session.expired','customer.subscription.deleted']){
+ for(const type of ['invoice.payment_failed','checkout.session.expired']){
   await assert.rejects(handler.handleVerifiedEvent({...event,type}),
    /V2_TEST_ACCOUNT_STATE_RECONCILIATION_PENDING/);
  }
+ const ignoredCancel=await handler.handleVerifiedEvent(event);
+ assert.equal(ignoredCancel.handled,false);
+ assert.equal(ignoredCancel.reason,'OUTSIDE_K4K_V2_TEST_SCOPE');
  const outside=await handler.handleVerifiedEvent({...event,type:'customer.created'});
  assert.equal(outside.handled,false);
  assert.equal(queries,0);
@@ -114,6 +117,51 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
  await assert.rejects(handler.handleVerifiedEvent({...event,type:'charge.dispute.created'}),/V2_TEST_DISPUTE_REVIEW_REQUIRED/);
  assert.equal(queries,0);
 });
+test('TEST subscription cancellation is verified against current Stripe state and exact bound owner, then idempotent',async()=>{
+ const sid='sub_test_cancel12345678',cid='cus_test_cancel12345678';
+ const priceId=V2_SANDBOX_PRICE_CONTRACTS.starterGBP.priceId;
+ let readCount=0,writeCount=0,status='active';
+ let stripeStatus='canceled',stripeOwner=user;
+ const stripe={
+  getSession:async()=>{throw Error('not called');},
+  getInvoice:async()=>{throw Error('not called');},
+  async getSubscription(id){
+   readCount++;
+   assert.equal(id,sid);
+   return {id:sid,livemode:false,status:stripeStatus,customer:cid,
+    metadata:{kind:'k4k_v2_subscription',credit_version:'v2',user_id:stripeOwner},
+    items:{data:[{price:{id:priceId},quantity:1}]}};
+  }
+ };
+ const gateway={
+  findSessionBinding:async()=>null,activatePendingBinding:async()=>null,
+  insertPendingBinding:async()=>null,rpc:async()=>{throw Error('credit RPC must never be called');},
+  async findBinding(){return {userId:user,kind:'subscription',status,priceId,
+   customerId:cid,subscriptionId:sid,sessionId:'cs_test_fake12345678'};},
+  async cancelSubscriptionBinding(current){
+   writeCount++;assert.equal(current.status,'active');
+   status='canceled';
+   return {...current,status:'canceled'};
+  }
+ };
+ const handler=createV2SandboxWebhookDispatcher({stripe,gateway,env:testEnv});
+ const event={id:'evt_test_cancel12345678',livemode:false,type:'customer.subscription.deleted',
+  data:{object:{id:sid,metadata:{credit_version:'v2',kind:'k4k_v2_subscription'}}}};
+ const first=await handler.handleVerifiedEvent(event);
+ assert.deepEqual({handled:first.handled,kind:first.kind,duplicate:first.duplicate,credits:first.credits},
+  {handled:true,kind:'subscription_canceled',duplicate:false,credits:0});
+ const repeat=await handler.handleVerifiedEvent(event);
+ assert.equal(repeat.handled,true);
+ assert.equal(repeat.duplicate,true);
+ assert.equal(writeCount,1);
+ assert.equal(readCount,2);
+ stripeStatus='active';
+ await assert.rejects(handler.handleVerifiedEvent(event),/V2_TEST_CANCEL_UNVERIFIED/);
+ stripeStatus='canceled';stripeOwner='22222222-2222-4222-8222-222222222222';
+ await assert.rejects(handler.handleVerifiedEvent(event),/V2_TEST_CANCEL_BINDING_INVALID/);
+ assert.equal(writeCount,1);
+});
+
 test('TEST webhook ignores unrelated Checkout, invoice, and refund account events without Stripe reads or grants',async()=>{
  let n=0;
  const stripe={getInvoice:async()=>{n++;},getSession:async()=>{n++;return {id:'cs_test_bad_1234567890',status:'open',payment_status:'unpaid'};}};
