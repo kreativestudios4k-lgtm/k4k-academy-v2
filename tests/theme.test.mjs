@@ -63,3 +63,13 @@ test('K4K pricing and studio views use dedicated responsive neon layouts',()=>{
  assert.match(creator,/k4k-creator-layout/);
  assert.match(creator,/extraUrlRegistry/);
 });
+
+test('alternate public registration routes both verified sessions and email-confirmed users to plan selection',()=>{
+ const page=source('app/k4k-app/register/page.js');
+ assert.match(page,/emailRedirectTo:window\.location\.origin\+'\/auth\/callback\?next=%2Fk4k-app%2Fcredits'/);
+ assert.match(page,/if\(data\?\.session\)\{window\.location\.assign\('\/k4k-app\/credits'\);return\}/);
+ assert.match(page,/\/login\?next=%2Fk4k-app%2Fcredits/);
+ assert.doesNotMatch(page,/\/login\?next=%2Fk4k-app%2Faccount/);
+ assert.match(page,/Registration does not activate a subscription or grant credits/);
+ assert.match(page,/Stripe TEST mode/);
+});
