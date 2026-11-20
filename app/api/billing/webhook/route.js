@@ -40,7 +40,9 @@ function isNonSubscriptionEvent(event) {
     return !invoiceSubscriptionId(object);
   }
   if (event.type === 'checkout.session.completed') {
-    return object?.mode !== 'subscription'&&!['k4k_credit_pack','k4k_manual_pix'].includes(object?.metadata?.kind);
+    // Never acknowledge a signed V2 one-time payment as a non-subscription event.
+    // Its adapter must grant exactly once or respond 503 for Stripe retry.
+    return object?.mode !== 'subscription'&&!['k4k_credit_pack','k4k_manual_pix','k4k_v2_single_video'].includes(object?.metadata?.kind);
   }
   return false;
 }
