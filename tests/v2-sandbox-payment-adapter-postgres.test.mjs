@@ -119,6 +119,28 @@ test('Stripe TEST Starter invoice grants 420 only once in isolated V2 wallet; le
   assert.equal(await legacy(pg),80);
  }finally{await pg.close()}
 });
+test('modern Stripe TEST paid invoice without legacy paid property credits once',async()=>{
+ const {pg,gateway}=await setup();try{
+  const {paid:discarded,...current}=mockInvoice('starterGBP');
+  current.subscription=null;
+  current.parent={subscription_details:{subscription:'sub_test_starter12345',
+   metadata:{credit_version:'v2',kind:'k4k_v2_subscription',user_id:user}}};
+  current.lines={data:[{pricing:{price_details:{price:p.starterGBP.priceId}},quantity:1}]};
+  const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe:{
+   getInvoice:async()=>current,getSession:async()=>mockSession()
+  }});
+  const first=await adapter.applyPaidInvoice({
+   invoiceId:current.id,eventId:'evt_test_modern_paid12345'
+  });
+  const retry=await adapter.applyPaidInvoice({
+   invoiceId:current.id,eventId:'evt_test_modern_retry12345'
+  });
+  assert.equal(first.credited,true);
+  assert.equal(retry.credited,false);
+  assert.equal((await balance(pg)).available,420);
+  assert.equal(await legacy(pg),80);
+ }finally{await pg.close()}
+});
 test('Creator BRL R$224.90 TEST invoice safely credits exactly 840 V2 credits',async()=>{
  const {pg,gateway}=await setup();try{
   const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe:{
