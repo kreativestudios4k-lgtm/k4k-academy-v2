@@ -141,6 +141,58 @@ test('modern Stripe TEST paid invoice without legacy paid property credits once'
   assert.equal(await legacy(pg),80);
  }finally{await pg.close()}
 });
+test('TEST monthly renewal grants another 420 once, ignoring webhook replays and preserving legacy credits',async()=>{
+ const {pg,gateway}=await setup();try{
+  const initial=mockInvoice('starterGBP');
+  const renewal=mockInvoice('starterGBP',{
+   id:'in_test_starter_renewal123456',billing_reason:'subscription_cycle'
+  });
+  const stripe={getInvoice:async id=>{
+   if(id===initial.id)return initial;
+   if(id===renewal.id)return renewal;
+   throw Error('UNEXPECTED_INVOICE');
+  },getSession:async()=>mockSession()};
+  const adapter=createV2SandboxPaymentAdapter({stripe,gateway,env});
+  const first=await adapter.applyPaidInvoice({
+   invoiceId:initial.id,eventId:'evt_test_initial_renewal12345'
+  });
+  const cycle=await adapter.applyPaidInvoice({
+   invoiceId:renewal.id,eventId:'evt_test_monthly_cycle12345'
+  });
+  const replay=await adapter.applyPaidInvoice({
+   invoiceId:renewal.id,eventId:'evt_test_monthly_cycle_replay12345'
+  });
+  assert.equal(first.credited,true);
+  assert.equal(cycle.credited,true);
+  assert.equal(replay.credited,false);
+  assert.equal((await balance(pg)).available,840);
+  assert.equal((await pg.query("select count(*)::int as n from public.k4k_v2_credit_receipts where source_kind='subscription_invoice'")).rows[0].n,2);
+  assert.equal(await legacy(pg),80);
+ }finally{await pg.close()}
+});
+test('failed TEST renewal invoice cannot add credits or invent a paid receipt',async()=>{
+ const {pg,gateway}=await setup();try{
+  const initial=mockInvoice('starterGBP');
+  const failure=mockInvoice('starterGBP',{
+   id:'in_test_starter_declined12345',status:'open',paid:false,
+   amount_paid:0,amount_remaining:p.starterGBP.amountMinor,
+   billing_reason:'subscription_cycle'
+  });
+  const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe:{
+   getInvoice:async id=>id===failure.id?failure:initial,
+   getSession:async()=>mockSession()
+  }});
+  await adapter.applyPaidInvoice({
+   invoiceId:initial.id,eventId:'evt_test_before_failed_cycle12345'
+  });
+  await assert.rejects(adapter.applyPaidInvoice({
+   invoiceId:failure.id,eventId:'evt_test_failed_cycle12345'
+  }),/V2_TEST_INVOICE_INVALID/);
+  assert.equal((await balance(pg)).available,420);
+  assert.equal((await pg.query("select count(*)::int as n from public.k4k_v2_credit_receipts where source_kind='subscription_invoice'")).rows[0].n,1);
+  assert.equal(await legacy(pg),80);
+ }finally{await pg.close()}
+});
 test('Creator BRL R$224.90 TEST invoice safely credits exactly 840 V2 credits',async()=>{
  const {pg,gateway}=await setup();try{
   const adapter=createV2SandboxPaymentAdapter({gateway,env,stripe:{
