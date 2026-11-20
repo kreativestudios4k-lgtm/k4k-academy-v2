@@ -114,6 +114,36 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
  await assert.rejects(handler.handleVerifiedEvent({...event,type:'charge.dispute.created'}),/V2_TEST_DISPUTE_REVIEW_REQUIRED/);
  assert.equal(queries,0);
 });
+test('TEST webhook ignores unrelated Checkout, invoice, and refund account events without Stripe reads or grants',async()=>{
+ let n=0;
+ const stripe={getInvoice:async()=>{n++;},getSession:async()=>{n++;}};
+ const gateway={findBinding:async()=>{n++;},rpc:async()=>{n++;},
+  insertPendingBinding:async()=>{n++;},findSessionBinding:async()=>{n++;},
+  activatePendingBinding:async()=>{n++;},
+  findReceipt:async()=>{n++;return null;}
+ };
+ const dispatcher=createV2SandboxWebhookDispatcher({stripe,gateway,env:testEnv});
+ const other={
+  id:'evt_external_1234567890',livemode:false,
+  type:'checkout.session.completed',
+  data:{object:{id:'cs_test_other_1234567890',metadata:{kind:'different_project'}}}
+ };
+ const ignored=await dispatcher.handleVerifiedEvent(other);
+ assert.equal(ignored.handled,false);
+ const externalInvoice=await dispatcher.handleVerifiedEvent({...other,type:'invoice.paid',
+  data:{object:{id:'in_other_123456789',lines:{data:[{price:{id:'price_not_our_test_price'}}]}}}});
+ assert.equal(externalInvoice.handled,false);
+ const externalRefund=await dispatcher.handleVerifiedEvent({...other,type:'charge.refunded',
+  data:{object:{id:'ch_other_123456789',payment_intent:null}}});
+ assert.equal(externalRefund.handled,false);
+ assert.equal(n,0);
+ await assert.rejects(dispatcher.handleVerifiedEvent({...other,
+  data:{object:{id:'cs_test_bad_1234567890',metadata:{
+   credit_version:'v2',kind:'k4k_v2_single_video'
+  }}}}),/V2_TEST_CHECKOUT_SESSION_INVALID/);
+ assert.equal(n,1);
+});
+
 test('new HTTP routes preserve compile-time shutdown and dedicated Stripe TEST-only credentials',()=>{
  const checkout=readFileSync(new URL('../app/api/v2/sandbox/checkout/route.js',import.meta.url),'utf8');
  const webhook=readFileSync(new URL('../app/api/v2/sandbox/webhook/route.js',import.meta.url),'utf8');
