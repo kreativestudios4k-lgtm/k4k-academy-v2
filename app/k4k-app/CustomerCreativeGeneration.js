@@ -9,13 +9,16 @@ async function call(body){
  if(!r.ok||json.error)throw Error(json.error||'Generation unavailable');
  return json;
 }
-export default function CustomerCreativeGeneration({model,mode,prompt,aspect,duration,resolution,referenceCount=0,onModels}){
+export default function CustomerCreativeGeneration({model,mode,prompt,aspect,duration,resolution,referenceCount=0,onModels,stayInWorkspace=false}){
  const [access,setAccess]=useState({}),[quote,setQuote]=useState(null),[jobs,setJobs]=useState([]),[busy,setBusy]=useState(false),[info,setInfo]=useState(''),[result,setResult]=useState(null);
  const lock=useRef(false),key=useRef(null);
  const enabled=access[model.id]===true&&(mode==='Text to video'||mode==='Text to image');
  useEffect(()=>{let alive=true;call({action:'models'}).then(v=>{if(alive){const availability=Object.fromEntries(v.models.map(m=>[m.id,m.enabled]));setAccess(availability);onModels?.(availability)}}).catch(()=>{if(alive){setAccess({});onModels?.({})}});call({action:'list'}).then(v=>{if(alive)setJobs(v.jobs||[])}).catch(()=>{});return()=>{alive=false}},[]);
  useEffect(()=>{setQuote(null);setResult(null);key.current=null;setInfo('')},[model.id,mode,prompt,aspect,duration,resolution]);
- if(!enabled)return <p style={{marginTop:12,fontSize:13,color:'#c9d0cb'}}>To generate with this model, <a href="/login" style={{textDecoration:'underline'}}>sign in</a> and select the text-only workflow. Models without public approval remain unavailable.</p>;
+ if(!enabled)return <section className="kcs-generation-panel" aria-label="Generation availability">
+  <button type="button" className="kcs-generate-primary" disabled aria-disabled="true">Generate · unavailable</button>
+  <p style={{marginTop:8,fontSize:12,color:'#bcbec6'}}>Sign in and select a supported text-only workflow. Models without approved API access remain unavailable; no credits are charged.</p>
+ </section>;
  async function attempt(fn){
   if(lock.current)return;lock.current=true;setBusy(true);
   try{await fn()}catch(e){setInfo(e.message)}finally{lock.current=false;setBusy(false)}
@@ -41,8 +44,8 @@ export default function CustomerCreativeGeneration({model,mode,prompt,aspect,dur
      const requestKey=key.current||crypto.randomUUID();key.current=requestKey;
      const v=await call({action:'submit',jobId:quote.jobId,quoteToken:quote.quoteToken,requestKey});
      setJobs(j=>[{id:quote.jobId,model:model.id,status:v.status,media_kind:model.kind,credits_quoted:quote.credits},...j.filter(x=>x.id!==quote.jobId)]);
-     setQuote(null);setInfo('Generation submitted. Opening your generations…');
-     window.location.assign('/k4k-app/videos#creative-generations');
+     setQuote(null);setInfo(stayInWorkspace?'Generation submitted. You can check its progress here or open your private Library.':'Generation submitted. Opening your generations…');
+     if(!stayInWorkspace)window.location.assign('/k4k-app/videos#creative-generations');
     })} className="kcs-generate-primary">{busy?'Submitting…':'Confirm & Generate · '+quote.credits+' credits'}</button>
     <button onClick={()=>{setQuote(null);key.current=null}} style={{marginLeft:10,padding:'11px 15px',borderRadius:8}}>Cancel</button>
    </div>}

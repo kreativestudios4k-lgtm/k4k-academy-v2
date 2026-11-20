@@ -25,7 +25,8 @@ function useLocalPreview(){
  useEffect(()=>{if(!file){setUrl('');return;}const objectUrl=URL.createObjectURL(file);setUrl(objectUrl);return()=>URL.revokeObjectURL(objectUrl)},[file]);
  return {file,url,setFile};
 }
-export default function Creator(){
+function EmbeddedCreatorFrame({children}){return <>{children}</>}
+export default function Creator({embedded=false}){
  const {locale}=useK4KLocale();
  const video=useLocalPreview(),character=useLocalPreview();
  const [extraImages,setExtraImages]=useState([]),[activeTab,setActiveTab]=useState('Motion Transfer'),[quality,setQuality]=useState('720p');
@@ -230,7 +231,8 @@ export default function Creator(){
   const referenceCount=extraImages.length+(character.file?1:0);
   const previewUrl=video.url||generationReference(selectedPreset).url;
   const previewTitle=video.file?.name||selectedPreset?.title||tr('Your next scene starts here.','Sua próxima cena começa aqui.','Tu próxima escena empieza aquí.');
-  return <PreviewShell active="Creator" studio>
+  const Frame=embedded?EmbeddedCreatorFrame:PreviewShell;
+ return <Frame active="Creator" studio>
    <CheckoutReturn/>
    <div className={'ks k4k-creator-layout ks-redesign ks-view-'+workspaceView}>
     <aside className="ks-panel" aria-label="Video creation settings">
@@ -281,5 +283,5 @@ export default function Creator(){
      </>}
     </section>
    </div>
-  </PreviewShell>;
+  </Frame>;
 }

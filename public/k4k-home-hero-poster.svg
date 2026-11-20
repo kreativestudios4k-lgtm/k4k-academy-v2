@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="K4K black chrome cinematic hero poster">
+<defs>
+ <radialGradient id="bg"><stop stop-color="#414147"/><stop offset=".58" stop-color="#101115"/><stop offset="1" stop-color="#020203"/></radialGradient>
+ <linearGradient id="silver" x1="0" x2=".7" y1="0" y2="1"><stop stop-color="#55575f"/><stop offset=".17" stop-color="#f9f9fa"/><stop offset=".35" stop-color="#63666d"/><stop offset=".55" stop-color="#e5e5e9"/><stop offset=".77" stop-color="#44464e"/><stop offset="1" stop-color="#f3f3f6"/></linearGradient>
+ <linearGradient id="beam" x1=".5" x2=".5" y1="0" y2="1"><stop stop-color="#f8f8ff" stop-opacity=".58"/><stop offset="1" stop-color="#9a9ba8" stop-opacity="0"/></linearGradient>
+ <radialGradient id="mist"><stop stop-color="#d4d4d9" stop-opacity=".21"/><stop offset="1" stop-color="#a2a2aa" stop-opacity="0"/></radialGradient>
+ <filter id="blur"><feGaussianBlur stdDeviation="16"/></filter>
+ <filter id="glow"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<rect width="1600" height="900" fill="url(#bg)"/>
+<path d="M100 0 350 0 740 700 630 900Z" fill="url(#beam)" opacity=".23"/>
+<path d="M1180 0 1370 0 1060 900 950 700Z" fill="url(#beam)" opacity=".2"/>
+<g fill="none" stroke="url(#silver)" transform="translate(800 -80)">
+ <ellipse cx="0" cy="170" rx="495" ry="186" stroke-width="52" opacity=".84"/>
+ <ellipse cx="0" cy="170" rx="410" ry="150" stroke-width="9" opacity=".92"/>
+ <ellipse cx="0" cy="170" rx="350" ry="111" stroke-width="5" opacity=".6"/>
+</g>
+<g stroke="#bcbcc3" stroke-width="21" opacity=".2"><path d="M-80 0 370 900"/><path d="M1690 0 1190 900"/><path d="M250 0 570 900"/><path d="M1370 0 1100 900"/></g>
+<ellipse cx="800" cy="805" rx="690" ry="160" fill="#9798a0" opacity=".17" filter="url(#blur)"/>
+<ellipse cx="800" cy="768" rx="535" ry="100" fill="#1e1f24" stroke="url(#silver)" stroke-width="13"/>
+<ellipse cx="800" cy="760" rx="420" ry="64" fill="none" stroke="#e6e6ed" stroke-width="4" opacity=".45"/>
+<ellipse cx="820" cy="660" rx="480" ry="160" fill="url(#mist)" filter="url(#blur)"/>
+<text x="800" y="530" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="284" font-weight="900" letter-spacing="-32" fill="#020304" opacity=".7" transform="translate(20 19)">K4K</text>
+<text x="800" y="530" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="284" font-weight="900" letter-spacing="-32" fill="url(#silver)">K4K</text>
+<path d="M0 670 Q800 540 1600 680 L1600 900 0 900Z" fill="#020203" opacity=".3"/>
+</svg>
