@@ -103,9 +103,11 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
  };
  const handler=createV2SandboxWebhookDispatcher({stripe,gateway,env:testEnv});
  const event={id:'evt_test_1234567890',livemode:false,type:'customer.subscription.deleted',data:{object:{id:'sub_test_1234567890'}}};
- await assert.rejects(handler.handleVerifiedEvent({
+ const externalExpired=await handler.handleVerifiedEvent({
   ...event,type:'checkout.session.expired'
- }),/V2_TEST_ACCOUNT_STATE_RECONCILIATION_PENDING/);
+ });
+ assert.equal(externalExpired.handled,false);
+ assert.equal(externalExpired.reason,'OUTSIDE_K4K_V2_TEST_SCOPE');
  const externalFailure=await handler.handleVerifiedEvent({
   ...event,type:'invoice.payment_failed'
  });
