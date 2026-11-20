@@ -4,8 +4,11 @@ import {readFileSync} from 'node:fs';
 import {currencyForCountry} from '../lib/k4k-market.mjs';
 import {resolvePrice} from '../lib/server/stripe-billing.mjs';
 const route=readFileSync(new URL('../app/api/billing/checkout/route.js',import.meta.url),'utf8');
-test('server derives checkout currency from edge country rather than trusting request body',()=>{
- assert.match(route,/currencyForCountry\(request\.headers\.get\('x-vercel-ip-country'\)\)/);
+test('server derives checkout currency from verified V2 assertion or direct Vercel edge rather than browser body',()=>{
+ assert.match(route,/verifiedBillingCountry\(request\.headers,\{body:rawBody,token\}\)/);
+ assert.match(route,/customerCountry=request\.headers\.get\('x-vercel-ip-country'\)/);
+ assert.match(route,/currencyForCountry\(customerCountry\)/);
+ assert.match(route,/COUNTRY_RELAY_INVALID/);
  assert.match(route,/body\?\.currency !== expectedCurrency/);
  assert.match(route,/resolvePrice\(body\?\.plan, expectedCurrency\)/);
  assert.match(route,/currency: expectedCurrency/);
