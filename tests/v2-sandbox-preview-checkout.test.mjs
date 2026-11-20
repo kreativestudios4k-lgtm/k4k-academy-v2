@@ -116,7 +116,7 @@ test('sandbox dispatcher rejects LIVE events and dispute automation while ignori
 });
 test('TEST webhook ignores unrelated Checkout, invoice, and refund account events without Stripe reads or grants',async()=>{
  let n=0;
- const stripe={getInvoice:async()=>{n++;},getSession:async()=>{n++;}};
+ const stripe={getInvoice:async()=>{n++;},getSession:async()=>{n++;return {id:'cs_test_bad_1234567890',status:'open',payment_status:'unpaid'};}};
  const gateway={findBinding:async()=>{n++;},rpc:async()=>{n++;},
   insertPendingBinding:async()=>{n++;},findSessionBinding:async()=>{n++;},
   activatePendingBinding:async()=>{n++;},
@@ -140,7 +140,7 @@ test('TEST webhook ignores unrelated Checkout, invoice, and refund account event
  await assert.rejects(dispatcher.handleVerifiedEvent({...other,
   data:{object:{id:'cs_test_bad_1234567890',metadata:{
    credit_version:'v2',kind:'k4k_v2_single_video'
-  }}}}),/V2_TEST_CHECKOUT_SESSION_INVALID/);
+  }}}}),/V2_TEST_SESSION_NOT_PAID/);
  assert.equal(n,1);
 });
 
