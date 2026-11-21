@@ -65,7 +65,7 @@ function paidTestInvoiceArgs(event:Record<string,unknown>):Record<string,unknown
  if(!invoice||invoice.object!=="invoice"||invoice.livemode!==false||
   invoice.status!=="paid"||invoice.paid_out_of_band===true||
   invoice.collection_method!=="charge_automatically"||
-  !["subscription_create","subscription_cycle"].includes(String(invoice.billing_reason))||
+  !["subscription_create","subscription_cycle","subscription_update"].includes(String(invoice.billing_reason))||
   invoice.currency!=="gbp"||invoice.subtotal!==1599||
   invoice.total!==1599||invoice.amount_paid!==1599||invoice.amount_due!==1599||
   invoice.amount_remaining!==0||
@@ -133,7 +133,10 @@ Deno.serve(async request=>{
     p?.price!==PRICE)
   return reply({received:true,handled:false,creditsAdded:0},200);
  const args=paidTestInvoiceArgs(event);
- if(!args)return reply({error:"SIGNED_INVOICE_PROOF_UNVERIFIED"},503);
+ if(!args){
+  console.warn("K4K_V3_PHASE43_TEST_PROOF_REJECTED");
+  return reply({error:"SIGNED_INVOICE_PROOF_UNVERIFIED"},503);
+ }
  try{
   const result=await fetch(DB+"/rest/v1/rpc/k4k_v3_test_phase43_grant_signed_invoice",{
    method:"POST",cache:"no-store",redirect:"error",
