@@ -53,6 +53,10 @@ export async function POST(request){
  if(event?.type!=='invoice.paid')
   return reply({received:true,handled:false,creditsAdded:0},200);
  const snapshot=event?.data?.object;
+ // Trial-start and zero-value invoices are never purchases: acknowledge
+ // without Stripe reads, DB writes or retry storms.
+ if(!Number.isSafeInteger(snapshot?.amount_paid)||snapshot.amount_paid<=0)
+  return reply({received:true,handled:false,creditsAdded:0},200);
  const hinted=snapshot?.lines?.data?.[0]?.pricing?.price_details?.price||
   snapshot?.lines?.data?.[0]?.price?.id;
  // Stripe webhooks are account-wide: unrelated apps' invoices are not ours.
