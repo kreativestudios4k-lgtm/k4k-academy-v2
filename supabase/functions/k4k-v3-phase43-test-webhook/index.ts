@@ -126,7 +126,8 @@ Deno.serve(async request=>{
  if(event.type!=="invoice.paid")
   return reply({received:true,handled:false,creditsAdded:0},200);
  const invoice=val(val(event.data)?.object);
- const l=val(val(invoice?.lines)?.data?.[0]);
+ const eventLines=val(invoice?.lines);
+ const l=val(Array.isArray(eventLines?.data)?eventLines.data[0]:null);
  const p=val(val(l?.pricing)?.price_details);
  if(!safeMoney(invoice?.amount_paid)||invoice?.amount_paid===0||
     p?.price!==PRICE)
