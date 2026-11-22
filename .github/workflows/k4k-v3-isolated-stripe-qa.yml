@@ -1,0 +1,38 @@
+name: K4K V3 Isolated Stripe QA
+
+on:
+  push:
+    branches:
+      - feat/v3-isolated-signed-webhook-qa-20261121
+    paths:
+      - '.github/workflows/k4k-v3-isolated-stripe-qa.yml'
+      - 'tests/**'
+      - 'lib/server/**'
+      - 'app/api/v3/sandbox/webhook/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  safe-stripe-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VERCEL_ENV: preview
+      K4K_V3_TEST_WEBHOOK_ENABLED: 'false'
+      K4K_LIVE_PAYMENTS_ENABLED: 'false'
+      K4K_ENABLE_PRODUCTION_GENERATION: 'false'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Invoice idempotency and safety
+        run: npm run test:billing
+      - name: V3 signed webhook validation (synthetic, no network writes)
+        run: node --test tests/v3-isolated-signed-webhook.test.mjs
+      - name: Customer journey regression
+        run: npm run test:journey
