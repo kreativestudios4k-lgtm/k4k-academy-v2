@@ -73,3 +73,19 @@ test('alternate public registration routes both verified sessions and email-conf
  assert.match(page,/Registration does not activate a subscription or grant credits/);
  assert.match(page,/Stripe TEST mode/);
 });
+
+test('public registration normalizes whitespace and rejects whitespace inside email addresses',()=>{
+ const page=source('app/k4k-app/register/page.js');
+ const normalization=page.match(/name\.trim\(\)\.replace\((\/.*?\/g),' '\)/);
+ const emailPattern=page.match(/if\(!((?:\/.*?\/))\.test\(address\)\)/);
+ assert.ok(normalization,'name whitespace normalization must exist');
+ assert.ok(emailPattern,'email validation must exist');
+ const nameRegex=new RegExp(normalization[1].slice(1,-2),'g');
+ const emailRegex=new RegExp(emailPattern[1].slice(1,-1));
+ assert.equal(' Ada   Lovelace '.trim().replace(nameRegex,' '),'Ada Lovelace');
+ assert.equal('Ada\t\nLovelace'.replace(nameRegex,' '),'Ada Lovelace');
+ assert.ok(emailRegex.test('creator@example.com'));
+ for(const invalid of ['user name@example.com','user\tname@example.com','user@example .com','user@example.com\n','user@example.com\r']){
+  assert.equal(emailRegex.test(invalid),false,JSON.stringify(invalid)+' must be rejected');
+ }
+});
