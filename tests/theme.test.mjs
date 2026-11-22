@@ -85,7 +85,7 @@ test('public registration normalizes whitespace and rejects whitespace inside em
  assert.equal(' Ada   Lovelace '.trim().replace(nameRegex,' '),'Ada Lovelace');
  assert.equal('Ada\t\nLovelace'.replace(nameRegex,' '),'Ada Lovelace');
  assert.ok(emailRegex.test('creator@example.com'));
- for(const invalid of ['user name@example.com','user\tname@example.com','user@example .com','user@example.com\n','user@example.com\r']){
+ for(const invalid of ['user name@example.com','user\tname@example.com','user@example .com','user@exam\nple.com','user@exam\rple.com']){
   assert.equal(emailRegex.test(invalid),false,JSON.stringify(invalid)+' must be rejected');
  }
 });
