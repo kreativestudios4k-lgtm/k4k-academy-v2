@@ -6,6 +6,7 @@ import catalogue from './template-catalogue.json';
 import {useK4KLocale} from './locale';
 import {useVerifiedAccount} from './useVerifiedAccount';
 import AccountMenu from './AccountMenu';
+import QuickCreate from './QuickCreate';
 import './creative-home.css';
 import './k4k-violet-hero.css';
 import './k4k-abstract-landing.css';
@@ -75,6 +76,7 @@ export default function CreativeHome(){
          <div className="khf-reference-bottomtag" aria-hidden="true"><span>CREATE</span><i/><span>EDIT</span><i/><span>GENERATE</span><i/><span>SCALE</span></div>
        </div>
      </section>
+     <QuickCreate/>
      <section className="khf-toolband" aria-label={tr('Creation shortcuts','Acesso rápido','Accesos rápidos')}>
        <div className="khf-toolband-inner">
          <div className="khf-toolband-heading"><span>{tr('WHAT WILL YOU CREATE?','O QUE VAI CRIAR?','¿QUÉ VAS A CREAR?')}</span><strong>{tr('Your next project starts here.','Seu próximo projeto começa aqui.','Tu próximo proyecto comienza aquí.')}</strong></div>
